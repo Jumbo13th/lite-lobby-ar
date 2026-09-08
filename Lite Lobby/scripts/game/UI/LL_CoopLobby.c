@@ -419,8 +419,56 @@ class LL_CoopLobby : MenuBase
 			AddPlayer(playerId);
 		}
 
+		SortPlayerList();
+
 		// A rebuild recreates every row, so a search typed before it must be re-applied.
 		ApplyPlayerFilter();
+	}
+
+	// Rows are reordered in place through their Z order, the way the vanilla scoreboard
+	// does it, so a name change or a late join never recreates the list.
+	protected void SortPlayerList()
+	{
+		array<LL_PlayerSelector> rows = {};
+		for (int i = 0; i < m_mPlayers.Count(); i++)
+		{
+			rows.Insert(m_mPlayers.GetElement(i));
+		}
+
+		int n = rows.Count();
+		for (int i = 1; i < n; i++)
+		{
+			LL_PlayerSelector cur = rows[i];
+			int j = i - 1;
+			while (j >= 0 && PlayerOrderedBefore(cur, rows[j]))
+			{
+				rows[j + 1] = rows[j];
+				j--;
+			}
+			rows[j + 1] = cur;
+		}
+
+		for (int i = 0; i < n; i++)
+		{
+			Widget root = rows[i].GetRootWidget();
+			if (root)
+				root.SetZOrder(i);
+		}
+	}
+
+	// Unit-tagged names first, then alphabetical ignoring case. The tag rule is explicit
+	// because "[" sorts after upper-case letters and before lower-case ones.
+	protected static bool PlayerOrderedBefore(LL_PlayerSelector a, LL_PlayerSelector b)
+	{
+		string nameA = a.GetPlayerName();
+		string nameB = b.GetPlayerName();
+
+		bool unitA = LL_LobbyManager.HasUnitTag(nameA);
+		bool unitB = LL_LobbyManager.HasUnitTag(nameB);
+		if (unitA != unitB)
+			return unitA;
+
+		return nameA.Compare(nameB, false) < 0;
 	}
 
 	protected void OnPlayerSearchChanged(string text)
@@ -564,6 +612,7 @@ class LL_CoopLobby : MenuBase
 		if (m_mPlayers.Find(playerId, playerSel))
 		{
 			playerSel.UpdateName(name);
+			SortPlayerList();
 			ApplyPlayerFilter();
 		}
 	}
@@ -627,7 +676,10 @@ class LL_CoopLobby : MenuBase
 		// A player connecting after the menu was built must get a row even if their name
 		// event raced the menu open.
 		if (connected && !m_mPlayers.Contains(playerId))
+		{
 			AddPlayer(playerId);
+			SortPlayerList();
+		}
 
 		UpdatePlayerInList(playerId);
 		UpdatePlayerCounter();

@@ -133,6 +133,11 @@ class LL_PlayerSelector : SCR_ButtonBaseComponent
 		return m_iPlayerId;
 	}
 
+	string GetPlayerName()
+	{
+		return m_sPlayerName;
+	}
+
 	protected void RebuildSearchText()
 	{
 		m_sSearchText = m_sPlayerName + " " + m_sRoleText;
