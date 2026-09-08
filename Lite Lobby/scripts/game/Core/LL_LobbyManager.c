@@ -161,16 +161,21 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		return "";
 	}
 
+	// One rule for colouring and ordering, so a name is never coloured as a unit but sorted as
+	// a player, or the reverse.
+	static bool HasUnitTag(string name)
+	{
+		return name.IndexOf("[") == 0 && name.IndexOf("]") >= 2;
+	}
+
 	// Render-time only: the stored name stays plain so non-rich renderers and name
 	// comparisons never see markup.
 	static string FormatPlayerNameRich(string name)
 	{
-		if (name.IndexOf("[") != 0)
+		if (!HasUnitTag(name))
 			return name;
 
 		int close = name.IndexOf("]");
-		if (close < 2)
-			return name;
 
 		// 226,167,79 = UIColors.CONTRAST_COLOR, the vanilla UI accent orange.
 		return string.Format("<color rgba=\"226,167,79,255\">%1</color>%2",
