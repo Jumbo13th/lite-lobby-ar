@@ -1,0 +1,12 @@
+GenericEntity : "{414422551A9A33EE}PrefabLibrary/CainLibrary/Props/Military/UAZ452_wreck_static.et" {
+ coords 1984.045 60.399 2222.916
+ angles 0 -11.62 0
+}
+SCR_DestructibleBuildingEntity : "{4DD5F16D919A99F4}Prefabs/Structures/Military/Bunkers/Bunker_01/Bunker_01_3fp_Base.et" {
+ coords 1966.477 0.437 2219.956
+ angles 0 -99.608 0
+}
+GenericEntity : "{BB033EBC565E7577}PrefabLibrary/DefaultLibrary/Props/Military/UAZ469_wreck.et" {
+ coords 1981.4 60.116 2229.893
+ angles 0.832 -21.713 -0.331
+}

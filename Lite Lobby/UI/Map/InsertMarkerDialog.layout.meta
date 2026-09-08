@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{1D21A7B8C9D0E1F2}UI/Map/InsertMarkerDialog.layout"
+ Configurations {
+  LayoutResourceClass PC {
+  }
+  LayoutResourceClass XBOX_ONE : PC {
+  }
+  LayoutResourceClass XBOX_SERIES : PC {
+  }
+  LayoutResourceClass PS4 : PC {
+  }
+  LayoutResourceClass PS5 : PC {
+  }
+  LayoutResourceClass HEADLESS : PC {
+  }
+ }
+}

@@ -1,0 +1,17 @@
+PolylineShapeEntity {
+ ID "699C978A0572D9A4"
+ components {
+  LL_FreezeZoneComponent "{699C978A138275B7}" {
+   m_fReturnSeconds 20
+  }
+  LL_MapZoneComponent "{699C978BF6DDCE0C}" {
+   m_FillColor 0.561 0.071 0.439 0.392
+   m_OutlineColor 0.502 0 0.376 1
+   m_aHideOnGameModeStates {
+   }
+   m_bHideAfterFreezeTime 1
+  }
+ }
+ coords 2.669 2.2 2.926
+ IsClosed 1
+}

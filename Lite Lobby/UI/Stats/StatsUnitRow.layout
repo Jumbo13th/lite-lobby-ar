@@ -1,0 +1,195 @@
+SizeLayoutWidgetClass {
+ Name "StatsUnitRow"
+ Slot LayoutSlot "{8C3E5A19D2B47651}" {
+  HorizontalAlign 3
+ }
+ AllowHeightOverride 1
+ HeightOverride 28
+ {
+  FrameWidgetClass "{8C3E5A19D2B47652}" {
+   Name "RowFrame"
+   Slot AlignableSlot "{8C3E5A19D2B47653}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   {
+    ImageWidgetClass "{8C3E5A19D2B47654}" {
+     Name "RowBg"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47655}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 1 1 1 0.03
+    }
+    TextWidgetClass "{8C3E5A19D2B47656}" {
+     Name "Place"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47657}" {
+      Anchor 0 0 0 1
+      OffsetLeft 10
+      OffsetTop 0
+      SizeX 26
+      OffsetRight -36
+      OffsetBottom 0
+     }
+     Color 0.55 0.55 0.55 1
+     Text ""
+     "Font Size" 14
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47658}" {
+     Name "Name"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47659}" {
+      Anchor 0 0 1 1
+      OffsetLeft 40
+      OffsetTop 0
+      OffsetRight 586
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 15
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4765A}" {
+     Name "Kills"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4765B}" {
+      Anchor 1 0 1 1
+      PositionX -578
+      OffsetLeft -578
+      OffsetTop 0
+      SizeX 64
+      OffsetRight 514
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4765C}" {
+     Name "ZoneKills"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4765D}" {
+      Anchor 1 0 1 1
+      PositionX -514
+      OffsetLeft -514
+      OffsetTop 0
+      SizeX 86
+      OffsetRight 428
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4765E}" {
+     Name "Teamkills"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4765F}" {
+      Anchor 1 0 1 1
+      PositionX -428
+      OffsetLeft -428
+      OffsetTop 0
+      SizeX 52
+      OffsetRight 376
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47660}" {
+     Name "Losses"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47661}" {
+      Anchor 1 0 1 1
+      PositionX -372
+      OffsetLeft -372
+      OffsetTop 0
+      SizeX 64
+      OffsetRight 308
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47662}" {
+     Name "Survivors"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47663}" {
+      Anchor 1 0 1 1
+      PositionX -304
+      OffsetLeft -304
+      OffsetTop 0
+      SizeX 64
+      OffsetRight 240
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47664}" {
+     Name "Objectives"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47665}" {
+      Anchor 1 0 1 1
+      PositionX -236
+      OffsetLeft -236
+      OffsetTop 0
+      SizeX 74
+      OffsetRight 162
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47666}" {
+     Name "Mult"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47667}" {
+      Anchor 1 0 1 1
+      PositionX -158
+      OffsetLeft -158
+      OffsetTop 0
+      SizeX 60
+      OffsetRight 98
+      OffsetBottom 0
+     }
+     Color 0.55 0.55 0.55 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47668}" {
+     Name "Total"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47669}" {
+      Anchor 1 0 1 1
+      PositionX -94
+      OffsetLeft -94
+      OffsetTop 0
+      SizeX 86
+      OffsetRight 8
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+     Text ""
+     "Font Size" 15
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+   }
+  }
+ }
+}

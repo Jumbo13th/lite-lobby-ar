@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{BA85C6ED4F9175CD}UI/Briefing/MissionDescriptionSelector.layout"
+ Configurations {
+  LayoutResourceClass PC {
+  }
+  LayoutResourceClass XBOX_ONE : PC {
+  }
+  LayoutResourceClass XBOX_SERIES : PC {
+  }
+  LayoutResourceClass PS4 : PC {
+  }
+  LayoutResourceClass PS5 : PC {
+  }
+  LayoutResourceClass HEADLESS : PC {
+  }
+ }
+}

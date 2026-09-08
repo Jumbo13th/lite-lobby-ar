@@ -1,0 +1,28 @@
+SCR_EditorModeEntity : "{E56F54E533ACE527}Prefabs/Editor/Modes/EditorModeBase.et" {
+ ID "54F0A77282A3AA3B"
+ components {
+  SCR_ContextActionsEditorComponent "{518AEC2A62FE8325}" {
+   m_ActionsLists {
+    SCR_EditorActionList "{54B2A6144BDB41FE}" {
+    }
+    SCR_EditorActionList "{54B2AA71F2ECD6D7}" {
+     m_Actions {
+      LL_RevivePlayerContextAction "{69A12AD8026923EE}" {
+       m_Info SCR_UIInfo "{69A12AD802692355}" {
+        Name "#LL-Editor_RevivePlayer"
+        Icon "{94486B3D11C0C501}UI/Textures/Editor/ContextMenu/ContextAction_Heal.edds"
+       }
+       m_iOrder 120
+       m_Effects {
+        SCR_SoundEditorEffect "{69A12AD802692356}" {
+         m_sSound "SOUND_E_ACTION_HEAL"
+        }
+       }
+       m_bIsServer 1
+      }
+     }
+    }
+   }
+  }
+ }
+}

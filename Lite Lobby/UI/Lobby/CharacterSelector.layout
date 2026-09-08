@@ -1,0 +1,212 @@
+ButtonWidgetClass {
+ Name "CharacterSelector"
+ components {
+  LL_CharacterSelector "{1A0D000000000001}" {
+   m_sSoundClicked ""
+   m_BackgroundDefault 0 0 0 0.314
+   m_BackgroundHovered 0.051 0.051 0.051 0.314
+   m_BackgroundSelected 0.76 0.392 0.08 0.3
+   m_BackgroundSelectedHovered 0.76 0.392 0.08 0.3
+   m_BackgroundClicked 0.76 0.392 0.08 0.3
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{1A0D000000000002}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{1A0D000000000003}" {
+    Padding 8 8 8 0
+   }
+   {
+    FrameWidgetClass "{1A0D000000000004}" {
+     Name "FCharacterSelector"
+     Slot OverlayWidgetSlot "{1A0D000000000005}" {
+     }
+     {
+      ImageWidgetClass "{1A0D000000000006}" {
+       Name "Background"
+       Slot FrameWidgetSlot "{1A0D000000000007}" {
+        OffsetLeft 0
+        OffsetTop 0
+        SizeX 608
+        OffsetRight -608
+        SizeY 40
+        OffsetBottom -40
+       }
+      }
+      ImageWidgetClass "{1A0D000000000008}" {
+       Name "CharacterFactionColor"
+       Slot FrameWidgetSlot "{1A0D000000000009}" {
+        OffsetLeft 0
+        OffsetTop 0
+        SizeX 6
+        OffsetRight -6
+        SizeY 40
+        OffsetBottom -40
+       }
+       Color 0.376 0.749 0.749 1
+      }
+      ScaleWidgetClass "{1A0D00000000000A}" {
+       Name "UnitIconScale"
+       Slot FrameWidgetSlot "{1A0D00000000000B}" {
+        PositionX 6
+        OffsetLeft 6
+        PositionY 0
+        OffsetTop 0
+        SizeX 40
+        OffsetRight -46
+        SizeY 40
+        OffsetBottom -40
+       }
+       "Scale Mode" "Scale to fill"
+       {
+        FrameWidgetClass "{1A0D00000000000C}" {
+         Name "UnitIconFrame"
+         Slot AlignableSlot "{1A0D00000000000D}" {
+         }
+         {
+          ImageWidgetClass "{1A0D00000000000E}" {
+           Name "UnitIcon"
+           Slot FrameWidgetSlot "{1A0D00000000000F}" {
+            Anchor 0 0 0 0
+            PositionX -17
+            OffsetLeft -17
+            PositionY -17
+            OffsetTop -17
+            SizeX 74
+            OffsetRight -57
+            SizeY 74
+            OffsetBottom -57
+           }
+           Texture "{00B30C29FAF85E1C}UI/Textures/Editor/EditableEntities/Characters/EditableEntity_Character_AntiTank.edds"
+           Size 64 64
+          }
+         }
+        }
+       }
+      }
+      TextWidgetClass "{1A0D000000000010}" {
+       Name "CharacterClassName"
+       Slot FrameWidgetSlot "{1A0D000000000011}" {
+        PositionX 46
+        OffsetLeft 46
+        OffsetTop 0
+        SizeX 238
+        OffsetRight -284
+        SizeY 40
+        OffsetBottom -40
+       }
+       Color 0.855 0.855 0.855 0.819
+       Text "Rifleman"
+       "Font Size" 18
+       "Min Font Size" 16
+       "Vertical Alignment" Center
+       FontProperties FontProperties "{1A0D000000000012}" {
+        Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+       }
+      }
+      ImageWidgetClass "{1A0D000000000013}" {
+       Name "StateIcon"
+       Slot FrameWidgetSlot "{1A0D000000000014}" {
+        PositionX 290
+        OffsetLeft 290
+        PositionY 0
+        OffsetTop 0
+        SizeX 40
+        OffsetRight -330
+        SizeY 40
+        OffsetBottom -40
+       }
+       Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+       Image "careerCircleOutline"
+       Size 32 32
+      }
+      RichTextWidgetClass "{1A0D000000000015}" {
+       Name "CharacterStatus"
+       Slot FrameWidgetSlot "{1A0D000000000016}" {
+        PositionX 336
+        OffsetLeft 336
+        OffsetTop 0
+        SizeX 220
+        OffsetRight -556
+        SizeY 40
+        OffsetBottom -40
+       }
+       Text ""
+       "Font Size" 18
+       "Min Font Size" 18
+       "Vertical Alignment" Center
+      }
+      ButtonWidgetClass "{1A0D000000000017}" {
+       Name "StateButton"
+       Slot FrameWidgetSlot "{1A0D000000000018}" {
+        Anchor 0 0 0 0
+        PositionX 290
+        OffsetLeft 290
+        PositionY 0
+        OffsetTop 0
+        SizeX 40
+        OffsetRight -330
+        SizeY 40
+        OffsetBottom -40
+       }
+       "Ignore Cursor" 1
+       "Is Visible" 0
+       components {
+        SCR_ButtonBaseComponent "{1A0D000000000019}" {
+         m_sSoundHovered ""
+         m_sSoundClicked ""
+         m_BackgroundDefault 1 1 1 0
+         m_BackgroundHovered 1 1 1 0.162
+         m_BackgroundSelected 1 1 1 0
+         m_BackgroundSelectedHovered 1 1 1 0.162
+         m_BackgroundClicked 1 1 1 0
+         m_bShowBorderOnFocus 0
+         m_bNoBorderAnimation 1
+        }
+       }
+       "no focus" 1
+       {
+        FrameWidgetClass "{1A0D00000000001A}" {
+         Name "StateButtonFrame"
+         Slot ButtonWidgetSlot "{1A0D00000000001B}" {
+         }
+         {
+          ImageWidgetClass "{1A0D00000000001C}" {
+           Name "Background"
+           Slot FrameWidgetSlot "{1A0D00000000001D}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 40
+            OffsetRight -40
+            SizeY 40
+            OffsetBottom -40
+           }
+          }
+         }
+        }
+       }
+      }
+      PanelWidgetClass "{1A0D00000000001E}" {
+       Name "Border"
+       Slot FrameWidgetSlot "{1A0D00000000001F}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 608
+        OffsetRight -608
+        SizeY 40
+        OffsetBottom -40
+       }
+       Color 0.761 0.392 0.078 1
+       style pixel_outline
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,110 @@
+FrameWidgetClass {
+ Name "RadioFrequencyDialog"
+ {
+  FrameWidgetClass "{69F1A2B3C4D50021}" {
+   Name "Panel"
+   Slot FrameWidgetSlot "{69F1A2B3C4D50022}" {
+    Anchor 0 0.5 0 0.5
+    PositionX 24
+    OffsetLeft 24
+    PositionY -78
+    OffsetTop -78
+    SizeX 380
+    OffsetRight -404
+    SizeY 156
+    OffsetBottom -78
+   }
+   {
+    ImageWidgetClass "{69F1A2B3C4D50023}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50024}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.007 0.012 0.014 0.9
+    }
+    ImageWidgetClass "{69F1A2B3C4D50025}" {
+     Name "Accent"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50026}" {
+      Anchor 0 0 0 1
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 3
+      OffsetRight -3
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    TextWidgetClass "{69F1A2B3C4D50027}" {
+     Name "Title"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50028}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 12
+      OffsetRight 8
+      OffsetBottom -30
+     }
+     Color 0.761 0.392 0.078 1
+     Text "#LL-Radio_SetFrequency"
+     "Font Size" 14
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{69F1A2B3C4D50029}" {
+      OutlineSize 2
+     }
+    }
+    TextWidgetClass "{69F1A2B3C4D5002A}" {
+     Name "RangeText"
+     Slot FrameWidgetSlot "{69F1A2B3C4D5002B}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 34
+      OffsetRight 8
+      OffsetBottom -50
+     }
+     Color 0.6 0.6 0.6 1
+     Text "30.0 - 90.0"
+     "Font Size" 12
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{69F1A2B3C4D5002C}" {
+      OutlineSize 2
+     }
+    }
+    EditBoxWidgetClass "{69F1A2B3C4D5002D}" {
+     Name "FrequencyEdit"
+     Slot FrameWidgetSlot "{69F1A2B3C4D5002E}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 58
+      OffsetRight 16
+      OffsetBottom -96
+     }
+     Color 0.92 0.92 0.92 1
+     "Font Size" 24
+     "Use placeholder text" 1
+     "Placeholder color" 0.45 0.45 0.45 1
+     "Placeholder text" "38.5"
+    }
+    TextWidgetClass "{69F1A2B3C4D5002F}" {
+     Name "HintText"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50030}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 126
+      OffsetRight 8
+      OffsetBottom -144
+     }
+     Color 0.6 0.6 0.6 1
+     Text "#LL-Radio_FrequencyHint"
+     "Font Size" 12
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{69F1A2B3C4D50031}" {
+      OutlineSize 2
+     }
+    }
+   }
+  }
+ }
+}

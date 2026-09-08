@@ -1,0 +1,60 @@
+ButtonWidgetClass {
+ Name "AliveFactionButton"
+ Slot LayoutSlot "{1D0B000000000010}" {
+  Padding 2 2 2 2
+  SizeMode Fill
+  FillWeight 1
+ }
+ "Ignore Cursor" 0
+ Color 1 1 1 0
+ components {
+  LL_AliveFactionButton "{1D0B000000000001}" {
+   m_sSoundHovered ""
+   m_sSoundClicked ""
+   m_bCanBeToggled 1
+   m_bIsToggled 1
+   m_BackgroundDefault 0 0 0 0.667
+   m_BackgroundHovered 1 1 1 0.161
+   m_BackgroundSelected 0 0 0 0
+   m_BackgroundSelectedHovered 1 1 1 0.161
+   m_BackgroundClicked 1 1 1 0.318
+  }
+ }
+ {
+  OverlayWidgetClass "{1D0B000000000002}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{1D0B000000000003}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   {
+    ImageWidgetClass "{1D0B000000000004}" {
+     Name "BackgroundFaction"
+     Slot OverlayWidgetSlot "{1D0B000000000005}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0.175 0.001 0.001 1
+    }
+    ImageWidgetClass "{1D0B000000000006}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{1D0B000000000007}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+      Padding 2 2 2 2
+     }
+    }
+    TextWidgetClass "{1D0B000000000008}" {
+     Name "SideCount"
+     Slot OverlayWidgetSlot "{1D0B000000000009}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Text "0"
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+   }
+  }
+ }
+}

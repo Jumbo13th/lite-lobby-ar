@@ -1,0 +1,106 @@
+VerticalLayoutWidgetClass {
+ Name "VoiceChannelRoom"
+ Slot LayoutSlot "{1D0F000000000010}" {
+  HorizontalAlign 3
+ }
+ components {
+  LL_VoiceChannelRoom "{1D0F000000000001}" {
+  }
+ }
+ {
+  FrameWidgetClass "{1D0F000000000020}" {
+   Name "RoomHeader"
+   Slot LayoutSlot "{1D0F000000000021}" {
+    HorizontalAlign 3
+    Padding 0 6 0 0
+   }
+   "Ignore Cursor" 0
+   components {
+    LL_VoiceChannelHeaderButton "{1D0F000000000022}" {
+    }
+   }
+   {
+    OverlayWidgetClass "{1D0F000000000029}" {
+     Name "Size"
+     Slot FrameWidgetSlot "{1D0F00000000002A}" {
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 8
+      OffsetRight -8
+      SizeY 44
+      OffsetBottom -44
+     }
+    }
+    ImageWidgetClass "{1D0F000000000025}" {
+     Name "RoomHeaderBackground"
+     Slot FrameWidgetSlot "{1D0F000000000026}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     "Ignore Cursor" 1
+     Color 0.205 0.205 0.205 1
+    }
+    ImageWidgetClass "{1D0F000000000031}" {
+     Name "RoomHoverHighlight"
+     Slot FrameWidgetSlot "{1D0F000000000032}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     "Is Visible" 0
+     "Ignore Cursor" 1
+     Color 1 1 1 0.055
+    }
+    TextWidgetClass "{1D0F00000000002D}" {
+     Name "RoomName"
+     Slot FrameWidgetSlot "{1D0F00000000002E}" {
+      Anchor 0 0 1 0
+      PositionX 12
+      OffsetLeft 12
+      PositionY 0
+      OffsetTop 0
+      SizeX -20
+      OffsetRight 8
+      SizeY 44
+      OffsetBottom -44
+     }
+     "Ignore Cursor" 1
+     Text "Channel"
+     "Font Size" 20
+     "Min Font Size" 20
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{1D0F000000000033}" {
+      Font "{CD2634D279AB011A}UI/Fonts/Roboto/Roboto_Bold.fnt"
+     }
+    }
+    PanelWidgetClass "{1D0F00000000002F}" {
+     Name "RoomJoinedBorder"
+     Slot FrameWidgetSlot "{1D0F000000000030}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     "Z Order" 1
+     "Is Visible" 0
+     "Ignore Cursor" 1
+     Color 0.761 0.392 0.078 1
+     style pixel_outline
+    }
+   }
+  }
+  VerticalLayoutWidgetClass "{1D0F000000000008}" {
+   Name "PlayersVerticalLayout"
+   Slot LayoutSlot "{1D0F000000000009}" {
+    HorizontalAlign 3
+    Padding 0 0 0 8
+   }
+  }
+ }
+}

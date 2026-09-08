@@ -1,0 +1,13 @@
+PolylineShapeEntity {
+ ID "699CA7457093C987"
+ components {
+  LL_MapZoneComponent "{699CA7457093C9DF}" {
+   m_FillColor 0.502 0.376 0 1
+   m_OutlineColor 0.502 0.376 0 1
+   m_bLineMode 1
+   m_aHideOnGameModeStates {
+   }
+  }
+ }
+ coords 2.669 2.2 2.926
+}

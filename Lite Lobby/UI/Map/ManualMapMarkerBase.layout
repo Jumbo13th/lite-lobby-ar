@@ -1,0 +1,106 @@
+FrameWidgetClass {
+ Name "root"
+ Slot FrameWidgetSlot "{1C0F000000000001}" {
+  OffsetLeft 0
+  OffsetTop 0
+  SizeX 2
+  OffsetRight -2
+  SizeY 2
+  OffsetBottom -2
+ }
+ "Z Order" 60
+ Clipping False
+ "Ignore Cursor" 0
+ components {
+  LL_ManualMarkerComponent "{1C0F000000000002}" {
+  }
+ }
+ {
+  FrameWidgetClass "{1C0F000000000003}" {
+   Name "MarkerFrame"
+   Slot FrameWidgetSlot "{1C0F000000000004}" {
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 60
+    OffsetRight -60
+    SizeY 60
+    OffsetBottom -60
+   }
+   {
+    OverlayWidgetClass "{1C0F000000000005}" {
+     Name "MarkerScrollLayout"
+     Slot FrameWidgetSlot "{1C0F000000000006}" {
+     }
+     "Ignore Cursor" 0
+    }
+    ImageWidgetClass "{1C0F000000000007}" {
+     Name "MarkerIcon"
+     Slot FrameWidgetSlot "{1C0F000000000008}" {
+      Anchor 0 0 0 0
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 60
+      OffsetRight -60
+      SizeY 60
+      OffsetBottom -60
+     }
+     Clipping False
+     Texture "{E23427CAC80DA8B7}UI/Textures/Icons/icons_mapMarkersUI.imageset"
+     Image "circle-2"
+     Size 56 56
+    }
+    PanelWidgetClass "{1C0F00000000000B}" {
+     Name "DescriptionPanel"
+     Slot FrameWidgetSlot "{1C0F00000000000C}" {
+      SizeToContent 1
+     }
+     Color 0 0 0 0.6
+     style full
+     {
+      PanelWidgetClass "{1C0F00000000000D}" {
+       Name "PanelBorder"
+       Slot FrameWidgetSlot "{1C0F00000000000E}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeToContent 1
+       }
+       style outline_2px
+       {
+        OverlayWidgetClass "{1C0F00000000000F}" {
+         Name "Overlay"
+         Slot FrameWidgetSlot "{1C0F000000000010}" {
+          PositionX 0
+          OffsetLeft 0
+          PositionY 0
+          OffsetTop 0
+          SizeToContent 1
+         }
+         {
+          RichTextWidgetClass "{1C0F000000000011}" {
+           Name "DescriptionText"
+           Slot OverlayWidgetSlot "{1C0F000000000012}" {
+            Padding 10 10 10 10
+           }
+           "Z Order" 1
+           Text "Description"
+           "Horizontal Alignment" Center
+           "Vertical Alignment" Center
+           "Shadow Offset" 3 3
+           "Shadow Size Increase" 2
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

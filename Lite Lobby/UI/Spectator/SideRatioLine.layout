@@ -1,0 +1,13 @@
+PanelWidgetClass {
+ Name "SideRatioLine"
+ Slot LayoutSlot "{1D0A000000000001}" {
+  SizeMode Fill
+  FillWeight 1
+ }
+ Color 0.024 0.937 0.082 1
+ components {
+  LL_SidesRatioLine "{1D0A000000000002}" {
+  }
+ }
+ style full
+}

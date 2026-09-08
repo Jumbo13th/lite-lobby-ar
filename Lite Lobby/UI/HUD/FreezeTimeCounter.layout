@@ -1,0 +1,65 @@
+FrameWidgetClass {
+ Name "FreezeTimeCounter"
+ components {
+  LL_FreezeTimeCounter "{1D12000000000001}" {
+  }
+ }
+ {
+  PanelWidgetClass "{1D12000000000002}" {
+   Name "Banner"
+   Slot FrameWidgetSlot "{1D12000000000003}" {
+    Anchor 0.5 0 0.5 0
+    PositionX -220
+    OffsetLeft -220
+    PositionY 180
+    OffsetTop 180
+    SizeX 440
+    OffsetRight -220
+    SizeY 64
+    OffsetBottom -244
+   }
+   Color 0.008 0.012 0.016 1
+   style full
+   {
+    OverlayWidgetClass "{1D12000000000004}" {
+     Name "Row"
+     Slot FrameWidgetSlot "{1D12000000000005}" {
+      Anchor 0 0 1 1
+      OffsetLeft 22
+      OffsetTop 0
+      OffsetRight 22
+      OffsetBottom 0
+     }
+     {
+      TextWidgetClass "{1D12000000000006}" {
+       Name "FreezeTimeText"
+       Slot OverlayWidgetSlot "{1D12000000000007}" {
+        HorizontalAlign 0
+        VerticalAlign 1
+       }
+       Color 0.8 0.8 0.8 1
+       Text "#LL-Freeze_Title"
+       "Font Size" 26
+       FontProperties FontProperties "{1D12000000000008}" {
+        OutlineSize 2
+       }
+      }
+      TextWidgetClass "{1D12000000000009}" {
+       Name "FreezeTimeCounterText"
+       Slot OverlayWidgetSlot "{1D1200000000000A}" {
+        HorizontalAlign 2
+        VerticalAlign 1
+       }
+       Color 0.95 0.6 0.1 1
+       Text "00:00"
+       "Font Size" 34
+       FontProperties FontProperties "{1D1200000000000B}" {
+        OutlineSize 2
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

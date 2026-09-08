@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{317D819C19DDD4D7}worlds/Arland/LobbyDemo.ent"
+ Configurations {
+  ENTResourceClass PC {
+  }
+  ENTResourceClass XBOX_ONE : PC {
+  }
+  ENTResourceClass XBOX_SERIES : PC {
+  }
+  ENTResourceClass PS4 : PC {
+  }
+  ENTResourceClass PS5 : PC {
+  }
+  ENTResourceClass HEADLESS : PC {
+  }
+ }
+}

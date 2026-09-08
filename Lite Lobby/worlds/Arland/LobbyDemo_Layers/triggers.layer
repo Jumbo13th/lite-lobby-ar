@@ -1,0 +1,124 @@
+GenericEntity ZoneCapture : "{0966A23E54B971A6}Prefabs/Triggers/LL_Trigger_ZoneCapture.et" {
+ components {
+  LL_TriggerZoneCapture "{69BB4EC6DDE48C6F}" {
+   m_sZoneEntityName "ObjectiveZone"
+   m_sZoneDisplayName "Road"
+   m_sAttackerFaction "US"
+   m_sDefenderFaction "USSR"
+   m_aFlagNames {
+    "ObjectiveFlag"
+   }
+   m_fStatPoints 20
+   m_fStatMaxPerPlayer 2
+   m_aConditions {
+    LL_TriggerFactionCondition "{69BD22C0D8849EA6}" {
+     m_sFaction "US"
+     m_sVersusFaction "USSR"
+    }
+    LL_TriggerFactionCondition "{69BD22C261674367}" {
+     m_sFaction "US"
+    }
+   }
+   m_fHoldSeconds 20
+  }
+ }
+ coords 1196.468 39 2713.883
+}
+$grp GenericEntity : "{2808BD90796C1E4E}Prefabs/Triggers/LL_Trigger_CriticalLoss.et" {
+ USSRLoss {
+  components {
+   LL_TriggerCriticalLoss "{69BD22C250937F93}" {
+    m_sMessage "USSR has suffered critical losses."
+    m_iThreshold 3
+   }
+  }
+  coords 1195.055 39 2712.29
+ }
+ USLoss {
+  components {
+   LL_TriggerCriticalLoss "{69BD22C250937F93}" {
+    m_sMessage "US has suffered critical losses."
+    m_sFactionKey "US"
+    m_iThreshold 3
+   }
+  }
+  coords 1195.558 39 2714.144
+ }
+}
+GenericEntity ZoneContest : "{2B3F9CB67479CFE7}Prefabs/Triggers/LL_Trigger_ZoneContest.et" {
+ components {
+  LL_TriggerZoneContest "{6A0F2E564940880E}" {
+   m_sMessage "Neutral Zone Captured!"
+   m_sZoneEntityName "NeutralZone"
+   m_sZoneDisplayName "Neutral Zone"
+   m_aFlagNames {
+    "NeutralFlag"
+   }
+   m_fStatPoints 20
+   m_fStatMaxPerPlayer 2
+   m_bStartsNeutral 1
+   m_fCaptureSeconds 20
+  }
+ }
+ coords 1195.07 39 2714.156
+}
+GenericEntity Timer : "{41A08F78A490DA42}Prefabs/Triggers/LL_Trigger_MissionEndTimer.et" {
+ components {
+  LL_TriggerMissionEndTimer "{69BD22C4CE5A4300}" {
+   m_sMessage "Timer trigger check"
+   m_iSeconds 60
+  }
+ }
+ coords 1196.136 39 2712.779
+}
+GenericEntity USSRSquadDefeat : "{42877F459BC30CDB}Prefabs/Triggers/LL_Trigger_DefeatGroup.et" {
+ components {
+  LL_TriggerDefeatGroup "{69BD22C33D35A288}" {
+   m_sMessage "USSR infantry squad has been eliminated."
+   m_sGroupEntityName "USSR1"
+   m_bRequireIdentification 1
+   m_sIdentifyFaction "US"
+   m_fStatPoints 20
+   m_fStatMaxPerPlayer 2
+  }
+ }
+ coords 1194.744 39 2716.683
+}
+$grp GenericEntity : "{8C5EB89AA51483A4}Prefabs/Structures/Military/Flags/FlagPole_02/LL_FlagPole.et" {
+ ObjectiveFlag {
+  coords 1968.459 59.802 2224.329
+ }
+ NeutralFlag {
+  coords 1368.705 47.101 2350.199
+ }
+}
+GenericEntity TargetsDestroy : "{C30939E43230ED0F}Prefabs/Triggers/LL_Trigger_Destroy.et" {
+ components {
+  LL_TriggerDestroy "{69BD22C391CCC3CE}" {
+   m_sMessage "Helicopters have been destroyed."
+   m_aTargets {
+    LL_TriggerDestroyTarget "{69E6851B5B43FD72}" {
+     m_sEntityName "UH1H_armed_gunship_HE_sharkNose1"
+    }
+    LL_TriggerDestroyTarget "{69E6851B5A98E810}" {
+     m_sEntityName "Mi8MT_armed_gunship_HEDP1"
+    }
+   }
+   m_fStatPoints 100
+   m_fStatMaxPerPlayer 10
+  }
+ }
+ coords 1192.046 39 2716.458
+}
+GenericEntity TimerForGroup : "{DACC0D89EF896549}Prefabs/Triggers/LL_Trigger_TimedMessage.et" {
+ components {
+  LL_TriggerTimedMessage "{6A1F470EA4F371AC}" {
+   m_sMessage "Time trigger for certain group"
+   m_aMessageGroups {
+    "US1"
+   }
+   m_iSeconds 10
+  }
+ }
+ coords 1195.561 39 2714.025
+}

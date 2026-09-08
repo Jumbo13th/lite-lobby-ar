@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{DA22ED7112FA8028}UI/Lobby/FactionSelector.layout"
+ Configurations {
+  LayoutResourceClass PC {
+  }
+  LayoutResourceClass XBOX_ONE : PC {
+  }
+  LayoutResourceClass XBOX_SERIES : PC {
+  }
+  LayoutResourceClass PS4 : PC {
+  }
+  LayoutResourceClass PS5 : PC {
+  }
+  LayoutResourceClass HEADLESS : PC {
+  }
+ }
+}

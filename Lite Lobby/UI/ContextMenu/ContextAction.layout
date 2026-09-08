@@ -1,0 +1,54 @@
+ButtonWidgetClass {
+ Name "ContextAction"
+ Color 1 1 1 0
+ style blank
+ components {
+  LL_ContextAction "{1D15000000000001}" {
+   m_sSoundClicked ""
+   m_BackgroundDefault 0 0 0 0
+   m_BackgroundHovered 0.171 0.171 0.171 0.481
+   m_BackgroundSelected 0.76 0.392 0.08 0.3
+   m_BackgroundSelectedHovered 0.76 0.392 0.08 0.4
+   m_BackgroundClicked 0.76 0.392 0.08 0.5
+  }
+ }
+ {
+  OverlayWidgetClass "{1D15000000000002}" {
+   Name "ContextActionOverlay"
+   Slot ButtonWidgetSlot "{1D15000000000003}" {
+   }
+   {
+    ImageWidgetClass "{1D15000000000004}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{1D15000000000005}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0 0 0 0
+     Size 240 26
+    }
+    ImageWidgetClass "{1D15000000000006}" {
+     Name "Icon"
+     Slot OverlayWidgetSlot "{1D15000000000007}" {
+      HorizontalAlign 0
+      VerticalAlign 3
+      Padding 6 0 0 0
+     }
+     Size 24 24
+    }
+    TextWidgetClass "{1D15000000000008}" {
+     Name "Text"
+     Slot OverlayWidgetSlot "{1D15000000000009}" {
+      HorizontalAlign 0
+      VerticalAlign 3
+      Padding 36 0 8 0
+     }
+     Text "Action"
+     "Font Size" 18
+     "Min Font Size" 12
+     "Vertical Alignment" Center
+    }
+   }
+  }
+ }
+}

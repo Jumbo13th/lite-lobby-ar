@@ -1,0 +1,295 @@
+AudioClass {
+ sounds {
+  SoundClass "300030" {
+   id 300030
+   name "LL_SR_PTT_START"
+   version 5
+   tl 540 -400
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300010:65" {
+       id 300010
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -14
+  }
+  SoundClass "300050" {
+   id 300050
+   name "LL_SR_PTT_START_L"
+   version 5
+   tl 540 -340
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300040:65" {
+       id 300040
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -14
+  }
+  SoundClass "300051" {
+   id 300051
+   name "LL_SR_PTT_START_R"
+   version 5
+   tl 540 -280
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300041:65" {
+       id 300041
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -14
+  }
+  SoundClass "300032" {
+   id 300032
+   name "LL_LR_PTT_START"
+   version 5
+   tl 540 -40
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300012:65" {
+       id 300012
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -14
+  }
+  SoundClass "300054" {
+   id 300054
+   name "LL_LR_PTT_START_L"
+   version 5
+   tl 540 20
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300044:65" {
+       id 300044
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -14
+  }
+  SoundClass "300055" {
+   id 300055
+   name "LL_LR_PTT_START_R"
+   version 5
+   tl 540 80
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300045:65" {
+       id 300045
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -14
+  }
+  SoundClass "300034" {
+   id 300034
+   name "LL_RADIO_CYCLE"
+   version 5
+   tl 540 320
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300014:65" {
+       id 300014
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -10
+  }
+  SoundClass "300035" {
+   id 300035
+   name "LL_RADIO_ON"
+   version 5
+   tl 540 380
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300015:65" {
+       id 300015
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -12
+  }
+  SoundClass "300036" {
+   id 300036
+   name "LL_RADIO_OFF"
+   version 5
+   tl 540 440
+   ins {
+    ConnectionsClass "con:64" {
+     id 64
+     links {
+      ConnectionClass "300016:65" {
+       id 300016
+       port 65
+      }
+     }
+    }
+   }
+   volume_dB -12
+  }
+ }
+ banks_local {
+  BankLocalClass "300010" {
+   id 300010
+   name "LL SR Start"
+   version 7
+   tl 88 -400
+   Samples {
+    AudioBankSampleClass "ll_radio_sr_start.wav" {
+     Filename "{69F1A2B3C4D50001}Sounds/Radio/ll_radio_sr_start.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300040" {
+   id 300040
+   name "LL SR Start L"
+   version 7
+   tl 88 -340
+   Samples {
+    AudioBankSampleClass "ll_radio_sr_start_l.wav" {
+     Filename "{69F1A2B3C4D50101}Sounds/Radio/ll_radio_sr_start_l.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300041" {
+   id 300041
+   name "LL SR Start R"
+   version 7
+   tl 88 -280
+   Samples {
+    AudioBankSampleClass "ll_radio_sr_start_r.wav" {
+     Filename "{69F1A2B3C4D50102}Sounds/Radio/ll_radio_sr_start_r.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300012" {
+   id 300012
+   name "LL LR Start"
+   version 7
+   tl 88 -40
+   Samples {
+    AudioBankSampleClass "ll_radio_lr_start.wav" {
+     Filename "{69F1A2B3C4D50003}Sounds/Radio/ll_radio_lr_start.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300044" {
+   id 300044
+   name "LL LR Start L"
+   version 7
+   tl 88 20
+   Samples {
+    AudioBankSampleClass "ll_radio_lr_start_l.wav" {
+     Filename "{69F1A2B3C4D50105}Sounds/Radio/ll_radio_lr_start_l.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300045" {
+   id 300045
+   name "LL LR Start R"
+   version 7
+   tl 88 80
+   Samples {
+    AudioBankSampleClass "ll_radio_lr_start_r.wav" {
+     Filename "{69F1A2B3C4D50106}Sounds/Radio/ll_radio_lr_start_r.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300014" {
+   id 300014
+   name "LL Cycle"
+   version 7
+   tl 88 320
+   Samples {
+    AudioBankSampleClass "ll_radio_cycle.wav" {
+     Filename "{69F1A2B3C4D50005}Sounds/Radio/ll_radio_cycle.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300015" {
+   id 300015
+   name "LL Power On"
+   version 7
+   tl 88 380
+   Samples {
+    AudioBankSampleClass "ll_radio_on.wav" {
+     Filename "{69F1A2B3C4D50006}Sounds/Radio/ll_radio_on.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+  BankLocalClass "300016" {
+   id 300016
+   name "LL Power Off"
+   version 7
+   tl 88 440
+   Samples {
+    AudioBankSampleClass "ll_radio_off.wav" {
+     Filename "{69F1A2B3C4D50007}Sounds/Radio/ll_radio_off.wav"
+     Probability 100
+     Index 0
+     SampleMetadata ""
+    }
+   }
+  }
+ }
+ version 1
+}

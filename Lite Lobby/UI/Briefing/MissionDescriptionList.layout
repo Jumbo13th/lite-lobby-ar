@@ -1,0 +1,21 @@
+ScrollLayoutWidgetClass {
+ Name "MissionDescriptionListScroll"
+ Slot FrameWidgetSlot "{1B0D000000000004}" {
+  Anchor 0 0 1 1
+  OffsetLeft 0
+  OffsetTop 0
+  OffsetRight 0
+  OffsetBottom 0
+ }
+ components {
+  LL_MissionDescriptionListUI "{1B0D000000000001}" {
+  }
+ }
+ {
+  VerticalLayoutWidgetClass "{1B0D000000000002}" {
+   Name "MissionDescriptionList"
+   Slot AlignableSlot "{1B0D000000000003}" {
+   }
+  }
+ }
+}

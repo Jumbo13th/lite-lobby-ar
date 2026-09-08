@@ -1,0 +1,573 @@
+FrameWidgetClass {
+ Name "GameModeHeader"
+ components {
+  LL_GameModeHeader "{1A0B000000000052}" {
+  }
+ }
+ {
+  ImageWidgetClass "{1A0B000000000053}" {
+   Name "GameModeHeaderBackground"
+   Slot FrameWidgetSlot "{1A0B000000000054}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0.008 0.012 0.016 1
+  }
+  ImageWidgetClass "{1A0B000000000055}" {
+   Name "GameModeHeaderLineBackground"
+   Slot FrameWidgetSlot "{1A0B000000000056}" {
+    Anchor 0 1 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY -4
+    OffsetTop -4
+    OffsetRight 0
+    SizeY 4
+    OffsetBottom 0
+   }
+   Color 0.238 0.238 0.238 1
+  }
+  ImageWidgetClass "{1A0B000000000057}" {
+   Name "GameModeHeaderLine"
+   Slot FrameWidgetSlot "{1A0B000000000058}" {
+    Anchor 0 1 0.3333 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY -4
+    OffsetTop -4
+    OffsetRight 0
+    SizeY 4
+    OffsetBottom 0
+   }
+   Color 0.761 0.386 0.078 1
+  }
+  OverlayWidgetClass "{1A0B000000000059}" {
+   Name "TabsOverlay"
+   Slot FrameWidgetSlot "{1A0B00000000005A}" {
+    Anchor 0.5 0 0.5 0
+    PositionX -320
+    OffsetLeft -320
+    PositionY 21
+    OffsetTop 21
+    SizeX 640
+    OffsetRight -320
+    SizeY 69
+    OffsetBottom -90
+   }
+   {
+    HorizontalLayoutWidgetClass "{1A0B00000000005B}" {
+     Name "HorizontalLayoutHeaderButtons"
+     Slot OverlayWidgetSlot "{1A0B00000000005C}" {
+      HorizontalAlign 1
+      VerticalAlign 1
+     }
+     {
+      ButtonWidgetClass "{1A0B000000000070}" {
+       Name "LobbyButton"
+       Slot LayoutSlot "{1A0B000000000071}" {
+        Padding 2.5 10 2.5 10
+       }
+       components {
+        SCR_ButtonBaseComponent "{1A0B000000000072}" {
+         m_bCanBeToggled 1
+         m_BackgroundDefault 0.028 0.028 0.028 1
+         m_BackgroundHovered 0.098 0.098 0.098 1
+         m_BackgroundSelected 0.761 0.386 0.078 1
+         m_BackgroundSelectedHovered 0.761 0.386 0.078 1
+         m_BackgroundClicked 0.761 0.386 0.078 1
+        }
+        LL_GameModeHeaderButton "{1A0B000000000073}" {
+        }
+       }
+       "no focus" 1
+       style blank
+       {
+        SizeLayoutWidgetClass "{1A0B000000000074}" {
+         Name "LobbyButtonSize"
+         Slot ButtonWidgetSlot "{1A0B000000000075}" {
+         }
+         AllowWidthOverride 1
+         WidthOverride 166
+         AllowHeightOverride 1
+         HeightOverride 39
+         {
+          FrameWidgetClass "{1A0B000000000076}" {
+           Name "LobbyButtonFrame"
+           Slot AlignableSlot "{1A0B000000000077}" {
+           }
+           {
+            ImageWidgetClass "{1A0B000000000078}" {
+             Name "Background"
+             Slot FrameWidgetSlot "{1A0B000000000079}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 166
+              OffsetRight -166
+              SizeY 39
+              OffsetBottom -39
+             }
+             Color 0.028 0.028 0.028 1
+            }
+            OverlayWidgetClass "{1A0B00000000007A}" {
+             Name "Overlay"
+             Slot FrameWidgetSlot "{1A0B00000000007B}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 166
+              OffsetRight -166
+              SizeY 39
+              OffsetBottom -39
+             }
+             {
+              TextWidgetClass "{1A0B00000000007C}" {
+               Name "StateText"
+               Slot OverlayWidgetSlot "{1A0B00000000007D}" {
+                HorizontalAlign 0
+                Padding 8 8 16 8
+               }
+               Color 0.216 0.216 0.216 1
+               Text "#LL-State_Slotting"
+               "Font Size" 20
+               "Min Font Size" 20
+              }
+             }
+            }
+            ImageWidgetClass "{1A0B00000000007E}" {
+             Name "ActiveImage"
+             Slot FrameWidgetSlot "{1A0B00000000007F}" {
+              PositionX 139
+              OffsetLeft 139
+              PositionY 8
+              OffsetTop 8
+              SizeX 24
+              OffsetRight -163
+              SizeY 24
+              OffsetBottom -32
+             }
+             "Is Visible" 0
+             Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+             Image "check"
+             Size 32 32
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1A0B000000000080}" {
+       Name "BriefingButton"
+       Slot LayoutSlot "{1A0B000000000081}" {
+        Padding 2.5 10 2.5 10
+       }
+       components {
+        SCR_ButtonBaseComponent "{1A0B000000000082}" {
+         m_bCanBeToggled 1
+         m_BackgroundDefault 0.028 0.028 0.028 1
+         m_BackgroundHovered 0.098 0.098 0.098 1
+         m_BackgroundSelected 0.761 0.386 0.078 1
+         m_BackgroundSelectedHovered 0.761 0.386 0.078 1
+         m_BackgroundClicked 0.761 0.386 0.078 1
+        }
+        LL_GameModeHeaderButton "{1A0B000000000083}" {
+        }
+       }
+       "no focus" 1
+       style blank
+       {
+        SizeLayoutWidgetClass "{1A0B000000000084}" {
+         Name "BriefingButtonSize"
+         Slot ButtonWidgetSlot "{1A0B000000000085}" {
+         }
+         AllowWidthOverride 1
+         WidthOverride 166
+         AllowHeightOverride 1
+         HeightOverride 39
+         {
+          FrameWidgetClass "{1A0B000000000086}" {
+           Name "BriefingButtonFrame"
+           Slot AlignableSlot "{1A0B000000000087}" {
+           }
+           {
+            ImageWidgetClass "{1A0B000000000088}" {
+             Name "Background"
+             Slot FrameWidgetSlot "{1A0B000000000089}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 166
+              OffsetRight -166
+              SizeY 39
+              OffsetBottom -39
+             }
+             Color 0.028 0.028 0.028 1
+            }
+            OverlayWidgetClass "{1A0B00000000008A}" {
+             Name "Overlay"
+             Slot FrameWidgetSlot "{1A0B00000000008B}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 166
+              OffsetRight -166
+              SizeY 39
+              OffsetBottom -39
+             }
+             {
+              TextWidgetClass "{1A0B00000000008C}" {
+               Name "StateText"
+               Slot OverlayWidgetSlot "{1A0B00000000008D}" {
+                HorizontalAlign 0
+                Padding 8 8 16 8
+               }
+               Color 0.216 0.216 0.216 1
+               Text "#LL-State_Briefing"
+               "Font Size" 20
+               "Min Font Size" 20
+              }
+             }
+            }
+            ImageWidgetClass "{1A0B00000000008E}" {
+             Name "ActiveImage"
+             Slot FrameWidgetSlot "{1A0B00000000008F}" {
+              PositionX 139
+              OffsetLeft 139
+              PositionY 8
+              OffsetTop 8
+              SizeX 24
+              OffsetRight -163
+              SizeY 24
+              OffsetBottom -32
+             }
+             "Is Visible" 0
+             Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+             Image "check"
+             Size 32 32
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1A0B000000000090}" {
+       Name "InGameButton"
+       Slot LayoutSlot "{1A0B000000000091}" {
+        Padding 2.5 10 2.5 10
+       }
+       components {
+        SCR_ButtonBaseComponent "{1A0B000000000092}" {
+         m_bCanBeToggled 1
+         m_BackgroundDefault 0.028 0.028 0.028 1
+         m_BackgroundHovered 0.098 0.098 0.098 1
+         m_BackgroundSelected 0.761 0.386 0.078 1
+         m_BackgroundSelectedHovered 0.761 0.386 0.078 1
+         m_BackgroundClicked 0.761 0.386 0.078 1
+        }
+        LL_GameModeHeaderButton "{1A0B000000000093}" {
+        }
+       }
+       "no focus" 1
+       style blank
+       {
+        SizeLayoutWidgetClass "{1A0B000000000094}" {
+         Name "InGameButtonSize"
+         Slot ButtonWidgetSlot "{1A0B000000000095}" {
+         }
+         AllowWidthOverride 1
+         WidthOverride 166
+         AllowHeightOverride 1
+         HeightOverride 39
+         {
+          FrameWidgetClass "{1A0B000000000096}" {
+           Name "InGameButtonFrame"
+           Slot AlignableSlot "{1A0B000000000097}" {
+           }
+           {
+            ImageWidgetClass "{1A0B000000000098}" {
+             Name "Background"
+             Slot FrameWidgetSlot "{1A0B000000000099}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 166
+              OffsetRight -166
+              SizeY 39
+              OffsetBottom -39
+             }
+             Color 0.028 0.028 0.028 1
+            }
+            OverlayWidgetClass "{1A0B00000000009A}" {
+             Name "Overlay"
+             Slot FrameWidgetSlot "{1A0B00000000009B}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 166
+              OffsetRight -166
+              SizeY 39
+              OffsetBottom -39
+             }
+             {
+              TextWidgetClass "{1A0B00000000009C}" {
+               Name "StateText"
+               Slot OverlayWidgetSlot "{1A0B00000000009D}" {
+                HorizontalAlign 0
+                Padding 8 8 16 8
+               }
+               Color 0.216 0.216 0.216 1
+               Text "#LL-State_Game"
+               "Font Size" 20
+               "Min Font Size" 20
+              }
+             }
+            }
+            ImageWidgetClass "{1A0B00000000009E}" {
+             Name "ActiveImage"
+             Slot FrameWidgetSlot "{1A0B00000000009F}" {
+              PositionX 139
+              OffsetLeft 139
+              PositionY 8
+              OffsetTop 8
+              SizeX 24
+              OffsetRight -163
+              SizeY 24
+              OffsetBottom -32
+             }
+             "Is Visible" 0
+             Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+             Image "check"
+             Size 32 32
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1A0B0000000000B0}" {
+       Name "AdvanceButton"
+       Slot LayoutSlot "{1A0B0000000000B1}" {
+        Padding 2.5 10 2.5 10
+       }
+       components {
+        SCR_ButtonBaseComponent "{1A0B0000000000B2}" {
+         m_BackgroundDefault 0.028 0.028 0.028 1
+         m_BackgroundHovered 0.098 0.098 0.098 1
+         m_BackgroundSelected 0.761 0.386 0.078 1
+         m_BackgroundSelectedHovered 0.761 0.386 0.078 1
+         m_BackgroundClicked 0.761 0.386 0.078 1
+        }
+       }
+       "no focus" 1
+       style blank
+       {
+        SizeLayoutWidgetClass "{1A0B0000000000B3}" {
+         Name "AdvanceButtonSize"
+         Slot ButtonWidgetSlot "{1A0B0000000000B4}" {
+         }
+         AllowWidthOverride 1
+         WidthOverride 39
+         AllowHeightOverride 1
+         HeightOverride 39
+         {
+          FrameWidgetClass "{1A0B0000000000B5}" {
+           Name "AdvanceButtonFrame"
+           Slot AlignableSlot "{1A0B0000000000B6}" {
+           }
+           {
+            ImageWidgetClass "{1A0B0000000000B7}" {
+             Name "Background"
+             Slot FrameWidgetSlot "{1A0B0000000000B8}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 39
+              OffsetRight -39
+              SizeY 39
+              OffsetBottom -39
+             }
+             Color 0.028 0.028 0.028 1
+            }
+            ImageWidgetClass "{1A0B0000000000B9}" {
+             Name "AdvanceIcon"
+             Slot FrameWidgetSlot "{1A0B0000000000BA}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 39
+              OffsetRight -39
+              SizeY 39
+              OffsetBottom -39
+             }
+             Color 0 0.502 0.125 1
+             Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+             Image "play"
+             Size 32 32
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1A0B0000000000D0}" {
+       Name "StatsButton"
+       Slot LayoutSlot "{1A0B0000000000D1}" {
+        Padding 14 10 2.5 10
+       }
+       components {
+        SCR_ButtonBaseComponent "{1A0B0000000000D2}" {
+         m_BackgroundDefault 0.028 0.028 0.028 1
+         m_BackgroundHovered 0.098 0.098 0.098 1
+         m_BackgroundSelected 0.761 0.386 0.078 1
+         m_BackgroundSelectedHovered 0.761 0.386 0.078 1
+         m_BackgroundClicked 0.761 0.386 0.078 1
+        }
+       }
+       "no focus" 1
+       style blank
+       {
+        SizeLayoutWidgetClass "{1A0B0000000000D3}" {
+         Name "StatsButtonSize"
+         Slot ButtonWidgetSlot "{1A0B0000000000D4}" {
+         }
+         AllowWidthOverride 1
+         WidthOverride 39
+         AllowHeightOverride 1
+         HeightOverride 39
+         {
+          FrameWidgetClass "{1A0B0000000000D5}" {
+           Name "StatsButtonFrame"
+           Slot AlignableSlot "{1A0B0000000000D6}" {
+           }
+           {
+            ImageWidgetClass "{1A0B0000000000D7}" {
+             Name "Background"
+             Slot FrameWidgetSlot "{1A0B0000000000D8}" {
+              PositionX 0
+              OffsetLeft 0
+              PositionY 0
+              OffsetTop 0
+              SizeX 39
+              OffsetRight -39
+              SizeY 39
+              OffsetBottom -39
+             }
+             Color 0.028 0.028 0.028 1
+            }
+            ImageWidgetClass "{1A0B0000000000D9}" {
+             Name "StatsIcon"
+             Slot FrameWidgetSlot "{1A0B0000000000DA}" {
+              PositionX 4
+              OffsetLeft 4
+              PositionY 4
+              OffsetTop 4
+              SizeX 31
+              OffsetRight -35
+              SizeY 31
+              OffsetBottom -35
+             }
+             Color 0.761 0.386 0.078 1
+             Texture "{402BB92E44897D60}UI/Textures/MANW2025/CupRanks.imageset"
+             Image "CupRank1"
+             Size 40 40
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  OverlayWidgetClass "{1A0B0000000000C0}" {
+   Name "OverlayTitle"
+   Slot FrameWidgetSlot "{1A0B0000000000C1}" {
+    PositionX 21
+    OffsetLeft 21
+    PositionY 32
+    OffsetTop 32
+    SizeX 440
+    OffsetRight -461
+    SizeY 46
+    OffsetBottom -78
+   }
+   {
+    ImageWidgetClass "{1A0B0000000000C2}" {
+     Name "GameModeHeaderTitleBackground"
+     Slot OverlayWidgetSlot "{1A0B0000000000C3}" {
+     }
+     Color 0.761 0.386 0.078 1
+     Texture "{E12BB5C5BD00269E}UI/Textures/Common/gradientTexture_Dither_right_512.edds"
+     Size 512 512
+     Mask "{E12BB5C5BD00269E}UI/Textures/Common/gradientTexture_Dither_right_512.edds"
+     "Transition width" 1
+     Progress 0.5
+     "Mask Mode" "Include Below"
+     Range 0.066
+    }
+    TextWidgetClass "{1A0B0000000000C4}" {
+     Name "TitleText"
+     Slot OverlayWidgetSlot "{1A0B0000000000C5}" {
+      HorizontalAlign 0
+      Padding 14 0 0 0
+     }
+     Text "Mission Name"
+     "Font Size" 28
+     "Min Font Size" 28
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{1A0B0000000000C6}" {
+      Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+      Bold 1
+     }
+    }
+   }
+  }
+  HorizontalLayoutWidgetClass "{1A0B0000000000C7}" {
+   Name "OverlayMissionData"
+   Slot FrameWidgetSlot "{1A0B0000000000C8}" {
+    Anchor 1 0 1 0
+    PositionX -499
+    OffsetLeft -499
+    PositionY 23
+    OffsetTop 23
+    SizeX 482
+    OffsetRight 17
+    SizeY 61
+    OffsetBottom -84
+   }
+   {
+    RichTextWidgetClass "{1A0B0000000000CD}" {
+     Name "AuthorRichText"
+     Slot LayoutSlot "{1A0B0000000000CE}" {
+      HorizontalAlign 0
+      VerticalAlign 0
+      Padding 8 18 0 0
+     }
+     Text "<color rgba='226,167,79,255'>Author:</color> Unknown"
+     "Font Size" 26
+     "Min Font Size" 26
+     FontProperties FontProperties "{1A0B0000000000CF}" {
+      Font "{E2CBA6F76AAA42AF}UI/Fonts/Roboto/Roboto_Regular.fnt"
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,70 @@
+$grp Vehicle : "{1FBB492E86002BF5}Prefabs/Vehicles/Wheeled/UAZ452/UAZ452_transport.et" {
+ UAZ452_transport2 {
+  components {
+   LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+    m_sGroupName "USSR3"
+   }
+  }
+  coords 1836.986 26.174 1935.715
+  angles 3.534 0 -2.47
+ }
+ UAZ452_transport1 {
+  components {
+   LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+    m_sGroupName "USSR2"
+   }
+  }
+  coords 1872.973 26.388 1935.073
+  angles 1.441 0 0
+ }
+}
+Vehicle BTR1 : "{C012BB3488BEA0C2}Prefabs/Vehicles/Wheeled/BTR70/BTR70.et" {
+ components {
+  LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+   m_sGroupName "USSR1"
+  }
+ }
+ coords 1802.343 23.427 1919.297
+ angles 0.895 0 0
+}
+Vehicle Mi8MT_armed_gunship_HEDP1 : "{DBEC63C9DEE4358C}Prefabs/Vehicles/Helicopters/Mi8MT/Mi8MT_armed_gunship_HEDP.et" {
+ coords 619.34 38.807 2558.128
+ angles 4.369 73.314 0
+}
+$grp SCR_AIGroup : "{E552DABF3636C2AD}Prefabs/Groups/OPFOR/Group_USSR_RifleSquad.et" {
+ USSR1 {
+  components {
+   LL_GroupCallsign "{69A104C3853ABBD3}" {
+    m_iCompany 0
+    m_iPlatoon 0
+    m_iSquad 0
+   }
+  }
+  coords 1800.32 23.992 1932.631
+  angles 4.466 -0.07 -0.898
+  m_aUnitPrefabSlots +{
+   "{9FFEF10757E742EB}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_Crew.et"
+   "{9FFEF10757E742EB}Prefabs/Characters/Factions/OPFOR/USSR_Army/Character_USSR_Crew.et"
+  }
+ }
+ USSR2 {
+  components {
+   LL_GroupCallsign "{69A104C39C8E73F3}" {
+    m_iCompany 0
+    m_iPlatoon 0
+    m_iSquad 1
+   }
+  }
+  coords 1872.766 25.95 1930.473
+ }
+ USSR3 {
+  components {
+   LL_GroupCallsign "{69A104C3750F7B79}" {
+    m_iCompany 0
+    m_iPlatoon 0
+    m_iSquad 2
+   }
+  }
+  coords 1836.66 25.76 1930.811
+ }
+}

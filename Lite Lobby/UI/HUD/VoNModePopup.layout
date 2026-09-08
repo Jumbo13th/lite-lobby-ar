@@ -1,0 +1,82 @@
+FrameWidgetClass {
+ Name "VoNModePopup"
+ components {
+  LL_VoNModeHud "{7C4B92A100000001}" {
+  }
+ }
+ {
+  FrameWidgetClass "{7C4B92A100000002}" {
+   Name "Pill"
+   Slot FrameWidgetSlot "{7C4B92A100000003}" {
+    Anchor 0 0.5 0 0.5
+    PositionX 0
+    OffsetLeft 0
+    PositionY -26
+    OffsetTop -26
+    SizeX 190
+    OffsetRight -190
+    SizeY 52
+    OffsetBottom -26
+   }
+   {
+    ImageWidgetClass "{7C4B92A100000004}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{7C4B92A100000005}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.007 0.012 0.014 0.9
+    }
+    ImageWidgetClass "{7C4B92A100000006}" {
+     Name "Accent"
+     Slot FrameWidgetSlot "{7C4B92A100000007}" {
+      Anchor 0 0 0 1
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 3
+      OffsetRight -3
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    TextWidgetClass "{7C4B92A100000008}" {
+     Name "Label"
+     Slot FrameWidgetSlot "{7C4B92A100000009}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 8
+      OffsetRight 8
+      OffsetBottom -22
+     }
+     Color 0.761 0.392 0.078 1
+     Text "#LL-VoN_ModeLabel"
+     "Font Size" 12
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{7C4B92A10000000A}" {
+      OutlineSize 2
+     }
+    }
+    TextWidgetClass "{7C4B92A10000000B}" {
+     Name "ModeName"
+     Slot FrameWidgetSlot "{7C4B92A10000000C}" {
+      Anchor 0 0 1 1
+      OffsetLeft 16
+      OffsetTop 20
+      OffsetRight 8
+      OffsetBottom 6
+     }
+     Color 0.92 0.92 0.92 1
+     Text "Normal"
+     "Font Size" 20
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{7C4B92A10000000D}" {
+      OutlineSize 2
+     }
+    }
+   }
+  }
+ }
+}

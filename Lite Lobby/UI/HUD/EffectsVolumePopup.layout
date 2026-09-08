@@ -1,0 +1,140 @@
+FrameWidgetClass {
+ Name "EffectsVolumePopup"
+ components {
+  LL_EffectsVolumeHud "{69D8B4C2F1E20310}" {
+  }
+ }
+ {
+  FrameWidgetClass "{69D8B4C2F1E20311}" {
+   Name "Pill"
+   Slot FrameWidgetSlot "{69D8B4C2F1E20312}" {
+    Anchor 0 0 0 0
+    PositionX 24
+    OffsetLeft 24
+    PositionY 24
+    OffsetTop 24
+    SizeX 190
+    OffsetRight -214
+    SizeY 52
+    OffsetBottom -76
+   }
+   {
+    ImageWidgetClass "{69D8B4C2F1E20313}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{69D8B4C2F1E20314}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.007 0.012 0.014 0.9
+    }
+    ImageWidgetClass "{69D8B4C2F1E20315}" {
+     Name "Accent"
+     Slot FrameWidgetSlot "{69D8B4C2F1E20316}" {
+      Anchor 0 0 0 1
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 3
+      OffsetRight -3
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    TextWidgetClass "{69D8B4C2F1E20317}" {
+     Name "Label"
+     Slot FrameWidgetSlot "{69D8B4C2F1E20318}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 8
+      OffsetRight 8
+      OffsetBottom -22
+     }
+     Color 0.761 0.392 0.078 1
+     Text "#LL-Sound_EffectsLabel"
+     "Font Size" 12
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{69D8B4C2F1E20319}" {
+      OutlineSize 2
+     }
+    }
+    ImageWidgetClass "{69D8B4C2F1E2031A}" {
+     Name "Seg1"
+     Slot FrameWidgetSlot "{69D8B4C2F1E2031B}" {
+      Anchor 0 0 0 0
+      PositionX 16
+      OffsetLeft 16
+      PositionY 26
+      OffsetTop 26
+      SizeX 6
+      OffsetRight -22
+      SizeY 18
+      OffsetBottom -44
+     }
+     Color 0.35 0.35 0.35 0.8
+    }
+    ImageWidgetClass "{69D8B4C2F1E2031C}" {
+     Name "Seg2"
+     Slot FrameWidgetSlot "{69D8B4C2F1E2031D}" {
+      Anchor 0 0 0 0
+      PositionX 30
+      OffsetLeft 30
+      PositionY 26
+      OffsetTop 26
+      SizeX 6
+      OffsetRight -36
+      SizeY 18
+      OffsetBottom -44
+     }
+     Color 0.35 0.35 0.35 0.8
+    }
+    ImageWidgetClass "{69D8B4C2F1E2031E}" {
+     Name "Seg3"
+     Slot FrameWidgetSlot "{69D8B4C2F1E2031F}" {
+      Anchor 0 0 0 0
+      PositionX 44
+      OffsetLeft 44
+      PositionY 26
+      OffsetTop 26
+      SizeX 6
+      OffsetRight -50
+      SizeY 18
+      OffsetBottom -44
+     }
+     Color 0.35 0.35 0.35 0.8
+    }
+    ImageWidgetClass "{69D8B4C2F1E20320}" {
+     Name "Seg4"
+     Slot FrameWidgetSlot "{69D8B4C2F1E20321}" {
+      Anchor 0 0 0 0
+      PositionX 58
+      OffsetLeft 58
+      PositionY 26
+      OffsetTop 26
+      SizeX 6
+      OffsetRight -64
+      SizeY 18
+      OffsetBottom -44
+     }
+     Color 0.35 0.35 0.35 0.8
+    }
+    ImageWidgetClass "{69D8B4C2F1E20322}" {
+     Name "Seg5"
+     Slot FrameWidgetSlot "{69D8B4C2F1E20323}" {
+      Anchor 0 0 0 0
+      PositionX 72
+      OffsetLeft 72
+      PositionY 26
+      OffsetTop 26
+      SizeX 6
+      OffsetRight -78
+      SizeY 18
+      OffsetBottom -44
+     }
+     Color 0.35 0.35 0.35 0.8
+    }
+   }
+  }
+ }
+}

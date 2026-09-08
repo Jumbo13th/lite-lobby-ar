@@ -1,0 +1,160 @@
+FrameWidgetClass {
+ Name "GameMapMenu"
+ {
+  FrameWidgetClass "{1C0E000000000001}" : "{0651202E9F2646DE}UI/layouts/Map/Map.layout" {
+   Name "MapFrame"
+   Slot FrameWidgetSlot "{1C0E000000000002}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+  }
+  FrameWidgetClass "{1C0E000000000010}" : "{9E63A4CB2D7F53AB}UI/Briefing/MissionDescriptionPanel.layout" {
+   Name "MissionDescriptionPanel"
+   Slot FrameWidgetSlot "{1C0E000000000011}" {
+    Anchor 0 0.5 0 0.5
+    PositionX 10
+    OffsetLeft 10
+    PositionY -320
+    OffsetTop -320
+    SizeX 480
+    OffsetRight -490
+    SizeY 640
+    OffsetBottom -320
+   }
+  }
+  FrameWidgetClass "{1C0E000000000060}" {
+   Name "ToolMenu"
+   Slot FrameWidgetSlot "{1C0E000000000061}" {
+    PositionX 10
+    OffsetLeft 10
+    PositionY 10
+    OffsetTop 10
+    SizeX -100
+    OffsetRight -150
+    SizeY 30
+    OffsetBottom -40
+    Alignment 0 0
+    SizeToContent 1
+   }
+   "Z Order" 1
+   Clipping False
+   "Ignore Cursor" 0
+   {
+    FrameWidgetClass "{1C0E000000000062}" {
+     Name "ToolMenuBar"
+     Slot FrameWidgetSlot "{1C0E000000000063}" {
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 30
+      OffsetRight -30
+      OffsetBottom -30
+      SizeToContent 1
+     }
+     Clipping True
+     {
+      ImageWidgetClass "{1C0E000000000064}" {
+       Name "MenuBackground"
+       Slot FrameWidgetSlot "{1C0E000000000065}" {
+        Anchor 0 0 1 1
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX -40
+        OffsetRight 0
+        SizeY -40
+        OffsetBottom 0
+        SizeToContent 1
+       }
+       Opacity 1
+       Color 0.008 0.012 0.016 0.95
+       Image ""
+       Size 40 40
+      }
+      HorizontalLayoutWidgetClass "{1C0E000000000066}" {
+       Name "ToolMenuHoriz"
+       Slot FrameWidgetSlot "{1C0E000000000067}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+        SizeToContent 1
+       }
+      }
+     }
+    }
+   }
+  }
+  OverlayWidgetClass "{1C0E000000000030}" {
+   Name "FooterNav"
+   Slot FrameWidgetSlot "{1C0E000000000031}" {
+    Anchor 0 1 1 1
+    PositionX 10
+    OffsetLeft 10
+    PositionY -152
+    OffsetTop -152
+    OffsetRight 15
+    SizeY 72
+    OffsetBottom 80
+   }
+   {
+    PanelWidgetClass "{1C0E000000000070}" {
+     Name "FooterNavPanel"
+     Slot OverlayWidgetSlot "{1C0E000000000071}" {
+      HorizontalAlign 0
+      VerticalAlign 1
+     }
+     Color 0.008 0.012 0.016 0.95
+     style full
+     {
+    HorizontalLayoutWidgetClass "{1C0E000000000032}" {
+     Name "FooterNavLeft"
+     Slot FrameWidgetSlot "{1C0E000000000072}" {
+      SizeToContent 1
+     }
+     {
+      ButtonWidgetClass "{1C0E000000000040}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationCloseMap"
+       Slot LayoutSlot "{1C0E000000000041}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+        Padding 15 15 15 15
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "GadgetMap"
+         m_sLabel "#LL-Map_CloseMap"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+      ButtonWidgetClass "{1C0E000000000038}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationDescription"
+       Slot LayoutSlot "{1C0E000000000039}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+        Padding 15 15 15 15
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "LL_SwitchDescription"
+         m_sLabel "#LL-Briefing_ShowHideDescription"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+     }
+    }
+     }
+    }
+   }
+  }
+ }
+}

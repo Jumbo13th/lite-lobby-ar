@@ -1,0 +1,82 @@
+ButtonWidgetClass {
+ Name "VehicleSelector"
+ components {
+  LL_VehicleSelector "{1A0E000000000001}" {
+   m_sSoundClicked ""
+   m_BackgroundDefault 0.1 0.11 0.14 0.45
+   m_BackgroundHovered 0.16 0.17 0.2 0.5
+   m_BackgroundSelected 0.1 0.11 0.14 0.45
+   m_BackgroundSelectedHovered 0.16 0.17 0.2 0.5
+   m_BackgroundClicked 0.1 0.11 0.14 0.45
+  }
+ }
+ style blank
+ {
+  FrameWidgetClass "{1A0E000000000002}" {
+   Name "Row"
+   Slot ButtonWidgetSlot "{1A0E000000000003}" {
+    Padding 8 8 8 0
+   }
+   {
+    ImageWidgetClass "{1A0E000000000004}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{1A0E000000000005}" {
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 608
+      OffsetRight -608
+      SizeY 40
+      OffsetBottom -40
+     }
+     Color 0.1 0.11 0.14 0.45
+    }
+    ImageWidgetClass "{1A0E000000000006}" {
+     Name "VehicleFactionColor"
+     Slot FrameWidgetSlot "{1A0E000000000007}" {
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 6
+      OffsetRight -6
+      SizeY 40
+      OffsetBottom -40
+     }
+     Color 0.376 0.749 0.749 1
+    }
+    ImageWidgetClass "{1A0E000000000008}" {
+     Name "VehicleIcon"
+     Slot FrameWidgetSlot "{1A0E000000000009}" {
+      PositionX 10
+      OffsetLeft 10
+      PositionY 4
+      OffsetTop 4
+      SizeX 32
+      OffsetRight -42
+      SizeY 32
+      OffsetBottom -36
+     }
+     Size 32 32
+    }
+    TextWidgetClass "{1A0E00000000000A}" {
+     Name "VehicleClassName"
+     Slot FrameWidgetSlot "{1A0E00000000000B}" {
+      PositionX 52
+      OffsetLeft 52
+      OffsetTop 0
+      SizeX 540
+      OffsetRight -592
+      SizeY 40
+      OffsetBottom -40
+     }
+     Color 0.855 0.855 0.855 0.95
+     Text "Vehicle"
+     "Font Size" 18
+     "Min Font Size" 16
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{1A0E00000000000C}" {
+      Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+     }
+    }
+   }
+  }
+ }
+}

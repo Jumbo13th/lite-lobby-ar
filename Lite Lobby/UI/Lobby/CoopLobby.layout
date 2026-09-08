@@ -1,0 +1,761 @@
+FrameWidgetClass {
+ Name "CoopLobby"
+ "Z Order" 9
+ {
+  ImageWidgetClass "{1A0B000000000001}" {
+   Name "BackgroundFull"
+   Slot FrameWidgetSlot "{1A0B000000000002}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0.012 0.014 0.016 1
+  }
+      ImageWidgetClass "{1A0B000000000010}" {
+       Name "HeadersStrip"
+       Slot FrameWidgetSlot "{1A0B000000000011}" {
+        Anchor 0 0 1 0
+        PositionX 0
+        OffsetLeft 0
+        PositionY 93
+        OffsetTop 93
+        OffsetRight 0
+        SizeY 65
+        OffsetBottom -158
+       }
+       Opacity 0.5
+       Color 0 0 0 1
+      }
+      ImageWidgetClass "{1A0B000000000012}" {
+       Name "FactionsPanel"
+       Slot FrameWidgetSlot "{1A0B000000000013}" {
+        Anchor 0 0 0 1
+        PositionX 0
+        OffsetLeft 0
+        PositionY 158
+        OffsetTop 158
+        SizeX 289
+        OffsetRight -289
+        OffsetBottom 128
+       }
+       Opacity 0.3
+       Color 0 0 0 1
+      }
+      TextWidgetClass "{1A0B000000000014}" {
+       Name "FactionsHeader"
+       Slot FrameWidgetSlot "{1A0B000000000015}" {
+        PositionX 24
+        OffsetLeft 24
+        PositionY 93
+        OffsetTop 93
+        SizeX 260
+        OffsetRight -284
+        SizeY 65
+        OffsetBottom -158
+       }
+       Text "#LL-Lobby_Factions"
+       "Font Size" 36
+       "Min Font Size" 36
+       "Vertical Alignment" Center
+       FontProperties FontProperties "{1A0B000000000016}" {
+        Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+       }
+      }
+      ScrollLayoutWidgetClass "{1A0B000000000017}" {
+       Name "FactionScroll"
+       Slot FrameWidgetSlot "{1A0B000000000018}" {
+        Anchor 0 0 0 1
+        PositionX 8
+        OffsetLeft 8
+        PositionY 166
+        OffsetTop 166
+        SizeX 281
+        OffsetRight -289
+        OffsetBottom 136
+       }
+       {
+        VerticalLayoutWidgetClass "{1A0B000000000019}" {
+         Name "FactionList"
+         Slot AlignableSlot "{1A0B00000000001A}" {
+         }
+        }
+       }
+      }
+      ImageWidgetClass "{1A0B000000000020}" {
+       Name "RolesPanel"
+       Slot FrameWidgetSlot "{1A0B000000000021}" {
+        Anchor 0 0 0 1
+        PositionX 293
+        OffsetLeft 293
+        PositionY 158
+        OffsetTop 158
+        SizeX 640
+        OffsetRight -933
+        OffsetBottom 128
+       }
+       Opacity 0.3
+       Color 0 0 0 1
+      }
+      TextWidgetClass "{1A0B000000000022}" {
+       Name "RolesHeader"
+       Slot FrameWidgetSlot "{1A0B000000000023}" {
+        PositionX 305
+        OffsetLeft 305
+        PositionY 93
+        OffsetTop 93
+        SizeX 260
+        OffsetRight -565
+        SizeY 65
+        OffsetBottom -158
+       }
+       Text "#LL-Lobby_Roles"
+       "Font Size" 36
+       "Min Font Size" 36
+       "Vertical Alignment" Center
+       FontProperties FontProperties "{1A0B000000000024}" {
+        Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+       }
+      }
+      RichTextWidgetClass "{69F1A2B3C4D50448}" {
+       Name "WebsiteLegend"
+       Slot FrameWidgetSlot "{69F1A2B3C4D50449}" {
+        PositionX 570
+        OffsetLeft 570
+        PositionY 93
+        OffsetTop 93
+        SizeX 355
+        OffsetRight -925
+        SizeY 65
+        OffsetBottom -158
+       }
+       "Is Visible" 0
+       Color 0.63 0.63 0.63 1
+       Text "#LL-Lobby_WebsiteLegend"
+       "Font Size" 16
+       "Min Font Size" 16
+       "Horizontal Alignment" Right
+       "Vertical Alignment" Center
+      }
+      ScrollLayoutWidgetClass "{1A0B000000000025}" {
+       Name "RolesScroll"
+       Slot FrameWidgetSlot "{1A0B000000000026}" {
+        Anchor 0 0 0 1
+        PositionX 293
+        OffsetLeft 293
+        PositionY 166
+        OffsetTop 166
+        SizeX 640
+        OffsetRight -933
+        OffsetBottom 136
+       }
+       {
+        VerticalLayoutWidgetClass "{1A0B000000000027}" {
+         Name "RolesList"
+         Slot AlignableSlot "{1A0B000000000028}" {
+         }
+        }
+       }
+      }
+      ImageWidgetClass "{1A0B000000000210}" {
+       Name "PreviewPanel"
+       Slot FrameWidgetSlot "{1A0B000000000211}" {
+        Anchor 0 0 0 1
+        PositionX 941
+        OffsetLeft 941
+        PositionY 158
+        OffsetTop 158
+        SizeX 457
+        OffsetRight -1398
+        OffsetBottom 128
+       }
+       Opacity 0.3
+       Color 0 0 0 1
+      }
+      TextWidgetClass "{1A0B000000000212}" {
+       Name "PreviewHeader"
+       Slot FrameWidgetSlot "{1A0B000000000213}" {
+        PositionX 953
+        OffsetLeft 953
+        PositionY 93
+        OffsetTop 93
+        SizeX 260
+        OffsetRight -1213
+        SizeY 65
+        OffsetBottom -158
+       }
+       Text "#LL-Lobby_Preview"
+       "Font Size" 36
+       "Min Font Size" 36
+       "Vertical Alignment" Center
+       FontProperties FontProperties "{1A0B000000000214}" {
+        Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+       }
+      }
+      FrameWidgetClass "{1A0B000000000215}" {
+       Name "LoadoutPreview"
+       Slot FrameWidgetSlot "{1A0B000000000216}" {
+        Anchor 0 0 0 1
+        PositionX 941
+        OffsetLeft 941
+        PositionY 166
+        OffsetTop 166
+        SizeX 457
+        OffsetRight -1398
+        OffsetBottom 136
+       }
+       components {
+        LL_LobbyLoadoutPreview "{1A0B000000000217}" {
+        }
+       }
+       {
+        ImageWidgetClass "{1A0B000000000230}" {
+         Name "NameBackground"
+         Slot FrameWidgetSlot "{1A0B000000000231}" {
+          Anchor 0 0 1 0
+          PositionX 0
+          OffsetLeft 0
+          PositionY 0
+          OffsetTop 0
+          OffsetRight 0
+          SizeY 44
+          OffsetBottom -44
+         }
+         Color 0.2 0.2 0.2 1
+         Opacity 0.85
+        }
+        TextWidgetClass "{1A0B000000000234}" {
+         Name "PreviewName"
+         Slot FrameWidgetSlot "{1A0B000000000235}" {
+          Anchor 0 0 1 0
+          PositionX 0
+          OffsetLeft 0
+          PositionY 0
+          OffsetTop 0
+          OffsetRight 0
+          SizeY 44
+          OffsetBottom -44
+         }
+         Text ""
+         "Font Size" 28
+         "Min Font Size" 28
+         "Horizontal Alignment" Center
+         "Vertical Alignment" Center
+         FontProperties FontProperties "{1A0B000000000236}" {
+          Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+         }
+        }
+        FrameWidgetClass "{1A0B000000000237}" {
+         Name "ModelFrame"
+         Slot FrameWidgetSlot "{1A0B000000000238}" {
+          Anchor 0 0 1 1
+          OffsetLeft 8
+          OffsetTop 52
+          OffsetRight 8
+          OffsetBottom 196
+         }
+         {
+          ItemPreviewWidgetClass "{1A0B000000000239}" {
+           Name "playerRender"
+           Slot FrameWidgetSlot "{1A0B00000000023A}" {
+            Anchor 0 0 1 1
+            OffsetLeft 0
+            OffsetTop 0
+            OffsetRight 0
+            OffsetBottom 0
+           }
+           Opacity 1
+           "Use Engine Scale" 0
+           xscale 4
+           yscale 4
+           Format "HDR High"
+          }
+          PanelWidgetClass "{1A0B00000000023B}" {
+           Name "PreviewBorder"
+           Slot FrameWidgetSlot "{1A0B00000000023C}" {
+            Anchor 0 0 1 1
+            OffsetLeft 0
+            OffsetTop 0
+            OffsetRight 0
+            OffsetBottom 0
+           }
+           "Z Order" 5
+           Color 0.171 0.171 0.171 1
+           style pixel_outline
+          }
+         }
+        }
+        RichTextWidgetClass "{1A0B00000000023D}" {
+         Name "PreviewGear"
+         Slot FrameWidgetSlot "{1A0B00000000023E}" {
+          Anchor 0 1 1 1
+          OffsetLeft 8
+          OffsetTop -180
+          OffsetRight 8
+          OffsetBottom 8
+         }
+         Text ""
+         "Font Size" 22
+         Wrap 1
+         FontProperties FontProperties "{1A0B00000000023F}" {
+          Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+         }
+        }
+       }
+      }
+      ImageWidgetClass "{1A0B000000000030}" {
+       Name "PlayersPanel"
+       Slot FrameWidgetSlot "{1A0B000000000031}" {
+        Anchor 1 0 1 1
+        PositionX -510
+        OffsetLeft -510
+        PositionY 158
+        OffsetTop 158
+        OffsetRight 0
+        OffsetBottom 128
+       }
+       Opacity 0.3
+       Color 0 0 0 1
+      }
+      TextWidgetClass "{1A0B000000000032}" {
+       Name "PlayersHeader"
+       Slot FrameWidgetSlot "{1A0B000000000033}" {
+        Anchor 1 0 1 0
+        PositionX -494
+        OffsetLeft -494
+        PositionY 93
+        OffsetTop 93
+        SizeX 260
+        OffsetRight 234
+        SizeY 65
+        OffsetBottom -158
+       }
+       Text "#LL-Lobby_Players"
+       "Font Size" 36
+       "Min Font Size" 36
+       "Vertical Alignment" Center
+       FontProperties FontProperties "{1A0B000000000034}" {
+        Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+       }
+      }
+      FrameWidgetClass "{1A0B000000000060}" {
+       Name "PlayersTabs"
+       Slot FrameWidgetSlot "{1A0B000000000061}" {
+        Anchor 1 0 1 0
+        PositionX -494
+        OffsetLeft -494
+        PositionY 166
+        OffsetTop 166
+        SizeX 480
+        OffsetRight 14
+        SizeY 42
+        OffsetBottom -208
+       }
+       {
+        OverlayWidgetClass "{1A0B000000000062}" {
+         Name "TabOverlay0"
+         Slot FrameWidgetSlot "{1A0B000000000063}" {
+          OffsetLeft 0
+          OffsetTop 0
+          SizeX 240
+          OffsetRight -240
+          SizeY 34
+          OffsetBottom -34
+         }
+         {
+          ButtonWidgetClass "{1A0B000000000064}" {
+           Name "TabPlayerList"
+           Slot OverlayWidgetSlot "{1A0B000000000065}" {
+           }
+           Color 1 1 1 0
+           components {
+            SCR_ButtonBaseComponent "{1A0B000000000066}" {
+             m_bCanBeToggled 1
+             m_bIsToggled 1
+             m_BackgroundDefault 0.027 0.027 0.027 1
+             m_BackgroundHovered 0.063 0.061 0.061 1
+             m_BackgroundSelected 0.761 0.386 0.078 1
+             m_BackgroundSelectedHovered 0.93 0.361 0.016 1
+             m_BackgroundClicked 0.761 0.386 0.078 1
+            }
+           }
+           "no focus" 1
+           {
+            FrameWidgetClass "{1A0B000000000067}" {
+             Name "TabFrame"
+             Slot ButtonWidgetSlot "{1A0B000000000068}" {
+             }
+             {
+              ImageWidgetClass "{1A0B000000000069}" {
+               Name "Background"
+               Slot FrameWidgetSlot "{1A0B00000000006A}" {
+                OffsetLeft 0
+                OffsetTop 0
+                SizeX 240
+                OffsetRight -240
+                SizeY 34
+                OffsetBottom -34
+               }
+              }
+             }
+            }
+           }
+          }
+          TextWidgetClass "{1A0B00000000006B}" {
+           Name "TabText"
+           Slot OverlayWidgetSlot "{1A0B00000000006C}" {
+            HorizontalAlign 0
+            Padding 8 0 0 0
+           }
+           Text "#LL-Lobby_TabList"
+          }
+         }
+        }
+        OverlayWidgetClass "{1A0B00000000006D}" {
+         Name "TabOverlay1"
+         Slot FrameWidgetSlot "{1A0B00000000006E}" {
+          PositionX 240
+          OffsetLeft 240
+          OffsetTop 0
+          SizeX 240
+          OffsetRight -480
+          SizeY 34
+          OffsetBottom -34
+         }
+         {
+          ButtonWidgetClass "{1A0B00000000006F}" {
+           Name "TabVoiceChannels"
+           Slot OverlayWidgetSlot "{1A0B000000000070}" {
+           }
+           Color 1 1 1 0
+           components {
+            SCR_ButtonBaseComponent "{1A0B000000000071}" {
+             m_bCanBeToggled 1
+             m_BackgroundDefault 0.027 0.027 0.027 1
+             m_BackgroundHovered 0.063 0.061 0.061 1
+             m_BackgroundSelected 0.761 0.386 0.078 1
+             m_BackgroundSelectedHovered 0.93 0.361 0.016 1
+             m_BackgroundClicked 0.761 0.386 0.078 1
+            }
+           }
+           "no focus" 1
+           {
+            FrameWidgetClass "{1A0B000000000072}" {
+             Name "TabFrame"
+             Slot ButtonWidgetSlot "{1A0B000000000073}" {
+             }
+             {
+              ImageWidgetClass "{1A0B000000000074}" {
+               Name "Background"
+               Slot FrameWidgetSlot "{1A0B000000000075}" {
+                OffsetLeft 0
+                OffsetTop 0
+                SizeX 240
+                OffsetRight -240
+                SizeY 34
+                OffsetBottom -34
+               }
+              }
+             }
+            }
+           }
+          }
+          TextWidgetClass "{1A0B000000000076}" {
+           Name "TabText"
+           Slot OverlayWidgetSlot "{1A0B000000000077}" {
+            HorizontalAlign 0
+            Padding 8 0 0 0
+           }
+           Text "#LL-Lobby_VoiceChannels"
+          }
+         }
+        }
+        ImageWidgetClass "{1A0B000000000081}" {
+         Name "TabsUnderline"
+         Slot FrameWidgetSlot "{1A0B000000000082}" {
+          PositionX 0
+          OffsetLeft 0
+          PositionY 34
+          OffsetTop 34
+          SizeX 480
+          OffsetRight -480
+          SizeY 8
+          OffsetBottom -42
+         }
+         Color 0.761 0.386 0.078 1
+        }
+       }
+      }
+      PanelWidgetClass "{1A0B000000000035}" {
+       Name "PanelPlayersCounter"
+       Slot FrameWidgetSlot "{1A0B000000000036}" {
+        Anchor 1 0 1 0
+        PositionX -122
+        OffsetLeft -122
+        PositionY 104
+        OffsetTop 104
+        SizeX 106
+        OffsetRight 16
+        SizeY 47
+        OffsetBottom -151
+       }
+       Color 0 0 0 0.25
+       style full
+       {
+        TextWidgetClass "{1A0B000000000037}" {
+         Name "PlayersCounter"
+         Slot FrameWidgetSlot "{1A0B000000000038}" {
+          Anchor 0 0 1 1
+          OffsetLeft 0
+          OffsetTop 0
+          OffsetRight 0
+          OffsetBottom 0
+         }
+         Text "0 / 0"
+         "Font Size" 26
+         "Min Font Size" 26
+         "Horizontal Alignment" Center
+         "Vertical Alignment" Center
+        }
+       }
+      }
+      ButtonWidgetClass "{1A0B0000000000A0}" : "{67B4F07635959DC7}UI/layouts/WidgetLibrary/EditBox/WLib_EditBoxSearch.layout" {
+       Name "PlayersSearch"
+       Slot FrameWidgetSlot "{1A0B0000000000A1}" {
+        Anchor 1 0 1 0
+        PositionX -494
+        OffsetLeft -494
+        PositionY 214
+        OffsetTop 214
+        SizeX 480
+        OffsetRight 14
+        SizeY 40
+        OffsetBottom -254
+       }
+       components {
+        SCR_EditBoxSearchComponent "{553AB38AB35B762C}" {
+         m_sSoundHovered ""
+         m_sSoundClicked ""
+         m_fSizeWithLabel 40
+         m_fSizeWithoutLabel 40
+        }
+       }
+       {
+        SizeLayoutWidgetClass "{5538C205B27B0F5D}" {
+         Prefab "{5538C205B27B0F5D}"
+         HeightOverride 40
+        }
+       }
+      }
+      TextWidgetClass "{1A0B0000000000A2}" {
+       Name "PlayersSearchEmpty"
+       Slot FrameWidgetSlot "{1A0B0000000000A3}" {
+        Anchor 1 0 1 0
+        PositionX -494
+        OffsetLeft -494
+        PositionY 270
+        OffsetTop 270
+        SizeX 480
+        OffsetRight 14
+        SizeY 30
+        OffsetBottom -300
+       }
+       "Is Visible" 0
+       Color 0.509 0.509 0.503 1
+       Text "#LL-Lobby_SearchNoMatch"
+       "Font Size" 18
+       "Horizontal Alignment" Center
+       "Vertical Alignment" Center
+       FontProperties FontProperties "{1A0B0000000000A4}" {
+        Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+       }
+      }
+      ScrollLayoutWidgetClass "{1A0B000000000039}" {
+       Name "PlayersScroll"
+       Slot FrameWidgetSlot "{1A0B00000000003A}" {
+        Anchor 1 0 1 1
+        PositionX -494
+        OffsetLeft -494
+        PositionY 262
+        OffsetTop 262
+        SizeX 480
+        OffsetRight 14
+        OffsetBottom 140
+       }
+       {
+        VerticalLayoutWidgetClass "{1A0B00000000003B}" {
+         Name "PlayersList"
+         Slot AlignableSlot "{1A0B00000000003C}" {
+         }
+        }
+       }
+      }
+      FrameWidgetClass "{1A0B000000000078}" {
+       Name "VoiceChannelsPanel"
+       Slot FrameWidgetSlot "{1A0B000000000079}" {
+        Anchor 1 0 1 1
+        PositionX -494
+        OffsetLeft -494
+        PositionY 214
+        OffsetTop 214
+        SizeX 480
+        OffsetRight 14
+        OffsetBottom 140
+       }
+       "Is Visible" 0
+       components {
+        LL_VoiceChannelList "{1A0B00000000007A}" {
+        }
+       }
+       {
+        ScrollLayoutWidgetClass "{1A0B00000000007B}" {
+         Name "VoiceChannelsScroll"
+         Slot FrameWidgetSlot "{1A0B00000000007C}" {
+          Anchor 0 0 1 1
+          OffsetLeft 0
+          OffsetTop 0
+          OffsetRight 0
+          OffsetBottom 0
+         }
+         {
+          VerticalLayoutWidgetClass "{1A0B00000000007D}" {
+           Name "RoomsList"
+           Slot AlignableSlot "{1A0B00000000007E}" {
+            HorizontalAlign 3
+           }
+          }
+         }
+        }
+       }
+      }
+      ImageWidgetClass "{1A0B000000000040}" {
+       Name "Separator"
+       Slot FrameWidgetSlot "{1A0B000000000041}" {
+        Anchor 0 1 1 1
+        PositionX 0
+        OffsetLeft 0
+        PositionY -128
+        OffsetTop -128
+        OffsetRight 0
+        SizeY 2
+        OffsetBottom 126
+       }
+       Color 0.171 0.171 0.171 1
+      }
+      OverlayWidgetClass "{1A0B000000000042}" {
+       Name "FooterNav"
+       Slot FrameWidgetSlot "{1A0B000000000043}" {
+        Anchor 0 1 1 1
+        PositionX 15
+        OffsetLeft 15
+        PositionY -126
+        OffsetTop -126
+        OffsetRight 15
+        SizeY 72
+        OffsetBottom 54
+       }
+       {
+        HorizontalLayoutWidgetClass "{1A0B000000000044}" {
+         Name "FooterNavLeft"
+         Slot OverlayWidgetSlot "{1A0B000000000045}" {
+          HorizontalAlign 0
+         }
+         {
+          ButtonWidgetClass "{1A0B000000000046}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+           Name "NavigationClose"
+           Slot LayoutSlot "{1A0B000000000047}" {
+            HorizontalAlign 3
+            VerticalAlign 3
+            Padding 15 15 15 15
+           }
+           components {
+            SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+             m_sActionName "MenuBack"
+             m_sLabel "#LL-Lobby_OpenMenu"
+             m_bIsMouseInput 1
+            }
+           }
+          }
+          ButtonWidgetClass "{1A0B000000000048}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+           Name "NavigationChat"
+           Slot LayoutSlot "{1A0B000000000049}" {
+            HorizontalAlign 3
+            VerticalAlign 3
+            Padding 15 15 15 15
+           }
+           components {
+            SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+             m_sActionName "ChatToggle"
+             m_sLabel "#LL-Lobby_Chat"
+             m_bIsMouseInput 1
+            }
+           }
+          }
+          ButtonWidgetClass "{1A0B00000000007F}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+           Name "NavigationVoice"
+           Slot LayoutSlot "{1A0B000000000080}" {
+            HorizontalAlign 3
+            VerticalAlign 3
+            Padding 15 15 15 15
+           }
+           components {
+            SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+             m_sActionName "VONDirect"
+             m_sLabel "#LL-Lobby_VoiceChat"
+            }
+           }
+          }
+         }
+        }
+        HorizontalLayoutWidgetClass "{1A0B00000000004A}" {
+         Name "FooterNavRight"
+         Slot OverlayWidgetSlot "{1A0B00000000004B}" {
+          HorizontalAlign 2
+         }
+         {
+          ButtonWidgetClass "{1A0B00000000004C}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+           Name "NavigationStart"
+           Slot LayoutSlot "{1A0B00000000004D}" {
+            HorizontalAlign 3
+            VerticalAlign 3
+            Padding 15 15 15 15
+           }
+           components {
+            SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+             m_sActionName "MenuSelect"
+             m_sLabel "#LL-Lobby_Ready"
+             m_bIsMouseInput 1
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      FrameWidgetClass "{1A0B000000000050}" : "{7C41E2A90B5D318F}UI/Lobby/GameModeHeader.layout" {
+       Name "GameModeHeader"
+       Slot FrameWidgetSlot "{1A0B000000000051}" {
+        Anchor 0 0 1 0
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        OffsetRight 0
+        SizeY 93
+        OffsetBottom -93
+       }
+      }
+      FrameWidgetClass "{1A0B0000000000D0}" : "{D89BBA18F99053D6}UI/layouts/HUD/Chat/ChatHud.layout" {
+       Name "Chat"
+       Slot FrameWidgetSlot "{1A0B0000000000D1}" {
+        Anchor 0 0 1 1
+        OffsetLeft 0
+        OffsetTop 0
+        OffsetRight 0
+        OffsetBottom 0
+       }
+       "Z Order" 50
+      }
+ }
+}

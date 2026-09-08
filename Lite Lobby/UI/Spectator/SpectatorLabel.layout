@@ -1,0 +1,112 @@
+FrameWidgetClass {
+ Name "SpectatorLabel"
+ Clipping False
+ "Ignore Cursor" 0
+ components {
+  LL_SpectatorLabel "{1D11000000000001}" {
+  }
+ }
+ {
+  RichTextWidgetClass "{1D11000000000002}" {
+   Name "Text"
+   Slot FrameWidgetSlot "{1D11000000000003}" {
+    PositionX 16
+    OffsetLeft 16
+    PositionY -24
+    OffsetTop -24
+    SizeX 200
+    OffsetRight -216
+    SizeY 24
+    OffsetBottom 0
+    Alignment 0.5 0
+    SizeToContent 1
+   }
+   "Z Order" 10
+   Text ""
+   "Font Size" 16
+   "Min Font Size" 16
+   "Horizontal Alignment" Center
+   "Vertical Alignment" Center
+   FontProperties FontProperties "{1D11000000000004}" {
+    Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+    OutlineSize 3
+   }
+  }
+  FrameWidgetClass "{1D11000000000005}" {
+   Name "IconFrame"
+   Slot FrameWidgetSlot "{1D11000000000006}" {
+    OffsetLeft 0
+    OffsetTop 0
+    SizeX 32
+    OffsetRight -32
+    SizeY 32
+    OffsetBottom -32
+   }
+   {
+    ImageWidgetClass "{1D11000000000007}" {
+     Name "CircleSmall"
+     Slot FrameWidgetSlot "{1D11000000000008}" {
+      PositionX 10
+      OffsetLeft 10
+      PositionY 10
+      OffsetTop 10
+      SizeX 12
+      OffsetRight -22
+      SizeY 12
+      OffsetBottom -22
+     }
+     Opacity 0.75
+     Texture "{8479B3B5347DF5CF}UI/Imagesets/MilitarySymbol/ID_D.imageset"
+     Image "Friend_SeaSurface_Bcg"
+     Size 16 16
+    }
+    OverlayWidgetClass "{1D11000000000009}" {
+     Name "OverlayCircle"
+     Slot FrameWidgetSlot "{1D1100000000000A}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     {
+      ImageWidgetClass "{1D1100000000000B}" {
+       Name "IconBackground"
+       Slot OverlayWidgetSlot "{1D1100000000000C}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       Texture "{8479B3B5347DF5CF}UI/Imagesets/MilitarySymbol/ID_D.imageset"
+       Image "Character_Bcg"
+       Size 64 64
+      }
+      ImageWidgetClass "{1D1100000000000D}" {
+       Name "IconCircle"
+       Slot OverlayWidgetSlot "{1D1100000000000E}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       Texture "{8479B3B5347DF5CF}UI/Imagesets/MilitarySymbol/ID_D.imageset"
+       Image "Character"
+       Size 64 64
+      }
+     }
+    }
+    ImageWidgetClass "{1D1100000000000F}" {
+     Name "UnitIcon"
+     Slot FrameWidgetSlot "{1D11000000000010}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     "Z Order" 2
+     Texture "{137763F3F592C65A}UI/Textures/Editor/EditableEntities/Base/EditableEntity_Base_None.edds"
+     Image ""
+     Size 64 64
+    }
+   }
+  }
+ }
+}

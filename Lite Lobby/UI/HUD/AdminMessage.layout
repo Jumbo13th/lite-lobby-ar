@@ -1,0 +1,106 @@
+FrameWidgetClass {
+ Name "AdminMessage"
+ components {
+  LL_AdminMessageHud "{1D13000000000001}" {
+  }
+ }
+ {
+  FrameWidgetClass "{1D13000000000002}" {
+   Name "Banner"
+   Slot FrameWidgetSlot "{1D13000000000003}" {
+    Anchor 0.5 0 0.5 0
+    PositionX -360
+    OffsetLeft -360
+    PositionY 24
+    OffsetTop 24
+    SizeX 720
+    OffsetRight -360
+    SizeY 130
+    OffsetBottom -154
+   }
+   {
+    ImageWidgetClass "{1D13000000000004}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{1D13000000000005}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.007 0.012 0.014 1
+    }
+    TextWidgetClass "{1D13000000000006}" {
+     Name "Header"
+     Slot FrameWidgetSlot "{1D13000000000007}" {
+      Anchor 0 0 1 0
+      OffsetLeft 0
+      OffsetTop 10
+      OffsetRight 0
+      OffsetBottom -34
+     }
+     Color 0.761 0.392 0.078 1
+     Text "#LL-AdminMessage_Announcement"
+     "Font Size" 16
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{1D13000000000008}" {
+      OutlineSize 2
+     }
+    }
+    ImageWidgetClass "{1D13000000000010}" {
+     Name "Separator"
+     Slot FrameWidgetSlot "{1D13000000000011}" {
+      Anchor 0 0 1 0
+      OffsetLeft 18
+      OffsetTop 38
+      OffsetRight 18
+      OffsetBottom -40
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    RichTextWidgetClass "{1D13000000000009}" {
+     Name "MessageText"
+     Slot FrameWidgetSlot "{1D1300000000000A}" {
+      OffsetLeft 24
+      OffsetTop 48
+      SizeX 672
+      OffsetRight -696
+      SizeY 70
+      OffsetBottom -118
+     }
+     Color 0.92 0.92 0.92 1
+     Text "Message"
+     "Font Size" 22
+     "Min Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+     Wrap 1
+    }
+    ImageWidgetClass "{1D1300000000000B}" {
+     Name "ProgressBar"
+     Slot FrameWidgetSlot "{1D1300000000000C}" {
+      Anchor 0 1 1 1
+      OffsetLeft 0
+      OffsetTop -6
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    PanelWidgetClass "{1D1300000000000D}" {
+     Name "Border"
+     Slot FrameWidgetSlot "{1D1300000000000E}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+     style outline_2px
+    }
+   }
+  }
+ }
+}

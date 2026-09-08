@@ -1,0 +1,9 @@
+GenericEntity {
+ ID "69BD22C4CE5A4318"
+ components {
+  LL_TriggerMissionEndTimer "{69BD22C4CE5A4300}" {
+   m_sMessage "#LL-TriggerMsg_TimeUp"
+  }
+ }
+ coords 2.669 2.2 2.926
+}

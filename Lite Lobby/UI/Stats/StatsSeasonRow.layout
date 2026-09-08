@@ -1,0 +1,212 @@
+SizeLayoutWidgetClass {
+ Name "StatsSeasonRow"
+ Slot LayoutSlot "{8C3E5A19D2B47671}" {
+  HorizontalAlign 3
+ }
+ AllowHeightOverride 1
+ HeightOverride 28
+ {
+  FrameWidgetClass "{8C3E5A19D2B47672}" {
+   Name "RowFrame"
+   Slot AlignableSlot "{8C3E5A19D2B47673}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   {
+    ImageWidgetClass "{8C3E5A19D2B47674}" {
+     Name "RowBg"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47675}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 1 1 1 0.03
+    }
+    TextWidgetClass "{8C3E5A19D2B47676}" {
+     Name "Place"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47677}" {
+      Anchor 0 0 0 1
+      OffsetLeft 10
+      OffsetTop 0
+      SizeX 30
+      OffsetRight -40
+      OffsetBottom 0
+     }
+     Color 0.55 0.55 0.55 1
+     Text ""
+     "Font Size" 14
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47678}" {
+     Name "Name"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47679}" {
+      Anchor 0 0 1 1
+      OffsetLeft 46
+      OffsetTop 0
+      OffsetRight 668
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 15
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4767A}" {
+     Name "Rating"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4767B}" {
+      Anchor 1 0 1 1
+      PositionX -660
+      OffsetLeft -660
+      OffsetTop 0
+      SizeX 88
+      OffsetRight 572
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+     Text ""
+     "Font Size" 15
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47682}" {
+     Name "RawPoints"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47683}" {
+      Anchor 1 0 1 1
+      PositionX -572
+      OffsetLeft -572
+      OffsetTop 0
+      SizeX 76
+      OffsetRight 496
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4767C}" {
+     Name "Games"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4767D}" {
+      Anchor 1 0 1 1
+      PositionX -496
+      OffsetLeft -496
+      OffsetTop 0
+      SizeX 60
+      OffsetRight 436
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4767E}" {
+     Name "Wins"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4767F}" {
+      Anchor 1 0 1 1
+      PositionX -436
+      OffsetLeft -436
+      OffsetTop 0
+      SizeX 74
+      OffsetRight 362
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47680}" {
+     Name "CommandWins"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47681}" {
+      Anchor 1 0 1 1
+      PositionX -362
+      OffsetLeft -362
+      OffsetTop 0
+      SizeX 94
+      OffsetRight 268
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47684}" {
+     Name "Kills"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47685}" {
+      Anchor 1 0 1 1
+      PositionX -268
+      OffsetLeft -268
+      OffsetTop 0
+      SizeX 68
+      OffsetRight 200
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47686}" {
+     Name "Losses"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47687}" {
+      Anchor 1 0 1 1
+      PositionX -200
+      OffsetLeft -200
+      OffsetTop 0
+      SizeX 68
+      OffsetRight 132
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B47688}" {
+     Name "Teamkills"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47689}" {
+      Anchor 1 0 1 1
+      PositionX -132
+      OffsetLeft -132
+      OffsetTop 0
+      SizeX 50
+      OffsetRight 82
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4768A}" {
+     Name "AvgPlayers"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4768B}" {
+      Anchor 1 0 1 1
+      PositionX -82
+      OffsetLeft -82
+      OffsetTop 0
+      SizeX 74
+      OffsetRight 8
+      OffsetBottom 0
+     }
+     Color 0.85 0.85 0.85 1
+     Text ""
+     "Font Size" 14
+     "Horizontal Alignment" Center
+     "Vertical Alignment" Center
+    }
+   }
+  }
+ }
+}

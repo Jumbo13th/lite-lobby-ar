@@ -1,0 +1,97 @@
+OverlayWidgetClass {
+ Name "ContextMenu"
+ Slot FrameWidgetSlot "{1D14000000000003}" {
+  SizeToContent 1
+ }
+ "Z Order" 10000
+ components {
+  LL_ContextMenu "{1D14000000000001}" {
+  }
+ }
+ {
+  BlurWidgetClass "{1D14000000000014}" {
+   Name "Blur"
+   Slot OverlayWidgetSlot "{1D14000000000015}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   "Ignore Cursor" 0
+   Intensity 0.8
+  }
+  ImageWidgetClass "{1D14000000000004}" {
+   Name "Background"
+   Slot OverlayWidgetSlot "{1D14000000000005}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   Color 0.008 0.012 0.016 0.9
+   Size 240 24
+  }
+  VerticalLayoutWidgetClass "{1D14000000000006}" {
+   Name "ActionsVerticalLayout"
+   Slot OverlayWidgetSlot "{1D14000000000007}" {
+    Padding 4 4 4 4
+   }
+   {
+    OverlayWidgetClass "{1D14000000000008}" {
+     Name "Header"
+     Slot LayoutSlot "{1D14000000000009}" {
+     }
+     {
+      ImageWidgetClass "{1D1400000000000A}" {
+       Name "HeaderBackground"
+       Slot OverlayWidgetSlot "{1D1400000000000B}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       Color 0.761 0.392 0.078 1
+       Size 232 26
+      }
+      RichTextWidgetClass "{1D1400000000000C}" {
+       Name "HeaderText"
+       Slot OverlayWidgetSlot "{1D1400000000000D}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+        Padding 8 0 8 0
+       }
+       Color 0 0 0 1
+       Text "Player"
+       "Font Size" 18
+       "Min Font Size" 12
+       "Vertical Alignment" Center
+      }
+     }
+    }
+    OverlayWidgetClass "{1D1400000000000E}" {
+     Name "NoActions"
+     Slot LayoutSlot "{1D1400000000000F}" {
+     }
+     {
+      TextWidgetClass "{1D14000000000010}" {
+       Name "NoActionsText"
+       Slot OverlayWidgetSlot "{1D14000000000011}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+        Padding 8 4 8 4
+       }
+       Color 0.6 0.6 0.6 1
+       Text "#LL-ContextMenu_NoActions"
+       "Font Size" 18
+       "Min Font Size" 12
+       "Vertical Alignment" Center
+      }
+     }
+    }
+   }
+  }
+  PanelWidgetClass "{1D14000000000012}" {
+   Name "Border"
+   Slot OverlayWidgetSlot "{1D14000000000013}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   Color 0.761 0.392 0.078 1
+   style outline_2px
+  }
+ }
+}

@@ -1,0 +1,97 @@
+FrameWidgetClass {
+ Name "ZoneExitWarning"
+ {
+  PanelWidgetClass "{1D11000000000001}" {
+   Name "Banner"
+   Slot FrameWidgetSlot "{1D11000000000002}" {
+    Anchor 0.5 0 0.5 0
+    PositionX -280
+    OffsetLeft -280
+    PositionY 56
+    OffsetTop 56
+    SizeX 560
+    OffsetRight -280
+    SizeY 104
+    OffsetBottom -160
+   }
+   Color 0.008 0.012 0.016 1
+   style full
+   {
+    OverlayWidgetClass "{1D11000000000005}" {
+     Name "Row"
+     Slot FrameWidgetSlot "{1D11000000000006}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 12
+      OffsetRight 16
+      OffsetBottom -46
+     }
+     {
+      TextWidgetClass "{1D11000000000007}" {
+       Name "Label"
+       Slot OverlayWidgetSlot "{1D11000000000008}" {
+        HorizontalAlign 0
+        VerticalAlign 1
+       }
+       Color 1 0 0 1
+       Text "#LL-Zone_Restricted"
+       "Font Size" 26
+       FontProperties FontProperties "{1D1100000000000A}" {
+        OutlineSize 2
+       }
+      }
+      TextWidgetClass "{1D11000000000009}" {
+       Name "Counter"
+       Slot OverlayWidgetSlot "{1D1100000000000B}" {
+        HorizontalAlign 2
+        VerticalAlign 1
+       }
+       Color 1 0 0 1
+       Text "00:00"
+       "Font Size" 26
+       FontProperties FontProperties "{1D1100000000000C}" {
+        OutlineSize 2
+       }
+      }
+     }
+    }
+    ImageWidgetClass "{1D1100000000000D}" {
+     Name "Separator"
+     Slot FrameWidgetSlot "{1D1100000000000E}" {
+      Anchor 0 0 1 0
+      OffsetLeft 0
+      OffsetTop 54
+      OffsetRight 0
+      OffsetBottom -56
+     }
+     Color 0.761 0.386 0.078 1
+    }
+    OverlayWidgetClass "{1D11000000000012}" {
+     Name "HintRow"
+     Slot FrameWidgetSlot "{1D11000000000013}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 64
+      OffsetRight 16
+      OffsetBottom -92
+     }
+     {
+      TextWidgetClass "{1D1100000000000F}" {
+       Name "Hint"
+       Slot OverlayWidgetSlot "{1D11000000000010}" {
+        HorizontalAlign 1
+        VerticalAlign 1
+       }
+       Color 1 1 1 1
+       Text "#LL-Zone_Return"
+       "Font Size" 20
+       FontProperties FontProperties "{1D11000000000011}" {
+        OutlineSize 2
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

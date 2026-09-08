@@ -1,0 +1,52 @@
+ImageSetClass {
+ RefSize 800 800
+ Textures {
+  ImageSetTextureClass "{69C546AD096BA30C}" {
+   screenSize FHD
+   size 800 800
+   path "{C5A8BA2A303C0A8C}UI/Textures/GroupManagement/FlagIcons/lite-icons-200.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass "fire-team" {
+   Pos 275 15
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass landing {
+   Pos 517 13
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass vehicle {
+   Pos 33 12
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass flag {
+   Pos 31 285
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass exclamation {
+   Pos 273 275
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass question {
+   Pos 518 283
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass dot {
+   Pos 273 531
+   Size 260 260
+   Flags 0 0
+  }
+  ImageSetDefClass squad {
+   Pos 30 539
+   Size 260 260
+   Flags 0 0
+  }
+ }
+}

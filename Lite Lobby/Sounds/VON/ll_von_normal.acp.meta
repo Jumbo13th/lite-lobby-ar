@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{6C81F2A3D4B5C602}Sounds/VON/ll_von_normal.acp"
+ Configurations {
+  AudioProjectResourceClass PC {
+  }
+  AudioProjectResourceClass XBOX_ONE : PC {
+  }
+  AudioProjectResourceClass XBOX_SERIES : PC {
+  }
+  AudioProjectResourceClass PS4 : PC {
+  }
+  AudioProjectResourceClass PS5 : PC {
+  }
+  AudioProjectResourceClass HEADLESS : PC {
+  }
+ }
+}

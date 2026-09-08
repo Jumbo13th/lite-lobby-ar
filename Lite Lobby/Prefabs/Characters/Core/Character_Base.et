@@ -1,0 +1,20 @@
+SCR_ChimeraCharacter {
+ ID "520EC961A090B1EE"
+ components {
+  LL_PlayableComponent "{69932A0B307ED856}" {
+   m_bIsPlayable 0
+  }
+  LL_VoNNormalComponent "{69D70BC9E6BF0039}" {
+   Filename "{6C81F2A3D4B5C602}Sounds/VON/ll_von_normal.acp"
+  }
+  LL_VoNShoutComponent "{69D70BC9FF37ED57}" {
+   Filename "{6C81F2A3D4B5C603}Sounds/VON/ll_von_shout.acp"
+  }
+  LL_VoNWhisperComponent "{69D70BC8182AD364}" {
+   Filename "{6C81F2A3D4B5C601}Sounds/VON/ll_von_whisper.acp"
+  }
+  SCR_VoNComponent "{520EA1D2F659C856}" {
+   Filename ""
+  }
+ }
+}

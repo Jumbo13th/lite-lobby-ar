@@ -1,0 +1,190 @@
+ButtonWidgetClass {
+ Name "FactionSelector"
+ Slot LayoutSlot "{1A0F000000000002}" {
+  Padding 0 0 0 0
+ }
+ components {
+  LL_FactionSelector "{1A0F000000000001}" {
+   m_bCanBeToggled 1
+   m_BackgroundDefault 0.038 0.038 0.038 0.825
+   m_BackgroundHovered 0.038 0.038 0.038 0.825
+   m_BackgroundSelected 0.014 0.014 0.014 0
+   m_BackgroundSelectedHovered 0.014 0.014 0.014 0
+   m_BackgroundClicked 0.014 0.014 0.014 0
+   m_bShowBorderOnHover 1
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{1A0F000000000003}" {
+   Name "OverlayBorder"
+   Slot ButtonWidgetSlot "{1A0F000000000004}" {
+    Padding 8 8 8 8
+   }
+   {
+    OverlayWidgetClass "{1A0F000000000005}" {
+     Name "Overlay"
+     Slot OverlayWidgetSlot "{1A0F000000000006}" {
+      Padding 8 8 8 8
+     }
+     {
+      VerticalLayoutWidgetClass "{1A0F000000000007}" {
+       Name "WLVFactionSelector"
+       Slot OverlayWidgetSlot "{1A0F000000000008}" {
+       }
+       {
+        FrameWidgetClass "{1A0F000000000009}" {
+         Name "FlagFrame"
+         Slot LayoutSlot "{1A0F00000000000A}" {
+         }
+         {
+          ScaleWidgetClass "{1A0F00000000000B}" {
+           Name "FlagScale"
+           Slot FrameWidgetSlot "{1A0F00000000000C}" {
+            OffsetLeft 0
+            OffsetTop 0
+            SizeX 224
+            OffsetRight -224
+            SizeY 144
+            OffsetBottom -144
+           }
+           "Scale Mode" "Scale to fill"
+           {
+            ImageWidgetClass "{1A0F00000000000D}" {
+             Name "FactionFlag"
+             Slot AlignableSlot "{1A0F00000000000E}" {
+             }
+             Texture "{FB266CDD4502D60B}UI/Textures/Editor/EditableEntities/Factions/EditableEntity_Faction_Fia.edds"
+             Size 256 256
+            }
+           }
+          }
+         }
+        }
+        FrameWidgetClass "{1A0F00000000000F}" {
+         Name "FactionFrame"
+         Slot LayoutSlot "{1A0F000000000010}" {
+         }
+         {
+          ImageWidgetClass "{1A0F000000000011}" {
+           Name "FactionColor"
+           Slot FrameWidgetSlot "{1A0F000000000012}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 224
+            OffsetRight -224
+            SizeY 40
+            OffsetBottom -40
+           }
+           Color 0.001 0.082 0.023 1
+          }
+          TextWidgetClass "{1A0F000000000013}" {
+           Name "FactionName"
+           Slot FrameWidgetSlot "{1A0F000000000014}" {
+            OffsetLeft 0
+            OffsetTop 0
+            SizeX 224
+            OffsetRight -224
+            SizeY 40
+            OffsetBottom -40
+           }
+           Text "FIA"
+           "Font Size" 28
+           "Min Font Size" 28
+           "Horizontal Alignment" Center
+           "Vertical Alignment" Center
+           FontProperties FontProperties "{1A0F000000000015}" {
+            Bold 1
+           }
+          }
+         }
+        }
+        FrameWidgetClass "{1A0F000000000016}" {
+         Name "FrameCounter"
+         Slot LayoutSlot "{1A0F000000000017}" {
+         }
+         {
+          ImageWidgetClass "{1A0F000000000018}" {
+           Name "FactionCounterBackground"
+           Slot FrameWidgetSlot "{1A0F000000000019}" {
+            OffsetLeft 0
+            OffsetTop 0
+            SizeX 224
+            OffsetRight -224
+            SizeY 40
+            OffsetBottom -40
+           }
+           Color 0.002 0.002 0.002 1
+          }
+          TextWidgetClass "{1A0F00000000001A}" {
+           Name "FactionCounter"
+           Slot FrameWidgetSlot "{1A0F00000000001B}" {
+            OffsetLeft 0
+            OffsetTop 0
+            SizeX 224
+            OffsetRight -224
+            SizeY 40
+            OffsetBottom -40
+           }
+           Text "0 / 0"
+           "Font Size" 26
+           "Min Font Size" 26
+           "Horizontal Alignment" Center
+           "Vertical Alignment" Center
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+    ImageWidgetClass "{1A0F00000000001C}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{1A0F00000000001D}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+      Padding 8 8 8 8
+     }
+     Color 0 0 0 1
+     Size 4 4
+    }
+    PanelWidgetClass "{1A0F00000000001E}" {
+     Name "Border"
+     Slot OverlayWidgetSlot "{1A0F00000000001F}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+      Padding 0 0 0 0
+     }
+     Color 0.761 0.392 0.078 1
+     style outline_2px
+    }
+    FrameWidgetClass "{1A0F000000000020}" {
+     Name "LockFrame"
+     Slot OverlayWidgetSlot "{1A0F000000000021}" {
+     }
+     {
+      ImageWidgetClass "{1A0F000000000022}" {
+       Name "LockImage"
+       Slot FrameWidgetSlot "{1A0F000000000023}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 40
+        OffsetRight -40
+        SizeY 40
+        OffsetBottom -40
+       }
+       "Is Visible" 0
+       Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+       Image "server-locked"
+       Size 32 32
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,16 @@
+LL_SpectatorCamera : "{D6DE32D1C0FCC1C7}Prefabs/Editor/Camera/ManualCameraBase.et" {
+ ID "6B11D3A45F2C8E07"
+ m_sActionContext "ManualCameraDebugContext"
+ m_aComponents {
+  SCR_SettingsManualCameraComponent "{52CC693B212FF1EA}" {
+   m_Flags 3
+   m_bCanHideCursor 1
+  }
+  SCR_AdjustSpeedManualCameraComponent "{52CC693B212FF018}" {
+   m_fMinMultiplier 0.001
+  }
+  SCR_ControlPlayerCameraComponent "{6997072EF5FA10D9}" {
+   m_iPriority 95
+  }
+ }
+}

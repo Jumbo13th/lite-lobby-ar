@@ -1,0 +1,9 @@
+GenericEntity {
+ ID "69BD22C391CCC3C9"
+ components {
+  LL_TriggerDestroy "{69BD22C391CCC3CE}" {
+   m_sMessage "#LL-TriggerMsg_Destroyed"
+  }
+ }
+ coords 2.669 2.2 2.926
+}

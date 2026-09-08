@@ -1,0 +1,74 @@
+SizeLayoutWidgetClass {
+ Name "StatsSideHeader"
+ Slot LayoutSlot "{8C3E5A19D2B47641}" {
+  HorizontalAlign 3
+  Padding 0 8 0 2
+ }
+ AllowHeightOverride 1
+ HeightOverride 34
+ {
+  FrameWidgetClass "{8C3E5A19D2B47642}" {
+   Name "HeaderFrame"
+   Slot AlignableSlot "{8C3E5A19D2B47643}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   {
+    ImageWidgetClass "{8C3E5A19D2B47644}" {
+     Name "HeaderBg"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47645}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.05 0.055 0.06 1
+    }
+    ImageWidgetClass "{8C3E5A19D2B47646}" {
+     Name "HeaderAccent"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47647}" {
+      Anchor 0 0 0 1
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 3
+      OffsetRight -3
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    TextWidgetClass "{8C3E5A19D2B47648}" {
+     Name "HeaderTitle"
+     Slot FrameWidgetSlot "{8C3E5A19D2B47649}" {
+      Anchor 0 0 1 1
+      OffsetLeft 14
+      OffsetTop 0
+      OffsetRight 210
+      OffsetBottom 0
+     }
+     Color 0.92 0.92 0.92 1
+     Text ""
+     "Font Size" 16
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{8C3E5A19D2B4764A}" {
+     Name "HeaderValue"
+     Slot FrameWidgetSlot "{8C3E5A19D2B4764B}" {
+      Anchor 1 0 1 1
+      PositionX -206
+      OffsetLeft -206
+      OffsetTop 0
+      SizeX 194
+      OffsetRight 12
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+     Text ""
+     "Font Size" 16
+     "Horizontal Alignment" Right
+     "Vertical Alignment" Center
+    }
+   }
+  }
+ }
+}

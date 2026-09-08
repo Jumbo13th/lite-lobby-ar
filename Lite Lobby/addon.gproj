@@ -1,0 +1,83 @@
+GameProject {
+ ID "LiteLobby"
+ GUID "699319AAA5BFC57F"
+ TITLE "Lite Lobby"
+ Dependencies {
+  "58D0FB3206B6F859"
+ }
+ Configurations {
+  GameProjectConfig PC {
+   WidgetManagerSettings WidgetManagerSettings "{AC4BE58770485E02}" {
+    StringTables {
+     StringTableDefinition "{69C774AE900D2DB4}" {
+      StringTableSource "{A0BC9BC571FC7241}Language/ll_localization.st"
+      Languages {
+       LanguageDefinition "{69C774AE6F6379E8}" {
+        Code "cs_cz"
+        StringTableRuntime "{C8AF45E38BAB0A0F}Language/ll_localization.cs_cz.conf"
+       }
+       LanguageDefinition "{69C774AE6F63790C}" {
+        Code "de_de"
+        StringTableRuntime "{1DD15FD098081B2F}Language/ll_localization.de_de.conf"
+       }
+       LanguageDefinition "{69C774AE6F63793C}" {
+        Code "en_us"
+        StringTableRuntime "{4321D59BF2FB1E2E}Language/ll_localization.en_us.conf"
+       }
+       LanguageDefinition "{69C774AE6F637926}" {
+        Code "es_es"
+        StringTableRuntime "{866D98121CF97531}Language/ll_localization.es_es.conf"
+       }
+       LanguageDefinition "{69C774AE6F637950}" {
+        Code "fr_fr"
+        StringTableRuntime "{3DC56D25FA7A9633}Language/ll_localization.fr_fr.conf"
+       }
+       LanguageDefinition "{69C774AE6F63795C}" {
+        Code "it_it"
+        StringTableRuntime "{BDD9E211575815CA}Language/ll_localization.it_it.conf"
+       }
+       LanguageDefinition "{69C774AE6F63794B}" {
+        Code "ja_jp"
+        StringTableRuntime "{ADC25F8369292561}Language/ll_localization.ja_jp.conf"
+       }
+       LanguageDefinition "{69C774AE6F637974}" {
+        Code "ko_kr"
+        StringTableRuntime "{0D7C772FFA04265E}Language/ll_localization.ko_kr.conf"
+       }
+       LanguageDefinition "{69C774AE6F63797E}" {
+        Code "pl_pl"
+        StringTableRuntime "{510DD1D544EBBA22}Language/ll_localization.pl_pl.conf"
+       }
+       LanguageDefinition "{69C774AE6F63796B}" {
+        Code "pt_br"
+        StringTableRuntime "{847A4B197F157098}Language/ll_localization.pt_br.conf"
+       }
+       LanguageDefinition "{69C774AE6F637A96}" {
+        Code "ru_ru"
+        StringTableRuntime "{D13B5FB1E26C15EE}Language/ll_localization.ru_ru.conf"
+       }
+       LanguageDefinition "{69C774AE6F637A89}" {
+        Code "uk_ua"
+        StringTableRuntime "{5B630A478E42ABBB}Language/ll_localization.uk_ua.conf"
+       }
+       LanguageDefinition "{69C774AE6F637A12}" {
+        Code "zh_cn"
+        StringTableRuntime "{81D3647AB7E27BA6}Language/ll_localization.zh_cn.conf"
+       }
+      }
+     }
+    }
+   }
+  }
+  GameProjectConfig XBOX_ONE {
+  }
+  GameProjectConfig XBOX_SERIES {
+  }
+  GameProjectConfig PS4 {
+  }
+  GameProjectConfig PS5 {
+  }
+  GameProjectConfig HEADLESS {
+  }
+ }
+}

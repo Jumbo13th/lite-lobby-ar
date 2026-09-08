@@ -1,0 +1,79 @@
+Vehicle UH1H_armed_gunship_HE_sharkNose1 : "{350492BE6F09A847}Prefabs/Vehicles/Helicopters/UH1H/UH1H_armed_gunship_HE_sharkNose.et" {
+ coords 1760.766 39.01 2875.508
+ angles 0 -102.266 0
+}
+$grp Vehicle : "{3EA6F47D95867114}Prefabs/Vehicles/Wheeled/M998/M1025_armed_M2HB.et" {
+ M1025_armed_M2HB1 {
+  components {
+   LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+    m_sGroupName "US1"
+   }
+  }
+  coords 1673.073 37.661 2583.669
+  angles 0 166.607 0
+ }
+ M1025_armed_M2HB2 {
+  components {
+   LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+    m_sGroupName "US2"
+   }
+  }
+  coords 1639.235 37.138 2584.359
+  angles 0 159.568 0
+ }
+}
+$grp Vehicle : "{4A71F755A4513227}Prefabs/Vehicles/Wheeled/M998/M1025.et" {
+ M1 {
+  components {
+   LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+    m_sGroupName "US1"
+   }
+  }
+  coords 1667.14 37.625 2581.126
+  angles 0 165.205 0
+ }
+ M2 {
+  components {
+   LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+    m_sGroupName "US2"
+   }
+  }
+  coords 1633.891 36.978 2581.631
+  angles 0 157.819 0
+ }
+}
+GenericEntity : "{ADA72BDCEF79C40A}Prefabs/MP/CombatOps/Cain/COCain_Ammo_MortarBox.et" {
+ components {
+  LL_TrackerComponent "{69F2E70CCC7419BD}" {
+   m_MarkerColor 1 0 0.75 1
+   m_bBlockMapWhileHeld 1
+   m_bBeaconSound 1
+  }
+ }
+ coords 1670.017 37.664 2584.502
+ angles 0 0 0
+}
+$grp SCR_AIGroup : "{DDF3799FA1387848}Prefabs/Groups/BLUFOR/Group_US_RifleSquad.et" {
+ US1 {
+  components {
+   LL_GroupCallsign "{69A104C34E99A0AB}" {
+    m_iCompany 0
+    m_iPlatoon 0
+    m_iSquad 0
+   }
+  }
+  coords 1669.255 37.719 2588.723
+  angles 0 165.732 0
+ }
+ US2 {
+  components {
+   LL_GroupCallsign "{69A104C347C9129A}" {
+    m_iCompany 0
+    m_iPlatoon 0
+    m_iSquad 1
+   }
+  }
+  coords 1632.996 37.028 2587.396
+  angles 0 148.422 0
+ }
+}

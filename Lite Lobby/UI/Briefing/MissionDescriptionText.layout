@@ -1,0 +1,42 @@
+FrameWidgetClass {
+ Name "MissionDescriptionText"
+ Slot FrameWidgetSlot "{1B0F000000000006}" {
+  Anchor 0 0 1 1
+  OffsetLeft 0
+  OffsetTop 0
+  OffsetRight 0
+  OffsetBottom 0
+ }
+ components {
+  LL_MissionDescriptionContentUI "{1B0F000000000001}" {
+  }
+ }
+ {
+  ScrollLayoutWidgetClass "{1B0F000000000002}" {
+   Name "DescriptionScroll"
+   Slot FrameWidgetSlot "{1B0F000000000003}" {
+    PositionX 15
+    OffsetLeft 15
+    PositionY 15
+    OffsetTop 15
+    SizeX 450
+    OffsetRight -465
+    SizeY 571
+    OffsetBottom -586
+   }
+   {
+    RichTextWidgetClass "{1B0F000000000004}" {
+     Name "DescriptionText"
+     Slot AlignableSlot "{1B0F000000000005}" {
+      HorizontalAlign 3
+      Padding 0 0 0 15
+     }
+     Text ""
+     "Font Size" 20
+     "Min Font Size" 20
+     Wrap 1
+    }
+   }
+  }
+ }
+}

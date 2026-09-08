@@ -1,0 +1,28 @@
+GenericEntity {
+ ID "6998D8B501DF5C50"
+ components {
+  BaseRadioComponent "{6998D8B4C4985062}" {
+   "Encryption key" "Lobby"
+   "Turned on" 1
+   Transceivers {
+    EditorFactionTransceiver "{6998E465A26326D3}" {
+     ChannelFrequency 1000
+     "Transmitting Range" 65000
+     "Max tunable frequency" 10000
+     "Frequency resolution" 10
+     EditorFaction ""
+    }
+   }
+  }
+  LL_VoNProxyComponent "{6998D8B4F4C3BF10}" {
+  }
+  SCR_RadioComponent "{6998E464D7124E04}" {
+  }
+  SCR_VoNComponent "{6998D8B4CEBAEDBC}" {
+   Filename "{6C237FD51869526C}Sounds/VON/ll_von.acp"
+  }
+  RplComponent "{6998D8B4FC76628B}" {
+   Streamable Disabled
+  }
+ }
+}

@@ -1,0 +1,155 @@
+ButtonWidgetClass {
+ Name "PlayerSelector"
+ components {
+  LL_PlayerSelector "{1A0E000000000001}" {
+   m_sSoundClicked ""
+   m_BackgroundDefault 1 1 1 0
+   m_BackgroundHovered 1 1 1 0.162
+   m_BackgroundSelectedHovered 0.76 0.392 0.08 0.3
+   m_BackgroundClicked 1 1 1 0
+  }
+ }
+ style blank
+ {
+  FrameWidgetClass "{1A0E000000000002}" {
+   Name "FPlayerSelector"
+   Slot ButtonWidgetSlot "{1A0E000000000003}" {
+   }
+   {
+    ImageWidgetClass "{1A0E000000000004}" {
+     Name "ImageCurrent"
+     Slot FrameWidgetSlot "{1A0E000000000005}" {
+      PositionX 6
+      OffsetLeft 6
+      PositionY 0
+      OffsetTop 0
+      SizeX 474
+      OffsetRight -480
+      SizeY 40
+      OffsetBottom -40
+     }
+     "Is Visible" 0
+     Opacity 0.4
+     Color 0.761 0.392 0.078 1
+     Texture "{E12BB5C5BD00269E}UI/Textures/Common/gradientTexture_Dither_right_512.edds"
+     Size 512 512
+     Mask "{E12BB5C5BD00269E}UI/Textures/Common/gradientTexture_Dither_right_512.edds"
+     "Transition width" 1
+     Progress 0.44
+     "Mask Mode" "Include Below"
+    }
+    ImageWidgetClass "{1A0E000000000006}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{1A0E000000000007}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 480
+      OffsetRight -480
+      SizeY 40
+      OffsetBottom -40
+     }
+    }
+    ImageWidgetClass "{1A0E000000000008}" {
+     Name "PlayerFactionColor"
+     Slot FrameWidgetSlot "{1A0E000000000009}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 6
+      OffsetRight -6
+      SizeY 40
+      OffsetBottom -40
+     }
+     Color 0.376 0.749 0.749 1
+    }
+    RichTextWidgetClass "{1A0E00000000000A}" {
+     Name "PlayerName"
+     Slot FrameWidgetSlot "{1A0E00000000000B}" {
+      PositionX 10
+      OffsetLeft 10
+      PositionY 0
+      OffsetTop 0
+      SizeX 170
+      OffsetRight -180
+      SizeY 40
+      OffsetBottom -40
+     }
+     Text "Player"
+     "Font Size" 20
+     "Min Font Size" 12
+     "Vertical Alignment" Center
+    }
+    TextWidgetClass "{1A0E00000000000C}" {
+     Name "PlayerGroupName"
+     Slot FrameWidgetSlot "{1A0E00000000000D}" {
+      PositionX 184
+      OffsetLeft 184
+      PositionY 0
+      OffsetTop 0
+      SizeX 252
+      OffsetRight -436
+      SizeY 40
+      OffsetBottom -40
+     }
+     Text ""
+     "Font Size" 18
+     "Min Font Size" 10
+     "Horizontal Alignment" Right
+     "Vertical Alignment" Center
+    }
+    ImageWidgetClass "{1A0E00000000000E}" {
+     Name "ReadyImage"
+     Slot FrameWidgetSlot "{1A0E00000000000F}" {
+      PositionX 444
+      OffsetLeft 444
+      PositionY 4
+      OffsetTop 4
+      SizeX 32
+      OffsetRight -476
+      SizeY 32
+      OffsetBottom -36
+     }
+     "Is Visible" 0
+     Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+     Image "check"
+     Size 32 32
+    }
+    ImageWidgetClass "{1A0E000000000010}" {
+     Name "PinImage"
+     Slot FrameWidgetSlot "{1A0E000000000011}" {
+      PositionX 192
+      OffsetLeft 192
+      PositionY 0
+      OffsetTop 0
+      SizeX 40
+      OffsetRight -232
+      SizeY 40
+      OffsetBottom -40
+     }
+     "Is Visible" 0
+     Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+     Image "pinPlay"
+     Size 32 32
+    }
+    PanelWidgetClass "{1A0E000000000012}" {
+     Name "Border"
+     Slot FrameWidgetSlot "{1A0E000000000013}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 480
+      OffsetRight -480
+      SizeY 40
+      OffsetBottom -40
+     }
+     Color 0.761 0.392 0.078 1
+     style pixel_outline
+    }
+   }
+  }
+ }
+}

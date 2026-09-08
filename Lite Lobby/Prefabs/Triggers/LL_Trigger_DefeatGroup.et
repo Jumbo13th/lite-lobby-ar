@@ -1,0 +1,9 @@
+GenericEntity {
+ ID "69BD22C33D35A29E"
+ components {
+  LL_TriggerDefeatGroup "{69BD22C33D35A288}" {
+   m_sMessage "#LL-TriggerMsg_GroupDefeated"
+  }
+ }
+ coords 2.669 2.2 2.926
+}

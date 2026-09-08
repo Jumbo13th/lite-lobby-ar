@@ -1,0 +1,107 @@
+VerticalLayoutWidgetClass {
+ Name "AlivePlayerGroup"
+ Slot LayoutSlot "{1D0D000000000011}" {
+  HorizontalAlign 3
+ }
+ Color 1 1 1 0
+ components {
+  LL_AlivePlayerGroup "{1D0D000000000001}" {
+  }
+ }
+ {
+  ButtonWidgetClass "{1D0D000000000002}" {
+   Name "AlivePlayerGroupButton"
+   Slot LayoutSlot "{1D0D000000000003}" {
+    HorizontalAlign 3
+    Padding 0 4 0 0
+   }
+   Color 1 1 1 0
+   components {
+    SCR_ButtonBaseComponent "{1D0D000000000004}" {
+     m_BackgroundDefault 1 1 1 0
+     m_BackgroundSelected 0.76 0.392 0.08 0.3
+    }
+   }
+   {
+    FrameWidgetClass "{1D0D000000000005}" {
+     Name "AlivePlayerGroupFrame"
+     Slot ButtonWidgetSlot "{1D0D000000000006}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     {
+      BlurWidgetClass "{1D0D000000000007}" {
+       Name "GroupBackgroundBlur"
+       Slot FrameWidgetSlot "{1D0D000000000008}" {
+        Anchor 0 0 1 0
+        PositionX 0
+        OffsetLeft 8
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 44
+        OffsetBottom -44
+       }
+       Color 0.521 0.521 0.521 1
+      }
+      ImageWidgetClass "{1D0D000000000009}" {
+       Name "Background"
+       Slot FrameWidgetSlot "{1D0D00000000000A}" {
+        Anchor 0 0 1 1
+        PositionX 0
+        OffsetLeft 8
+        PositionY 0
+        OffsetTop 0
+        SizeX -1600
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+      }
+      TextWidgetClass "{1D0D00000000000B}" {
+       Name "GroupName"
+       Slot FrameWidgetSlot "{1D0D00000000000C}" {
+        Anchor 0 0 1 1
+        PositionX 6
+        OffsetLeft 16
+        PositionY 0
+        OffsetTop 0
+        SizeX -1621
+        OffsetRight 8
+        SizeY 0
+        OffsetBottom 4
+       }
+       Text "Group"
+       "Font Size" 20
+       "Min Font Size" 20
+       "Vertical Alignment" Center
+      }
+      ImageWidgetClass "{1D0D00000000000D}" {
+       Name "GroupFactionColor"
+       Slot FrameWidgetSlot "{1D0D00000000000E}" {
+        Anchor 0 1 1 1
+        PositionX 8
+        OffsetLeft 8
+        PositionY -4
+        OffsetTop -4
+        SizeX -16
+        OffsetRight 0
+        SizeY 4
+        OffsetBottom 0
+       }
+       Color 0.502 0 0.376 1
+      }
+     }
+    }
+   }
+  }
+  VerticalLayoutWidgetClass "{1D0D00000000000F}" {
+   Name "PlayersVerticalLayout"
+   Slot LayoutSlot "{1D0D000000000010}" {
+    HorizontalAlign 3
+    Padding 8 0 0 4
+   }
+  }
+ }
+}

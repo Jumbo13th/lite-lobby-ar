@@ -1,0 +1,238 @@
+FrameWidgetClass {
+ Name "SlottingExportDialog"
+ "Z Order" 10000
+ {
+  ImageWidgetClass "{69F1A2B3C4D50301}" {
+   Name "DimBackground"
+   Slot FrameWidgetSlot "{69F1A2B3C4D50302}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0.98
+  }
+  ButtonWidgetClass "{69F1A2B3C4D50322}" {
+   Name "InputBlocker"
+   Slot FrameWidgetSlot "{69F1A2B3C4D50323}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Color 1 1 1 0
+   "no focus" 1
+   components {
+    SCR_ButtonBaseComponent "{69F1A2B3C4D50324}" {
+     m_sSoundHovered ""
+     m_sSoundClicked ""
+     m_BackgroundDefault 1 1 1 0
+     m_BackgroundHovered 1 1 1 0
+     m_BackgroundClicked 1 1 1 0
+     m_bShowBorderOnFocus 0
+     m_bNoBorderAnimation 1
+    }
+   }
+  }
+  FrameWidgetClass "{69F1A2B3C4D50303}" {
+   Name "Panel"
+   Slot FrameWidgetSlot "{69F1A2B3C4D50304}" {
+    Anchor 0.5 0.5 0.5 0.5
+    PositionX -450
+    OffsetLeft -450
+    PositionY -380
+    OffsetTop -380
+    SizeX 900
+    OffsetRight -450
+    SizeY 760
+    OffsetBottom -380
+   }
+   {
+    ImageWidgetClass "{69F1A2B3C4D50305}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50306}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.007 0.012 0.014 1
+    }
+    ImageWidgetClass "{69F1A2B3C4D50307}" {
+     Name "Accent"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50308}" {
+      Anchor 0 0 0 1
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 3
+      OffsetRight -3
+      OffsetBottom 0
+     }
+     Color 0.761 0.392 0.078 1
+    }
+    TextWidgetClass "{69F1A2B3C4D50309}" {
+     Name "Title"
+     Slot FrameWidgetSlot "{69F1A2B3C4D5030A}" {
+      Anchor 0 0 1 0
+      OffsetLeft 16
+      OffsetTop 12
+      OffsetRight 16
+      OffsetBottom -36
+     }
+     Color 0.761 0.392 0.078 1
+     Text "#LL-SlottingExport_Title"
+     "Font Size" 18
+     "Vertical Alignment" Center
+     FontProperties FontProperties "{69F1A2B3C4D5030B}" {
+      OutlineSize 2
+     }
+    }
+    ScrollLayoutWidgetClass "{69F1A2B3C4D5030C}" {
+     Name "JsonScroll"
+     Slot FrameWidgetSlot "{69F1A2B3C4D5030D}" {
+      Anchor 0 0 1 1
+      OffsetLeft 16
+      OffsetTop 44
+      OffsetRight 16
+      OffsetBottom 64
+     }
+     {
+      RichTextWidgetClass "{69F1A2B3C4D5030E}" {
+       Name "JsonText"
+       Slot AlignableSlot "{69F1A2B3C4D5030F}" {
+        HorizontalAlign 3
+        Padding 0 0 12 12
+       }
+       Color 0.85 0.85 0.85 1
+       Text ""
+       "Font Size" 14
+       "Min Font Size" 14
+       Wrap 1
+      }
+     }
+    }
+    ButtonWidgetClass "{69F1A2B3C4D50310}" {
+     Name "CopyButton"
+     Slot FrameWidgetSlot "{69F1A2B3C4D50311}" {
+      Anchor 0 1 0 1
+      PositionX 16
+      OffsetLeft 16
+      PositionY -52
+      OffsetTop -52
+      SizeX 260
+      OffsetRight -276
+      SizeY 36
+      OffsetBottom 16
+     }
+     Color 0.15 0.15 0.15 0.9
+     components {
+      SCR_ButtonBaseComponent "{69F1A2B3C4D50312}" {
+       m_BackgroundDefault 0.15 0.15 0.15 0.9
+       m_BackgroundHovered 0.28 0.28 0.28 0.95
+       m_BackgroundClicked 0.45 0.31 0.16 1
+      }
+     }
+     {
+      FrameWidgetClass "{69F1A2B3C4D50313}" {
+       Name "CopyButtonFrame"
+       Slot ButtonWidgetSlot "{69F1A2B3C4D50314}" {
+       }
+       {
+        ImageWidgetClass "{69F1A2B3C4D50315}" {
+         Name "Background"
+         Slot FrameWidgetSlot "{69F1A2B3C4D50316}" {
+          OffsetLeft 0
+          OffsetTop 0
+          SizeX 260
+          OffsetRight -260
+          SizeY 36
+          OffsetBottom -36
+         }
+         Color 0.15 0.15 0.15 0.9
+        }
+        TextWidgetClass "{69F1A2B3C4D50317}" {
+         Name "CopyLabel"
+         Slot FrameWidgetSlot "{69F1A2B3C4D50318}" {
+          OffsetLeft 0
+          OffsetTop 0
+          SizeX 260
+          OffsetRight -260
+          SizeY 36
+          OffsetBottom -36
+         }
+         Color 0.92 0.92 0.92 1
+         Text "#LL-SlottingExport_Copy"
+         "Font Size" 15
+         "Horizontal Alignment" Center
+         "Vertical Alignment" Center
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{69F1A2B3C4D50319}" {
+     Name "CloseButton"
+     Slot FrameWidgetSlot "{69F1A2B3C4D5031A}" {
+      Anchor 1 1 1 1
+      PositionX -176
+      OffsetLeft -176
+      PositionY -52
+      OffsetTop -52
+      SizeX 160
+      OffsetRight 16
+      SizeY 36
+      OffsetBottom 16
+     }
+     Color 0.15 0.15 0.15 0.9
+     components {
+      SCR_ButtonBaseComponent "{69F1A2B3C4D5031B}" {
+       m_BackgroundDefault 0.15 0.15 0.15 0.9
+       m_BackgroundHovered 0.28 0.28 0.28 0.95
+       m_BackgroundClicked 0.45 0.31 0.16 1
+      }
+     }
+     {
+      FrameWidgetClass "{69F1A2B3C4D5031C}" {
+       Name "CloseButtonFrame"
+       Slot ButtonWidgetSlot "{69F1A2B3C4D5031D}" {
+       }
+       {
+        ImageWidgetClass "{69F1A2B3C4D5031E}" {
+         Name "Background"
+         Slot FrameWidgetSlot "{69F1A2B3C4D5031F}" {
+          OffsetLeft 0
+          OffsetTop 0
+          SizeX 160
+          OffsetRight -160
+          SizeY 36
+          OffsetBottom -36
+         }
+         Color 0.15 0.15 0.15 0.9
+        }
+        TextWidgetClass "{69F1A2B3C4D50320}" {
+         Name "CloseLabel"
+         Slot FrameWidgetSlot "{69F1A2B3C4D50321}" {
+          OffsetLeft 0
+          OffsetTop 0
+          SizeX 160
+          OffsetRight -160
+          SizeY 36
+          OffsetBottom -36
+         }
+         Color 0.92 0.92 0.92 1
+         Text "#LL-SlottingDialog_Close"
+         "Font Size" 15
+         "Horizontal Alignment" Center
+         "Vertical Alignment" Center
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

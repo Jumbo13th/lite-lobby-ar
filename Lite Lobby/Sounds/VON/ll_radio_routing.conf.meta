@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{69F1A2B3C4D50010}Sounds/VON/ll_radio_routing.conf"
+ Configurations {
+  CONFResourceClass PC {
+  }
+  CONFResourceClass XBOX_ONE : PC {
+  }
+  CONFResourceClass XBOX_SERIES : PC {
+  }
+  CONFResourceClass PS4 : PC {
+  }
+  CONFResourceClass HEADLESS : PC {
+  }
+  CONFResourceClass PS5 : PC {
+  }
+ }
+}

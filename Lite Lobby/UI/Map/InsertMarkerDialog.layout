@@ -1,0 +1,266 @@
+FrameWidgetClass {
+ Name "LL_InsertMarkerDialog"
+ Slot FrameWidgetSlot "{1D22000000000001}" {
+  SizeX 360
+  OffsetRight -360
+  SizeY 338
+  OffsetBottom -338
+ }
+ "Z Order" 10000
+ components {
+  LL_InsertMarkerDialog "{1D22000000000002}" {
+  }
+ }
+ {
+  OverlayWidgetClass "{1D22000000000003}" {
+   Name "Panel"
+   Slot FrameWidgetSlot "{1D22000000000004}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   {
+    ImageWidgetClass "{1D22000000000005}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{1D22000000000006}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0.008 0.012 0.016 0.95
+     Size 360 24
+    }
+    VerticalLayoutWidgetClass "{1D22000000000009}" {
+     Name "DialogVLayout"
+     Slot OverlayWidgetSlot "{1D2200000000000A}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+      Padding 20 14 20 20
+     }
+     {
+      OverlayWidgetClass "{1D2200000000000B}" {
+       Name "Header"
+       Slot LayoutSlot "{1D2200000000000C}" {
+        HorizontalAlign 3
+       }
+       {
+        ImageWidgetClass "{1D2200000000000D}" {
+         Name "HeaderBackground"
+         Slot OverlayWidgetSlot "{1D2200000000000E}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 0.761 0.392 0.078 1
+         Size 300 26
+        }
+        RichTextWidgetClass "{1D2200000000000F}" {
+         Name "HeaderText"
+         Slot OverlayWidgetSlot "{1D22000000000010}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+          Padding 8 0 8 0
+         }
+         Color 0 0 0 1
+         Text "#LL-InsertMarker_Title"
+         "Font Size" 18
+         "Min Font Size" 12
+         "Vertical Alignment" Center
+        }
+       }
+      }
+      SizeLayoutWidgetClass "{1D22000000000011}" {
+       Name "PreviewFrame"
+       Slot LayoutSlot "{1D22000000000012}" {
+        HorizontalAlign 3
+        Padding 0 8 0 0
+       }
+       Clipping True
+       AllowHeightOverride 1
+       HeightOverride 66
+       {
+        VerticalLayoutWidgetClass "{1D22000000000013}" {
+         Name "PreviewVLayout"
+         Slot AlignableSlot "{1D22000000000014}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+         }
+         {
+          ImageWidgetClass "{1D22000000000015}" {
+           Name "PreviewIcon"
+           Slot LayoutSlot "{1D22000000000016}" {
+            HorizontalAlign 1
+           }
+           Size 38 38
+          }
+          TextWidgetClass "{1D22000000000017}" {
+           Name "PreviewText"
+           Slot LayoutSlot "{1D22000000000018}" {
+            HorizontalAlign 1
+           }
+           Color 1 1 1 1
+           Text ""
+           "Font Size" 14
+           "Min Font Size" 10
+           FontProperties FontProperties "{1D22000000000019}" {
+            Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+            OutlineSize 3
+           }
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1D2200000000001A}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditBoxRoot"
+       Slot LayoutSlot "{1D2200000000001B}" {
+        HorizontalAlign 3
+        Padding 0 8 0 0
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_sLabel "#LL-General_Description"
+         m_fSizeWithLabel 44
+         m_sLabelLayout "{1D24A7B8C9D0E1F2}UI/Map/MarkerDialogLabelWide.layout"
+        }
+       }
+       {
+        VerticalLayoutWidgetClass "{5AA4D27F39EB2514}" {
+         Prefab "{5AA4D27F39EB2514}"
+         {
+          SizeLayoutWidgetClass "{5538C205B27B0F5D}" {
+           Prefab "{5538C205B27B0F5D}"
+           {
+            OverlayWidgetClass "{55367D8E531FD623}" {
+             Prefab "{55367D8E531FD623}"
+             {
+              HorizontalLayoutWidgetClass "{55367D8E4592BC6E}" {
+               Prefab "{55367D8E4592BC6E}"
+               {
+                OverlayWidgetClass "{5538C2059A570E94}" {
+                 Prefab "{5538C2059A570E94}"
+                 {
+                  HorizontalLayoutWidgetClass "{58D095EE846E2B93}" {
+                   Prefab "{58D095EE846E2B93}"
+                   {
+                    EditBoxWidgetClass "{5538C2058B18F877}" {
+                     Prefab "{5538C2058B18F877}"
+                     components {
+                      EditBoxFilterComponent "{5538D70DF38310BC}" {
+                       m_iCharacterLimit 64
+                      }
+                     }
+                     "Font Size" 18
+                     FontProperties FontProperties "{554896CC8367BD77}" {
+                      Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+                     }
+                    }
+                   }
+                  }
+                 }
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1D2200000000001C}" : "{4B5AE6E64037FFB4}UI/layouts/WidgetLibrary/ComboBox/WLib_ComboBox.layout" {
+       Name "TypeCombo"
+       Slot LayoutSlot "{1D2200000000001D}" {
+        HorizontalAlign 3
+        Padding 0 8 0 0
+       }
+       components {
+        SCR_ComboBoxComponent "{546B1D464BC32853}" {
+         m_fMaxListHeight 220
+         m_sLabel "#LL-InsertMarker_Type"
+         m_fSizeWithLabel 44
+         m_sLabelLayout "{1D23A7B8C9D0E1F2}UI/Map/MarkerDialogLabel.layout"
+         m_sElementLayout "{F84B269BBA680B3E}UI/layouts/WidgetLibrary/ComboBox/Elements/WLib_ComboBoxElementIcon.layout"
+        }
+       }
+      }
+      ButtonWidgetClass "{1D2200000000001E}" : "{4B5AE6E64037FFB4}UI/layouts/WidgetLibrary/ComboBox/WLib_ComboBox.layout" {
+       Name "ColorCombo"
+       Slot LayoutSlot "{1D2200000000001F}" {
+        HorizontalAlign 3
+        Padding 0 8 0 0
+       }
+       components {
+        SCR_ComboBoxComponent "{546B1D464BC32853}" {
+         m_fMaxListHeight 220
+         m_sLabel "#LL-InsertMarker_Color"
+         m_fSizeWithLabel 44
+         m_sLabelLayout "{1D23A7B8C9D0E1F2}UI/Map/MarkerDialogLabel.layout"
+         m_sElementLayout "{F84B269BBA680B3E}UI/layouts/WidgetLibrary/ComboBox/Elements/WLib_ComboBoxElementIcon.layout"
+        }
+       }
+      }
+      HorizontalLayoutWidgetClass "{1D22000000000020}" {
+       Name "ButtonsHLayout"
+       Slot LayoutSlot "{1D22000000000021}" {
+        HorizontalAlign 3
+        Padding 0 14 0 0
+       }
+       "Ignore Cursor" 0
+       {
+        ButtonWidgetClass "{1D22000000000022}" : "{75C912A1C89BE6C2}UI/layouts/WidgetLibrary/Buttons/WLib_ButtonText.layout" {
+         Name "ButtonCancel"
+         Slot LayoutSlot "{1D22000000000023}" {
+          VerticalAlign 1
+         }
+         components {
+          SCR_ButtonTextComponent "{5548F0143AE99095}" {
+           m_sText "#LL-General_Cancel"
+          }
+         }
+         {
+          SizeLayoutWidgetClass "{5548EB41A8E48247}" {
+           Prefab "{5548EB41A8E48247}"
+           AllowWidthOverride 1
+           WidthOverride 140
+           AllowHeightOverride 1
+           HeightOverride 34
+          }
+         }
+        }
+        SizeLayoutWidgetClass "{1D22000000000028}" {
+         Name "ButtonsSpacer"
+         Slot LayoutSlot "{1D22000000000029}" {
+          SizeMode Fill
+          FillWeight 1
+         }
+        }
+        ButtonWidgetClass "{1D22000000000024}" : "{75C912A1C89BE6C2}UI/layouts/WidgetLibrary/Buttons/WLib_ButtonText.layout" {
+         Name "ButtonOK"
+         Slot LayoutSlot "{1D22000000000025}" {
+          VerticalAlign 1
+         }
+         components {
+          SCR_ButtonTextComponent "{5548F0143AE99095}" {
+           m_sText "#LL-General_OK"
+          }
+         }
+         {
+          SizeLayoutWidgetClass "{5548EB41A8E48247}" {
+           Prefab "{5548EB41A8E48247}"
+           AllowWidthOverride 1
+           WidthOverride 140
+           AllowHeightOverride 1
+           HeightOverride 34
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

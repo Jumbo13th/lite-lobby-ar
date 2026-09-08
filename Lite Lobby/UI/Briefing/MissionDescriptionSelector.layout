@@ -1,0 +1,85 @@
+ButtonWidgetClass {
+ Name "MissionDescriptionSelector"
+ Slot LayoutSlot "{1B0E000000000001}" {
+ }
+ "no focus" 1
+ style blank
+ components {
+  LL_MissionDescriptionSelectorUI "{1B0E000000000002}" {
+   m_BackgroundDefault 1 1 1 0
+   m_BackgroundHovered 1 1 1 0.162
+   m_BackgroundSelected 1 1 1 0
+   m_BackgroundSelectedHovered 1 1 1 0.162
+   m_BackgroundClicked 1 1 1 0
+  }
+ }
+ {
+  FrameWidgetClass "{1B0E000000000003}" {
+   Name "SelectorFrame"
+   Slot ButtonWidgetSlot "{1B0E000000000004}" {
+   }
+   {
+    ImageWidgetClass "{1B0E000000000005}" {
+     Name "Background"
+     Slot FrameWidgetSlot "{1B0E000000000006}" {
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 480
+      OffsetRight -480
+      SizeY 44
+      OffsetBottom -44
+     }
+     Color 0 0 0 1
+    }
+    ImageWidgetClass "{1B0E000000000007}" {
+     Name "FolderIcon"
+     Slot FrameWidgetSlot "{1B0E000000000008}" {
+      PositionX 8
+      OffsetLeft 8
+      PositionY 7
+      OffsetTop 7
+      SizeX 28
+      OffsetRight -36
+      SizeY 28
+      OffsetBottom -35
+     }
+     Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+     Image "veh_right"
+     Size 28 28
+    }
+    RichTextWidgetClass "{1B0E000000000009}" {
+     Name "DescriptionName"
+     Slot FrameWidgetSlot "{1B0E00000000000A}" {
+      PositionX 41
+      OffsetLeft 41
+      PositionY 0
+      OffsetTop 0
+      SizeX 373
+      OffsetRight -414
+      SizeY 44
+      OffsetBottom -44
+     }
+     Text "#LL-General_Description"
+     "Font Size" 22
+     "Min Font Size" 22
+     "Vertical Alignment" Center
+    }
+    PanelWidgetClass "{1B0E00000000000B}" {
+     Name "Border"
+     Slot FrameWidgetSlot "{1B0E00000000000C}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 480
+      OffsetRight -480
+      SizeY 44
+      OffsetBottom -44
+     }
+     Color 0.761 0.392 0.078 1
+     style outline_2px
+    }
+   }
+  }
+ }
+}

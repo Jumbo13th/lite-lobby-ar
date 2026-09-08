@@ -1,0 +1,7 @@
+Vehicle {
+ ID "BBCBA43A9778AE21"
+ components {
+  LL_VehicleSquadLinkComponent "{69A2BAB93BE1FBF2}" {
+  }
+ }
+}

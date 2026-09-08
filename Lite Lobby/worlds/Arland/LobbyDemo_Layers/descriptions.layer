@@ -1,0 +1,34 @@
+$grp LL_MissionDescription : "{4A2582FF7C761EAE}Prefabs/Map/LL_MissionDescription.et" {
+ MissionIntroduction {
+  coords 1888.095 12.036 1823.855
+  m_sTitle "Introduction"
+ }
+ MissionTime {
+  coords 1887.536 11.802 1821.507
+  m_sTitle "Time"
+  m_iOrder 3
+ }
+ MissionSides {
+  coords 1888.064 12.08 1824.186
+  m_sTitle "Sides"
+  m_iOrder 2
+ }
+ USSRObjectives {
+  coords 1882.053 12.692 1824.82
+  m_sTitle "USSR Objectives"
+  m_iOrder 4
+  m_bShowForAnyFaction 0
+  m_aVisibleForFactions {
+   "USSR"
+  }
+ }
+ USObjectives {
+  coords 1883.952 14.879 1824.237
+  m_sTitle "US Objectives"
+  m_iOrder 5
+  m_bShowForAnyFaction 0
+  m_aVisibleForFactions {
+   "US"
+  }
+ }
+}

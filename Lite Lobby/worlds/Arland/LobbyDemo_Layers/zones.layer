@@ -1,0 +1,249 @@
+$grp PolylineShapeEntity : "{572E4151F14515AC}Prefabs/Map/LL_MapPolyZone.et" {
+ ObjectiveZone {
+  components {
+   LL_MapZoneComponent "{699CA7457093C9DF}" {
+    m_FillColor 0.502 0.376 0 0.392
+    m_bLineMode 0
+   }
+   LL_StatZoneComponent "{69E49098316242AA}" {
+   }
+  }
+  coords 1985.797 60.469 2214.278
+  Points {
+   ShapePoint "{69BD22CA4CBBAE38}" {
+    Position 2.352 -0.031 -0.482
+   }
+   ShapePoint "{69BD22CA4C6D55E5}" {
+    Position -12.587 -1.226 -4.44
+   }
+   ShapePoint "{69BD22CA4AB7F1F6}" {
+    Position -22.245 -1.413 0.448
+   }
+   ShapePoint "{69BD22CA48A77341}" {
+    Position -26.788 -1.244 7.415
+   }
+   ShapePoint "{69BD22CA4731CAC3}" {
+    Position -28.215 -1.169 12.557
+   }
+   ShapePoint "{69BD22CA46DB20E6}" {
+    Position -23.869 -0.826 19.243
+   }
+   ShapePoint "{69BD22CA4659C13A}" {
+    Position -16.717 -0.195 21.248
+   }
+   ShapePoint "{69BD22CA45198599}" {
+    Position -5.371 0.116 25.594
+   }
+   ShapePoint "{69BD22CA4463743B}" {
+    Position 5.267 3.471 28.263
+   }
+   ShapePoint "{69BD22CA42A592DC}" {
+    Position 11.946 4.185 21.021
+   }
+   ShapePoint "{69BD22CA41B28CB0}" {
+    Position 14.019 4.198 15.535
+   }
+   ShapePoint "{69BD22CA40ACAB51}" {
+    Position 12.093 3.022 8.145
+   }
+   ShapePoint "{69BD22CA5F9214D2}" {
+    Position 7.959 0.719 1.273
+   }
+  }
+  IsClosed 1
+ }
+ NeutralZone {
+  components {
+   LL_MapZoneComponent "{699CA7457093C9DF}" {
+    m_FillColor 0.251 0.502 0 0.392
+    m_OutlineColor 0.251 0.502 0 1
+    m_bLineMode 0
+   }
+  }
+  coords 1379.143 36.207 2339.347
+  Points {
+   ShapePoint "{6A0F2E414B6ECAD1}" {
+    Position 0.195 -0.02 -0.174
+   }
+   ShapePoint "{6A0F2E4148E6AC03}" {
+    Position 0.981 0.137 21.884
+   }
+   ShapePoint "{6A0F2E41427C249A}" {
+    Position -18.034 0.922 22.475
+   }
+   ShapePoint "{6A0F2E414111F264}" {
+    Position -17.802 0.449 0.783
+   }
+  }
+  IsClosed 1
+ }
+}
+$grp PolylineShapeEntity : "{ED49F2EA3B80B3A0}Prefabs/Zones/LL_FreezeZone.et" {
+ USSSRFreezeZone {
+  components {
+   LL_FreezeZoneComponent "{699C978A138275B7}" {
+    m_fReturnSeconds 20
+   }
+   LL_MapZoneComponent "{699C978BF6DDCE0C}" {
+    m_bShowForAnyFaction 0
+    m_aVisibleForFactions {
+     "USSR"
+    }
+   }
+  }
+  coords 1844.565 26.399 1933.955
+  Points {
+   ShapePoint "{699C97894D598D39}" {
+    Position 4.199 -3.444 -50.292
+   }
+   ShapePoint "{699C97894B5DD808}" {
+    Position -32.938 -3.356 -34.366
+   }
+   ShapePoint "{699C978948A43E48}" {
+    Position -46.89 -3.071 -30.977
+   }
+   ShapePoint "{699C978948753288}" {
+    Position -63.506 -2.664 7.344
+   }
+   ShapePoint "{699C9789465AFC6A}" {
+    Position -20.901 -0.275 25.326
+   }
+   ShapePoint "{699C9789453DFC55}" {
+    Position 5.669 1.41 39.147
+   }
+   ShapePoint "{699C9789454A24CF}" {
+    Position 18.759 1.832 44.315
+   }
+   ShapePoint "{699C97894435F122}" {
+    Position 38.416 0.03 22.897
+   }
+   ShapePoint "{699C978941FC6766}" {
+    Position 55.998 -1.09 6.702
+   }
+  }
+ }
+ USFreezeZone {
+  components {
+   LL_FreezeZoneComponent "{699C978A138275B7}" {
+    m_fReturnSeconds 20
+   }
+   LL_MapZoneComponent "{699C978BF6DDCE0C}" {
+    m_bShowForAnyFaction 0
+    m_aVisibleForFactions {
+     "US"
+    }
+   }
+  }
+  coords 1630.755 38.812 2549.153
+  Points {
+   ShapePoint "{699C97894D598D39}" {
+    Position 4.199 -3.444 -50.292
+   }
+   ShapePoint "{699C97894B5DD808}" {
+    Position -32.938 -3.356 -34.366
+   }
+   ShapePoint "{699C978948A43E48}" {
+    Position -46.89 -3.071 -30.977
+   }
+   ShapePoint "{699C978948753288}" {
+    Position -63.506 -2.664 7.344
+   }
+   ShapePoint "{699C9789465AFC6A}" {
+    Position -42.761 -2.621 36.622
+   }
+   ShapePoint "{699C9789453DFC55}" {
+    Position -15.399 -1.895 59.884
+   }
+   ShapePoint "{699C9789454A24CF}" {
+    Position 6.503 -1.053 66.94
+   }
+   ShapePoint "{699C97894435F122}" {
+    Position 54.725 1.766 86.803
+   }
+   ShapePoint "{699C978941FC6766}" {
+    Position 78.258 -0.539 2.558
+   }
+  }
+ }
+}
+SCR_EditorRestrictionZoneEntity USSRVanillaFreeze : "{EF72FA7CD87618D5}PrefabsEditable/RestrictionZone/E_EditorRestrictionZoneSmall.et" {
+ coords 1836.961 27.636 1929.419
+}
+$grp PolylineShapeEntity : "{F1A7F9989D3DA4CC}Prefabs/Zones/LL_RestrictionZone.et" {
+ GameZone {
+  coords 1827.218 20.591 1858.694
+  Points {
+   ShapePoint "{699CA743C992378A}" {
+    Position -141.875 17.952 912.627
+   }
+   ShapePoint "{699CA743C9D3CA3D}" {
+    Position -295.944 17.972 824.152
+   }
+   ShapePoint "{699CA743C40EBBB3}" {
+    Position -403.442 15.533 622.353
+   }
+   ShapePoint "{699CA743C444BDC1}" {
+    Position -455.537 16.446 605.717
+   }
+   ShapePoint "{699CA743C389CC9D}" {
+    Position -536.575 16.818 545.742
+   }
+   ShapePoint "{699CA743C3CF2360}" {
+    Position -534.777 18.402 474.685
+   }
+   ShapePoint "{699CA743C2A420F7}" {
+    Position -392.564 20.128 229.013
+   }
+   ShapePoint "{699CA743C243E941}" {
+    Position -344.837 -17.401 16.064
+   }
+   ShapePoint "{699CA743C1943DFA}" {
+    Position -219.264 -42.868 -127.396
+   }
+   ShapePoint "{699CA743C1E5C59A}" {
+    Position 13.195 -21.396 -98.758
+   }
+   ShapePoint "{699CA743C135A590}" {
+    Position 194.315 -11.243 -41.55
+   }
+   ShapePoint "{699CA743C0F8AF7A}" {
+    Position 344.473 50.101 331.517
+   }
+   ShapePoint "{699CA743C0C96E42}" {
+    Position 409.641 54.699 567.668
+   }
+   ShapePoint "{699CA743DF99AE0D}" {
+    Position 328.789 31.503 782.25
+   }
+   ShapePoint "{699CA743DF3B2B78}" {
+    Position 44.132 19.162 941.479
+   }
+  }
+ }
+ LandminesZone {
+  components {
+   LL_MapZoneComponent "{699C9789A1638EE5}" {
+    m_FillColor 0 0 0 0.392
+   }
+   LL_ZoneRestrictionComponent "{699C9789A1638ED2}" {
+    m_fReturnSeconds 5
+    m_bLethalToEnter 1
+   }
+  }
+  coords 1587.127 40.378 2383.096
+  Points {
+   ShapePoint "{699CA7401389C790}" {
+    Position -9.539 0.257 26.568
+   }
+   ShapePoint "{699CA74012BE76E4}" {
+    Position -25.486 -0.272 -2.725
+   }
+   ShapePoint "{699CA7401268DE8B}" {
+    Position 27.473 0.42 -34.341
+   }
+   ShapePoint "{699CA7401128486C}" {
+    Position 39.535 0.735 -5.715
+   }
+  }
+ }
+}

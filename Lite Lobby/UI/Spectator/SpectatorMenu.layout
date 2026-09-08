@@ -1,0 +1,953 @@
+FrameWidgetClass {
+ Name "SpectatorMenu"
+ {
+  FrameWidgetClass "{1D0C0000000000E0}" : "{0651202E9F2646DE}UI/layouts/Map/Map.layout" {
+   Name "MapFrame"
+   Slot FrameWidgetSlot "{1D0C0000000000E1}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Visible 0
+  }
+  FrameWidgetClass "{1D0C0000000000E4}" {
+   Name "ToolMenu"
+   Slot FrameWidgetSlot "{1D0C0000000000E5}" {
+    PositionX 10
+    OffsetLeft 10
+    PositionY 40
+    OffsetTop 40
+    SizeX -100
+    OffsetRight -150
+    SizeY 30
+    OffsetBottom -70
+    Alignment 0 0
+    SizeToContent 1
+   }
+   "Z Order" 1
+   Clipping False
+   "Ignore Cursor" 0
+   Visible 0
+   {
+    FrameWidgetClass "{1D0C0000000000E6}" {
+     Name "ToolMenuBar"
+     Slot FrameWidgetSlot "{1D0C0000000000E7}" {
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 30
+      OffsetRight -30
+      OffsetBottom -30
+      SizeToContent 1
+     }
+     Clipping True
+     {
+      ImageWidgetClass "{1D0C0000000000E8}" {
+       Name "MenuBackground"
+       Slot FrameWidgetSlot "{1D0C0000000000E9}" {
+        Anchor 0 0 1 1
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX -40
+        OffsetRight 0
+        SizeY -40
+        OffsetBottom 0
+        SizeToContent 1
+       }
+       Opacity 1
+       Color 0.008 0.012 0.016 0.95
+       Image ""
+       Size 40 40
+      }
+      HorizontalLayoutWidgetClass "{1D0C0000000000EA}" {
+       Name "ToolMenuHoriz"
+       Slot FrameWidgetSlot "{1D0C0000000000EB}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+        SizeToContent 1
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass "{1D0C0000000000D0}" {
+   Name "LabelsFrame"
+   Slot FrameWidgetSlot "{1D0C0000000000D1}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   Clipping True
+   "Ignore Cursor" 1
+  }
+  FrameWidgetClass "{1D0C000000000001}" {
+   Name "SidesRatioFrame"
+   Slot FrameWidgetSlot "{1D0C000000000002}" {
+    Anchor 0 0 1 0
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 18
+    OffsetBottom -18
+   }
+   {
+    ImageWidgetClass "{1D0C000000000003}" {
+     Name "SidesRatioBackground"
+     Slot FrameWidgetSlot "{1D0C000000000004}" {
+      Anchor 0 0 1 1
+      OffsetLeft 0
+      OffsetTop 0
+      OffsetRight 0
+      OffsetBottom 0
+     }
+     Color 0.007 0.012 0.014 1
+    }
+    HorizontalLayoutWidgetClass "{1D0C000000000005}" {
+     Name "SidesRatio"
+     Slot FrameWidgetSlot "{1D0C000000000006}" {
+      Anchor 0 0 1 0
+      PositionX 512
+      OffsetLeft 512
+      PositionY 6
+      OffsetTop 6
+      SizeX -1024
+      OffsetRight 512
+      SizeY 6
+      OffsetBottom -12
+     }
+     components {
+      LL_SidesRatio "{1D0C000000000007}" {
+      }
+     }
+    }
+    TextWidgetClass "{1D0C000000000008}" {
+     Name "GameTimerText"
+     Slot FrameWidgetSlot "{1D0C000000000009}" {
+      PositionX 11
+      OffsetLeft 11
+      PositionY 0
+      OffsetTop 0
+      SizeX 99
+      OffsetRight -110
+      SizeY 18
+      OffsetBottom -18
+     }
+     Text "00:00:00"
+     "Font Size" 18
+     "Min Font Size" 18
+     "Vertical Alignment" Center
+    }
+   }
+  }
+  FrameWidgetClass "{1D0C000000000010}" {
+   Name "AlivePlayersList"
+   Slot FrameWidgetSlot "{1D0C000000000011}" {
+    Anchor 0 0.5 0 0.5
+    PositionX 0
+    OffsetLeft 0
+    PositionY -320
+    OffsetTop -320
+    SizeX 430
+    OffsetRight -430
+    SizeY 640
+    OffsetBottom -320
+   }
+   Clipping False
+   "Ignore Cursor" 0
+   components {
+    LL_AlivePlayerList "{1D0C000000000012}" {
+    }
+   }
+   {
+    ImageWidgetClass "{1D0C000000000013}" {
+     Name "Extender"
+     Slot FrameWidgetSlot "{1D0C000000000014}" {
+      Anchor 0 0 1 1
+      PositionX -15
+      OffsetLeft -25
+      PositionY -15
+      OffsetTop -25
+      SizeX 30
+      OffsetRight -25
+      SizeY 30
+      OffsetBottom -25
+     }
+     Opacity 0
+     Clipping False
+     "Ignore Cursor" 0
+    }
+    BlurWidgetClass "{1D0C000000000015}" {
+     Name "AlivePlayersBlure"
+     Slot FrameWidgetSlot "{1D0C000000000016}" {
+      Anchor 0 0 0 0
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 430
+      OffsetRight -430
+      SizeY 640
+      OffsetBottom -640
+     }
+     "Z Order" -1
+     Opacity 0.9
+     Intensity 0.3
+    }
+    ImageWidgetClass "{1D0C000000000017}" {
+     Name "AlivePlayersBackground"
+     Slot FrameWidgetSlot "{1D0C000000000018}" {
+      Anchor 0 0 0 0
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 430
+      OffsetRight -430
+      SizeY 640
+      OffsetBottom -640
+     }
+     Opacity 0.9
+     Color 0.007 0.012 0.014 0.9
+    }
+    FrameWidgetClass "{1D0C000000000020}" {
+     Name "AlivePlayersHeader"
+     Slot FrameWidgetSlot "{1D0C000000000021}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 430
+      OffsetRight -430
+      SizeY 84
+      OffsetBottom -84
+     }
+     {
+      ImageWidgetClass "{1D0C000000000022}" {
+       Name "AlivePlayersHeaderBackground"
+       Slot FrameWidgetSlot "{1D0C000000000023}" {
+        Anchor 0 0 0 0
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 430
+        OffsetRight -430
+        SizeY 39
+        OffsetBottom -39
+       }
+       Color 0.007 0.012 0.014 1
+      }
+      OverlayWidgetClass "{1D0C000000000024}" {
+       Name "AlivePlayersHeaderTextOverlay"
+       Slot FrameWidgetSlot "{1D0C000000000025}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 430
+        OffsetRight -430
+        SizeY 39
+        OffsetBottom -39
+       }
+       {
+        TextWidgetClass "{1D0C000000000026}" {
+         Name "AlivePlayersHeaderText"
+         Slot OverlayWidgetSlot "{1D0C000000000027}" {
+          HorizontalAlign 0
+          Padding 8 0 0 0
+         }
+         Text "#LL-Lobby_Players"
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C000000000030}" {
+       Name "ShowDeathButton"
+       Slot FrameWidgetSlot "{1D0C000000000031}" {
+        Anchor 0 0 0 0
+        PositionX 348
+        OffsetLeft 348
+        PositionY 4
+        OffsetTop 4
+        SizeX 32
+        OffsetRight -380
+        SizeY 32
+        OffsetBottom -36
+       }
+       "Z Order" 1
+       Color 1 1 1 0
+       components {
+        SCR_ButtonBaseComponent "{1D0C000000000032}" {
+         m_sSoundHovered ""
+         m_sSoundClicked ""
+         m_bCanBeToggled 1
+         m_BackgroundDefault 1 1 1 0
+         m_BackgroundHovered 1 1 1 0.162
+         m_BackgroundSelected 1 1 1 0.162
+         m_BackgroundSelectedHovered 1 1 1 0.243
+         m_BackgroundClicked 1 1 1 0
+         m_bShowBorderOnFocus 0
+         m_bNoBorderAnimation 1
+        }
+       }
+       "no focus" 1
+       {
+        FrameWidgetClass "{1D0C000000000033}" {
+         Name "ShowDeathButtonFrame"
+         Slot ButtonWidgetSlot "{1D0C000000000034}" {
+         }
+         {
+          ImageWidgetClass "{1D0C000000000035}" {
+           Name "Background"
+           Slot FrameWidgetSlot "{1D0C000000000036}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 32
+            OffsetRight -32
+            SizeY 32
+            OffsetBottom -32
+           }
+          }
+          ImageWidgetClass "{1D0C000000000037}" {
+           Name "ShowDeathImage"
+           Slot FrameWidgetSlot "{1D0C000000000038}" {
+            OffsetLeft 0
+            OffsetTop 0
+            SizeX 32
+            OffsetRight -32
+            SizeY 32
+            OffsetBottom -32
+           }
+           Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+           Image "death"
+           Size 32 32
+          }
+         }
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C000000000040}" {
+       Name "PinButton"
+       Slot FrameWidgetSlot "{1D0C000000000041}" {
+        Anchor 0 0 0 0
+        PositionX 391
+        OffsetLeft 391
+        PositionY 0
+        OffsetTop 0
+        SizeX 39
+        OffsetRight -430
+        SizeY 39
+        OffsetBottom -39
+       }
+       "Z Order" 1
+       Color 1 1 1 0
+       components {
+        SCR_ButtonBaseComponent "{1D0C000000000042}" {
+         m_sSoundHovered ""
+         m_sSoundClicked ""
+         m_bCanBeToggled 1
+         m_BackgroundDefault 1 1 1 0
+         m_BackgroundHovered 1 1 1 0.162
+         m_BackgroundSelected 1 1 1 0.162
+         m_BackgroundSelectedHovered 1 1 1 0.243
+         m_BackgroundClicked 1 1 1 0.162
+         m_bShowBorderOnFocus 0
+         m_bNoBorderAnimation 1
+        }
+       }
+       "no focus" 1
+       {
+        FrameWidgetClass "{1D0C000000000043}" {
+         Name "PinButtonFrame"
+         Slot ButtonWidgetSlot "{1D0C000000000044}" {
+         }
+         {
+          ImageWidgetClass "{1D0C000000000045}" {
+           Name "Background"
+           Slot FrameWidgetSlot "{1D0C000000000046}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 39
+            OffsetRight -39
+            SizeY 39
+            OffsetBottom -39
+           }
+           Color 1 1 1 0
+          }
+          ImageWidgetClass "{1D0C000000000047}" {
+           Name "PinImage"
+           Slot FrameWidgetSlot "{1D0C000000000048}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 39
+            OffsetRight -39
+            SizeY 39
+            OffsetBottom -39
+           }
+           Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+           Image "pinPlay"
+           Size 32 32
+          }
+         }
+        }
+       }
+      }
+      HorizontalLayoutWidgetClass "{1D0C000000000050}" {
+       Name "SidesRatioPanel"
+       Slot FrameWidgetSlot "{1D0C000000000051}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 39
+        OffsetTop 39
+        SizeX 430
+        OffsetRight -430
+        SizeY 6
+        OffsetBottom -45
+       }
+       Clipping True
+       components {
+        LL_SidesRatio "{1D0C000000000052}" {
+        }
+       }
+      }
+      ImageWidgetClass "{1D0C000000000053}" {
+       Name "AlivePlayersHeaderSeparator"
+       Slot FrameWidgetSlot "{1D0C000000000054}" {
+        Anchor 0 0 0 0
+        PositionX 0
+        OffsetLeft 0
+        PositionY 45
+        OffsetTop 45
+        SizeX 430
+        OffsetRight -430
+        SizeY 6
+        OffsetBottom -51
+       }
+       Color 0.007 0.012 0.014 1
+      }
+      HorizontalLayoutWidgetClass "{1D0C000000000055}" {
+       Name "HorizontalLayoutFactions"
+       Slot FrameWidgetSlot "{1D0C000000000056}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 51
+        OffsetTop 51
+        SizeX 430
+        OffsetRight -430
+        SizeY 33
+        OffsetBottom -84
+       }
+      }
+     }
+    }
+    ScrollLayoutWidgetClass "{1D0C000000000060}" {
+     Name "AlivePlayersListScroll"
+     Slot FrameWidgetSlot "{1D0C000000000061}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 84
+      OffsetTop 84
+      SizeX 430
+      OffsetRight -430
+      SizeY 556
+      OffsetBottom -640
+     }
+     {
+      VerticalLayoutWidgetClass "{1D0C000000000062}" {
+       Name "AlivePlayersListLayout"
+       Slot AlignableSlot "{1D0C000000000063}" {
+        HorizontalAlign 3
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass "{1D0C000000000070}" {
+   Name "VoiceChatFrame"
+   Slot FrameWidgetSlot "{1D0C000000000071}" {
+    Anchor 1 0.5 1 0.5
+    PositionX -446
+    OffsetLeft -446
+    PositionY -320
+    OffsetTop -320
+    SizeX 430
+    OffsetRight 16
+    SizeY 640
+    OffsetBottom -320
+   }
+   Clipping False
+   "Ignore Cursor" 0
+   components {
+    LL_VoiceChannelList "{1D0C000000000072}" {
+    }
+   }
+   {
+    ImageWidgetClass "{1D0C000000000073}" {
+     Name "Extender"
+     Slot FrameWidgetSlot "{1D0C000000000074}" {
+      Anchor 0 0 1 1
+      PositionX 0
+      OffsetLeft -25
+      PositionY 0
+      OffsetTop -25
+      SizeX 0
+      OffsetRight -25
+      SizeY 0
+      OffsetBottom -25
+     }
+     Opacity 0
+     Clipping False
+     "Ignore Cursor" 0
+    }
+    BlurWidgetClass "{1D0C000000000075}" {
+     Name "VoiceChatBlure"
+     Slot FrameWidgetSlot "{1D0C000000000076}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 430
+      OffsetRight -430
+      SizeY 640
+      OffsetBottom -640
+     }
+     "Z Order" -1
+     Opacity 0.9
+     Intensity 0.3
+    }
+    ImageWidgetClass "{1D0C000000000077}" {
+     Name "VoiceChatBackground"
+     Slot FrameWidgetSlot "{1D0C000000000078}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 430
+      OffsetRight -430
+      SizeY 640
+      OffsetBottom -640
+     }
+     Opacity 0.9
+     Color 0.007 0.012 0.014 0.9
+    }
+    FrameWidgetClass "{1D0C000000000080}" {
+     Name "VoiceChatHeaderFrame"
+     Slot FrameWidgetSlot "{1D0C000000000081}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 430
+      OffsetRight -430
+      SizeY 39
+      OffsetBottom -39
+     }
+     {
+      ImageWidgetClass "{1D0C000000000082}" {
+       Name "VoiceChatHeaderBackground"
+       Slot FrameWidgetSlot "{1D0C000000000083}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 430
+        OffsetRight -430
+        SizeY 39
+        OffsetBottom -39
+       }
+       Color 0.007 0.012 0.014 1
+      }
+      OverlayWidgetClass "{1D0C000000000084}" {
+       Name "VoiceChatHeaderTextOverlay"
+       Slot FrameWidgetSlot "{1D0C000000000085}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 430
+        OffsetRight -430
+        SizeY 39
+        OffsetBottom -39
+       }
+       {
+        TextWidgetClass "{1D0C000000000086}" {
+         Name "VoiceChatHeaderText"
+         Slot OverlayWidgetSlot "{1D0C000000000087}" {
+          HorizontalAlign 0
+          Padding 8 0 0 0
+         }
+         Text "#LL-Lobby_VoiceChannels"
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C000000000090}" {
+       Name "PinButton"
+       Slot FrameWidgetSlot "{1D0C000000000091}" {
+        Anchor 0 0 0 0
+        PositionX 391
+        OffsetLeft 391
+        PositionY 0
+        OffsetTop 0
+        SizeX 39
+        OffsetRight -430
+        SizeY 39
+        OffsetBottom -39
+       }
+       "Z Order" 1
+       Color 1 1 1 0
+       components {
+        SCR_ButtonBaseComponent "{1D0C000000000092}" {
+         m_sSoundHovered ""
+         m_sSoundClicked ""
+         m_bCanBeToggled 1
+         m_BackgroundDefault 1 1 1 0
+         m_BackgroundHovered 1 1 1 0.162
+         m_BackgroundSelected 1 1 1 0.162
+         m_BackgroundSelectedHovered 1 1 1 0.243
+         m_BackgroundClicked 1 1 1 0.162
+         m_bShowBorderOnFocus 0
+         m_bNoBorderAnimation 1
+        }
+       }
+       "no focus" 1
+       {
+        FrameWidgetClass "{1D0C000000000093}" {
+         Name "PinButtonFrame"
+         Slot ButtonWidgetSlot "{1D0C000000000094}" {
+         }
+         {
+          ImageWidgetClass "{1D0C000000000095}" {
+           Name "Background"
+           Slot FrameWidgetSlot "{1D0C000000000096}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 39
+            OffsetRight -39
+            SizeY 39
+            OffsetBottom -39
+           }
+           Color 1 1 1 0
+          }
+          ImageWidgetClass "{1D0C000000000097}" {
+           Name "PinImage"
+           Slot FrameWidgetSlot "{1D0C000000000098}" {
+            PositionX 0
+            OffsetLeft 0
+            PositionY 0
+            OffsetTop 0
+            SizeX 39
+            OffsetRight -39
+            SizeY 39
+            OffsetBottom -39
+           }
+           Texture "{D17288006833490F}UI/Textures/Icons/icons_wrapperUI-32.imageset"
+           Image "pinPlay"
+           Size 32 32
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+    ScrollLayoutWidgetClass "{1D0C0000000000A0}" {
+     Name "RoomsListScroll"
+     Slot FrameWidgetSlot "{1D0C0000000000A1}" {
+      PositionX 10
+      OffsetLeft 10
+      PositionY 49
+      OffsetTop 49
+      SizeX 420
+      OffsetRight -430
+      SizeY 581
+      OffsetBottom -640
+     }
+     {
+      VerticalLayoutWidgetClass "{1D0C0000000000A2}" {
+       Name "RoomsList"
+       Slot AlignableSlot "{1D0C0000000000A3}" {
+        HorizontalAlign 3
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass "{1D0C000000000110}" {
+   Name "KillfeedFrame"
+   Slot FrameWidgetSlot "{1D0C000000000111}" {
+    Anchor 0.5 0.5 0.5 0.5
+    PositionX -300
+    OffsetLeft -300
+    PositionY -360
+    OffsetTop -360
+    SizeX 600
+    OffsetRight -300
+    SizeY 720
+    OffsetBottom -360
+   }
+   Clipping False
+   "Ignore Cursor" 0
+   {
+    BlurWidgetClass "{1D0C000000000112}" {
+     Name "KillfeedBlur"
+     Slot FrameWidgetSlot "{1D0C000000000113}" {
+      Anchor 0 0 0 0
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 600
+      OffsetRight -600
+      SizeY 720
+      OffsetBottom -720
+     }
+     "Z Order" -1
+     Opacity 0.9
+     Intensity 0.3
+    }
+    ImageWidgetClass "{1D0C000000000114}" {
+     Name "KillfeedBackground"
+     Slot FrameWidgetSlot "{1D0C000000000115}" {
+      Anchor 0 0 0 0
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 600
+      OffsetRight -600
+      SizeY 720
+      OffsetBottom -720
+     }
+     Opacity 0.9
+     Color 0.007 0.012 0.014 0.9
+    }
+    FrameWidgetClass "{1D0C000000000118}" {
+     Name "KillfeedHeaderFrame"
+     Slot FrameWidgetSlot "{1D0C000000000119}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 600
+      OffsetRight -600
+      SizeY 39
+      OffsetBottom -39
+     }
+     {
+      ImageWidgetClass "{1D0C00000000011A}" {
+       Name "KillfeedHeaderBackground"
+       Slot FrameWidgetSlot "{1D0C00000000011B}" {
+        Anchor 0 0 0 0
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 600
+        OffsetRight -600
+        SizeY 39
+        OffsetBottom -39
+       }
+       Color 0.007 0.012 0.014 1
+      }
+      OverlayWidgetClass "{1D0C00000000011C}" {
+       Name "KillfeedHeaderTextOverlay"
+       Slot FrameWidgetSlot "{1D0C00000000011D}" {
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 600
+        OffsetRight -600
+        SizeY 39
+        OffsetBottom -39
+       }
+       {
+        TextWidgetClass "{1D0C00000000011E}" {
+         Name "KillfeedHeaderText"
+         Slot OverlayWidgetSlot "{1D0C00000000011F}" {
+          HorizontalAlign 0
+          Padding 8 0 0 0
+         }
+         Color 0.761 0.392 0.078 1
+         Text "#LL-Killfeed_Title"
+        }
+       }
+      }
+     }
+    }
+    ScrollLayoutWidgetClass "{1D0C000000000120}" {
+     Name "KillfeedScroll"
+     Slot FrameWidgetSlot "{1D0C000000000121}" {
+      PositionX 16
+      OffsetLeft 16
+      PositionY 51
+      OffsetTop 51
+      SizeX 568
+      OffsetRight -584
+      SizeY 653
+      OffsetBottom -704
+     }
+     {
+      RichTextWidgetClass "{1D0C000000000116}" {
+       Name "KillfeedText"
+       Slot AlignableSlot "{1D0C000000000117}" {
+        HorizontalAlign 3
+       }
+       Color 0.85 0.85 0.85 1
+       Text "Killfeed"
+      }
+     }
+    }
+   }
+  }
+  OverlayWidgetClass "{1D0C0000000000B0}" {
+   Name "OverlayFooter"
+   Slot FrameWidgetSlot "{1D0C0000000000B1}" {
+    Anchor 0 1 0 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY -48
+    OffsetTop -48
+    SizeX 1920
+    OffsetRight -1920
+    SizeY 48
+    OffsetBottom 0
+   }
+   {
+    HorizontalLayoutWidgetClass "{1D0C0000000000B2}" {
+     Name "FooterLayout"
+     Slot OverlayWidgetSlot "{1D0C0000000000B3}" {
+      HorizontalAlign 0
+      VerticalAlign 0
+     }
+     {
+      ButtonWidgetClass "{1D0C0000000000B4}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationChat"
+       Slot LayoutSlot "{1D0C0000000000B5}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "ChatToggle"
+         m_sLabel "#LL-Lobby_Chat"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C0000000000B6}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationFactionVoice"
+       Slot LayoutSlot "{1D0C0000000000B7}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "VONDirect"
+         m_sLabel "#LL-Lobby_VoiceChat"
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C0000000000E2}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationMap"
+       Slot LayoutSlot "{1D0C0000000000E3}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "GadgetMap"
+         m_sLabel "#LL-Spectator_Map"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C000000000100}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationKillfeed"
+       Slot LayoutSlot "{1D0C000000000101}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "LL_SpectatorKillfeed"
+         m_sLabel "#LL-Spectator_Killfeed"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C0000000000B8}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationSwitchSpectatorUI"
+       Slot LayoutSlot "{1D0C0000000000B9}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "LL_SwitchSpectatorUI"
+         m_sLabel "#LL-Spectator_HideShowUI"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C0000000000BC}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationResetCamera"
+       Slot LayoutSlot "{1D0C0000000000BD}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "LL_SpectatorReset"
+         m_sLabel "#LL-Spectator_ResetCamera"
+         m_bIsMouseInput 1
+        }
+       }
+      }
+      ButtonWidgetClass "{1D0C0000000000BE}" : "{08CF3B69CB1ACBC4}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButton.layout" {
+       Name "NavigationAttachCamera"
+       Slot LayoutSlot "{1D0C0000000000BF}" {
+        Padding 20 0 0 0
+       }
+       components {
+        SCR_InputButtonComponent "{5D346C3DD81D95CD}" {
+         m_sActionName "ManualCameraAttach"
+         m_sLabel "#LL-Spectator_DetachCamera"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass "{1D0C0000000000C0}" : "{D89BBA18F99053D6}UI/layouts/HUD/Chat/ChatHud.layout" {
+   Name "Chat"
+   Slot FrameWidgetSlot "{1D0C0000000000C1}" {
+    Anchor 0 0 1 1
+    OffsetLeft 0
+    OffsetTop 0
+    OffsetRight 0
+    OffsetBottom 0
+   }
+   "Z Order" 50
+  }
+ }
+}
