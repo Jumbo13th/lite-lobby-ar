@@ -1,0 +1,9 @@
+SCR_MapEntity {
+ ID "5255036BAB847859"
+ components {
+  SCR_CompassComponent "{6A532E0249D9B76C}" {
+  }
+  SCR_WristwatchComponent "{6A532E0248576BC3}" {
+  }
+ }
+}
