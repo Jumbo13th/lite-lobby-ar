@@ -1,0 +1,273 @@
+---
+title: "2. Создание мира с Lite Lobby"
+description: "Мир на основе Эверона, системные объекты, игровой режим, файл сценария и карта."
+prev:
+  link: "/lite-lobby-ar/ru/create-mission/project/"
+  label: "1. Подготовка проекта"
+next:
+  link: "/lite-lobby-ar/ru/create-mission/base-character/"
+  label: "3. Базовый персонаж"
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
+import worldEditorLaunch from '../../../../assets/guide/05.png';
+import baseWorld from '../../../../assets/guide/06.png';
+import newWorld from '../../../../assets/guide/07.png';
+import subscene from '../../../../assets/guide/08.png';
+import saveWorld from '../../../../assets/guide/09.png';
+import systemsLayer from '../../../../assets/guide/10.png';
+import gameModeSetup from '../../../../assets/guide/11.png';
+import gameModeTemplate from '../../../../assets/guide/12.png';
+import worldScan from '../../../../assets/guide/13.png';
+import scanResults from '../../../../assets/guide/14.png';
+import createEntities from '../../../../assets/guide/15.png';
+import entitiesCreated from '../../../../assets/guide/16.png';
+import createHeader from '../../../../assets/guide/17.png';
+import headerCreated from '../../../../assets/guide/18.png';
+import removeGameMaster from '../../../../assets/guide/20.png';
+import lobbyGameMode from '../../../../assets/guide/21.png';
+import missionDetails from '../../../../assets/guide/19.png';
+import mapSetup from '../../../../assets/guide/22.png';
+
+[К оглавлению руководства](../)
+
+В подготовленном аддоне создадим мир миссии, добавим игровой режим Lite Lobby и настроим карту. В примере используем Эверон.
+
+## Создание мира {#create-world}
+
+В Workbench миром называют карту вместе с размещёнными на ней объектами. Возьмём карту Эверона из игры и создадим на её основе отдельную сцену. В ней будут храниться объекты нашей миссии.
+
+### Открытие карты {#open-world-editor}
+
+В главном окне Workbench нажмите **World Editor** в блоке **Quick Launch**. Это редактор, в котором мы будем размещать объекты миссии.
+
+<LL_Screenshot
+  src={worldEditorLaunch}
+  alt="В главном окне Workbench стрелка указывает на World Editor в блоке Quick Launch."
+  caption="Запуск редактора мира."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В панели **Resource Browser** откройте `ArmaReforger/worlds/Eden` и дважды щёлкните `Eden.ent`. Дождитесь загрузки карты.
+
+<LL_Screenshot
+  src={baseWorld}
+  alt="В Resource Browser открыт каталог ArmaReforger/worlds/Eden и выбран файл Eden.ent."
+  caption="Карта Eden.ent в файлах игры."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Создание отдельной сцены {#create-subscene}
+
+Выберите **File → New World**.
+
+<LL_Screenshot
+  src={newWorld}
+  alt="После загрузки Eden.ent в меню File выбран пункт New World."
+  caption="Создание мира на основе открытой карты."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В окне **Create world** выберите **Sub-scene (of current world)** и нажмите **OK**. Новая сцена будет использовать открытую карту, а добавленные нами объекты сохранит отдельно от неё.
+
+<LL_Screenshot
+  src={subscene}
+  alt="В окне Create world выбран вариант Sub-scene (of current world)."
+  caption="Выбор сцены на основе текущего мира."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Сохранение мира {#save-world}
+
+Нажмите `Ctrl+S`.
+
+В окне сохранения откройте свой проект. Кнопкой **New Folder** создайте папку `Worlds`, а внутри неё — папку `Eden`. Откройте `Eden`, в поле **File name** введите `ShootingStar_Ep1` и нажмите **OK**.
+
+<Aside type="tip" title="Названия файлов и структура папок">
+Для файла мира выберите название вроде `DesertStorm` или `SilentPort`: начинайте каждое слово с заглавной буквы и не ставьте пробелы между словами. Не используйте имена `test_world`, `tempworld` или `Temp World`. Расположите файл так же, как на скриншоте: `Worlds` → `Eden` → файл мира. Переименование файлов и папок может вызывать проблемы в движке, поэтому окончательные названия лучше выбрать сразу.
+
+Для сервера Triad Tactics рекомендуем указывать в имени номер эпизода: `DesertStorm_Ep1`, `DesertStorm_Ep2`, `DesertStorm_Ep3`. Игры на сервере состоят из трёх эпизодов. Если вы создаёте миссию для другого сервера, `_Ep1` можно опустить.
+</Aside>
+
+<LL_Screenshot
+  src={saveWorld}
+  alt="В окне Save world as выбрана папка Worlds/Eden своего проекта; в File name введено ShootingStar_Ep1."
+  caption="Сохранение мира в своём аддоне."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Workbench сохранит файл мира в папке аддона по пути `Worlds/Eden/ShootingStar_Ep1.ent`. В панели **Hierarchy** наша сцена `ShootingStar_Ep1` появится рядом с базовым миром `Eden`.
+
+### Слой для систем миссии {#systems-layer}
+
+Чтобы объекты было проще находить, их распределяют по слоям. Для [системных объектов миссии](/lite-lobby-ar/ru/create-mission/world/#game-mode-setup) подготовим слой с именем `a_systems`.
+
+В панели **Hierarchy** найдите слой `default` внутри своей сцены `ShootingStar_Ep1`. Нажмите на него правой кнопкой мыши и выберите **Rename**. Введите `a_systems` и нажмите **OK**.
+
+<LL_Screenshot
+  src={systemsLayer}
+  alt="В Hierarchy выбран слой default сцены ShootingStar_Ep1; в окне Rename layer введено a_systems."
+  caption="Слой a_systems для системных объектов миссии."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить изменения.
+
+## Мастер настройки мира {#game-mode-setup}
+
+За игровой режим, фракции, связь и другие функции отвечают системные объекты. Добавить их в мир поможет мастер **Game Mode Setup**.
+
+### Выбор шаблона {#game-mode-template}
+
+В панели **Hierarchy** дважды щёлкните по слою `a_systems`, чтобы сделать его активным. Мастер добавит новые объекты в этот слой.
+
+Выберите **Plugins → Game Mode Setup**.
+
+<LL_Screenshot
+  src={gameModeSetup}
+  alt="В меню Plugins выбран пункт Game Mode Setup; в Hierarchy активен слой a_systems."
+  caption="Запуск мастера настройки игрового режима."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `…` у поля **Template**. Откройте папку `ArmaReforger/Configs/Workbench/GameModeSetup`, выберите `GameMaster.conf` и нажмите **OK**. Вернувшись в окно мастера, нажмите **Next**.
+
+<LL_Screenshot
+  src={gameModeTemplate}
+  alt="В окне выбора Template указан GameMaster.conf из папки Configs/Workbench/GameModeSetup."
+  caption="Выбор шаблона GameMaster.conf."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Создание системных объектов {#generate-systems}
+
+В окне **World Scan** нажмите **Scan world**. Мастер проверит, какие системные объекты уже есть в мире.
+
+<LL_Screenshot
+  src={worldScan}
+  alt="В окне World Scan стрелка указывает на кнопку Scan world."
+  caption="Проверка объектов мира."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В разделе **Missing Entities** появится список недостающих объектов. Нажмите **Next**.
+
+<LL_Screenshot
+  src={scanResults}
+  alt="Окно World Scan Results со списком Missing Entities и кнопкой Next."
+  caption="Объекты, которые нужно добавить."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В окне **World Configuration** нажмите **Create entities**, чтобы создать эти объекты в слое `a_systems`.
+
+<LL_Screenshot
+  src={createEntities}
+  alt="В окне World Configuration стрелка указывает на кнопку Create entities."
+  caption="Создание системных объектов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Когда объекты будут созданы, мастер покажет окно с результатом. Позже мы вернёмся к объекту `MapEntity` и выберем для него файлы в разделе [«Настройка карты»](/lite-lobby-ar/ru/create-mission/world/#map-setup). Сейчас нажмите **Next**.
+
+<LL_Screenshot
+  src={entitiesCreated}
+  alt="Окно World Configuration Completed с напоминаниями о настройке SCR_AIWorld и MapEntity."
+  caption="Системные объекты созданы."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Создание файла сценария {#create-mission-header}
+
+Чтобы игроки могли выбрать миссию в списке сценариев, создадим для неё отдельный файл — **Mission Header**. В нём хранятся ссылка на мир, название миссии и её описание.
+
+В окне **Mission Header** нажмите **Create header**.
+
+<LL_Screenshot
+  src={createHeader}
+  alt="В окне Mission Header стрелка указывает на кнопку Create header."
+  caption="Создание файла сценария."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Мастер создаст в вашем аддоне файл `Missions/ShootingStar_Ep1.conf` и откроет его в редакторе. Он получит то же имя, что и файл мира. Нажмите **Next**.
+
+<LL_Screenshot
+  src={headerCreated}
+  alt="Подтверждение создания Missions/ShootingStar_Ep1.conf; за окном мастера открыт новый файл."
+  caption="Созданный файл сценария."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+## Добавление игрового режима Lite Lobby {#lite-lobby-game-mode}
+
+Мастер добавил в мир игровой режим Game Master. Заменим его игровым режимом Lite Lobby.
+
+В панели **Hierarchy** раскройте слой `a_systems`, выберите `GameMode_Editor_Full` и нажмите `Delete`. Вместе с игровым режимом удалятся его вложенные объекты, перечёркнутые на скриншоте. Объекты `MapEntity`, `PerceptionManager` и `SCR_AIWorld` находятся отдельно и останутся в слое.
+
+<LL_Screenshot
+  src={removeGameMaster}
+  alt="В слое a_systems перечёркнут GameMode_Editor_Full с вложенными объектами; MapEntity, PerceptionManager и SCR_AIWorld находятся отдельно."
+  caption="Удаление игрового режима Game Master."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Дважды щёлкните по `a_systems`, чтобы сделать слой активным. В **Resource Browser** выберите проект **LiteLobby** и введите `GameMode` в строку поиска. Найдите `LL_GameMode_Lobby.et`.
+
+Файл `.et` — это **префаб**, готовый шаблон объекта с настройками. Перетащите `LL_GameMode_Lobby.et` из **Resource Browser** на карту в окне редактора. В слое `a_systems` появится игровой режим Lite Lobby с вложенными системными объектами.
+
+<LL_Screenshot
+  src={lobbyGameMode}
+  alt="В Resource Browser найден LL_GameMode_Lobby.et; в слое a_systems появился LL_GameMode_Lobby1 с вложенными объектами."
+  caption="Игровой режим Lite Lobby добавлен в миссию."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить мир.
+
+## Название и описание миссии {#mission-details}
+
+В панели **Resource Browser** найдите в своём аддоне файл `Missions/ShootingStar_Ep1.conf`, созданный [мастером настройки](/lite-lobby-ar/ru/create-mission/world/#create-mission-header). Откройте его и заполните поля:
+
+| Поле | Что указать |
+| --- | --- |
+| **World** | Файл мира вашей миссии. Мастер уже указал `ShootingStar_Ep1.ent`. |
+| **Name** | Название миссии, которое увидят игроки в списке сценариев. |
+| **Author** | Ваше имя или никнейм. |
+| **Description** | Краткое описание: кто участвует в миссии и где происходит действие. |
+| **Player Count** | На сколько игроков рассчитана миссия. В примере — `128`. |
+
+В разделе **Save Types** снимите все четыре флажка: **MANUAL**, **AUTO**, **SCRIPTED** и **SHUTDOWN**. Это отключит сохранение прогресса во время игры.
+
+<LL_Screenshot
+  src={missionDetails}
+  alt="Файл ShootingStar_Ep1.conf с заполненными полями World, Name, Author, Description, Player Count и отключёнными флажками Save Types."
+  caption="Название, описание и параметры миссии."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить файл сценария.
+
+## Настройка карты {#map-setup}
+
+Объект `MapEntity` отвечает за карту, которую игроки открывают во время миссии. Для её отображения укажем готовые файлы Эверона.
+
+Вернитесь в **World Editor**. В панели **Hierarchy** выберите `MapEntity` в слое `a_systems`. Справа, в **Object Properties**, найдите компоненты `SCR_CompassComponent` и `SCR_WristwatchComponent`, которые отвечают за компас и часы. Обычно они уже есть в списке. Если одного из них нет, нажмите **Add Component** внизу панели, найдите компонент по названию и выберите его.
+
+Нажмите на верхнюю строку **SCR_MapEntity** в панели **Object Properties** и раскройте раздел **Unsorted**. Заполните два поля, выбирая файлы из проекта **ArmaReforger** через кнопку `…`:
+
+- **Map Geometry Data** — `worlds/Eden/Eden.topo`. Здесь хранятся дороги, здания и другие объекты для отображения на карте.
+- **Satellite background image** — `UI/Textures/Map/worlds/EveronRasterized.edds`. Это фон карты с рельефом и лесами.
+
+<LL_Screenshot
+  src={mapSetup}
+  alt="Выбран MapEntity; в Object Properties видны компоненты компаса и часов, а в полях карты указаны Eden.topo и EveronRasterized.edds."
+  caption="Настройки карты Эверона."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить настройки.
+
+
+Мир миссии подготовлен. Теперь [создадим базового персонажа](../base-character/), от которого будут наследоваться бойцы подразделения.

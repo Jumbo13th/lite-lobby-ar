@@ -1,0 +1,336 @@
+---
+title: "6. Groups and playable slots"
+description: "Build a group from the completed characters, check it in Game Master, and configure slots, vehicles and starting zones."
+prev:
+  link: "/lite-lobby-ar/create-mission/character-editor/"
+  label: "5. Character names and Game Master checks"
+next:
+  link: "/lite-lobby-ar/create-mission/objectives/"
+  label: "7. Mission objectives and triggers"
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import inheritGroup from '../../../assets/guide/79.png';
+import nameGroup from '../../../assets/guide/80.png';
+import groupFolder from '../../../assets/guide/81.png';
+import groupTranslation from '../../../assets/guide/82.png';
+import groupUiInfo from '../../../assets/guide/83.png';
+import groupMilitarySymbol from '../../../assets/guide/84.png';
+import alphaMembers from '../../../assets/guide/85.png';
+import alphaFormation from '../../../assets/guide/86.png';
+import overrideGroupCatalog from '../../../assets/guide/87.png';
+import duplicateGroupEntry from '../../../assets/guide/88.png';
+import assignGroupEntry from '../../../assets/guide/89.png';
+import groupBrowser from '../../../assets/guide/90.png';
+import step106 from '../../../assets/guide/106.png';
+import step107 from '../../../assets/guide/107.png';
+import step108 from '../../../assets/guide/108.png';
+import step109 from '../../../assets/guide/109.png';
+import step110 from '../../../assets/guide/110.png';
+import step111 from '../../../assets/guide/111.png';
+import step112 from '../../../assets/guide/112.png';
+import step113 from '../../../assets/guide/113.png';
+
+[Back to the guide contents](../)
+
+The characters are ready. Combine them into a group, check it in Game Master, then place it in the mission world and configure playable slots. Finally, add vehicles and starting zones.
+
+## Group prefab {#group-prefab}
+
+A group prefab combines several character prefabs so you can place the entire unit at once. The example creates **Split Team Alpha**, the first half of an ODA in **Triad Shooting Star**. Use your own names and roster for your unit.
+
+### Create the prefab {#create-group-prefab}
+
+Stop the test session and return to **World Editor**.
+
+In the **ArmaReforger** project, open `Prefabs/Groups/BLUFOR`. Right-click `Group_US_Base.et` and select **Inherit in → your addon**.
+
+<LL_Screenshot
+  src={inheritGroup}
+  alt="Inherit in selected for Group_US_Base.et with the TriadShootingStar addon highlighted."
+  caption="Creating a group from the US faction base."
+  originalLabel="Open original image"
+/>
+
+Enter `TSS_Group_US_GB_SplitTeamAlpha` and click **OK**.
+
+<LL_Screenshot
+  src={nameGroup}
+  alt="TSS_Group_US_GB_SplitTeamAlpha entered in the Create inherited file dialog."
+  caption="Naming the group prefab."
+  originalLabel="Open original image"
+/>
+
+In your addon, open `Prefabs/Groups/BLUFOR`. Right-click an empty area in **Resource Browser**, create a `Green Berets` folder, and drag the new prefab into it.
+
+<LL_Screenshot
+  src={groupFolder}
+  alt="A Green Berets folder being created under the addon's Prefabs/Groups/BLUFOR."
+  caption="The folder for Green Berets groups."
+  originalLabel="Open original image"
+/>
+
+### Group name {#group-name}
+
+Open `Language/tss_localization.st` in **String Editor**. [Add a row](/lite-lobby-ar/create-mission/character-editor/#localization-entry) with the key `TSS-Groups_SplitTeamAlpha`:
+
+- **Target En Us** — `Split Team Alpha`.
+- **Target Ru Ru** — `Группа «Альфа»`.
+
+Save the table with `Ctrl+S` and build the translations with `Ctrl+B`.
+
+<LL_Screenshot
+  src={groupTranslation}
+  alt="TSS-Groups_SplitTeamAlpha added in String Editor with the English name Split Team Alpha."
+  caption="The group name in the translation table."
+  originalLabel="Open original image"
+/>
+
+Open `TSS_Group_US_GB_SplitTeamAlpha.et` with **Edit Prefab** and select the group entity. Enter `edita` in the component search, select **SCR_EditableGroupComponent**, and expand **Visualization → UI Info**.
+
+Set **Name** to `#TSS-Groups_SplitTeamAlpha`. Under **Authored Labels**, use `+` to add `GROUPSIZE_LARGE`, as in the example. This is a size category for the in-game editor.
+
+<LL_Screenshot
+  src={groupUiInfo}
+  alt="SCR_EditableGroupComponent with #TSS-Groups_SplitTeamAlpha as the name and GROUPSIZE_LARGE added."
+  caption="The group name and category in the in-game editor."
+  originalLabel="Open original image"
+/>
+
+### Military symbol {#group-symbol}
+
+Further down, enable **Use UI Info Name** so the group uses the text from **Name**. Under **Military Symbol**, set:
+
+- **Identity** — `BLUFOR`.
+- **Dimension** — `LAND`.
+- **Icons** — check `RECON`.
+
+This gives the group a BLUFOR ground reconnaissance symbol.
+
+<LL_Screenshot
+  src={groupMilitarySymbol}
+  alt="Use UI Info Name enabled, with BLUFOR, LAND and RECON selected under Military Symbol."
+  caption="Using the UI Info name and configuring the group symbol."
+  originalLabel="Open original image"
+/>
+
+### Group members {#group-members}
+
+Alpha has six characters. The previous chapters created the commander and communications sergeant. The completed mission includes four more specialists: an operations sergeant, machine gunner, engineer, and medic. Their prefabs were created the same way as those two characters.
+
+To reproduce Alpha's roster, first create these four prefabs using the names in the table below and equip them for their roles. For your own unit, choose [character prefabs](/lite-lobby-ar/create-mission/base-character/) with the roles and equipment you need. Add the characters to the group once all their prefabs are ready.
+
+Clear the component search and select the **SCR_AIGroup** entity itself. Expand **Group Members → Unit Prefab Slots** and add six entries with `+`.
+
+From your addon's `Prefabs/Characters/Factions/BLUFOR/US_Army/Green Berets` folder, drag the prefabs into the entries in this order:
+
+| Entry | Prefab |
+| --- | --- |
+| `0` | `TSS_Character_US_GB_DetachmentCommander.et` |
+| `1` | `TSS_Character_US_GB_OperationsSergeant.et` |
+| `2` | `TSS_Character_US_GB_WeaponsSergeant_M249.et` |
+| `3` | `TSS_Character_US_GB_EngineerSergeant.et` |
+| `4` | `TSS_Character_US_GB_MedicalSergeant.et` |
+| `5` | `TSS_Character_US_GB_CommsSergeant.et` |
+
+Each entry represents one character. For a different unit composition, assign your own prefabs.
+
+<LL_Screenshot
+  src={alphaMembers}
+  alt="SCR_AIGroup with six Split Team Alpha character prefabs in Unit Prefab Slots."
+  caption="The Split Team Alpha roster."
+  originalLabel="Open original image"
+/>
+
+### Formation {#group-formation}
+
+Enter `format` in the component search and select **AIFormationComponent**. Set **Default Formation** to `line`, as in the example.
+
+<LL_Screenshot
+  src={alphaFormation}
+  alt="AIFormationComponent with Default Formation set to line."
+  caption="The group's default formation."
+  originalLabel="Open original image"
+/>
+
+Save the group prefab with `Ctrl+S`.
+
+## Checking the group in Game Master {#group-catalog}
+
+Add the group prefab to the US faction catalog so it appears in Game Master.
+
+### Register the group {#register-group}
+
+In the **ArmaReforger** project, open `Configs/EntityCatalog/US`. Right-click `Groups_EntityCatalog_US.conf` and select **Override in → your addon**.
+
+<LL_Screenshot
+  src={overrideGroupCatalog}
+  alt="Override in selected for Groups_EntityCatalog_US.conf with the TriadShootingStar addon highlighted."
+  caption="Overriding the US group catalog."
+  originalLabel="Open original image"
+/>
+
+In your addon, double-click this file to open it. Under **Entity Entry List**, find `Group_US_EngineerTeam.et`, right-click the entry, and select **Duplicate**.
+
+<LL_Screenshot
+  src={duplicateGroupEntry}
+  alt="Duplicate selected for Group_US_EngineerTeam.et in Groups_EntityCatalog_US.conf."
+  caption="Copying an existing group entry."
+  originalLabel="Open original image"
+/>
+
+Expand the new entry. From your addon's `Prefabs/Groups/BLUFOR/Green Berets` folder, drag `TSS_Group_US_GB_SplitTeamAlpha.et` into its **Entity Prefab** field.
+
+<LL_Screenshot
+  src={assignGroupEntry}
+  alt="A group prefab is dragged from Resource Browser into Entity Prefab."
+  caption="Assigning a group prefab. The screenshot shows Company HQ; we are adding Alpha."
+  originalLabel="Open original image"
+/>
+
+The **Entity Data List** settings have already been copied from the existing entry. Save the catalog with `Ctrl+S`.
+
+### Check the group {#test-group}
+
+[Launch the mission and open Game Master](/lite-lobby-ar/create-mission/character-editor/#test-characters). Press `Tab`. In **Entity Browser**, select the **US** faction and **Group** type; clear the **Character** filter if it is still selected from the previous check.
+
+Find your group by name in **Search**. For the example, enter `Alpha`, or `Альфа` with the game set to Russian.
+
+<LL_Screenshot
+  src={groupBrowser}
+  alt="Company HQ, Split Team Alpha and Split Team Bravo visible in Entity Browser."
+  caption="The example mission's groups in the in-game catalog."
+  originalLabel="Open original image"
+/>
+
+Select your group and left-click the ground to place it. All characters listed in **Unit Prefab Slots** should appear; the Alpha example has six. Check the roster and equipment. If someone is missing, check the [group's prefab list](/lite-lobby-ar/create-mission/groups-and-slots/#group-members).
+
+## Groups in the world and playable slots {#playable-forces}
+
+The group has been checked in Game Master. Stop the game and return to World Editor: units that should be present when the mission starts must be placed in the world itself.
+
+Use Alpha to learn placement and slot settings. The following screenshots also show **Company HQ** and **Split Team Bravo** from the completed mission. To reproduce the full roster, prepare those groups the same way as Alpha, using their own names and rosters.
+
+The example uses US and USSR. For your own mission, assemble the required factions’ groups from the game’s character prefabs. Later tests of triggers that compare character counts require playable units on both sides.
+
+### Making characters available in the lobby {#playable-characters}
+
+Open the character prefab in your addon. If your soldiers inherit settings from a shared base, open that base; in our example it is `TSS_Character_US_GB_BaseLoadout.et`. In **Object Properties**, find **LL_PlayableComponent** and enable **Is Playable**. Lite Lobby supplies this component; characters derived from the prefab inherit its setting.
+
+If you use the game’s original characters, first [create child prefabs in your addon](/lite-lobby-ar/create-mission/base-character/#create-base-prefab) and [assign them to the group roster](/lite-lobby-ar/create-mission/groups-and-slots/#group-members). This keeps playable-slot settings on your own characters.
+
+<LL_Screenshot
+  src={step106}
+  alt="Is Playable is enabled in LL_PlayableComponent on the base character prefab."
+  caption="Making the character available as a lobby slot."
+  originalLabel="Open original image"
+/>
+
+Disable **Is Playable** for characters intended only as AI. Save the prefab and return to the mission world.
+
+### Placing groups and assigning callsigns {#group-callsigns}
+
+Create a `US` layer and make it active. In your addon's `Prefabs/Groups/BLUFOR/Green Berets` folder, find the Alpha prefab and drag it to the group's starting position. If you have also prepared Company HQ and Bravo, place them the same way.
+
+For each placed group, enter its object name at the top of **Object Properties**, then select **LL_GroupCallsign**. If the component is missing, add it through **Add Component**.
+
+Use Alpha’s row below to configure it. The other rows show the settings for the full example roster:
+
+| Group | Object name | **Company** | **Platoon** | **Squad** |
+| --- | --- | --- | --- | --- |
+| Company HQ | `AB_PL1` | `0` | `0` | `0` |
+| Alpha | `AB_S1` | `0` | `1` | `0` |
+| Bravo | `AB_S2` | `0` | `1` | `1` |
+
+The numbers select entries from the faction's callsign lists, starting at zero. In this example they produce **Atlas Red 1**, **Atlas White 1** and **Atlas White 2**. **Company**, **Platoon** and **Squad** are fields in the game's callsign system: we use them for the headquarters and the two ODA halves without adding a platoon to their organisation.
+
+<LL_Screenshot
+  src={step107}
+  alt="Company HQ AB_PL1 has Company 0, Platoon 0 and Squad 0."
+  caption="The headquarters callsign."
+  originalLabel="Open original image"
+/>
+<LL_Screenshot
+  src={step108}
+  alt="Alpha group AB_S1 has Company 0, Platoon 1 and Squad 0."
+  caption="Alpha's callsign."
+  originalLabel="Open original image"
+/>
+<LL_Screenshot
+  src={step109}
+  alt="Bravo group AB_S2 has Company 0, Platoon 1 and Squad 1."
+  caption="Bravo's callsign."
+  originalLabel="Open original image"
+/>
+
+Change these settings on the **placed groups**: several groups using the same prefab can have different callsigns. `AB_S1` is the editor object name used for references; **Atlas White 1** is the callsign players see.
+
+For additional ODAs, place more Alpha and Bravo groups with unique object names and callsign combinations. The next pair can use **Platoon** `2` and **Squad** `0`/`1`.
+
+If you have prepared Soviet groups for your mission, place them the same way in a separate `USSR` layer. Characters intended for players must also have **Is Playable** enabled. Alpha alone is enough for the slot-list check below; place groups on both sides before testing triggers that count characters.
+
+### Checking the slot list {#check-slots}
+
+Press the green launch button in **World Editor** and open the lobby with `U` if it is hidden. Check factions, callsigns, roles and character equipment.
+
+<LL_Screenshot
+  src={step110}
+  alt="The lobby shows Atlas Red 1, Atlas White 1 and Atlas White 2 with roles and a character preview."
+  caption="Groups and playable slots in the lobby. The screenshot already includes an expanded roster."
+  originalLabel="Open original image"
+/>
+
+If a group is missing, check its characters' **Is Playable** setting and the group prefab's **Unit Prefab Slots**. Characters must belong to a group and a faction.
+
+## Group vehicles {#squad-vehicles}
+
+Assign vehicles to a [group placed in the mission world](/lite-lobby-ar/create-mission/groups-and-slots/#playable-forces) so players can see their unit’s vehicles in the lobby. You will need the group’s object name from **Hierarchy**.
+
+If the world is running, stop the test and return to the editor. Find a vehicle in **Resource Browser** and drag it beside the group. The screenshot uses `S105_darkred.et` from **ArmaReforger**.
+
+Select the vehicle and **LL_VehicleSquadLinkComponent**. If it is missing, add it through **Add Component**. Set **Group Name** to the placed group's object name: `AB_S1` for Alpha, or `AB_S2` for Bravo if you have prepared and placed it. The vehicle will then appear under that group in the lobby.
+
+<LL_Screenshot
+  src={step111}
+  alt="The vehicle's LL_VehicleSquadLinkComponent references AB_S9 from the expanded mission roster."
+  caption="Linking a vehicle to a group. The screenshot uses AB_S9 from the expanded roster; use the name of your placed group."
+  originalLabel="Open original image"
+/>
+
+Select **SCR_VehicleFactionAffiliationComponent** and set **Faction affiliation** to `US`. Use `USSR` for Soviet vehicles.
+
+<LL_Screenshot
+  src={step112}
+  alt="The vehicle's SCR_VehicleFactionAffiliationComponent has Faction affiliation US."
+  caption="Assigning the vehicle to the US side."
+  originalLabel="Open original image"
+/>
+
+Repeat for the other vehicles. **Group Name** must match the object name in **Hierarchy**, not its callsign or prefab filename.
+
+## Starting zones and freeze time
+
+With the groups and vehicles placed, define their starting zones and the time allowed for players to prepare.
+
+### Starting zone {#freeze-zone}
+
+Freeze time is a preparation period after the game starts. A starting zone keeps players from leaving before that period ends.
+
+In **ArmaReforger → PrefabsEditable → RestrictionZone**, find `E_EditorRestrictionZoneLarge.et` and drag it onto the starting position. Position it so characters and vehicles are inside the inner circle. Add another zone for another starting position.
+
+<LL_Screenshot
+  src={step113}
+  alt="E_EditorRestrictionZoneLarge.et surrounds the starting characters and vehicles."
+  caption="A starting zone with warning and exit boundaries."
+  originalLabel="Open original image"
+/>
+
+The yellow boundary marks where players receive a warning; crossing the red boundary can kill the character. Lite Lobby removes these zones when freeze time ends.
+
+### Freeze duration {#freeze-duration}
+
+In **Hierarchy**, select the game mode, `LL_GameMode_Lobby1`, then **LL_GameModeCoop** in **Object Properties**. **Freeze Time** is in milliseconds: `120000` means two minutes. **Hard Freeze Time** is the initial pause that locks controls while the world loads; it is part of the overall freeze period.
+
+Press `Ctrl+S` to save the world.
+
+Groups, playable slots and starting positions are configured. Next, add map markings, mission conditions and the briefing.

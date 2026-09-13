@@ -1,0 +1,61 @@
+---
+import config from 'virtual:starlight/user-config';
+
+const translations = {
+  en: {
+    aboutBefore: 'Lite Lobby is developed by the',
+    aboutAfter: 'collective for the wider Arma community.',
+    source: 'Full source on GitHub.',
+    license: 'Released under Bohemia Interactive’s',
+    licenseSuffix: '.',
+    terms: 'Reuse, modify, and share Lite Lobby for noncommercial use in Arma, with attribution.',
+  },
+  ru: {
+    aboutBefore: 'Lite Lobby разработан коллективом',
+    aboutAfter: 'для всего сообщества Arma.',
+    source: 'Открытый исходный код доступен на GitHub.',
+    license: 'Lite Lobby распространяется по лицензии',
+    licenseSuffix: ' от Bohemia Interactive.',
+    terms: 'Мод можно использовать в некоммерческих проектах Arma, изменять и распространять с указанием авторства.',
+  },
+};
+const language = Astro.locals.starlightRoute.lang === 'ru' ? 'ru' : 'en';
+const text = translations[language];
+const github = config.social?.find(({ icon }) => icon === 'github');
+if (!github) throw new Error('The project introduction requires a GitHub social link.');
+---
+
+<div class="ll-project-intro not-content">
+  <p>
+    {text.aboutBefore}{' '}
+    <a href={`https://triad-tactics.com/${language}`} target="_blank" rel="noopener noreferrer">Triad Tactics</a>{' '}
+    {text.aboutAfter}{' '}
+    <a href={github.href} target="_blank" rel="noopener noreferrer">{text.source}</a>
+  </p>
+  <p class="ll-project-license">
+    {text.license}{' '}
+    <a href="https://www.bohemia.net/en/licenses/arma-public-license" target="_blank" rel="noopener noreferrer">Arma Public License (APL)</a>{text.licenseSuffix}{' '}
+    {text.terms}
+  </p>
+</div>
+
+<style>
+  .ll-project-intro {
+    margin-block: 0 2rem;
+    color: var(--sl-color-gray-2);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  p { margin: 0; }
+  .ll-project-license {
+    margin-block-start: 0.625rem;
+    color: var(--sl-color-gray-3);
+    font-size: 0.875rem;
+  }
+  a {
+    color: var(--sl-color-text-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+  a:hover { color: var(--sl-color-white); }
+</style>

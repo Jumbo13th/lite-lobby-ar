@@ -1,0 +1,273 @@
+---
+title: "2. Create a world with Lite Lobby"
+description: "An Everon-based world, system entities, game mode, scenario header and in-game map."
+prev:
+  link: "/lite-lobby-ar/create-mission/project/"
+  label: "1. Prepare the project"
+next:
+  link: "/lite-lobby-ar/create-mission/base-character/"
+  label: "3. The base character"
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import worldEditorLaunch from '../../../assets/guide/05.png';
+import baseWorld from '../../../assets/guide/06.png';
+import newWorld from '../../../assets/guide/07.png';
+import subscene from '../../../assets/guide/08.png';
+import saveWorld from '../../../assets/guide/09.png';
+import systemsLayer from '../../../assets/guide/10.png';
+import gameModeSetup from '../../../assets/guide/11.png';
+import gameModeTemplate from '../../../assets/guide/12.png';
+import worldScan from '../../../assets/guide/13.png';
+import scanResults from '../../../assets/guide/14.png';
+import createEntities from '../../../assets/guide/15.png';
+import entitiesCreated from '../../../assets/guide/16.png';
+import createHeader from '../../../assets/guide/17.png';
+import headerCreated from '../../../assets/guide/18.png';
+import removeGameMaster from '../../../assets/guide/20.png';
+import lobbyGameMode from '../../../assets/guide/21.png';
+import missionDetails from '../../../assets/guide/19.png';
+import mapSetup from '../../../assets/guide/22.png';
+
+[Back to the guide contents](../)
+
+In the prepared addon, create the mission world, add Lite Lobby’s game mode and configure the in-game map. The example uses Everon.
+
+## Create the world {#create-world}
+
+A world contains the map and the objects placed on it. Use Everon from the game to create a separate scene for our mission objects.
+
+### Open the map {#open-world-editor}
+
+In the main Workbench window, click **World Editor** under **Quick Launch**. This is the editor where we will place mission objects.
+
+<LL_Screenshot
+  src={worldEditorLaunch}
+  alt="The main Workbench window with an arrow pointing to World Editor under Quick Launch."
+  caption="Starting World Editor."
+  originalLabel="Open original image"
+/>
+
+In **Resource Browser**, open `ArmaReforger/worlds/Eden` and double-click `Eden.ent`. Wait for the map to load.
+
+<LL_Screenshot
+  src={baseWorld}
+  alt="Resource Browser showing ArmaReforger/worlds/Eden with Eden.ent selected."
+  caption="The Eden.ent map in the game files."
+  originalLabel="Open original image"
+/>
+
+### Create a separate scene {#create-subscene}
+
+Choose **File → New World**.
+
+<LL_Screenshot
+  src={newWorld}
+  alt="The File menu with New World selected after loading Eden.ent."
+  caption="Creating a world based on the open map."
+  originalLabel="Open original image"
+/>
+
+In **Create world**, select **Sub-scene (of current world)** and click **OK**. This scene uses the open map and stores the objects we add separately.
+
+<LL_Screenshot
+  src={subscene}
+  alt="The Create world dialog with Sub-scene (of current world) selected."
+  caption="Selecting a scene based on the current world."
+  originalLabel="Open original image"
+/>
+
+### Save the world {#save-world}
+
+Press `Ctrl+S`.
+
+In the save dialog, open your project. Use **New Folder** to create a `Worlds` folder and an `Eden` folder inside it. Open `Eden`, enter `ShootingStar_Ep1` in **File name**, and click **OK**.
+
+<Aside type="tip" title="File names and folder structure">
+For the world file, use a name such as `DesertStorm` or `SilentPort`: capitalize each word without spaces. Avoid `test_world`, `tempworld`, or `Temp World`. Follow the folder structure in the screenshot: `Worlds` → `Eden` → world file. Renaming files and folders can cause problems in the engine, so choose their final names from the start.
+
+For the Triad Tactics server, we recommend keeping the episode in the filename: `DesertStorm_Ep1`, `DesertStorm_Ep2`, `DesertStorm_Ep3`, as games have three episodes. For missions intended for other servers, you can omit `_Ep1`.
+</Aside>
+
+<LL_Screenshot
+  src={saveWorld}
+  alt="The Save world as dialog showing the project's Worlds/Eden folder and ShootingStar_Ep1 in File name."
+  caption="Saving the world in your addon."
+  originalLabel="Open original image"
+/>
+
+The world file will be at `Worlds/Eden/ShootingStar_Ep1.ent` inside your addon folder. **Hierarchy** will show our `ShootingStar_Ep1` scene alongside the base world, `Eden`.
+
+### Mission systems layer {#systems-layer}
+
+Layers organize scene objects into groups. Prepare `a_systems` for the [mission's system objects](/lite-lobby-ar/create-mission/world/#game-mode-setup).
+
+In **Hierarchy**, find the `default` layer under your `ShootingStar_Ep1` scene. Right-click it and choose **Rename**. Enter `a_systems` and click **OK**.
+
+<LL_Screenshot
+  src={systemsLayer}
+  alt="Hierarchy with the default layer under ShootingStar_Ep1 selected and a_systems entered in Rename layer."
+  caption="Renaming your scene's layer."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the changes.
+
+## World setup wizard {#game-mode-setup}
+
+A mission needs system objects to handle the game mode, factions, communications, and other functions. We will add them using the **Game Mode Setup** wizard.
+
+### Select a template {#game-mode-template}
+
+In **Hierarchy**, double-click `a_systems` to make it the active layer. New objects will be added to this layer.
+
+Choose **Plugins → Game Mode Setup**.
+
+<LL_Screenshot
+  src={gameModeSetup}
+  alt="Game Mode Setup selected in the Plugins menu, with a_systems active in Hierarchy."
+  caption="Opening the game mode setup wizard."
+  originalLabel="Open original image"
+/>
+
+Click `…` in **Template**. Open `ArmaReforger/Configs/Workbench/GameModeSetup`, select `GameMaster.conf`, and click **OK**, then **Next**.
+
+<LL_Screenshot
+  src={gameModeTemplate}
+  alt="The Template picker with GameMaster.conf selected in Configs/Workbench/GameModeSetup."
+  caption="Selecting the GameMaster.conf template."
+  originalLabel="Open original image"
+/>
+
+### Create system objects {#generate-systems}
+
+In **World Scan**, click **Scan world**. The wizard checks which system objects are already in the world.
+
+<LL_Screenshot
+  src={worldScan}
+  alt="The World Scan dialog with an arrow pointing to Scan world."
+  caption="Checking the world's objects."
+  originalLabel="Open original image"
+/>
+
+**Missing Entities** lists the objects that need to be added. Click **Next**.
+
+<LL_Screenshot
+  src={scanResults}
+  alt="World Scan Results showing the Missing Entities list and Next button."
+  caption="Objects that need to be added."
+  originalLabel="Open original image"
+/>
+
+In **World Configuration**, click **Create entities** to create these objects in `a_systems`.
+
+<LL_Screenshot
+  src={createEntities}
+  alt="The World Configuration dialog with an arrow pointing to Create entities."
+  caption="Creating system objects."
+  originalLabel="Open original image"
+/>
+
+The wizard confirms the objects were created. We will assign the map files for `MapEntity` later in [map setup](/lite-lobby-ar/create-mission/world/#map-setup). For now, click **Next**.
+
+<LL_Screenshot
+  src={entitiesCreated}
+  alt="World Configuration Completed with setup reminders for SCR_AIWorld and MapEntity."
+  caption="System objects created."
+  originalLabel="Open original image"
+/>
+
+### Create the scenario file {#create-mission-header}
+
+For the mission to appear in the game's scenario list, it needs a separate file called a **Mission Header**. This file contains the world reference, mission name, and description.
+
+In **Mission Header**, click **Create header**.
+
+<LL_Screenshot
+  src={createHeader}
+  alt="The Mission Header dialog with an arrow pointing to Create header."
+  caption="Creating the scenario file."
+  originalLabel="Open original image"
+/>
+
+The wizard creates and opens `Missions/ShootingStar_Ep1.conf` in your addon. The filename matches the world's name. Click **Next**.
+
+<LL_Screenshot
+  src={headerCreated}
+  alt="Confirmation that Missions/ShootingStar_Ep1.conf was created, with the new file open behind the wizard."
+  caption="The generated scenario file."
+  originalLabel="Open original image"
+/>
+
+## Add the Lite Lobby game mode {#lite-lobby-game-mode}
+
+The wizard added the Game Master game mode. Replace it with the Lite Lobby game mode.
+
+In **Hierarchy**, expand `a_systems`, select `GameMode_Editor_Full`, and press `Delete`. This also removes its child objects, crossed out in the screenshot. The separate `MapEntity`, `PerceptionManager`, and `SCR_AIWorld` objects remain in the layer.
+
+<LL_Screenshot
+  src={removeGameMaster}
+  alt="GameMode_Editor_Full and its children crossed out in a_systems; MapEntity, PerceptionManager and SCR_AIWorld are separate objects."
+  caption="Removing the Game Master game mode."
+  originalLabel="Open original image"
+/>
+
+Double-click `a_systems` to make it the active layer. In **Resource Browser**, select the **LiteLobby** project and enter `GameMode` in the search box. Find `LL_GameMode_Lobby.et`.
+
+An `.et` file is a **prefab**, a ready-made object template with its settings. Drag `LL_GameMode_Lobby.et` from **Resource Browser** onto the map in the editor viewport. The Lite Lobby game mode and its child system objects will appear in `a_systems`.
+
+<LL_Screenshot
+  src={lobbyGameMode}
+  alt="LL_GameMode_Lobby.et found in Resource Browser, with LL_GameMode_Lobby1 and its children added to a_systems."
+  caption="The Lite Lobby game mode added to the mission."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the world.
+
+## Mission name and description {#mission-details}
+
+In your addon's **Resource Browser**, open `Missions/ShootingStar_Ep1.conf`, created by the [setup wizard](/lite-lobby-ar/create-mission/world/#create-mission-header), and enter your mission's details:
+
+| Field | What to enter |
+| --- | --- |
+| **World** | Your mission's world file. The wizard has already set this to `ShootingStar_Ep1.ent`. |
+| **Name** | The mission name players will see in the scenario list. |
+| **Author** | Your name or nickname. |
+| **Description** | A short description of who takes part in the mission and where it takes place. |
+| **Player Count** | How many players the mission is designed for. The example uses `128`. |
+
+Under **Save Types**, clear all four checkboxes: **MANUAL**, **AUTO**, **SCRIPTED**, and **SHUTDOWN**. These control progress saves during gameplay.
+
+<LL_Screenshot
+  src={missionDetails}
+  alt="ShootingStar_Ep1.conf with World, Name, Author, Description and Player Count filled in, and all Save Types disabled."
+  caption="Mission name, description, and settings."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the scenario file.
+
+## Configure the map {#map-setup}
+
+`MapEntity` controls the map players open during the mission. We will assign Everon's existing map files.
+
+Return to **World Editor**. In **Hierarchy**, select `MapEntity` in `a_systems`. **Object Properties** on the right should list `SCR_CompassComponent` and `SCR_WristwatchComponent` — the compass and watch. These are usually already present. If either is missing, click **Add Component** at the bottom of the panel, search for its name, and select it from the list.
+
+Click the top **SCR_MapEntity** row in **Object Properties** and expand **Unsorted**. Click `…` beside each of the two fields and select the file from the **ArmaReforger** project:
+
+- **Map Geometry Data** — `worlds/Eden/Eden.topo`. This contains roads, buildings, and other objects displayed on the map.
+- **Satellite background image** — `UI/Textures/Map/worlds/EveronRasterized.edds`. This provides the map background with terrain relief and forests.
+
+<LL_Screenshot
+  src={mapSetup}
+  alt="MapEntity selected, with compass and watch components in Object Properties and Eden.topo and EveronRasterized.edds assigned to the map fields."
+  caption="Everon map settings."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the settings.
+
+
+The mission world is prepared. Next, [create the base character](../base-character/) for the soldiers in the unit.

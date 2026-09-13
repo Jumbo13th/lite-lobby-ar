@@ -1,0 +1,160 @@
+---
+title: "1. Prepare the project"
+description: "Prepare Workbench, create the mission addon and add Lite Lobby."
+prev:
+  link: "/lite-lobby-ar/create-mission/"
+  label: "Create a mission"
+next:
+  link: "/lite-lobby-ar/create-mission/world/"
+  label: "2. Create a world with Lite Lobby"
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import repositoryLayout from '../../../assets/mission/repository-layout.png';
+import createProject from '../../../assets/guide/01.png';
+import projectSettings from '../../../assets/guide/02.png';
+import projectSettingsMenu from '../../../assets/guide/03.png';
+import dependencySettings from '../../../assets/guide/04.png';
+import missingAddonDependencies from '../../../assets/mission/missing-addon-dependencies.png';
+import workshopGuidSearch from '../../../assets/mission/workshop-guid-search.png';
+import scanForProjects from '../../../assets/mission/scan-for-projects.png';
+import workshopAddonsFolder from '../../../assets/mission/workshop-addons-folder.png';
+
+[Back to the guide contents](../)
+
+Create an addon — a separate addition to the game that stores your mission world, characters and settings.
+
+## Preparation {#preparation}
+
+To create a mission, you will need:
+
+- Arma Reforger.
+- Arma Reforger Tools — the Workbench editor.
+- [Lite Lobby](https://reforger.armaplatform.com/workshop/699319AAA5BFC57F), installed from Workshop.
+
+[Official Bohemia Interactive instructions for setting up Workbench](https://community.bistudio.com/wiki/Arma_Reforger%3AMod_Project_Setup#Workbench_Launcher_Setup).
+
+<span id="create-project"></span>
+
+## Create the project in Workbench {#workbench-project}
+
+Launch Arma Reforger Tools. In **Enfusion Workbench Launcher**, open **Add Project** and select **Create New Project**.
+
+<LL_Screenshot
+  src={createProject}
+  alt="Enfusion Workbench Launcher with Create New Project selected in the Add Project menu."
+  caption="Creating a project in Workbench Launcher."
+  originalLabel="Open original image"
+/>
+
+In the **New Project** window, enter your project's name in **Project Name**. Our example uses `Triad Shooting Star`.
+
+<Aside type="tip" title="Keep naming consistent">
+Choose your own name in the same format: `Desert Storm`, rather than `Desert_Storm` or `DesertStorm`. Spaces make the words easier to read; Workbench will also use this name for the project folder.
+
+Follow the naming patterns in the screenshots. Arma's naming conventions depend on the type of file or object. Consistency matters: it helps you and other authors find files and understand the mission.
+</Aside>
+
+In **Location**, choose the parent folder where Workbench will create the new addon folder.
+
+If you use Git, select the repository folder — the folder that holds your project and its change history. We recommend keeping the repository under `Documents\My Games\ArmaReforgerWorkbench\addons`. In our example, it is named `triad-shooting-star-ar`. If repositories are new to you, start with [Git and Arma Reforger](/lite-lobby-ar/git/).
+
+<LL_Screenshot
+  src={projectSettings}
+  alt="The New Project window: Project Name is Triad Shooting Star and Location points to the triad-shooting-star-ar repository folder."
+  caption="The project name and parent folder."
+  originalLabel="Open original image"
+/>
+
+Click **Create**. Workbench automatically creates a `Triad Shooting Star` folder inside the selected folder, using the **Project Name** value.
+
+### Project folder {#project-folder}
+
+The addon folder contains the project file, `addon.gproj`:
+
+```text
+triad-shooting-star-ar/
+└── Triad Shooting Star/
+    └── addon.gproj
+```
+
+<LL_Screenshot
+  src={repositoryLayout}
+  alt="The triad-shooting-star-ar folder contains the Triad Shooting Star folder created by Workbench, the .git folder, and the .gitattributes and .gitignore files."
+  caption="The addon folder after creating the project."
+  originalLabel="Open original image"
+/>
+
+The `.git` folder stores the repository's change history and sits alongside the addon folder.
+
+## Add Lite Lobby {#lite-lobby-dependency}
+
+Add Lite Lobby to the project's dependencies — the addons our mission needs.
+
+In Workbench, open **File → Project Settings**.
+
+<LL_Screenshot
+  src={projectSettingsMenu}
+  alt="The File menu in Workbench with Project Settings selected."
+  caption="Opening the project settings."
+  originalLabel="Open original image"
+/>
+
+1. In **Dependencies**, click `+`.
+2. Click the `…` button in the new row.
+3. Open the Workshop-installed mod's folder: `Documents\My Games\ArmaReforger\addons\LiteLobby_699319AAA5BFC57F`.
+4. Select the project file with the `.gproj` extension inside it and click **Open**.
+
+<LL_Screenshot
+  src={dependencySettings}
+  alt="A new Dependencies row with its browse button opening the project picker at the LiteLobby_699319AAA5BFC57F folder."
+  caption="Adding Lite Lobby from Workshop."
+  originalLabel="Open original image"
+/>
+
+Click **OK** to save the settings, then close Workbench.
+
+Reopen your mission project. The **Resource Browser** should now show a **LiteLobby** folder with its files available for use.
+
+### If Workbench cannot find an addon {#missing-addon-dependencies}
+
+After restarting, you may see **Missing Addon Dependencies**. This means Lite Lobby or another required addon is not installed, or the Launcher has not found it on your computer yet.
+
+<LL_Screenshot
+  src={missingAddonDependencies}
+  alt="The Missing Addon Dependencies dialog lists the missing addon GUID 699319AAA5BFC57F."
+  caption="The Launcher cannot find a required addon."
+  originalLabel="Open original image"
+/>
+
+The code in the message is the addon's **GUID**, its identifier. If you do not recognize it, enter it in the search on the [Workshop website](https://reforger.armaplatform.com/workshop). In this example, `699319AAA5BFC57F` identifies Lite Lobby.
+
+<LL_Screenshot
+  src={workshopGuidSearch}
+  alt="A Workshop search for GUID 699319AAA5BFC57F returns Lite Lobby."
+  caption="Finding the missing addon by GUID."
+  originalLabel="Open original image"
+/>
+
+If the addon is not installed, launch Arma Reforger and download it through the in-game Workshop. Then choose **Add Project → Scan for Projects** in the Launcher. If it is already installed, start with the scan.
+
+<LL_Screenshot
+  src={scanForProjects}
+  alt="The Add Project menu in Workbench Launcher points to Scan for Projects."
+  caption="Finding installed addons."
+  originalLabel="Open original image"
+/>
+
+Select your installed addons folder — usually `Documents\My Games\ArmaReforger\addons` — and click **Select Folder**.
+
+<LL_Screenshot
+  src={workshopAddonsFolder}
+  alt="The Documents, My Games, ArmaReforger, addons folder is selected, with an arrow pointing to Select Folder."
+  caption="The Arma Reforger addons folder."
+  originalLabel="Open original image"
+/>
+
+After scanning, reopen your mission project.
+
+The project is created and Lite Lobby is connected. Next, [create the mission world](../world/).

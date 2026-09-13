@@ -1,0 +1,41 @@
+---
+title: Как открыть пример миссии
+description: Пример миссии Arma Reforger на Lite Lobby.
+---
+
+**Triad Shooting Star** — миссия на Lite Lobby, на примере которой написано это руководство. Откройте её в Workbench, чтобы изучать объекты и их настройки, сверяясь с соответствующими главами руководства.
+
+Понадобятся Arma Reforger и Arma Reforger Tools.
+
+## Открытие проекта {#open-project}
+
+1. [Скачайте архив с проектом миссии](https://github.com/Jumbo13th/triad-shooting-star-ar/archive/0288431eae2c423e31baaba295176a28be1ef873.zip) и распакуйте его. Рекомендуем поместить извлечённую папку проекта в `Documents\My Games\ArmaReforgerWorkbench\addons`.
+2. Запустите **Arma Reforger Tools**. В **Workbench Launcher** выберите **Add Project → Add Existing Project**.
+3. В окне выбора файла перейдите в распакованную папку проекта, откройте вложенную папку `Triad Shooting Star` и выберите `addon.gproj`.
+4. Выберите **Triad Shooting Star** в списке проектов и нажмите **Open**.
+
+Если вы уже пользуетесь Git, можно клонировать [репозиторий проекта](https://github.com/Jumbo13th/triad-shooting-star-ar) через GitHub Desktop. В архиве по ссылке выше сохранена версия, использованная в руководстве; текущая версия в репозитории может от неё отличаться.
+
+### Если не хватает дополнений {#missing-dependencies}
+
+Для этой миссии нужны Lite Lobby и другие моды. Если появится окно **Missing Addon Dependencies**, Workbench не смог найти один или несколько из них. В сообщении указаны GUID — идентификаторы недостающих модов. Поочерёдно введите их в строку поиска на [сайте Workshop](https://reforger.armaplatform.com/workshop) и установите найденные моды через Workshop в игре.
+
+В Launcher выберите **Add Project → Scan for Projects**, укажите папку установленных модов — обычно `Documents\My Games\ArmaReforger\addons` — и нажмите **Select Folder**. После сканирования снова откройте проект. [Эти действия показаны на скриншотах](/lite-lobby-ar/ru/create-mission/project/#missing-addon-dependencies).
+
+## Открытие мира {#open-world}
+
+В Workbench нажмите **World Editor** в разделе **Quick Launch**. В панели **Resource Browser** выберите проект **TriadShootingStar**, найдите файл `Worlds/Eden/ShootingStar_Ep1.ent` и откройте его двойным щелчком мыши.
+
+В редакторе откроется готовый мир миссии. Как создать такой мир на основе игровой карты, объясняет глава [«Создание мира с Lite Lobby»](../create-mission/world/).
+
+## Как разбирать пример {#study-example}
+
+Выберите, какую часть миссии вы хотите разобрать, и найдите относящиеся к ней объекты. В панели **Hierarchy** раскройте нужный слой и выберите объект. Его свойства появятся в панели **Object Properties** — сравните их с настройками, описанными в соответствующей главе.
+
+| Что изучить | Где смотреть | Раздел руководства |
+| --- | --- | --- |
+| Захват порта | Слой `triggers`, объекты `PortTrigger` и `PortCapture` | [Триггер захвата](/lite-lobby-ar/ru/create-mission/objectives/#port-capture) |
+| Группы и позывные | Слой `US`, например группа `AB_PL1` | [Группы и игровые слоты](/lite-lobby-ar/ru/create-mission/groups-and-slots/#playable-forces) |
+| Снаряжение бойцов | Папка `Prefabs/Characters` аддона Triad Shooting Star в панели **Resource Browser** | [Часть II. Персонажи](/lite-lobby-ar/ru/create-mission/#characters-part) |
+
+Полный список глав приведён на странице [«Как создать миссию»](../create-mission/). К ним можно обращаться при изучении примера или проходить их по порядку, создавая собственную миссию.

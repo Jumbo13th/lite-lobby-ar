@@ -1,0 +1,89 @@
+---
+import Footer from '@astrojs/starlight/components/Footer.astro';
+import { Icon } from '@astrojs/starlight/components';
+import config from 'virtual:starlight/user-config';
+import LL_GuideFragments from './LL_GuideFragments.astro';
+import fragments from '../data/guide-fragments.json';
+
+const translations = {
+  en: {
+    title: 'Need help with Lite Lobby?',
+    description: 'Ask in #lite-lobby-issues on Discord. The authors are quick to respond.',
+    action: 'Ask for help',
+  },
+  ru: {
+    title: 'Нужна помощь с Lite Lobby?',
+    description: 'Пишите в канал #lite-lobby-issues в Discord. Авторы быстро отвечают.',
+    action: 'Задать вопрос',
+  },
+};
+const text = translations[Astro.locals.starlightRoute.lang === 'ru' ? 'ru' : 'en'];
+const discord = config.social?.find(({ icon }) => icon === 'discord');
+if (!discord) throw new Error('The help panel requires a Discord social link.');
+const { editUrl, lastUpdated, pagination } = Astro.locals.starlightRoute;
+const hasFooterContent = editUrl || lastUpdated || pagination.prev || pagination.next || config.credits;
+const guide = Astro.url.pathname
+  .slice(import.meta.env.BASE_URL.replace(/\/$/, '').length)
+  .replace(/^\/(?:ru\/)?/, '').replace(/\/$/, '');
+---
+
+{Object.hasOwn(fragments, guide) && <LL_GuideFragments guide={guide} />}
+{hasFooterContent && <div class="ll-guide-footer"><Footer /></div>}
+<aside class="ll-help" aria-labelledby="ll-help-title" data-pagefind-ignore>
+  <div class="ll-help-copy">
+    <h2 id="ll-help-title">{text.title}</h2>
+    <p>{text.description}</p>
+  </div>
+  <a href={discord.href} target="_blank" rel="noopener noreferrer">
+    <Icon name="discord" size="1.125rem" />
+    {text.action}
+  </a>
+</aside>
+
+<style>
+  .ll-guide-footer { margin-block-start: 2rem; }
+  .ll-guide-footer :global(footer > .meta:empty) { display: none; }
+  .ll-help {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    margin-block-start: 2rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--sl-color-hairline-light);
+  }
+  .ll-help-copy { flex: 1 1 22rem; }
+  h2 {
+    margin: 0;
+    color: var(--sl-color-white);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  p {
+    margin: 0.375rem 0 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--sl-color-text-accent);
+    border-radius: 0.5rem;
+    color: var(--sl-color-text-accent);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+  a:hover { background: var(--sl-color-accent-low); }
+  a:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 3px;
+  }
+</style>

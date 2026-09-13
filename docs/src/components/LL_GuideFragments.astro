@@ -1,0 +1,64 @@
+---
+import chapters from '../data/chapters.json';
+import fragments from '../data/guide-fragments.json';
+
+interface Props {
+  guide: string;
+}
+
+const { guide } = Astro.props;
+const locale = Astro.locals.starlightRoute.lang === 'ru' ? 'ru' : 'en';
+const prefix = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${locale === 'ru' ? 'ru/' : ''}`;
+const targets = (fragments as Record<string, Record<string, string>>)[guide];
+const destinations = Object.fromEntries(
+  Object.entries(targets).map(([id, target]) => [id, `${prefix}${target}`]),
+);
+const pages = [...chapters.hubs, ...chapters.chapters];
+const fallback = new Map<string, { title: string; ids: string[] }>();
+for (const [id, target] of Object.entries(targets)) {
+  const slug = target.split('#')[0].replace(/\/$/, '');
+  const entry = fallback.get(slug);
+  if (entry) entry.ids.push(id);
+  else fallback.set(slug, {
+    title: pages.find((page) => page.slug === slug)!.title[locale],
+    ids: [id],
+  });
+}
+---
+
+<div hidden data-ll-guide-fragments={JSON.stringify(destinations)}></div>
+<noscript data-pagefind-ignore>
+  <p>{locale === 'ru'
+    ? 'Новые адреса разделов руководства:'
+    : 'Updated guide section links:'}</p>
+  <ul>
+    {[...fallback].map(([slug, entry]) => (
+      <li>
+        {entry.ids.filter(Boolean).map((id) => <span id={id}></span>)}
+        <a href={`${prefix}${slug}/`}>{entry.title}</a>
+      </li>
+    ))}
+  </ul>
+</noscript>
+
+<script>
+  function forwardGuideFragment() {
+    const element = document.querySelector<HTMLElement>('[data-ll-guide-fragments]');
+    if (!element) return;
+    let id: string;
+    try {
+      id = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return;
+    }
+    const destinations: Record<string, string> = JSON.parse(element.dataset.llGuideFragments!);
+    const destination = destinations[id] ?? destinations[''];
+    if (!destination) return;
+    const target = new URL(destination, location.origin);
+    target.search = location.search;
+    if (target.href !== location.href) location.replace(target.href);
+  }
+
+  forwardGuideFragment();
+  window.addEventListener('hashchange', forwardGuideFragment);
+</script>

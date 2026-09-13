@@ -1,0 +1,325 @@
+---
+title: "4. Weapons and character variants"
+description: "Arm the shared base, distribute ammunition, and create two character variants."
+prev:
+  link: "/lite-lobby-ar/create-mission/base-character/"
+  label: "3. The base character"
+next:
+  link: "/lite-lobby-ar/create-mission/character-editor/"
+  label: "5. Character names and Game Master checks"
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import inheritOda from '../../../assets/guide/38.png';
+import nameOda from '../../../assets/guide/39.png';
+import odaArmor from '../../../assets/guide/40.png';
+import odaWebbing from '../../../assets/guide/41.png';
+import odaWeapon from '../../../assets/guide/42.png';
+import odaGrenade from '../../../assets/guide/43.png';
+import odaSmoke from '../../../assets/guide/44.png';
+import inheritedInventory from '../../../assets/guide/46.png';
+import odaInventorySetup from '../../../assets/guide/45.png';
+import firstPouch from '../../../assets/guide/47.png';
+import secondPouchAndButtpack from '../../../assets/guide/48.png';
+import backpackAmmo from '../../../assets/guide/49.png';
+import inheritComms from '../../../assets/guide/52.png';
+import duplicateBackpackRadio from '../../../assets/guide/53.png';
+import backpackRadioChannel from '../../../assets/guide/54.png';
+import commsRadio from '../../../assets/guide/55.png';
+import commsStorage from '../../../assets/guide/56.png';
+import inheritCommander from '../../../assets/guide/66.png';
+import nameCommander from '../../../assets/guide/67.png';
+import commanderLauncher from '../../../assets/guide/68.png';
+import commanderBinoculars from '../../../assets/guide/69.png';
+
+[Back to the guide contents](../)
+
+The base prefab already contains the uniform and personal items. For the ODA, the Green Beret detachment in our mission, prepare a child with armor, webbing, weapons, and ammunition. Once that shared loadout is complete, create the sergeant and commander with their additional equipment.
+
+## The unit's shared combat loadout {#oda-base}
+
+Later changes to a parent prefab also pass to its children, except for settings changed in a child itself. That is why we keep shared settings and individual equipment in separate prefabs. See the [reference on inheritance, duplicates, and overrides](/lite-lobby-ar/character-prefabs/prefab-operations/) for more detail.
+
+In **Resource Browser**, open your addon's `Green Berets` folder. Right-click `TSS_Character_US_GB_BaseLoadout.et` and select **Inherit**.
+
+<LL_Screenshot
+  src={inheritOda}
+  alt="The Inherit command selected in the context menu of TSS_Character_US_GB_BaseLoadout.et."
+  caption="Creating the ODA base from the shared loadout prefab."
+  originalLabel="Open original image"
+/>
+
+Enter `TSS_Character_US_GB_ODA_Base` in **File Name** and click **OK**. The screenshots show an older name without `GB`; this guide uses the name from the current example mission.
+
+<LL_Screenshot
+  src={nameOda}
+  alt="Create inherited file dialog showing the older name TSS_Character_US_ODA_Base, without GB."
+  caption="Naming the new prefab."
+  originalLabel="Open original image"
+/>
+
+### Armor and webbing {#armor-and-webbing}
+
+Open the new `TSS_Character_US_GB_ODA_Base.et` through **Edit Prefab**, select the character, and find **BaseLoadoutManagerComponent** by searching for `load`.
+
+Under **Slots**, expand **ArmoredVest**, the body armor slot. In **ArmaReforger**, open `Prefabs/Characters/Vests/Vest_PASGT` and drag `Vest_PASGT.et` into **Prefab**.
+
+<LL_Screenshot
+  src={odaArmor}
+  alt="Vest_PASGT.et assigned to ArmoredVest, with body armor visible on the character."
+  caption="PASGT body armor."
+  originalLabel="Open original image"
+/>
+
+Next, expand **Vest**, the slot for webbing with pouches for magazines and other items. Find `Vest_ALICE_rifleman.et` in `Prefabs/Characters/Vests/Vest_ALICE/Variants` and drag it into this slot's **Prefab** field.
+
+<LL_Screenshot
+  src={odaWebbing}
+  alt="Vest_ALICE_rifleman.et assigned to Vest, with webbing visible over the body armor."
+  caption="ALICE webbing."
+  originalLabel="Open original image"
+/>
+
+### Primary weapon {#primary-weapon}
+
+Type `weap` in the component search. Several **CharacterWeaponSlotComponent** entries will appear, representing weapon slots. Select the one with **Weapon Slot Type** set to `primary` and **Weapon Slot Index** set to `0`.
+
+In **ArmaReforger**, open `Prefabs/Weapons/Rifles/M16/Variants`. Drag `Rifle_M16A2_carbine_OliveGreen_Solid.et` into the selected component's **Weapon Template** field.
+
+<LL_Screenshot
+  src={odaWeapon}
+  alt="Rifle_M16A2_carbine_OliveGreen_Solid.et assigned to CharacterWeaponSlotComponent with type primary and index 0."
+  caption="M16A2 carbine in the primary weapon slot."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the prefab.
+
+### Grenade slots {#grenade-slots}
+
+Continue editing `TSS_Character_US_GB_ODA_Base.et`. Type `gre` in the component search. Find **CharacterGrenadeSlotComponent** with **Weapon Slot Type** set to `grenade` and **Weapon Slot Index** set to `3`.
+
+In **ArmaReforger**, find `Grenade_M67.et` under `Prefabs/Weapons/Grenades`. Drag it into **Weapon Template**.
+
+<LL_Screenshot
+  src={odaGrenade}
+  alt="Grenade_M67.et assigned to CharacterGrenadeSlotComponent with type grenade and index 3."
+  caption="M67 fragmentation grenade."
+  originalLabel="Open original image"
+/>
+
+Select the second **CharacterGrenadeSlotComponent**, with **Weapon Slot Type** set to `throwable`. Drag `Smoke_ANM8HC.et` from the same folder into its **Weapon Template** field.
+
+<LL_Screenshot
+  src={odaSmoke}
+  alt="Smoke_ANM8HC.et assigned to CharacterGrenadeSlotComponent with type throwable."
+  caption="AN-M8 smoke grenade."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the prefab.
+
+## Ammunition and pouches {#oda-ammunition}
+
+Continue editing `TSS_Character_US_GB_ODA_Base.et`: distribute ammunition and other items between its storage locations. Both child prefabs will inherit this inventory.
+
+Select the character and find **SCR_InventoryStorageManagerComponent** using the component search. Expand **Initial Inventory Items**.
+
+The trouser contents are already inherited from `TSS_Character_US_GB_BaseLoadout.et`: the radio, compass, map, and other items from the [base inventory](/lite-lobby-ar/create-mission/base-character/#initial-inventory). You do not need to add them again.
+
+<LL_Screenshot
+  src={inheritedInventory}
+  alt="Initial Inventory Items showing the twelve inherited items in Pants/Pants_US_BDU.et."
+  caption="Trouser contents inherited from the shared prefab."
+  originalLabel="Open original image"
+/>
+
+For each new storage location, click `+` beside **Initial Inventory Items**. In the new **ItemsInitConfigurationItem**, select **Target Storage**, then add **Prefabs To Spawn** entries with `+` and drag items into them from **Resource Browser**.
+
+<LL_Screenshot
+  src={odaInventorySetup}
+  alt="SCR_InventoryStorageManagerComponent showing new entries, Target Storage selection, and Prefabs To Spawn."
+  caption="Adding items to the ODA character's equipment."
+  originalLabel="Open original image"
+/>
+
+### Flashlight {#flashlight}
+
+Add an entry with **Target Storage** set to `Jacket/Jacket_US_BDU_TigerStripe.et`, the jacket pockets. Add one **Prefabs To Spawn** entry and assign `Flashlight_MX991.et` from **ArmaReforger**. You can find it by searching for its filename.
+
+### Magazine pouches {#magazine-pouches}
+
+Use two magazine types from `Prefabs/Weapons/Magazines` in **ArmaReforger**:
+
+- `Magazine_556x45_STANAG_30rnd_M855_Ball.et` — 30 standard rounds.
+- `Magazine_556x45_STANAG_30rnd_M856_Tracer.et` — 30 tracer rounds.
+
+For the first pouch, add an entry with this **Target Storage**:
+
+`Vest/Vest_ALICE_rifleman.et/MagPouch/Pouch_ALICE_30rnd_STANAG.et`
+
+Add four **Prefabs To Spawn** entries: two M855 magazines and two `Grenade_M67.et` grenades.
+
+<LL_Screenshot
+  src={firstPouch}
+  alt="MagPouch containing two M855 magazines and two M67 grenades."
+  caption="First pouch: magazines and fragmentation grenades."
+  originalLabel="Open original image"
+/>
+
+For the second pouch, add an entry with this **Target Storage**:
+
+`Vest/Vest_ALICE_rifleman.et/MagPouch2/Pouch_ALICE_30rnd_STANAG.et`
+
+Add two M855 magazines and two `Smoke_ANM8HC.et` grenades.
+
+### Reserve magazines {#reserve-magazines}
+
+For the buttpack, select this **Target Storage**:
+
+`Vest/Vest_ALICE_rifleman.et/Buttpack/Vest_ALICE_buttpack.et`
+
+Add three M855 magazines and one M856 tracer magazine.
+
+<LL_Screenshot
+  src={secondPouchAndButtpack}
+  alt="MagPouch2 containing two M855 magazines and two smoke grenades; Buttpack containing three M855 magazines and one M856."
+  caption="Second pouch and buttpack."
+  originalLabel="Open original image"
+/>
+
+Create another entry for the backpack with this **Target Storage**:
+
+`Back/Backpack_ALICE_Medium_assembled.et`
+
+Add the same reserve: three M855 magazines and one M856.
+
+<LL_Screenshot
+  src={backpackAmmo}
+  alt="Backpack_ALICE_Medium_assembled.et containing three M855 magazines and one M856."
+  caption="Reserve magazines in the backpack."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the prefab.
+
+## Character with a backpack radio {#comms-sergeant}
+
+The shared `TSS_Character_US_GB_ODA_Base.et` prefab is complete. Create a communications sergeant from it: replace the backpack with a radio, choose a different uniform, and update its item storage. Make these changes in the sergeant prefab so other soldiers keep the shared loadout.
+
+In `Green Berets`, right-click `TSS_Character_US_GB_ODA_Base.et` and select **Inherit**. Name the new prefab `TSS_Character_US_GB_CommsSergeant`.
+
+<LL_Screenshot
+  src={inheritComms}
+  alt="Inherit selected in the context menu of TSS_Character_US_GB_ODA_Base.et."
+  caption="Creating the communications sergeant from the ODA base."
+  originalLabel="Open original image"
+/>
+
+### Backpack radio {#backpack-radio}
+
+In **ArmaReforger**, open `Prefabs/Items/Equipment/Radios`. Right-click `Radio_ANPRC77.et`, select **Duplicate to → your addon**, and name it `TSS_Radio_ANPRC77`.
+
+<LL_Screenshot
+  src={duplicateBackpackRadio}
+  alt="Duplicate to → TriadShootingStar selected for Radio_ANPRC77.et."
+  caption="Copying the AN/PRC-77 backpack radio."
+  originalLabel="Open original image"
+/>
+
+Open the new radio through **Edit Prefab**, select it, and find **BaseRadioComponent** by searching for `BaseRadio`. Expand **Transceivers**, hover over the second **RadioTransceiver**, and press `Delete`. We also keep just one channel on the backpack radio to simplify gameplay. Save the prefab with `Ctrl+S`.
+
+<LL_Screenshot
+  src={backpackRadioChannel}
+  alt="The second RadioTransceiver crossed out in TSS_Radio_ANPRC77.et settings."
+  caption="Removing the backpack radio's second channel."
+  originalLabel="Open original image"
+/>
+
+Open `TSS_Character_US_GB_CommsSergeant.et` through **Edit Prefab**. Select the character, find **BaseLoadoutManagerComponent**, and expand **Slots → Back**. Drag `TSS_Radio_ANPRC77.et` from your addon into **Prefab**. The radio replaces the backpack.
+
+<LL_Screenshot
+  src={commsRadio}
+  alt="TSS_Radio_ANPRC77.et assigned to the communications sergeant's Back slot."
+  caption="Communications sergeant with a backpack radio."
+  originalLabel="Open original image"
+/>
+
+### The sergeant's uniform {#comms-uniform}
+
+You can also change an individual character's uniform. The screenshots use a patrol cap, rolled-sleeve jacket, and Tiger Stripe trousers. Under **BaseLoadoutManagerComponent → Slots**, assign these **Prefab** values:
+
+- **Hat** — `Hat_Patrol_US_01_TigerStripe.et`.
+- **Jacket** — `Jacket_US_BDU_rolledup_TigerStripe.et`.
+- **Pants** — `Pants_US_BDU_TigerStripe.et`.
+
+Find all three files by searching in **ArmaReforger**.
+
+#### Inventory after replacing equipment {#storage-after-changes}
+
+After replacing clothing, update where its items are stored. Under **SCR_InventoryStorageManagerComponent → Initial Inventory Items**, open the trouser inventory entry and select `Pants/Pants_US_BDU_TigerStripe.et` in **Target Storage**.
+
+<LL_Screenshot
+  src={commsStorage}
+  alt="The sergeant's existing item list with Target Storage set to Pants/Pants_US_BDU_TigerStripe.et."
+  caption="Assigning the item list to the new trousers."
+  originalLabel="Open original image"
+/>
+
+Also update the flashlight entry's **Target Storage** to `Jacket/Jacket_US_BDU_rolledup_TigerStripe.et`.
+
+The radio has replaced the backpack, so remove the magazines intended for it. Find the entry with **Target Storage** set to `Back/Backpack_ALICE_Medium_assembled.et`. In its **Prefabs To Spawn** list, hover over each entry and press `Delete` until the list is empty.
+
+Press `Ctrl+S` to save the sergeant prefab.
+
+## Character with additional weapons {#detachment-commander}
+
+For the commander, return to `TSS_Character_US_GB_ODA_Base.et` and its shared loadout. Create another child and add an M72A3 launcher and M22 binoculars.
+
+In the `Green Berets` folder, right-click `TSS_Character_US_GB_ODA_Base.et` and select **Inherit**.
+
+<LL_Screenshot
+  src={inheritCommander}
+  alt="Inherit selected in the context menu of TSS_Character_US_GB_ODA_Base.et."
+  caption="Creating the commander prefab from the ODA base."
+  originalLabel="Open original image"
+/>
+
+Name the prefab `TSS_Character_US_GB_DetachmentCommander` and click **OK**.
+
+<LL_Screenshot
+  src={nameCommander}
+  alt="The Create inherited file dialog with the commander prefab name."
+  caption="Naming the detachment commander prefab."
+  originalLabel="Open original image"
+/>
+
+Open the new prefab with **Edit Prefab** and select the character.
+
+### Launcher {#commander-launcher}
+
+Enter `weap` in the component search. Find the **CharacterWeaponSlotComponent** with **Weapon Slot Type** set to `primary` and **Weapon Slot Index** set to `1`. This is the second primary weapon slot; slot `0` already holds the carbine.
+
+In the **ArmaReforger** project, open `Prefabs/Weapons/Launchers/M72` and drag `Launcher_M72A3.et` into **Weapon Template**.
+
+<LL_Screenshot
+  src={commanderLauncher}
+  alt="Launcher_M72A3.et assigned to CharacterWeaponSlotComponent with type primary and index 1."
+  caption="M72A3 in the second weapon slot."
+  originalLabel="Open original image"
+/>
+
+### Binoculars {#commander-binoculars}
+
+Expand **SCR_CharacterInventoryStorageComponent** and select its nested **SCR_EquipmentStorageComponent**. In its properties, expand **Initial Storage Slots → BinocularSlot**.
+
+Search for `Binoculars_M22.et` in the **ArmaReforger** project and drag it into this slot's **Prefab** field.
+
+<LL_Screenshot
+  src={commanderBinoculars}
+  alt="Binoculars_M22.et assigned to BinocularSlot in SCR_EquipmentStorageComponent."
+  caption="M22 binoculars in the commander's equipment."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the commander prefab. Both characters' equipment is ready. In the next chapter, [set their names and roles, add them to Game Master, and check them in game](../character-editor/).

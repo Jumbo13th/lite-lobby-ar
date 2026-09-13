@@ -1,0 +1,41 @@
+---
+title: Open the example mission
+description: An example Arma Reforger mission using Lite Lobby.
+---
+
+**Triad Shooting Star** is the Lite Lobby mission used throughout this guide. Open it in Workbench to inspect existing objects and compare their settings with the relevant chapters.
+
+You will need Arma Reforger and Arma Reforger Tools.
+
+## Open the project {#open-project}
+
+1. [Download the ZIP of the example version used in this guide](https://github.com/Jumbo13th/triad-shooting-star-ar/archive/0288431eae2c423e31baaba295176a28be1ef873.zip) and extract it. We recommend placing the extracted folder in `Documents\My Games\ArmaReforgerWorkbench\addons`.
+2. Launch **Arma Reforger Tools**. In **Workbench Launcher**, select **Add Project → Add Existing Project**.
+3. Open `Triad Shooting Star` inside the extracted folder, select `addon.gproj`, and confirm.
+4. Select **Triad Shooting Star** in the project list and click **Open**.
+
+You can also clone the [project repository](https://github.com/Jumbo13th/triad-shooting-star-ar) through GitHub Desktop if you already use Git. The ZIP above contains the version used to write this guide; the repository may receive further changes.
+
+### Missing addons {#missing-dependencies}
+
+The example uses Lite Lobby and other mods. If **Missing Addon Dependencies** appears, search for each listed GUID on the [Workshop website](https://reforger.armaplatform.com/workshop) and install the required mods through Workshop in the game.
+
+In Launcher, select **Add Project → Scan for Projects**, choose your installed mods folder — usually `Documents\My Games\ArmaReforger\addons` — and click **Select Folder**. Open the project again after scanning. [See these steps in screenshots](/lite-lobby-ar/create-mission/project/#missing-addon-dependencies).
+
+## Open the world {#open-world}
+
+In Workbench, click **World Editor** under **Quick Launch**. In **Resource Browser**, select **TriadShootingStar** and double-click `Worlds/Eden/ShootingStar_Ep1.ent`.
+
+This is the completed mission world. The chapter [Create a world with Lite Lobby](../create-mission/world/) explains how it is built on an existing game terrain.
+
+## Study the example {#study-example}
+
+Choose a task and find its objects. Expand the layer in **Hierarchy**, select an object, and compare **Object Properties** with the relevant chapter:
+
+| What to study | Where to look | Guide section |
+| --- | --- | --- |
+| Port capture | The `triggers` layer: `PortTrigger` and `PortCapture` | [Capture trigger](/lite-lobby-ar/create-mission/objectives/#port-capture) |
+| Groups and callsigns | The `US` layer, for example `AB_PL1` | [Groups and playable slots](/lite-lobby-ar/create-mission/groups-and-slots/#playable-forces) |
+| Character equipment | The Triad Shooting Star addon's `Prefabs/Characters` folder in **Resource Browser** | [Part II. Characters](/lite-lobby-ar/create-mission/#characters-part) |
+
+[Create a mission](../create-mission/) lists all chapters in order. Use them to explore the example or build your own mission step by step.

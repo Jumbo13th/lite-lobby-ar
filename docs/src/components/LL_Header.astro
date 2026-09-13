@@ -1,0 +1,79 @@
+---
+import Header from '@astrojs/starlight/components/Header.astro';
+import MobileMenuToggle from '@astrojs/starlight/components/MobileMenuToggle.astro';
+import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+
+const needsMenu = !Astro.locals.starlightRoute.hasSidebar;
+---
+
+<Header />
+{needsMenu && (
+  <div class="ll-home-menu-controls">
+    <MobileMenuToggle />
+    <div id="starlight__sidebar" class="ll-mobile-menu" popover>
+      <MobileMenuFooter />
+    </div>
+  </div>
+)}
+
+<script>
+  const menu = document.querySelector<HTMLElement>('.ll-mobile-menu');
+  if (menu) {
+    matchMedia('(min-width: 50rem)').addEventListener('change', ({ matches }) => {
+      if (matches && menu.matches(':popover-open')) menu.hidePopover();
+    });
+  }
+</script>
+
+<style>
+  .ll-mobile-menu {
+    position: fixed;
+    inset: calc(var(--sl-nav-height) + 0.5rem) var(--sl-nav-pad-x) auto auto;
+    width: min(14rem, calc(100vw - 2 * var(--sl-nav-pad-x)));
+    max-height: calc(100dvh - var(--sl-nav-height) - 1.5rem);
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.75rem;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 0.5rem;
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-white);
+    box-shadow: var(--sl-shadow-md);
+  }
+  .ll-mobile-menu :global(.mobile-preferences) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+    border: 0;
+    padding: 0;
+  }
+  .ll-mobile-menu :global(.social-icons) {
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0 0 0.5rem;
+    border-block-end: 1px solid var(--sl-color-hairline-light);
+  }
+  .ll-mobile-menu :global(.social-icons a) {
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: 0;
+    padding: 0;
+    border-radius: 0.375rem;
+    font-size: 1.25rem;
+  }
+  .ll-mobile-menu :global(.social-icons a:hover) {
+    background: var(--sl-color-accent-low);
+  }
+  .ll-mobile-menu :global(select) {
+    width: 100%;
+    min-height: 2.75rem;
+    margin-inline: 0;
+  }
+  @media (min-width: 50rem) {
+    .ll-home-menu-controls { display: none; }
+  }
+</style>

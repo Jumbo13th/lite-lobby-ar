@@ -1,0 +1,40 @@
+---
+title: "8. Test and publish"
+description: "Test the mission in Workbench and on a server, then publish the addon to Workshop."
+prev:
+  link: "/lite-lobby-ar/create-mission/objectives/"
+  label: "7. Mission objectives and triggers"
+next: false
+---
+
+
+
+[Back to the guide contents](../)
+
+Before publishing to Workshop, test the mission in Workbench and on a dedicated server. The checks below use Triad Shooting Star; use the corresponding objectives and units for your own mission.
+
+## Testing in Workbench {#final-test}
+
+Launch the world and follow the player's full route:
+
+1. Choose a slot in the lobby. Check the role name, equipment and the group's vehicles.
+2. Use **Play** in the lobby to enter briefing. Check the text, port link, map markings and conditions. Side-specific orders should only appear for the intended side.
+3. Press **Play** again to enter the game. Check starting positions and freeze restrictions; players should be able to leave the starting zone freely when freeze ends.
+4. Test port capture with playable characters from both sides: continuous holding, timer reset when a condition fails, flag changes and the announcement.
+5. Test losses, superiority and the timer. To speed up testing, temporarily reduce durations after recording the original values, then restore them.
+
+`U` toggles the lobby; `Y` toggles Game Master. Threshold conditions count playable slots, so adding arbitrary AI does not replace a test with the prepared roster.
+
+## Testing on a server {#multiplayer-test}
+
+Before an event, test on a dedicated server with at least two participants on opposing sides. Check slots, briefing, vehicles, radio communication and announcements for both players. Workbench testing does not replace a multiplayer test.
+
+If you use Git, commit the verified changes and push them to GitHub: [Git and Arma Reforger](/lite-lobby-ar/git/).
+
+## Publishing the mission {#publish-mission}
+
+Your mission is distributed as part of your addon. In **Resource Manager**, sign in to your Bohemia account through **Workbench → Link**, then open **Workbench → Publish Project**. Fill in the project details and prepare the package; **Working Dir** must be separate from your source folder.
+
+Follow [Bohemia Interactive's official publishing instructions](https://community.bistudio.com/wiki/Arma_Reforger%3AMod_Publishing_Process) for packaging and uploading to Workshop.
+
+After uploading, install the published version through Workshop and check that the scenario starts with its dependencies. All participants and the server need the appropriate addon version for multiplayer.

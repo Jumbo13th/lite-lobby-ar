@@ -1,0 +1,235 @@
+---
+title: "3. The base character"
+description: "Create the shared character base: prefab, uniform, personal radio, inventory, and watch."
+prev:
+  link: "/lite-lobby-ar/create-mission/world/"
+  label: "2. Create a world with Lite Lobby"
+next:
+  link: "/lite-lobby-ar/create-mission/character-variants/"
+  label: "4. Weapons and character variants"
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import inheritCharacter from '../../../assets/guide/23.png';
+import nameCharacter from '../../../assets/guide/24.png';
+import characterFolder from '../../../assets/guide/25.png';
+import editCharacter from '../../../assets/guide/26.png';
+import loadoutSlots from '../../../assets/guide/27.png';
+import characterHat from '../../../assets/guide/28.png';
+import characterJacket from '../../../assets/guide/29.png';
+import characterBackpack from '../../../assets/guide/30.png';
+import duplicateRadio from '../../../assets/guide/31.png';
+import nameRadio from '../../../assets/guide/32.png';
+import removeTransceiver from '../../../assets/guide/33.png';
+import singleTransceiver from '../../../assets/guide/34.png';
+import inventorySetup from '../../../assets/guide/35.png';
+import inventoryFilled from '../../../assets/guide/36.png';
+import characterWatch from '../../../assets/guide/37.png';
+
+[Back to the guide contents](../)
+
+The mission world is ready. Next, create characters for the Green Beret unit in the **Triad Shooting Star** addon, using the US faction already included in the game. See the [optional reference](/lite-lobby-ar/character-prefabs/planning/) for choosing a unit and its equipment.
+
+A **character prefab** is a soldier template containing appearance, equipment, and other settings. It is stored in an `.et` file. First, prepare the shared `BaseLoadout` prefab with a uniform and personal items. Characters with different weapons will later inherit from it.
+
+## Names and folders {#naming-and-folders}
+
+Add an **addon prefix** to your prefab names — a short identifier at the start of the filename. The mission addon we are creating characters for in this guide is called **Triad Shooting Star**. Its initials give us `TSS_`. Choose an abbreviation for your own addon: for example, **Desert Storm** → `DS_`. This makes it clear which addon a file belongs to.
+
+Follow the game's names: for example, `Character_US_Rifleman.et` → `TSS_Character_US_Rifleman.et`. Preserve capitalization, underscores, and the order of the name's parts. Use your chosen prefix for all your prefabs.
+
+Follow the game's folder structure inside your addon. For example, US Army prefabs are in `Prefabs/Characters/Factions/BLUFOR/US_Army`. Place your variants in the same folder structure so they are easy to find and compare with the originals.
+
+## Create a base prefab {#create-base-prefab}
+
+Create a [child of the game's `Character_US_Base.et`](/lite-lobby-ar/character-prefabs/prefab-operations/#prefab-operations): a new prefab that inherits its settings. We will change the uniform and equipment in this child.
+
+In **World Editor**, use the **Resource Browser** panel to open the **ArmaReforger** project and navigate to `Prefabs/Characters/Factions/BLUFOR/US_Army`. Right-click `Character_US_Base.et` and select **Inherit in → your addon**. The screenshot uses **TriadShootingStar**.
+
+<LL_Screenshot
+  src={inheritCharacter}
+  alt="Character_US_Base.et selected in Resource Browser, with Inherit in → TriadShootingStar open in the context menu."
+  caption="Creating a prefab based on Character_US_Base.et."
+  originalLabel="Open original image"
+/>
+
+In **Create inherited file**, enter `TSS_Character_US_GB_BaseLoadout` in **File Name** and click **OK**. Replace `TSS_` with your chosen addon prefix. Here, `GB` means Green Berets and `BaseLoadout` means the base equipment setup.
+
+<LL_Screenshot
+  src={nameCharacter}
+  alt="Create inherited file dialog with TSS_Character_US_GB_BaseLoadout entered as the filename."
+  caption="Naming the base equipment prefab."
+  originalLabel="Open original image"
+/>
+
+Workbench will create `TSS_Character_US_GB_BaseLoadout.et` in your addon under `Prefabs/Characters/Factions/BLUFOR/US_Army`. It recreates the folder structure automatically.
+
+### Unit folder {#unit-folder}
+
+In **Resource Browser**, open `Prefabs/Characters/Factions/BLUFOR/US_Army` in your addon. Right-click an empty area in the file list, choose the option to create a folder, and name it `Green Berets`. We will keep this unit's prefabs here.
+
+Drag `TSS_Character_US_GB_BaseLoadout.et` into `Green Berets`, then open the folder.
+
+<LL_Screenshot
+  src={characterFolder}
+  alt="The Green Berets folder beside the base prefab in the addon's US_Army directory, with an arrow pointing to the folder."
+  caption="The Green Berets folder for the unit's prefabs."
+  originalLabel="Open original image"
+/>
+
+## The character’s uniform {#base-outfit}
+
+Double-click `TSS_Character_US_GB_BaseLoadout.et` in **Resource Browser**. In the window that opens, click **Edit Prefab** on the right. This opens **World Editor** in prefab edit mode.
+
+<LL_Screenshot
+  src={editCharacter}
+  alt="TSS_Character_US_GB_BaseLoadout.et open with an arrow pointing to the Edit Prefab button on the right."
+  caption="Opening the prefab for editing."
+  originalLabel="Open original image"
+/>
+
+Select the character in **Hierarchy**. Type `load` in the component search field in **Object Properties**, then select **BaseLoadoutManagerComponent**. This component controls what the character wears.
+
+Expand **Slots** — the places for individual pieces of equipment. Start with **Hat**, the headgear slot.
+
+<LL_Screenshot
+  src={loadoutSlots}
+  alt="BaseLoadoutManagerComponent selected, with Slots and Hat expanded and an empty Prefab field."
+  caption="The headgear slot in the loadout settings."
+  originalLabel="Open original image"
+/>
+
+### Headgear and jacket {#hat-and-jacket}
+
+In **Resource Browser**, open `Prefabs/Characters/HeadGear/Hat_Boonie_US_01` in the **ArmaReforger** project. Drag `Hat_Boonie_US_TigerStripe.et` into the **Prefab** field of the **Hat** slot. The boonie hat will appear on the character.
+
+<LL_Screenshot
+  src={characterHat}
+  alt="Hat_Boonie_US_TigerStripe.et assigned to the Hat slot's Prefab field, with the boonie hat visible on the character."
+  caption="Tiger Stripe boonie hat."
+  originalLabel="Open original image"
+/>
+
+Expand the **Jacket** slot. Find `Jacket_US_BDU_TigerStripe.et` in `Prefabs/Characters/Uniforms` and drag it into this slot's **Prefab** field.
+
+<LL_Screenshot
+  src={characterJacket}
+  alt="Jacket_US_BDU_TigerStripe.et assigned to the Jacket slot, with the jacket visible on the character."
+  caption="Tiger Stripe jacket."
+  originalLabel="Open original image"
+/>
+
+### Trousers, boots, and backpack {#pants-boots-backpack}
+
+Fill the **Prefab** field in three more slots the same way. All files are in the **ArmaReforger** project:
+
+| Slot | Folder | File |
+| --- | --- | --- |
+| **Pants** — trousers | `Prefabs/Characters/Uniforms` | `Pants_US_BDU.et` |
+| **Boots** | `Prefabs/Characters/Footwear` | `CombatBoots_US_01.et` |
+| **Back** — backpack | `Prefabs/Items/Equipment/Backpacks` | `Backpack_ALICE_Medium_assembled.et` |
+
+<LL_Screenshot
+  src={characterBackpack}
+  alt="The character is dressed, with Backpack_ALICE_Medium_assembled.et assigned to the Back slot's Prefab field."
+  caption="Base uniform and ALICE backpack."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the prefab.
+
+## Radio {#radio-setup}
+
+We will prepare a radio variant with one channel for this mission. Two channels let every soldier stay in contact with their own unit and the whole side at the same time. We do not want that in this mission, so we will remove the second channel to simplify gameplay.
+
+In **Resource Browser**, open the **ArmaReforger** project and `Prefabs/Items/Equipment/Radios`. Right-click `Radio_ANPRC68.et` and select **Duplicate to → your addon**. This command creates a copy of the prefab in your addon.
+
+<LL_Screenshot
+  src={duplicateRadio}
+  alt="Radio_ANPRC68.et context menu with Duplicate to → TriadShootingStar selected."
+  caption="Copying the radio into the mission addon."
+  originalLabel="Open original image"
+/>
+
+In **Duplicate File**, enter `TSS_Radio_ANPRC68` and click **OK**. Use your own prefix for your addon.
+
+<LL_Screenshot
+  src={nameRadio}
+  alt="Duplicate File dialog with TSS_Radio_ANPRC68 entered as the filename."
+  caption="Naming the radio prefab."
+  originalLabel="Open original image"
+/>
+
+Open the new `TSS_Radio_ANPRC68.et` through **Edit Prefab**. Select the radio in **Hierarchy**, type `BaseRadio` in the component search, and select **BaseRadioComponent**.
+
+Expand **Unsorted → Transceivers**. Hover over the second **RadioTransceiver**, crossed out in the screenshot, and press `Delete` on the keyboard.
+
+<LL_Screenshot
+  src={removeTransceiver}
+  alt="BaseRadioComponent with two expanded RadioTransceiver entries; the second is crossed out."
+  caption="Removing the second transceiver."
+  originalLabel="Open original image"
+/>
+
+One **RadioTransceiver** will remain. Press `Ctrl+S`.
+
+<LL_Screenshot
+  src={singleTransceiver}
+  alt="The radio's Transceivers list contains one RadioTransceiver."
+  caption="Radio with one transceiver."
+  originalLabel="Open original image"
+/>
+
+## Inventory contents {#initial-inventory}
+
+Return to `TSS_Character_US_GB_BaseLoadout.et` and open it through **Edit Prefab**. Select the character, type `InventoryStora` in the component search, and select **SCR_InventoryStorageManagerComponent**. This sets the items the character starts with in the mission.
+
+1. Click `+` beside **Initial Inventory Items** and expand the new **ItemsInitConfigurationItem**.
+2. Set **Target Storage** to `Pants/Pants_US_BDU.et` — the trouser pockets that will hold the items.
+3. Add entries to **Prefabs To Spawn** with `+`. Each entry represents one item; our loadout needs 12 entries.
+
+<LL_Screenshot
+  src={inventorySetup}
+  alt="SCR_InventoryStorageManagerComponent with Target Storage set to Pants/Pants_US_BDU.et and empty Prefabs To Spawn entries."
+  caption="Choosing the storage and adding item entries."
+  originalLabel="Open original image"
+/>
+
+Drag the required prefabs from **Resource Browser** into **Prefabs To Spawn** entries. To find a file, select its project and search for its filename. Take the radio from your addon and the other items from **ArmaReforger**.
+
+| Item | Prefab | Quantity |
+| --- | --- | --- |
+| Radio | `TSS_Radio_ANPRC68.et` | 1 |
+| Compass | `Compass_SY183.et` | 1 |
+| Map | `PaperMap_01_folded_US.et` | 1 |
+| Field dressing | `FieldDressing_US_01.et` | 4 |
+| Morphine | `MorphineInjection_01_base.et` | 2 |
+| Tourniquet | `Tourniquet_US_01.et` | 2 |
+| Entrenching tool | `ETool_ALICE_FreeRoamBuilding_Gadget.et` | 1 |
+
+For several identical items, assign the same prefab to several entries: four entries for field dressings, for example.
+
+<LL_Screenshot
+  src={inventoryFilled}
+  alt="Twelve Prefabs To Spawn entries: radio, compass, map, four dressings, two morphine injectors, two tourniquets, and an entrenching tool."
+  caption="The character's base inventory."
+  originalLabel="Open original image"
+/>
+
+## Wristwatch {#wristwatch}
+
+In the component list, expand **SCR_CharacterInventoryStorageComponent** and select its child **SCR_EquipmentStorageComponent**. In its properties, expand **Initial Storage Slots → WristwatchSlot**, the wristwatch slot.
+
+In **Resource Browser**, select **ArmaReforger** and find `Watch_SandY184A.et`. Drag it into the **Prefab** field of **WristwatchSlot**.
+
+<LL_Screenshot
+  src={characterWatch}
+  alt="Watch_SandY184A.et assigned to WristwatchSlot in SCR_EquipmentStorageComponent."
+  caption="The character's wristwatch."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the character prefab.
+
+The shared `TSS_Character_US_GB_BaseLoadout.et` is complete: uniform, backpack, personal radio, pocket items, and watch. In the next chapter, [create its child with weapons and ammunition](../character-variants/).
+

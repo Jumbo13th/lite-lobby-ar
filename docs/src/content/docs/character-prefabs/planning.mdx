@@ -1,0 +1,144 @@
+---
+title: "Choose a unit and its equipment"
+description: "Choose a unit, its personnel, weapons, and equipment to match your mission's historical period."
+prev: false
+next: false
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_OrgChart from '../../../components/LL_OrgChart.astro';
+
+[Back to the guide contents](/lite-lobby-ar/create-mission/)
+
+Before creating characters, choose the unit they will represent. Its organization and the mission's historical period determine the personnel roles, weapons, and equipment you need. The Green Berets in the **Triad Shooting Star** mission provide an example of these choices.
+
+## Who are we recreating? {#authenticity}
+
+Arma is close to a combat simulator. Before choosing uniforms and weapons, establish the period, service branch, and specific unit. Authenticity matters on the Triad Tactics server and in other projects too.
+
+<Aside type="caution" title="Equipment mistakes to avoid">
+- **An AK-103 in the 1979–1989 Soviet-Afghan War** is an anachronism: it only appeared in the 1990s.
+- **MultiCam for the USMC in Iraq in 2003** is a mistake. Match uniforms to the year and photographs of the specific unit.
+
+Also check load-bearing equipment, headgear, weapons, and other kit against photographs.
+</Aside>
+
+## Unit organization {#unit-organization}
+
+A unit's **organization and establishment** define its subunits, chain of command, and personnel roles. These determine which prefabs you need: commanders, riflemen, machine gunners, medics, and communications specialists.
+
+On the Triad Tactics server, the usual scale is company versus company; a side may also represent several platoons. An infantry company's command chain looks like this:
+
+<LL_OrgChart caption="A simplified infantry company command chain; platoon and squad numbers depend on its establishment.">
+<ul>
+<li>
+<span><strong>Company HQ</strong></span>
+<ul>
+<li>
+<span>Platoon HQ</span>
+<ul>
+<li>
+<span>Squad</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</LL_OrgChart>
+
+## Green Berets in our mission {#green-berets}
+
+In this guide, we are creating character prefabs for the **Triad Shooting Star** mission addon. One side in this mission represents the Green Berets — US Army Special Forces. Their equivalent of an infantry company consists of a headquarters and six **ODAs** (*Operational Detachments Alpha*, also called **A-Teams**). There are no platoons in this structure: ODAs report directly to company headquarters.
+
+<LL_OrgChart caption="Special Forces company structure: no Platoon HQ between Company HQ and an ODA.">
+<ul>
+<li>
+<span><strong>Company HQ</strong></span>
+<ul>
+<li>
+<span>ODA · A-Team</span>
+<ul>
+<li>
+<span>Split A · Alpha</span>
+</li>
+<li>
+<span>Split B · Bravo</span>
+</li>
+</ul>
+</li>
+<li>
+<span>The company's other ODAs</span>
+</li>
+</ul>
+</li>
+</ul>
+</LL_OrgChart>
+
+A standard ODA has 12 members: its leadership and specialists in weapons, engineering, medicine, and communications.
+
+In our example, Company HQ has two members: the company commander and executive officer. The following diagram shows an ODA divided into two six-person halves — Split A and Split B:
+
+<LL_OrgChart caption="ODA personnel roles divided between Split A and Split B in our example.">
+<ul>
+<li>
+<span><strong>ODA · 12 members</strong></span>
+<ul class="branches">
+<li>
+<span><strong>Split A · Alpha · 6 members</strong></span>
+<ul>
+<li>
+<span>Detachment Commander</span>
+</li>
+<li>
+<span>Operations Sergeant</span>
+</li>
+<li>
+<span>Weapons Sergeant</span>
+</li>
+<li>
+<span>Engineer Sergeant</span>
+</li>
+<li>
+<span>Medical Sergeant</span>
+</li>
+<li>
+<span>Communications Sergeant</span>
+</li>
+</ul>
+</li>
+<li>
+<span><strong>Split B · Bravo · 6 members</strong></span>
+<ul>
+<li>
+<span>Assistant Detachment Commander</span>
+</li>
+<li>
+<span>Intelligence Sergeant</span>
+</li>
+<li>
+<span>Weapons Sergeant</span>
+</li>
+<li>
+<span>Engineer Sergeant</span>
+</li>
+<li>
+<span>Medical Sergeant</span>
+</li>
+<li>
+<span>Communications Sergeant</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</LL_OrgChart>
+
+[Prepare character prefabs](/lite-lobby-ar/create-mission/base-character/) for the roles you have chosen, with suitable equipment for the commander, medic, and other specialists.
+
+We cannot reproduce every detail in the game, but should preserve the unit's roles, command structure, and equipment.
+
+<Aside type="tip" title="Researching your unit">
+Search online for your chosen unit's organization, uniforms, equipment, and weapons in the relevant year. Use these findings as the basis for your mission instead of inventing its personnel and kit.
+</Aside>

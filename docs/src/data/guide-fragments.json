@@ -1,0 +1,333 @@
+{
+  "create-mission": {
+    "preparation": "create-mission/project/#preparation",
+    "create-project": "create-mission/project/#create-project",
+    "workbench-project": "create-mission/project/#workbench-project",
+    "project-folder": "create-mission/project/#project-folder",
+    "lite-lobby-dependency": "create-mission/project/#lite-lobby-dependency",
+    "missing-addon-dependencies": "create-mission/project/#missing-addon-dependencies",
+    "create-world": "create-mission/world/#create-world",
+    "open-world-editor": "create-mission/world/#open-world-editor",
+    "create-subscene": "create-mission/world/#create-subscene",
+    "save-world": "create-mission/world/#save-world",
+    "systems-layer": "create-mission/world/#systems-layer",
+    "game-mode-setup": "create-mission/world/#game-mode-setup",
+    "game-mode-template": "create-mission/world/#game-mode-template",
+    "generate-systems": "create-mission/world/#generate-systems",
+    "create-mission-header": "create-mission/world/#create-mission-header",
+    "mission-details": "create-mission/world/#mission-details",
+    "lite-lobby-game-mode": "create-mission/world/#lite-lobby-game-mode",
+    "map-setup": "create-mission/world/#map-setup",
+    "map-markings": "create-mission/objectives/#map-markings",
+    "map-line": "create-mission/objectives/#map-line",
+    "draw-map-line": "create-mission/objectives/#draw-map-line",
+    "port-marking": "create-mission/objectives/#port-marking",
+    "port-capture": "create-mission/objectives/#port-capture",
+    "capture-area": "create-mission/objectives/#capture-area",
+    "capture-flags": "create-mission/objectives/#capture-flags",
+    "capture-settings": "create-mission/objectives/#capture-settings",
+    "mission-conditions": "create-mission/objectives/#mission-conditions",
+    "critical-losses": "create-mission/objectives/#critical-losses",
+    "mission-timer": "create-mission/objectives/#mission-timer",
+    "supremacy": "create-mission/objectives/#supremacy",
+    "conditions-briefing": "create-mission/objectives/#conditions-briefing",
+    "mission-briefing": "create-mission/objectives/#mission-briefing",
+    "playable-forces": "create-mission/groups-and-slots/#playable-forces",
+    "playable-characters": "create-mission/groups-and-slots/#playable-characters",
+    "group-callsigns": "create-mission/groups-and-slots/#group-callsigns",
+    "check-slots": "create-mission/groups-and-slots/#check-slots",
+    "squad-vehicles": "create-mission/groups-and-slots/#squad-vehicles",
+    "freeze-zone": "create-mission/groups-and-slots/#freeze-zone",
+    "final-test": "create-mission/publishing/#final-test",
+    "publish-mission": "create-mission/publishing/#publish-mission",
+    "preface": "create-mission/#reading-paths",
+    "character-prefabs": "create-mission/#characters-part"
+  },
+  "character-prefabs": {
+    "authenticity": "character-prefabs/planning/#authenticity",
+    "unit-organization": "character-prefabs/planning/#unit-organization",
+    "green-berets": "character-prefabs/planning/#green-berets",
+    "naming-and-folders": "create-mission/base-character/#naming-and-folders",
+    "create-base-prefab": "create-mission/base-character/#create-base-prefab",
+    "unit-folder": "create-mission/base-character/#unit-folder",
+    "base-outfit": "create-mission/base-character/#base-outfit",
+    "hat-and-jacket": "create-mission/base-character/#hat-and-jacket",
+    "pants-boots-backpack": "create-mission/base-character/#pants-boots-backpack",
+    "radio-setup": "create-mission/base-character/#radio-setup",
+    "initial-inventory": "create-mission/base-character/#initial-inventory",
+    "wristwatch": "create-mission/base-character/#wristwatch",
+    "prefab-operations": "character-prefabs/prefab-operations/#prefab-operations",
+    "inherit-prefab": "character-prefabs/prefab-operations/#inherit-prefab",
+    "duplicate-prefab": "character-prefabs/prefab-operations/#duplicate-prefab",
+    "override-prefab": "character-prefabs/prefab-operations/#override-prefab",
+    "oda-base": "create-mission/character-variants/#oda-base",
+    "armor-and-webbing": "create-mission/character-variants/#armor-and-webbing",
+    "primary-weapon": "create-mission/character-variants/#primary-weapon",
+    "grenade-slots": "create-mission/character-variants/#grenade-slots",
+    "oda-ammunition": "create-mission/character-variants/#oda-ammunition",
+    "flashlight": "create-mission/character-variants/#flashlight",
+    "magazine-pouches": "create-mission/character-variants/#magazine-pouches",
+    "reserve-magazines": "create-mission/character-variants/#reserve-magazines",
+    "comms-sergeant": "create-mission/character-variants/#comms-sergeant",
+    "backpack-radio": "create-mission/character-variants/#backpack-radio",
+    "comms-uniform": "create-mission/character-variants/#comms-uniform",
+    "comms-role": "create-mission/character-editor/#comms-role",
+    "character-localization": "create-mission/character-editor/#character-localization",
+    "create-string-table": "create-mission/character-editor/#create-string-table",
+    "localization-entry": "create-mission/character-editor/#localization-entry",
+    "register-localization": "create-mission/character-editor/#register-localization",
+    "localized-character-name": "create-mission/character-editor/#localized-character-name",
+    "detachment-commander": "create-mission/character-variants/#detachment-commander",
+    "commander-launcher": "create-mission/character-variants/#commander-launcher",
+    "commander-binoculars": "create-mission/character-variants/#commander-binoculars",
+    "commander-name": "create-mission/character-editor/#commander-name",
+    "character-catalog": "create-mission/character-editor/#character-catalog",
+    "override-character-catalog": "create-mission/character-editor/#override-character-catalog",
+    "catalog-entries": "create-mission/character-editor/#catalog-entries",
+    "test-characters": "create-mission/character-editor/#test-characters",
+    "find-test-characters": "create-mission/character-editor/#find-test-characters",
+    "place-test-characters": "create-mission/character-editor/#place-test-characters",
+    "group-prefab": "create-mission/groups-and-slots/#group-prefab",
+    "create-group-prefab": "create-mission/groups-and-slots/#create-group-prefab",
+    "group-name": "create-mission/groups-and-slots/#group-name",
+    "group-symbol": "create-mission/groups-and-slots/#group-symbol",
+    "group-members": "create-mission/groups-and-slots/#group-members",
+    "group-formation": "create-mission/groups-and-slots/#group-formation",
+    "group-catalog": "create-mission/groups-and-slots/#group-catalog",
+    "register-group": "create-mission/groups-and-slots/#register-group",
+    "test-group": "create-mission/groups-and-slots/#test-group",
+    "": "create-mission/#characters-part"
+  },
+  "character-prefabs/characters/radioman": {
+    "comms-sergeant": "create-mission/character-variants/#comms-sergeant",
+    "backpack-radio": "create-mission/character-variants/#backpack-radio",
+    "comms-uniform": "create-mission/character-variants/#comms-uniform",
+    "comms-role": "create-mission/character-editor/#comms-role",
+    "": "create-mission/character-variants/#comms-sergeant"
+  },
+  "character-prefabs/characters/oda": {
+    "oda-base": "create-mission/character-variants/#oda-base",
+    "armor-and-webbing": "create-mission/character-variants/#armor-and-webbing",
+    "primary-weapon": "create-mission/character-variants/#primary-weapon",
+    "grenade-slots": "create-mission/character-variants/#grenade-slots",
+    "": "create-mission/character-variants/#oda-base"
+  },
+  "character-prefabs/characters/commander": {
+    "detachment-commander": "create-mission/character-variants/#detachment-commander",
+    "commander-launcher": "create-mission/character-variants/#commander-launcher",
+    "commander-binoculars": "create-mission/character-variants/#commander-binoculars",
+    "commander-name": "create-mission/character-editor/#commander-name",
+    "": "create-mission/character-variants/#detachment-commander"
+  },
+  "create-mission/scenario": {
+    "lite-lobby-game-mode": "create-mission/world/#lite-lobby-game-mode",
+    "map-setup": "create-mission/world/#map-setup",
+    "mission-details": "create-mission/world/#mission-details",
+    "": "create-mission/world/#mission-details"
+  },
+  "create-mission/finishing": {
+    "freeze-zone": "create-mission/groups-and-slots/#freeze-zone",
+    "final-test": "create-mission/publishing/#final-test",
+    "publish-mission": "create-mission/publishing/#publish-mission",
+    "": "create-mission/groups-and-slots/#freeze-zone"
+  },
+  "create-mission/conditions": {
+    "critical-losses": "create-mission/objectives/#critical-losses",
+    "mission-timer": "create-mission/objectives/#mission-timer",
+    "supremacy": "create-mission/objectives/#supremacy",
+    "mission-conditions": "create-mission/objectives/#mission-conditions",
+    "conditions-briefing": "create-mission/objectives/#conditions-briefing",
+    "": "create-mission/objectives/#mission-conditions"
+  },
+  "create-mission/map": {
+    "map-markings": "create-mission/objectives/#map-markings",
+    "map-line": "create-mission/objectives/#map-line",
+    "draw-map-line": "create-mission/objectives/#draw-map-line",
+    "port-marking": "create-mission/objectives/#port-marking",
+    "map-setup": "create-mission/world/#map-setup",
+    "": "create-mission/world/#map-setup"
+  },
+  "character-prefabs/characters/inventory": {
+    "initial-inventory": "create-mission/base-character/#initial-inventory",
+    "storage-after-changes": "create-mission/character-variants/#storage-after-changes",
+    "oda-ammunition": "create-mission/character-variants/#oda-ammunition",
+    "flashlight": "create-mission/character-variants/#flashlight",
+    "magazine-pouches": "create-mission/character-variants/#magazine-pouches",
+    "reserve-magazines": "create-mission/character-variants/#reserve-magazines",
+    "": "create-mission/character-variants/#oda-ammunition"
+  },
+  "character-prefabs/characters/base": {
+    "oda-base": "create-mission/character-variants/#oda-base",
+    "comms-sergeant": "create-mission/character-variants/#comms-sergeant",
+    "detachment-commander": "create-mission/character-variants/#detachment-commander",
+    "naming-and-folders": "create-mission/base-character/#naming-and-folders",
+    "create-base-prefab": "create-mission/base-character/#create-base-prefab",
+    "unit-folder": "create-mission/base-character/#unit-folder",
+    "base-outfit": "create-mission/base-character/#base-outfit",
+    "hat-and-jacket": "create-mission/base-character/#hat-and-jacket",
+    "pants-boots-backpack": "create-mission/base-character/#pants-boots-backpack",
+    "": "create-mission/base-character/#naming-and-folders"
+  },
+  "character-prefabs/characters/outfit": {
+    "base-outfit": "create-mission/base-character/#base-outfit",
+    "hat-and-jacket": "create-mission/base-character/#hat-and-jacket",
+    "pants-boots-backpack": "create-mission/base-character/#pants-boots-backpack",
+    "wristwatch": "create-mission/base-character/#wristwatch",
+    "armor-and-webbing": "create-mission/character-variants/#armor-and-webbing",
+    "comms-uniform": "create-mission/character-variants/#comms-uniform",
+    "commander-binoculars": "create-mission/character-variants/#commander-binoculars",
+    "": "create-mission/base-character/#base-outfit"
+  },
+  "character-prefabs/characters/localization": {
+    "localized-character-name": "create-mission/character-editor/#localized-character-name",
+    "character-localization": "create-mission/character-editor/#character-localization",
+    "create-string-table": "create-mission/character-editor/#create-string-table",
+    "localization-entry": "create-mission/character-editor/#localization-entry",
+    "commander-name": "create-mission/character-editor/#commander-name",
+    "build-runtime-table": "create-mission/character-editor/#build-runtime-table",
+    "register-localization": "create-mission/character-editor/#register-localization",
+    "": "create-mission/character-editor/#character-localization"
+  },
+  "character-prefabs/characters/radios": {
+    "radio-setup": "create-mission/base-character/#radio-setup",
+    "backpack-radio": "create-mission/character-variants/#backpack-radio",
+    "": "create-mission/base-character/#radio-setup"
+  },
+  "character-prefabs/characters/weapons": {
+    "commander-launcher": "create-mission/character-variants/#commander-launcher",
+    "oda-base": "create-mission/character-variants/#oda-base",
+    "armor-and-webbing": "create-mission/character-variants/#armor-and-webbing",
+    "primary-weapon": "create-mission/character-variants/#primary-weapon",
+    "grenade-slots": "create-mission/character-variants/#grenade-slots",
+    "": "create-mission/character-variants/#oda-base"
+  },
+  "character-prefabs/characters/radio-operator": {
+    "comms-role": "create-mission/character-editor/#comms-role",
+    "comms-sergeant": "create-mission/character-variants/#comms-sergeant",
+    "backpack-radio": "create-mission/character-variants/#backpack-radio",
+    "comms-uniform": "create-mission/character-variants/#comms-uniform",
+    "storage-after-changes": "create-mission/character-variants/#storage-after-changes",
+    "": "create-mission/character-variants/#comms-sergeant"
+  },
+  "character-prefabs/characters/additional-equipment": {
+    "commander-role": "create-mission/character-editor/#commander-role",
+    "commander-name": "create-mission/character-editor/#commander-name",
+    "detachment-commander": "create-mission/character-variants/#detachment-commander",
+    "commander-launcher": "create-mission/character-variants/#commander-launcher",
+    "commander-binoculars": "create-mission/character-variants/#commander-binoculars",
+    "": "create-mission/character-variants/#detachment-commander"
+  },
+  "character-prefabs/characters": {
+    "topic-index": "create-mission/#characters-part",
+    "": "create-mission/base-character/"
+  },
+  "character-prefabs/groups": {
+    "": "create-mission/groups-and-slots/"
+  },
+  "create-mission/dependencies": {
+    "lite-lobby-dependency": "create-mission/project/#lite-lobby-dependency",
+    "missing-addon-dependencies": "create-mission/project/#missing-addon-dependencies",
+    "": "create-mission/project/#lite-lobby-dependency"
+  },
+  "create-mission/game-mode": {
+    "game-mode-setup": "create-mission/world/#game-mode-setup",
+    "game-mode-template": "create-mission/world/#game-mode-template",
+    "generate-systems": "create-mission/world/#generate-systems",
+    "create-mission-header": "create-mission/world/#create-mission-header",
+    "": "create-mission/world/#game-mode-setup"
+  },
+  "create-mission/lobby-game-mode": {
+    "lite-lobby-game-mode": "create-mission/world/#lite-lobby-game-mode",
+    "": "create-mission/world/#lite-lobby-game-mode"
+  },
+  "create-mission/forces": {
+    "playable-forces": "create-mission/groups-and-slots/#playable-forces",
+    "playable-characters": "create-mission/groups-and-slots/#playable-characters",
+    "group-callsigns": "create-mission/groups-and-slots/#group-callsigns",
+    "check-slots": "create-mission/groups-and-slots/#check-slots",
+    "": "create-mission/groups-and-slots/#playable-forces"
+  },
+  "create-mission/vehicles": {
+    "squad-vehicles": "create-mission/groups-and-slots/#squad-vehicles",
+    "": "create-mission/groups-and-slots/#squad-vehicles"
+  },
+  "create-mission/freeze": {
+    "freeze-zone": "create-mission/groups-and-slots/#freeze-zone",
+    "freeze-duration": "create-mission/groups-and-slots/#freeze-duration",
+    "": "create-mission/groups-and-slots/#freeze-zone"
+  },
+  "create-mission/map-markings": {
+    "map-markings": "create-mission/objectives/#map-markings",
+    "map-line": "create-mission/objectives/#map-line",
+    "draw-map-line": "create-mission/objectives/#draw-map-line",
+    "port-marking": "create-mission/objectives/#port-marking",
+    "": "create-mission/objectives/#map-markings"
+  },
+  "create-mission/briefing": {
+    "mission-briefing": "create-mission/objectives/#mission-briefing",
+    "": "create-mission/objectives/#mission-briefing"
+  },
+  "create-mission/capture": {
+    "port-capture": "create-mission/objectives/#port-capture",
+    "capture-area": "create-mission/objectives/#capture-area",
+    "capture-flags": "create-mission/objectives/#capture-flags",
+    "capture-settings": "create-mission/objectives/#capture-settings",
+    "": "create-mission/objectives/#port-capture"
+  },
+  "create-mission/loss": {
+    "critical-losses": "create-mission/objectives/#critical-losses",
+    "": "create-mission/objectives/#critical-losses"
+  },
+  "create-mission/timer": {
+    "mission-timer": "create-mission/objectives/#mission-timer",
+    "": "create-mission/objectives/#mission-timer"
+  },
+  "create-mission/supremacy": {
+    "supremacy": "create-mission/objectives/#supremacy",
+    "": "create-mission/objectives/#supremacy"
+  },
+  "create-mission/testing": {
+    "final-test": "create-mission/publishing/#final-test",
+    "multiplayer-test": "create-mission/publishing/#multiplayer-test",
+    "": "create-mission/publishing/#final-test"
+  },
+  "character-prefabs/characters/equipment": {
+    "radio-setup": "create-mission/base-character/#radio-setup",
+    "initial-inventory": "create-mission/base-character/#initial-inventory",
+    "wristwatch": "create-mission/base-character/#wristwatch",
+    "": "create-mission/base-character/#radio-setup"
+  },
+  "character-prefabs/characters/roles": {
+    "comms-role": "create-mission/character-editor/#comms-role",
+    "localized-character-name": "create-mission/character-editor/#localized-character-name",
+    "commander-role": "create-mission/character-editor/#commander-role",
+    "": "create-mission/character-editor/#comms-role"
+  },
+  "character-prefabs/characters/catalog": {
+    "character-catalog": "create-mission/character-editor/#character-catalog",
+    "override-character-catalog": "create-mission/character-editor/#override-character-catalog",
+    "catalog-entries": "create-mission/character-editor/#catalog-entries",
+    "test-characters": "create-mission/character-editor/#test-characters",
+    "find-test-characters": "create-mission/character-editor/#find-test-characters",
+    "place-test-characters": "create-mission/character-editor/#place-test-characters",
+    "": "create-mission/character-editor/#character-catalog"
+  },
+  "character-prefabs/groups/setup": {
+    "group-prefab": "create-mission/groups-and-slots/#group-prefab",
+    "create-group-prefab": "create-mission/groups-and-slots/#create-group-prefab",
+    "group-name": "create-mission/groups-and-slots/#group-name",
+    "group-symbol": "create-mission/groups-and-slots/#group-symbol",
+    "": "create-mission/groups-and-slots/#group-prefab"
+  },
+  "character-prefabs/groups/roster": {
+    "group-members": "create-mission/groups-and-slots/#group-members",
+    "group-formation": "create-mission/groups-and-slots/#group-formation",
+    "": "create-mission/groups-and-slots/#group-members"
+  },
+  "character-prefabs/groups/catalog": {
+    "group-catalog": "create-mission/groups-and-slots/#group-catalog",
+    "register-group": "create-mission/groups-and-slots/#register-group",
+    "test-group": "create-mission/groups-and-slots/#test-group",
+    "": "create-mission/groups-and-slots/#group-catalog"
+  }
+}

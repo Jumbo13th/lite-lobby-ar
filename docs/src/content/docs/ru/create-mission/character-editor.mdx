@@ -1,0 +1,297 @@
+---
+title: "5. Названия персонажей и проверка в Game Master"
+description: "Общая таблица переводов, названия и роли персонажей, каталог Game Master и проверка в игре."
+prev:
+  link: "/lite-lobby-ar/ru/create-mission/character-variants/"
+  label: "4. Вооружение и варианты персонажей"
+next:
+  link: "/lite-lobby-ar/ru/create-mission/groups-and-slots/"
+  label: "6. Группы и игровые слоты"
+---
+
+import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
+import launchStringEditor from '../../../../assets/guide/58.png';
+import newStringTable from '../../../../assets/guide/59.png';
+import stringTableLocation from '../../../../assets/guide/60.png';
+import stringTableClass from '../../../../assets/guide/61.png';
+import commsTranslation from '../../../../assets/guide/62.png';
+import buildRuntimeTable from '../../../../assets/guide/63.png';
+import registerStringTable from '../../../../assets/guide/64.png';
+import commanderTranslation from '../../../../assets/guide/70.png';
+import commsRole from '../../../../assets/guide/57.png';
+import commsName from '../../../../assets/guide/65.png';
+import commanderRole from '../../../../assets/guide/71.png';
+import overrideCharacterCatalog from '../../../../assets/guide/72.png';
+import duplicateCatalogEntry from '../../../../assets/guide/73.png';
+import assignCatalogPrefab from '../../../../assets/guide/74.png';
+import characterCatalogRoster from '../../../../assets/guide/75.png';
+import launchCharacterTest from '../../../../assets/guide/76.png';
+import testCharacterBrowser from '../../../../assets/guide/77.png';
+import placedTestCharacters from '../../../../assets/guide/78.png';
+
+[К оглавлению руководства](../)
+
+У связиста и командира готовы префабы со снаряжением. Теперь настроим для обоих названия и роли в игровом редакторе, добавим их в каталог Game Master и проверим в мире миссии.
+
+## Таблица переводов {#character-localization}
+
+**Таблица переводов** хранит варианты текста для разных языков. Создадим одну таблицу для персонажей и групп аддона **Triad Shooting Star**.
+
+Первой записью в таблице станет название связиста: «Сержант связи» и **Communications Sergeant**. Игра выберет нужный вариант в зависимости от языка игрока.
+
+### Создание таблицы переводов {#create-string-table}
+
+В главном окне Workbench нажмите **String Editor** в разделе **Quick Launch**.
+
+<LL_Screenshot
+  src={launchStringEditor}
+  alt="В главном окне Workbench стрелкой отмечена кнопка String Editor."
+  caption="Открытие редактора переводов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Выберите **File → New**.
+
+<LL_Screenshot
+  src={newStringTable}
+  alt="В меню File редактора String Editor выбран пункт New."
+  caption="Создание таблицы переводов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В окне сохранения откройте свой аддон. Кнопкой **New Folder** создайте папку `Language` и перейдите в неё. В поле **File name** введите `tss_localization` и нажмите **OK**. Здесь `tss` — префикс нашего аддона; для своей миссии используйте выбранный вами префикс.
+
+<LL_Screenshot
+  src={stringTableLocation}
+  alt="В окне Create string table выбрана папка Language аддона и введено имя tss_localization."
+  caption="Таблица Language/tss_localization.st."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В следующем окне выберите **CustomStringTableItem**.
+
+<LL_Screenshot
+  src={stringTableClass}
+  alt="В окне выбора класса строки отмечен CustomStringTableItem."
+  caption="Тип строки таблицы переводов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Название на двух языках {#localization-entry}
+
+Каждой строке таблицы нужен **ключ** — уникальное обозначение, по которому игра найдёт её переводы. В поле **Insert** введите `TSS-Characters_CommsSergeant` без `#` и нажмите кнопку **Insert**.
+
+Выберите добавленную строку слева и заполните поля справа:
+
+- **Target En Us** — `Communications Sergeant`.
+- **Translated Texts → Target Ru Ru** — `Сержант связи`.
+
+<LL_Screenshot
+  src={commsTranslation}
+  alt="В String Editor добавлена строка TSS-Characters_CommsSergeant; Target En Us заполнен, поле Target Ru Ru находится ниже в Translated Texts."
+  caption="Добавление названия связиста."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+#### Название второго персонажа {#commander-name}
+
+Таким же способом добавьте строку для командира с ключом `TSS-Characters_DetachmentCommander` и заполните переводы:
+
+- **Target En Us** — `Detachment Commander`.
+- **Target Ru Ru** — `Командир отряда`.
+
+<LL_Screenshot
+  src={commanderTranslation}
+  alt="В таблицу переводов добавлена строка TSS-Characters_DetachmentCommander с английским названием Detachment Commander."
+  caption="Название командира в общей таблице аддона."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Сборка файлов переводов {#build-runtime-table}
+
+Нажмите `Ctrl+S`, чтобы сохранить таблицу. Затем выберите **Table → Build Runtime Table** (`Ctrl+B`). Эта команда создаёт из таблицы отдельные файлы переводов, которые использует игра. После изменения текста снова сохраните таблицу и выполните эту команду.
+
+<LL_Screenshot
+  src={buildRuntimeTable}
+  alt="В меню Table выбран пункт Build Runtime Table с сочетанием Ctrl+B."
+  caption="Создание файлов переводов для игры."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Подключение таблицы к проекту {#register-localization}
+
+Чтобы игра загрузила переводы, подключим таблицу в настройках аддона. В главном окне Workbench откройте **File → Project Settings**. В поле **Project** выберите свой аддон, а в **Configuration** — **PC**.
+
+1. Раскройте **Widget Manager Settings → String Tables** и нажмите `+`.
+2. Откройте новую запись. У поля **String Table Source** нажмите `…` и выберите `Language/tss_localization.st` из своего аддона.
+3. В списке **Languages** этой записи добавьте английский и русский языки. Для каждого заполните **Code** и укажите в **String Table Runtime** соответствующий файл переводов:
+
+| Code | String Table Runtime |
+| --- | --- |
+| `en_us` | `Language/tss_localization.en_us.conf` |
+| `ru_ru` | `Language/tss_localization.ru_ru.conf` |
+
+Если эти записи уже заполнены, добавлять их повторно не нужно. Нажмите **OK**.
+
+<LL_Screenshot
+  src={registerStringTable}
+  alt="В Project Settings в списке Widget Manager Settings → String Tables добавлена Language/tss_localization.st."
+  caption="Таблица переводов подключена к аддону."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+## Названия и роли в префабах {#editor-character-properties}
+
+За эти сведения отвечает **SCR_EditableCharacterComponent → Visualization → UI Info**:
+
+- **Name** — название персонажа.
+- **Authored Labels** — метки персонажа, в том числе его роль.
+
+### Роль персонажа {#comms-role}
+
+Откройте `TSS_Character_US_GB_CommsSergeant.et` через **Edit Prefab** и выберите персонажа. В поиске компонентов введите `edita`, выберите **SCR_EditableCharacterComponent** и раскройте **Visualization → UI Info**.
+
+В списке **Authored Labels** замените `ROLE_RIFLEMAN` на `ROLE_RADIOOPERATOR`. Так мы указываем для игрового редактора, что персонаж выполняет роль связиста.
+
+<LL_Screenshot
+  src={commsRole}
+  alt="В SCR_EditableCharacterComponent раскрыты UI Info и Authored Labels; для связиста выбрана метка ROLE_RADIOOPERATOR."
+  caption="Настройка роли связиста."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Название из таблицы переводов {#localized-character-name}
+
+В **Name** пока указано `#AR-Role_Rifleman` — ссылка на игровое название «Стрелок». Замените её на `#TSS-Characters_CommsSergeant`.
+
+В этом поле перед ключом ставится `#`: так игра отличает ссылку на перевод от обычного текста. Сам ключ после `#` должен точно совпадать с **Id** строки в String Editor.
+
+<LL_Screenshot
+  src={commsName}
+  alt="В поле Name префаба сержанта связи указано #TSS-Characters_CommsSergeant."
+  caption="Ссылка на название из таблицы переводов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Сохраните префаб нажатием `Ctrl+S`.
+
+### Настройка второго персонажа {#commander-role}
+
+Откройте `TSS_Character_US_GB_DetachmentCommander.et` через **Edit Prefab**, выберите персонажа и раскройте тот же раздел **SCR_EditableCharacterComponent → Visualization → UI Info**:
+
+- В **Name** укажите `#TSS-Characters_DetachmentCommander`.
+- В **Authored Labels** замените `ROLE_RIFLEMAN` на `ROLE_LEADER`.
+
+<LL_Screenshot
+  src={commanderRole}
+  alt="В UI Info командира указаны #TSS-Characters_DetachmentCommander и метка ROLE_LEADER."
+  caption="Название и роль командира в игровом редакторе."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Сохраните префаб нажатием `Ctrl+S`.
+
+Если вместо названия отображается ключ с `#`, проверьте, совпадает ли он с **Id** строки, [созданы ли файлы переводов](#build-runtime-table) и [подключена ли таблица к аддону](#register-localization). Для загрузки новой таблицы может потребоваться перезапуск Workbench.
+
+## Добавление персонажей в каталог {#character-catalog}
+
+Названия и роли настроены. Чтобы находить и размещать бойцов через **Game Master**, добавим их в каталог фракции США.
+
+Для каждого префаба персонажа нужна отдельная запись каталога. В ней указываются файл префаба и настройки его доступности в игровом редакторе.
+
+### Оверрайд каталога {#override-character-catalog}
+
+В **Resource Browser** выберите проект **ArmaReforger** и откройте папку `Configs/EntityCatalog/US`. Щёлкните правой кнопкой мыши по `Characters_EntityCatalog_US.conf` и выберите **Override in → ваш аддон**.
+
+<LL_Screenshot
+  src={overrideCharacterCatalog}
+  alt="Для Characters_EntityCatalog_US.conf выбрана команда Override in с выбором аддона."
+  caption="Оверрайд каталога персонажей США."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Здесь нужен [оверрайд](/lite-lobby-ar/ru/character-prefabs/prefab-operations/#override-prefab): мы дополняем каталог, который игра уже использует. Поэтому имя `Characters_EntityCatalog_US.conf` сохраняем без префикса `TSS_`.
+
+### Добавление бойцов {#catalog-entries}
+
+Перейдите в папку `Configs/EntityCatalog/US` своего аддона и двойным щелчком откройте `Characters_EntityCatalog_US.conf`. В списке **Entity Entry List** найдите запись `Character_US_SF_Sapper_S.et`, щёлкните по ней правой кнопкой мыши и выберите **Duplicate**.
+
+<LL_Screenshot
+  src={duplicateCatalogEntry}
+  alt="В контекстном меню записи Character_US_SF_Sapper_S.et выбрана команда Duplicate."
+  caption="Копирование готовой записи каталога."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Команда копирует только запись каталога; новый файл префаба при этом не создаётся. В полученной записи укажем уже подготовленного связиста.
+
+Раскройте добавленную запись. В **Resource Browser** откройте папку `Green Berets` своего аддона и перетащите `TSS_Character_US_GB_CommsSergeant.et` в поле **Entity Prefab**.
+
+<LL_Screenshot
+  src={assignCatalogPrefab}
+  alt="Префаб персонажа перетаскивают из Resource Browser в поле Entity Prefab записи каталога."
+  caption="Назначение префаба. На скриншоте показан заместитель командира; мы добавляем связиста."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Вместе с записью скопированы настройки **Entity Data List**, необходимые для игрового редактора. Они подходят и нашим бойцам, поэтому менять их не нужно.
+
+Скопируйте полученную запись командой **Duplicate**. В копии замените значение **Entity Prefab** на `TSS_Character_US_GB_DetachmentCommander.et`. Теперь в каталоге есть две отдельные записи: для связиста и для командира.
+
+<LL_Screenshot
+  src={characterCatalogRoster}
+  alt="В каталоге добавлены префабы персонажей миссии Triad Shooting Star."
+  caption="Полный набор бойцов примера миссии. На этом этапе у нас добавлены двое."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Остальных бойцов добавляйте так же, по мере готовности их префабов. В `BaseLoadout` и `ODA_Base` собраны общие настройки для персонажей разных должностей; сами эти префабы в каталог не добавляем.
+
+Сохраните каталог нажатием `Ctrl+S`.
+
+## Проверка в игре {#test-characters}
+
+Откройте в **World Editor** мир своей миссии и нажмите зелёную кнопку запуска на верхней панели.
+
+<LL_Screenshot
+  src={launchCharacterTest}
+  alt="В World Editor открыт мир миссии; стрелкой отмечена зелёная кнопка запуска."
+  caption="Запуск миссии для проверки персонажей."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Поиск персонажей {#find-test-characters}
+
+После запуска миссии нажимайте **Play** в самом лобби, пока не начнётся игра. Затем нажмите `Y`, чтобы открыть **Game Master**.
+
+`U` открывает и закрывает лобби, а `Y` — Game Master.
+
+В **Game Master** нажмите `Tab`, чтобы открыть **Entity Browser** — каталог объектов для размещения. В фильтрах справа выберите фракцию **US** и тип **Character**.
+
+Найдите обоих бойцов через поле **Search**, вводя их названия: «Сержант связи» и «Командир отряда». Если игра работает на английском языке, ищите **Communications Sergeant** и **Detachment Commander**.
+
+<LL_Screenshot
+  src={testCharacterBrowser}
+  alt="В Entity Browser выбрана фракция US; среди персонажей видны Communications Sergeant и Detachment Commander."
+  caption="Персонажи примера миссии в игровом каталоге."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+На карточках персонажей вместо миниатюр может отображаться `PLACE HOLDER`: изображения для этих префабов ещё не подготовлены. Такие карточки тоже можно выбирать и использовать для размещения бойцов.
+
+Если бойца нет в списке, проверьте его запись в [каталоге персонажей](#catalog-entries). Если вместо названия виден ключ с `#`, проверьте [ссылку на перевод](#localized-character-name).
+
+### Размещение персонажей {#place-test-characters}
+
+Выберите карточку бойца, наведите курсор на землю и щёлкните левой кнопкой мыши, чтобы разместить его в мире. Таким же способом добавьте второго персонажа. Щелчок правой кнопкой мыши отменяет размещение.
+
+<LL_Screenshot
+  src={placedTestCharacters}
+  alt="В Game Master на местности размещены персонажи миссии Triad Shooting Star."
+  caption="Проверка внешнего вида. На скриншоте весь набор примера; нам пока нужны связист и командир."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Осмотрите обоих персонажей и сверьте их снаряжение с настройками префабов. У связиста должны быть ранцевая радиостанция, кепка и куртка с закатанными рукавами, а у командира — M72A3 и бинокль.
+
+Персонажи проверены. В следующей главе [объединим их в группу и разместим в миссии](../groups-and-slots/).
