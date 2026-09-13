@@ -41,6 +41,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	[Attribute("0", UIWidgets.CheckBox, "Remove AI units not occupied by players when GAME starts.", category: "Lite Lobby")]
 	protected bool m_bRemoveRedundantUnits;
 
+	[Attribute("0", UIWidgets.CheckBox, "Let AI groups report the enemies they identify as timestamped military markers on their own faction's map (a game feature since 1.8). Off by default: in a lobby mission those markers reveal player squads to the other side. A faction whose own settings forbid AI reports never reports, even when this is on.", category: "Lite Lobby")]
+	protected bool m_bAllowAiSpotReports;
+
 	[Attribute("1", UIWidgets.CheckBox, "Disable text chat for alive players during GAME. Admins always see chat.", category: "Lite Lobby")]
 	protected bool m_bDisableChat;
 
@@ -120,6 +123,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	int GetHardFreezeDuration()		{ return m_iHardFreezeTime; }
 
 	bool RemoveRedundantUnits()	{ return m_bRemoveRedundantUnits; }
+	bool AllowAiSpotReports()	{ return m_bAllowAiSpotReports; }
 	bool IsChatDisabled()		{ return m_bDisableChat; }
 	bool HideProximityVonUI()	{ return m_bHideProximityVonUI; }
 	bool HideRadioSpeakerUI()	{ return m_bHideRadioSpeakerUI; }
