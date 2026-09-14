@@ -2,9 +2,10 @@
 
 For maintainers verifying this feature during maintenance or before publication.
 
-1. Use Node 26.8.2 and npm 12.0.2; enter the repository's docs directory. The runtime
-   version is recorded in .nvmrc. Install npm 12.0.2 with npm install --global npm@12.0.2
-   if your Node installation still uses its bundled npm.
+1. Use the latest stable Node.js release (`node` in docs/.nvmrc) and npm. Enter docs;
+   with nvm, run nvm install and nvm use. Install npm with npm install --global npm@latest.
+   npm ci uses the checked-in lockfile; npm update refreshes it within the manifest
+   constraints. TypeScript remains on 6.x until Astro Check supports 7.x.
 2. Run npm ci, then npx playwright install chromium.
 3. Run npm run validate. Expect bilingual route/link checks, image-integrity checks,
    browser scenarios, and fixture-exclusion checks to pass.
@@ -38,7 +39,7 @@ After extracting the matching official Node.js Windows ZIP under
 `$env:LOCALAPPDATA\Programs`, select it from docs in the current PowerShell terminal:
 
 ```powershell
-$nodeVersion = (Get-Content .nvmrc).Trim()
+$nodeVersion = (Invoke-RestMethod 'https://nodejs.org/dist/index.json')[0].version.TrimStart('v')
 $nodeDirectory = "$env:LOCALAPPDATA\Programs\node-v$nodeVersion-win-x64"
 if (!(Test-Path -LiteralPath "$nodeDirectory\node.exe")) {
   throw "Install Node.js $nodeVersion in $nodeDirectory first."

@@ -1,5 +1,18 @@
 # Research: Lite Lobby Guide Site
 
+T116 (2026-09-15): official npm metadata still resolves Astro 7.3.2, Starlight 0.42.0,
+Markdown Remark 7.3.1, Astro Check 0.9.10, Cheerio 1.2.0 and Playwright 1.63.0.
+Node Current is 26.8.2 and npm latest is 12.0.2. TypeScript latest is 7.0.2, but
+Astro Check declares ^5.0.0 || ^6.0.0, so retain ^6.0.3. Manifests now prefer latest
+dist-tags, with exact resolutions only in package-lock.json. The lockfile-only
+Dependabot strategy preserves these selectors. GitHub Actions use existing moving
+v7/v5 tags; Dependabot can propose the next major. Node uses the current-release
+alias and npm is installed with @latest. esbuild script permission uses its name.
+Sources: https://registry.npmjs.org/@astrojs/check/latest,
+https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference,
+https://github.com/actions/setup-node#supported-version-syntax,
+https://docs.npmjs.com/cli/v12/commands/npm-install-scripts/.
+
 ## Opening existing missions (T106)
 
 The operator requested one Workshop and one GitHub example on the same supporting

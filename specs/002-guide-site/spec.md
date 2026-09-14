@@ -1,5 +1,7 @@
 # Feature Specification: Lite Lobby Guide Site
 
+T116: enable Dependabot for docs npm dependencies and GitHub Actions, and prefer floating latest stable versions where supported. Retain the npm lockfile and a TypeScript 6 compatibility range while Astro Check excludes TypeScript 7. Update the existing PR after validation.
+
 T114: normalize screenshot folders and numbered filenames, authorized by the operator despite earlier original-filename preservation requirements. Preserve every source byte and every page image sequence; update imports and tests together. Canonical paths use assets/screenshots/<topic>/ with lowercase kebab-case folders, three-digit numbered captures and descriptive kebab-case supplementary filenames.
 
 T113: audit navigation consistency across all active RU/EN pages: supplementary return links, overview/sidebar membership, heading anchors, chapter transitions, current titles and legacy/internal destinations. Fix the four supplementary pages uniformly, preserve existing anchors and do not reorganize the course.

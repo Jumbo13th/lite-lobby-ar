@@ -1,5 +1,7 @@
 # Implementation Plan: Lite Lobby Guide Site
 
+T116: use latest npm dist-tags except TypeScript ^6.0.3; select Node current via .nvmrc node and npm@latest in CI. Use verified moving Action major tags. Dependabot checks weekly with grouped lockfile-only npm updates and grouped Action updates; it does not auto-merge. Allow esbuild install scripts by package name. Verify metadata, npm update/ci, configuration syntax and full website validation.
+
 T114: record source hashes and current rendered-page image sequences, move 144 PNGs to topic folders under assets/screenshots, retain unused reference sources without publishing them, consolidate checksum inventories and verify case-sensitive paths. Update RU/EN imports and fixture paths; compare old/new page image hashes, verify every rendered original and responsive image, then rebuild production preview.
 
 T113: add the missing top return links to Git and existing-mission pages; list all four supplementary materials in the overview; align two locale-dependent heading anchors with compatibility spans; remove the empty EN prefab-operations heading while retaining its anchor. Extend existing navigation validation, rebuild and verify production preview on port 4322.
@@ -85,7 +87,7 @@ still requires the later launch decision.
 
 ## Technical Context
 
-**Language/Version**: Astro 7.3.2, TypeScript 6.0.3, JavaScript, Node 26.8.2, npm 12.0.2.
+**Language/Version**: Latest stable Astro, Node.js and npm; TypeScript 6.x for Astro Check compatibility. Exact dependency versions are recorded in docs/package-lock.json.
 **Primary Dependencies**: Starlight 0.42.0, markdown-remark 7.3.1, Astro Check 0.9.10, Playwright for browser validation.
 **Storage**: MDX pages and 113 original PNG files; no database.
 **Testing**: Astro Check, production build, local-link/translation/asset checks, Chromium browser checks at 390, 768, 1440, and 1920 px in both languages/themes.
@@ -318,7 +320,7 @@ must be stopped at the end.
 
 ### CI and release
 
-Use the Node version in docs/.nvmrc on Ubuntu, npm 12.0.2, npm ci, Playwright Chromium
+Use the current Node release selected by docs/.nvmrc on Ubuntu, npm@latest, npm ci, Playwright Chromium
 installation, and npm run validate.
 Default permissions contents:read. A workflow_dispatch boolean publish defaults to
 false. Only a successful manual main run with publish=true may upload the normal

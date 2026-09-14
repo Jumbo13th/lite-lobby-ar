@@ -1,5 +1,7 @@
 # Tasks: Lite Lobby Guide Site
 
+- [x] T116 Added weekly Dependabot updates, supported floating version selectors and the TypeScript 6 compatibility exception. Refreshed the lockfile; clean npm ci, dependency audit, YAML parsing and full website validation passed. Prepared for PR #3.
+
 - [x] T115 Prepared the reviewed guide changes for PR: reconciled current requirements and task status, corrected quickstart counts and trailing whitespace. Clean installation, full website validation, dependency audit and mergeability review passed before submission.
 
 - [x] T114 Normalized all 144 PNGs under assets/screenshots/topic folders with lowercase kebab-case names and three-digit numbering. Consolidated inventories with original/current paths and unchanged hashes; updated imports, fixtures and validation. Confirmed all 20 illustrated locale-page image sequences unchanged, all 921 original/responsive HTTP URLs valid, and 564 image occurrences decode across RU/EN desktop/mobile. Full validation passed (107 production routes). Preview on 4322 rebuilt; unused source references remain unpublished.

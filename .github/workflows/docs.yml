@@ -5,11 +5,13 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/docs.yml'
+      - '.github/dependabot.yml'
   push:
     branches: [main]
     paths:
       - 'docs/**'
       - '.github/workflows/docs.yml'
+      - '.github/dependabot.yml'
   workflow_dispatch:
     inputs:
       publish:
@@ -31,15 +33,15 @@ jobs:
         working-directory: docs
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@v7
       - name: Set up Node
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@v7
         with:
           node-version-file: docs/.nvmrc
           cache: npm
           cache-dependency-path: docs/package-lock.json
       - name: Set up npm
-        run: npm install --global npm@12.0.2
+        run: npm install --global npm@latest
       - name: Install dependencies
         run: npm ci
       - name: Install Chromium
@@ -48,7 +50,7 @@ jobs:
         run: npm run validate
       - name: Upload website for publication
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true && github.ref == 'refs/heads/main' }}
-        uses: actions/upload-pages-artifact@v5.0.0
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/dist
           retention-days: 1
@@ -71,4 +73,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5.0.1
+        uses: actions/deploy-pages@v5
