@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.validation-dist/
+.validation-results/
+src/content/docs/ll-validation-fixture.mdx
+src/content/docs/ru/ll-validation-fixture.mdx
+*.log
+.env*

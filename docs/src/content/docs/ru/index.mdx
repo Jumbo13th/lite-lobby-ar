@@ -1,0 +1,22 @@
+---
+title: Руководство Lite Lobby
+description: Руководство по Lite Lobby для Arma Reforger.
+template: splash
+hero:
+  title: <span class="ll-title-accent">Руководство</span> Lite Lobby
+---
+
+import LL_GuideHome from '../../../components/LL_GuideHome.astro';
+import LL_ProjectIntro from '../../../components/LL_ProjectIntro.astro';
+
+<LL_ProjectIntro />
+
+<LL_GuideHome
+  guides={[
+    'Как создать миссию',
+    'Как открыть существующую миссию',
+    'Git и Arma Reforger',
+    'Миссии для Triad Tactics',
+  ]}
+  triadPages={['Настройка миссии для Triad Tactics', 'Требования к миссиям Triad Tactics']}
+/>

@@ -1,0 +1,305 @@
+---
+title: "7. Mission objectives and triggers"
+description: "Map markings, capture, loss, timer and superiority triggers, and the briefing text."
+prev:
+  link: "/lite-lobby-ar/create-mission/groups-and-slots/"
+  label: "6. Units in the mission"
+next:
+  link: "/lite-lobby-ar/create-mission/publishing/"
+  label: "8. Test and publish"
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import { Aside } from '@astrojs/starlight/components';
+import mapMarkings from '../../../assets/screenshots/create-mission/091.png';
+import mapLineSettings from '../../../assets/screenshots/create-mission/092.png';
+import mapLinePoints from '../../../assets/screenshots/create-mission/093.png';
+import mapRedLine from '../../../assets/screenshots/create-mission/094.png';
+import mapPort from '../../../assets/screenshots/create-mission/095.png';
+import step96 from '../../../assets/screenshots/create-mission/096.png';
+import step97 from '../../../assets/screenshots/create-mission/097.png';
+import step98 from '../../../assets/screenshots/create-mission/098.png';
+import step99 from '../../../assets/screenshots/create-mission/099.png';
+import step100 from '../../../assets/screenshots/create-mission/100.png';
+import step101 from '../../../assets/screenshots/create-mission/101.png';
+import step102 from '../../../assets/screenshots/create-mission/102.png';
+import step103 from '../../../assets/screenshots/create-mission/103.png';
+import step104 from '../../../assets/screenshots/create-mission/104.png';
+import step105 from '../../../assets/screenshots/create-mission/105.png';
+
+[Back to the guide contents](../)
+
+The units and playable slots are already in place. Add map markings, define the port capture conditions and other objectives, then write the briefing for players. Continue in World Editor.
+
+## Map markings {#map-markings}
+
+The screenshot shows the map markings we want to create. Play will take place in the area outlined in orange. Crossing the red line is prohibited by the mission rules.
+
+<LL_Screenshot
+  src={mapMarkings}
+  alt="Map of northern Everon: an orange rectangle marks the play area, and a red line near Montignac marks a boundary players must not cross."
+  caption="The play area and the boundary players must not cross. We will start with the red line."
+  originalLabel="Open original image"
+/>
+
+### Line settings {#map-line}
+
+In **Hierarchy**, right-click your scene, `ShootingStar_Ep1`, and create a layer named `markers`. Double-click the layer to make it active: new map markings will go here.
+
+In **Resource Browser**, open **LiteLobby → Prefabs → Map** and drag `LL_MapPolyZone.et` onto the terrain. Select the added object in **Hierarchy**, then **LL_MapZoneComponent** in **Object Properties**.
+
+Set these properties:
+
+- **Outline Color** — red.
+- **Outline Width** — `10`, the line's thickness.
+- **Line Mode** — enabled: draws a line without a fill or a connection between its ends.
+- **Show For Any Faction** — enabled, so all sides can see the line.
+
+<LL_Screenshot
+  src={mapLineSettings}
+  alt="LL_MapPolyZone_1 selected in the markers layer; LL_MapZoneComponent has a red Outline Color, width 10 and Line Mode enabled."
+  caption="The line prefab and its map display settings."
+  originalLabel="Open original image"
+/>
+
+### Drawing the line {#draw-map-line}
+
+A line consists of points joined by straight segments. We will place these points along roads and landmarks.
+
+Select the line object and activate **Vector Tool**, the curved-line button on the top toolbar. Its settings appear on the right. Enable **Snap to terrain** to place new points on the ground.
+
+Hold `Ctrl` and left-click the terrain to add points in order. To extend an existing line, select its last point first.
+
+<Aside type="tip" title="Edit the prefab's line">
+You do not need **New Polyline**: it creates a separate line. We are editing the `LL_MapPolyZone` object, which already has the component that draws it on the in-game map.
+</Aside>
+
+<LL_Screenshot
+  src={mapLinePoints}
+  alt="Vector Tool shows the selected LL_MapPolyZone points along a road; New Polyline is crossed out."
+  caption="Points define the line's path across the terrain."
+  originalLabel="Open original image"
+/>
+
+Enter `RedLine` in the name field at the top of **Object Properties**. This makes the object easier to find in **Hierarchy**.
+
+<LL_Screenshot
+  src={mapRedLine}
+  alt="The object is named RedLine and its points run through the Montignac area."
+  caption="The completed RedLine in the editor."
+  originalLabel="Open original image"
+/>
+
+### Marking the port {#port-marking}
+
+Add another `LL_MapPolyZone.et` to the `markers` layer and name it `Port`. Use **Vector Tool** to place points along the port boundary, as shown below.
+
+In **LL_MapZoneComponent**, choose a green **Outline Color** and set **Outline Width** to `7`. Enable **Line Mode** and **Show For Any Faction**, as for `RedLine`.
+
+<LL_Screenshot
+  src={mapPort}
+  alt="The Port line follows the port boundary; LL_MapZoneComponent has a green outline and width 7."
+  caption="A separate green line marks the port."
+  originalLabel="Open original image"
+/>
+
+These lines only appear on the map. Next, create a separate area that defines the port capture conditions.
+
+Press `Ctrl+S` to save the world.
+
+## Triggers {#triggers}
+
+Triggers check mission conditions and announce when they are met. The example uses port capture, critical losses, a time limit and numerical superiority. Use the conditions that suit your own mission’s objectives.
+
+Testing capture, losses and superiority requires [groups on both sides with playable slots](/lite-lobby-ar/create-mission/groups-and-slots/#playable-forces). If you have only placed Alpha so far, prepare and place the remaining participants first.
+
+### Placement and announcements {#mission-conditions}
+
+The trigger prefabs are in **LiteLobby → Prefabs → Triggers**. Create a `triggers` layer in your scene if it does not already exist. Make the layer active and add the prefabs to it, then select each object’s corresponding component in **Object Properties**.
+
+For each trigger, enable **Broadcast Message** and **Show In Briefing**. Enter the announcement in **Message**; leave **Message Faction** and **Message Groups** empty to address all sides.
+
+<Aside type="caution" title="Triggers do not end the mission">
+Capture, critical losses, supremacy and the timer announce when their conditions are met. The mission continues until the host ends it.
+</Aside>
+
+### Capture trigger {#port-capture}
+
+Define the port boundary, place flags, and connect them to the trigger.
+
+#### Capture area {#capture-area}
+
+Make sure the `triggers` layer is active. In **Vector Tool**, click **New Polyline** to define the boundary of the area the trigger will check.
+
+Place points around the port using `Ctrl` and the left mouse button. Enter `PortTrigger` in the name field at the top of **Object Properties**.
+
+<LL_Screenshot
+  src={step96}
+  alt="Creating a separate PortTrigger line in the triggers layer using New Polyline."
+  caption="The area in which characters will be counted."
+  originalLabel="Open original image"
+/>
+
+Select **PolylineShapeEntity**, expand **Unsorted** and enable **Is Closed**. This joins the last point to the first.
+
+<LL_Screenshot
+  src={step97}
+  alt="PortTrigger has Is Closed enabled and forms a closed boundary around the port."
+  caption="The closed capture area."
+  originalLabel="Open original image"
+/>
+
+#### Flags {#capture-flags}
+
+In **Resource Browser**, find `LL_FlagPole.et` in **LiteLobby**, under `Prefabs/Structures/Military/Flags/FlagPole_02`.
+
+Drag it into the port and name the object `Flag1`. Place the other flags the same way. The example uses six: `Flag1`–`Flag6`. They show capture progress and which side owns the port.
+
+<LL_Screenshot
+  src={step98}
+  alt="LL_FlagPole.et placed in the port and named Flag1."
+  caption="The first flag in the capture area."
+  originalLabel="Open original image"
+/>
+
+#### Capture settings {#capture-settings}
+
+From **LiteLobby → Prefabs → Triggers**, add `LL_Trigger_ZoneCapture.et` to the `triggers` layer. Name it `PortCapture` and select **LL_TriggerZoneCapture**.
+
+| Field | Value |
+| --- | --- |
+| **Zone Entity Name** | `PortTrigger` — the name of the area you drew. |
+| **Zone Display Name** | `Port` — the name shown to players. |
+| **Attacker Faction** | `US` — the attacking side. |
+| **Defender Faction** | `USSR` — the side that owns the port initially. |
+| **Flag Names** | Use `+` to add `Flag1`, `Flag2`, …, `Flag6`. |
+| **Message** | `The United States captured the port.` |
+
+<LL_Screenshot
+  src={step99}
+  alt="PortCapture references PortTrigger, factions US and USSR, and six flag names."
+  caption="Connecting the trigger to its area and flags."
+  originalLabel="Open original image"
+/>
+
+In **Conditions**, configure the two **LL_TriggerFactionCondition** entries already included in the prefab.
+
+| Field | First entry | Second entry |
+| --- | --- | --- |
+| **Faction** | `US` | `US` |
+| **Operator** | `GREATER_EQUAL` | `GREATER_EQUAL` |
+| **Versus Faction** | `USSR` | Empty |
+| **Versus Multiplier** | `2` | Not used |
+| **Versus Number** | Not used | `1` |
+
+The first entry requires at least twice as many US characters as Soviet characters inside the port: four against two, for example. The second requires at least one US character. Without it, an empty area would also satisfy the first condition.
+
+Set **Hold Seconds** to `120`. Both conditions must hold continuously for two minutes. If either fails, the timer resets.
+
+<LL_Screenshot
+  src={step100}
+  alt="Two conditions require US at least USSR × 2 and US at least 1; Hold Seconds is 120."
+  caption="Port capture conditions."
+  originalLabel="Open original image"
+/>
+
+<Aside type="note" title="Which characters count">
+The trigger counts living characters registered as playable slots, including bot-controlled slots. Ordinary AI outside the lobby do not count. The previous chapter covered [playable slots](/lite-lobby-ar/create-mission/groups-and-slots/#playable-forces).
+</Aside>
+
+### Critical loss trigger {#critical-losses}
+
+Add `LL_Trigger_CriticalLoss.et`, name it `USSRLoss` and select **LL_TriggerCriticalLoss**.
+
+- **Faction Key** — `USSR`.
+- **Threshold** — `5`.
+- **Message** — `The USSR suffered critical losses.`
+
+This means **five or fewer characters remaining alive**, not five casualties.
+
+<LL_Screenshot
+  src={step101}
+  alt="USSRLoss has Faction Key USSR, Threshold 5 and a critical-loss message."
+  caption="The Soviet side's loss threshold."
+  originalLabel="Open original image"
+/>
+
+Add a second trigger named `USLoss`. Set **Faction Key** to `US`, **Threshold** to `7` and write a message about the US side.
+
+Choose thresholds that fit your mission's numbers. To test this trigger, the living playable count must first exceed **Threshold**, then fall to that threshold through losses.
+
+### Timer trigger {#mission-timer}
+
+Add `LL_Trigger_MissionEndTimer.et`, name it `MissionTimer` and select **LL_TriggerMissionEndTimer**.
+
+Set **Seconds** to `4800`, or 80 minutes. The countdown starts after the freeze period ends. Set **Message** to `The attacking side failed to complete its objective in time.`
+
+<LL_Screenshot
+  src={step102}
+  alt="MissionTimer has Seconds 4800 and a message announcing the time limit."
+  caption="An announcement 80 minutes after freeze ends."
+  originalLabel="Open original image"
+/>
+
+### Superiority trigger {#supremacy}
+
+Add `LL_Trigger_Supremacy.et`, name it `USSRSupremacy` and select **LL_TriggerSupremacy**.
+
+- **Faction Key** — `USSR`.
+- **Versus Faction** — `US`.
+- **Supremacy Ratio** — `4`.
+- **Message** — `The Soviet side gained a numerical advantage over the US side.`
+
+The condition is met when living Soviet characters outnumber US characters by at least four to one: 20 against 5, for example.
+
+<LL_Screenshot
+  src={step103}
+  alt="USSRSupremacy compares USSR against US with Supremacy Ratio 4."
+  caption="Four-to-one superiority for the Soviet side."
+  originalLabel="Open original image"
+/>
+
+To check superiority for the US side too, add a second trigger named `USSupremacy`, swap the factions and choose the required ratio.
+
+### Conditions in the briefing {#conditions-briefing}
+
+With **Show In Briefing** enabled, Lite Lobby generates the condition's description from its settings. You do not need to repeat it in the briefing text.
+
+<LL_Screenshot
+  src={step104}
+  alt="Mission Conditions lists port capture, critical losses, an 80-minute timer and numerical superiority."
+  caption="Example briefing after configuring capture, critical loss, timer and superiority triggers."
+  originalLabel="Open original image"
+/>
+
+## Briefing {#mission-briefing}
+
+Describe the situation, each side's objectives and restrictions: where to go, what to capture and what the mission rules prohibit.
+
+Create a `descriptions` layer and make it active. Drag `LL_MissionDescription.et` from **LiteLobby → Prefabs → Map** into the world. Name the object `MissionConditions`.
+
+Select **LL_MissionDescription** in **Object Properties**. Set **Title** to `Situation and objective`. Click `…` beside **Text Data** and replace the sample with your own text.
+
+<LL_Screenshot
+  src={step105}
+  alt="The multiline Text Data field is open for LL_MissionDescription."
+  caption="Editing the briefing text."
+  originalLabel="Open original image"
+/>
+
+The field supports headings, dividers and links to map objects. The example below links to `PortTrigger`, the area [created above](#capture-area). To link to a different object, replace `PortTrigger` with its name; that object must already exist in your world.
+
+```text
+<h>Situation</h>
+Soviet forces hold the port.
+<hr/>
+<h>US objective</h>
+Capture <link=PortTrigger>the port</link>.
+<br/>See the mission conditions for the capture requirements.
+```
+
+`<h>` marks a heading, `<hr/>` adds a divider and `<br/>` inserts a line break. The `<link=PortTrigger>` link moves the map to the object named `PortTrigger`.
+
+**Show For Any Faction** makes the text available to everyone. For a side-specific order, add another `LL_MissionDescription.et`, disable that checkbox and enter `US` or `USSR` in **Visible For Factions**. **Order** sorts the entries: lower numbers appear first.
+
+Save the world with `Ctrl+S`. In the next chapter, [test the mission and prepare it for publication](../publishing/).

@@ -1,0 +1,479 @@
+---
+title: "5. Characters and groups in Game Master"
+description: "Character names and roles, Game Master catalogs, group prefab creation, and roster checks."
+prev:
+  link: "/lite-lobby-ar/create-mission/character-variants/"
+  label: "4. Weapons and character variants"
+next:
+  link: "/lite-lobby-ar/create-mission/groups-and-slots/"
+  label: "6. Units in the mission"
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import inheritGroup from '../../../assets/screenshots/create-mission/079.png';
+import nameGroup from '../../../assets/screenshots/create-mission/080.png';
+import groupFolder from '../../../assets/screenshots/create-mission/081.png';
+import groupTranslation from '../../../assets/screenshots/create-mission/082.png';
+import groupUiInfo from '../../../assets/screenshots/create-mission/083.png';
+import groupMilitarySymbol from '../../../assets/screenshots/create-mission/084.png';
+import alphaMembers from '../../../assets/screenshots/create-mission/085.png';
+import alphaFormation from '../../../assets/screenshots/create-mission/086.png';
+import overrideGroupCatalog from '../../../assets/screenshots/create-mission/087.png';
+import duplicateGroupEntry from '../../../assets/screenshots/create-mission/088.png';
+import assignGroupEntry from '../../../assets/screenshots/create-mission/089.png';
+import groupBrowser from '../../../assets/screenshots/create-mission/090.png';
+import launchStringEditor from '../../../assets/screenshots/create-mission/058.png';
+import newStringTable from '../../../assets/screenshots/create-mission/059.png';
+import stringTableLocation from '../../../assets/screenshots/create-mission/060.png';
+import stringTableClass from '../../../assets/screenshots/create-mission/061.png';
+import commsTranslation from '../../../assets/screenshots/create-mission/062.png';
+import buildRuntimeTable from '../../../assets/screenshots/create-mission/063.png';
+import registerStringTable from '../../../assets/screenshots/create-mission/064.png';
+import commanderTranslation from '../../../assets/screenshots/create-mission/070.png';
+import commsRole from '../../../assets/screenshots/create-mission/057.png';
+import commsName from '../../../assets/screenshots/create-mission/065.png';
+import commanderRole from '../../../assets/screenshots/create-mission/071.png';
+import overrideCharacterCatalog from '../../../assets/screenshots/create-mission/072.png';
+import duplicateCatalogEntry from '../../../assets/screenshots/create-mission/073.png';
+import assignCatalogPrefab from '../../../assets/screenshots/create-mission/074.png';
+import characterCatalogRoster from '../../../assets/screenshots/create-mission/075.png';
+import launchCharacterTest from '../../../assets/screenshots/create-mission/076.png';
+import testCharacterBrowser from '../../../assets/screenshots/create-mission/077.png';
+import placedTestCharacters from '../../../assets/screenshots/create-mission/078.png';
+
+[Back to the guide contents](../)
+
+Set the character names and roles, add them to the Game Master catalog, and test them in game. Then assemble a group from the completed characters and check its roster.
+
+## Translation table {#character-localization}
+
+A **translation table** stores text in different languages. Create one table for the characters and groups of the **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)** addon.
+
+The first row will contain **Communications Sergeant** and **Сержант связи**. The game chooses the name based on the player's language.
+
+### Creating a translation table {#create-string-table}
+
+In the main Workbench window, click **String Editor** under **Quick Launch**.
+
+<LL_Screenshot
+  src={launchStringEditor}
+  alt="The String Editor button is marked in the main Workbench window."
+  caption="Opening the translation editor."
+  originalLabel="Open original image"
+/>
+
+Select **File → New**.
+
+<LL_Screenshot
+  src={newStringTable}
+  alt="The New command in the String Editor File menu."
+  caption="Creating a translation table."
+  originalLabel="Open original image"
+/>
+
+Inside your addon, create a `Language` folder using **New Folder** and open it. Enter `tss_localization` in **File name** and click **OK**. `tss` is our addon prefix; use your own prefix for your addon.
+
+<LL_Screenshot
+  src={stringTableLocation}
+  alt="The Create string table dialog with the addon's Language folder selected and tss_localization entered."
+  caption="The Language/tss_localization.st table."
+  originalLabel="Open original image"
+/>
+
+In the next dialog, select **CustomStringTableItem**.
+
+<LL_Screenshot
+  src={stringTableClass}
+  alt="CustomStringTableItem selected in the item class dialog."
+  caption="Choosing the translation row type."
+  originalLabel="Open original image"
+/>
+
+### Name in two languages {#localization-entry}
+
+Enter `TSS-Characters_CommsSergeant` without `#` in the **Insert** field and click **Insert**. This is the key: an identifier the game uses to find the translated text.
+
+Select the new row on the left and fill in the fields on the right:
+
+- **Target En Us** — `Communications Sergeant`.
+- **Translated Texts → Target Ru Ru** — `Сержант связи`.
+
+<LL_Screenshot
+  src={commsTranslation}
+  alt="String Editor shows TSS-Characters_CommsSergeant with Target En Us filled in; Target Ru Ru is below under Translated Texts."
+  caption="Adding the sergeant's name."
+  originalLabel="Open original image"
+/>
+
+#### The second character’s name {#commander-name}
+
+Add another row for the commander with the key `TSS-Characters_DetachmentCommander` and fill in the translations:
+
+- **Target En Us** — `Detachment Commander`.
+- **Target Ru Ru** — `Командир отряда`.
+
+<LL_Screenshot
+  src={commanderTranslation}
+  alt="TSS-Characters_DetachmentCommander added to the translation table with the English name Detachment Commander."
+  caption="The commander's name in the addon's shared table."
+  originalLabel="Open original image"
+/>
+
+### Build the translation files {#build-runtime-table}
+
+Press `Ctrl+S`, then select **Table → Build Runtime Table** (`Ctrl+B`). This creates the translation files the game reads. Repeat this command after changing text in the table.
+
+<LL_Screenshot
+  src={buildRuntimeTable}
+  alt="Build Runtime Table and its Ctrl+B shortcut in the Table menu."
+  caption="Building translations for the game."
+  originalLabel="Open original image"
+/>
+
+### Registering the table {#register-localization}
+
+In the main Workbench window, open **File → Project Settings**. Select your addon under **Project** and **PC** under **Configuration**.
+
+1. Expand **Widget Manager Settings → String Tables** and click `+`.
+2. Expand the new entry. Use `…` beside **String Table Source** to select `Language/tss_localization.st` from your addon.
+3. In its **Languages** list, add entries for English and Russian. Set **Code** and the matching **String Table Runtime** file for each:
+
+| Code | String Table Runtime |
+| --- | --- |
+| `en_us` | `Language/tss_localization.en_us.conf` |
+| `ru_ru` | `Language/tss_localization.ru_ru.conf` |
+
+If these entries are already filled in, do not add them again. Click **OK**.
+
+<LL_Screenshot
+  src={registerStringTable}
+  alt="Language/tss_localization.st added under Widget Manager Settings → String Tables in Project Settings."
+  caption="The translation table registered in the addon."
+  originalLabel="Open original image"
+/>
+
+## Names and roles in the prefabs {#editor-character-properties}
+
+These settings are under **SCR_EditableCharacterComponent → Visualization → UI Info**:
+
+- **Name** — the character's name.
+- **Authored Labels** — labels describing the character, including its role.
+
+### Character role {#comms-role}
+
+Open `TSS_Character_US_GB_CommsSergeant.et` through **Edit Prefab** and select the character. Enter `edita` in the component search, select **SCR_EditableCharacterComponent**, and expand **Visualization → UI Info**.
+
+In **Authored Labels**, replace `ROLE_RIFLEMAN` with `ROLE_RADIOOPERATOR`. This identifies the character's role in the in-game editor.
+
+<LL_Screenshot
+  src={commsRole}
+  alt="SCR_EditableCharacterComponent with UI Info and Authored Labels expanded and ROLE_RADIOOPERATOR selected."
+  caption="Setting the radio operator role."
+  originalLabel="Open original image"
+/>
+
+### Name from the translation table {#localized-character-name}
+
+**Name** still contains `#AR-Role_Rifleman`, a reference to the game's “Rifleman” label. Replace it with `#TSS-Characters_CommsSergeant`.
+
+Here, `#` is required: it marks a reference to a translation row. The key after it must exactly match the **Id** in String Editor.
+
+<LL_Screenshot
+  src={commsName}
+  alt="The communications sergeant's Name field contains #TSS-Characters_CommsSergeant."
+  caption="Referencing the name in the translation table."
+  originalLabel="Open original image"
+/>
+
+Save the prefab with `Ctrl+S`.
+
+### Configure the second character {#commander-role}
+
+Open `TSS_Character_US_GB_DetachmentCommander.et` through **Edit Prefab**, select the character, and expand the same **SCR_EditableCharacterComponent → Visualization → UI Info** section:
+
+- Set **Name** to `#TSS-Characters_DetachmentCommander`.
+- In **Authored Labels**, replace `ROLE_RIFLEMAN` with `ROLE_LEADER`.
+
+<LL_Screenshot
+  src={commanderRole}
+  alt="The commander's UI Info contains #TSS-Characters_DetachmentCommander and ROLE_LEADER."
+  caption="The commander's name and role in the in-game editor."
+  originalLabel="Open original image"
+/>
+
+Save the prefab with `Ctrl+S`.
+
+If a key starting with `#` appears instead of the name, check that it matches the row's **Id**, the [runtime files have been built](#build-runtime-table), and the [table is registered](#register-localization). Workbench may need a restart to load a new table.
+
+## Add characters to the catalog {#character-catalog}
+
+Names and roles are configured. Add the characters to the US faction catalog so they can be found and placed through **Game Master**.
+
+Each character needs its own catalog entry. The entry references a character prefab and contains its availability settings for the in-game editor.
+
+### Override the catalog {#override-character-catalog}
+
+In the **ArmaReforger** project's **Resource Browser**, open `Configs/EntityCatalog/US`. Right-click `Characters_EntityCatalog_US.conf` and select **Override in → your addon**.
+
+<LL_Screenshot
+  src={overrideCharacterCatalog}
+  alt="Override in selected for Characters_EntityCatalog_US.conf, with the addon choices shown."
+  caption="Overriding the US character catalog."
+  originalLabel="Open original image"
+/>
+
+Use an [override](/lite-lobby-ar/character-prefabs/prefab-operations/#override-prefab) here because we are extending the catalog the game already uses. Keep the filename `Characters_EntityCatalog_US.conf` without a `TSS_` prefix.
+
+### Add the characters {#catalog-entries}
+
+In your addon, double-click this file under `Configs/EntityCatalog/US` to open it. In **Entity Entry List**, find `Character_US_SF_Sapper_S.et`, right-click the entry, and select **Duplicate**.
+
+<LL_Screenshot
+  src={duplicateCatalogEntry}
+  alt="Duplicate selected in the context menu of the Character_US_SF_Sapper_S.et catalog entry."
+  caption="Copying an existing catalog entry."
+  originalLabel="Open original image"
+/>
+
+This copies the catalog entry; it does not create another prefab file.
+
+Expand the added entry. In **Resource Browser**, open your addon's `Green Berets` folder and drag `TSS_Character_US_GB_CommsSergeant.et` into **Entity Prefab**.
+
+<LL_Screenshot
+  src={assignCatalogPrefab}
+  alt="A character prefab is dragged from Resource Browser into a catalog entry's Entity Prefab field."
+  caption="Assigning a prefab. The screenshot shows the assistant commander; we are adding the communications sergeant."
+  originalLabel="Open original image"
+/>
+
+The copied entry already contains the settings needed by the in-game editor under **Entity Data List**. Our characters can use these settings unchanged.
+
+Use **Duplicate** on the new entry and replace its **Entity Prefab** with `TSS_Character_US_GB_DetachmentCommander.et`. The catalog now has separate entries for the sergeant and commander.
+
+<LL_Screenshot
+  src={characterCatalogRoster}
+  alt="The Triad Shooting Star mission's character prefabs added to the catalog."
+  caption="The example mission's full roster. At this stage, we have added two characters."
+  originalLabel="Open original image"
+/>
+
+Add the other characters the same way as you finish their prefabs. `BaseLoadout` and `ODA_Base` are inheritance bases, so we do not add them to the catalog.
+
+Save the catalog with `Ctrl+S`.
+
+## Check in game {#test-characters}
+
+Open your mission world in **World Editor** and click the green play button on the top toolbar.
+
+<LL_Screenshot
+  src={launchCharacterTest}
+  alt="The mission world open in World Editor with the green play button marked."
+  caption="Launching the mission to check the characters."
+  originalLabel="Open original image"
+/>
+
+### Find the characters {#find-test-characters}
+
+After launching the mission, click **Play** in the lobby until gameplay starts. Then press `Y` to open **Game Master**.
+
+`U` opens and closes the lobby; `Y` opens and closes Game Master.
+
+In **Game Master**, press `Tab` to open **Entity Browser**, the catalog of objects you can place. In the filters on the right, select the **US** faction and **Character** type.
+
+Use **Search** to find **Communications Sergeant** and **Detachment Commander**. With the game set to Russian, search for **Сержант связи** and **Командир отряда**.
+
+<LL_Screenshot
+  src={testCharacterBrowser}
+  alt="Entity Browser with the US faction selected and Communications Sergeant and Detachment Commander among the characters."
+  caption="The example mission's characters in the in-game catalog."
+  originalLabel="Open original image"
+/>
+
+The thumbnails may still show `PLACE HOLDER`: preview images have not been prepared for these prefabs yet. You can still place the characters.
+
+If a character is missing, check its [catalog entry](#catalog-entries). If its name appears as a key starting with `#`, check the [translation reference](#localized-character-name).
+
+### Place the characters {#place-test-characters}
+
+Select a character card, point at the ground, and left-click. Place the other character the same way. Right-click cancels placement.
+
+<LL_Screenshot
+  src={placedTestCharacters}
+  alt="Triad Shooting Star characters placed on the terrain in Game Master."
+  caption="Checking appearance. The screenshot shows the full example roster; we only need the sergeant and commander so far."
+  originalLabel="Open original image"
+/>
+
+Inspect both characters: the sergeant should have a backpack radio, patrol cap, and rolled-sleeve jacket; the commander should have an M72A3 and binoculars. Compare their uniforms and weapons with their prefab settings.
+
+## Group prefab {#group-prefab}
+
+A group prefab combines several character prefabs so you can place the entire unit at once. The example creates **Split Team Alpha**, the first half of an ODA in **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)**. Use your own names and roster for your unit.
+
+### Create the prefab {#create-group-prefab}
+
+Stop the test session and return to **World Editor**.
+
+In the **ArmaReforger** project, open `Prefabs/Groups/BLUFOR`. Right-click `Group_US_Base.et` and select **Inherit in → your addon**.
+
+<LL_Screenshot
+  src={inheritGroup}
+  alt="Inherit in selected for Group_US_Base.et with the TriadShootingStar addon highlighted."
+  caption="Creating a group from the US faction base."
+  originalLabel="Open original image"
+/>
+
+Enter `TSS_Group_US_GB_SplitTeamAlpha` and click **OK**.
+
+<LL_Screenshot
+  src={nameGroup}
+  alt="TSS_Group_US_GB_SplitTeamAlpha entered in the Create inherited file dialog."
+  caption="Naming the group prefab."
+  originalLabel="Open original image"
+/>
+
+In your addon, open `Prefabs/Groups/BLUFOR`. Right-click an empty area in **Resource Browser**, create a `Green Berets` folder, and drag the new prefab into it.
+
+<LL_Screenshot
+  src={groupFolder}
+  alt="A Green Berets folder being created under the addon's Prefabs/Groups/BLUFOR."
+  caption="The folder for Green Berets groups."
+  originalLabel="Open original image"
+/>
+
+### Group name {#group-name}
+
+Open `Language/tss_localization.st` in **String Editor**. [Add a row](/lite-lobby-ar/create-mission/character-editor/#localization-entry) with the key `TSS-Groups_SplitTeamAlpha`:
+
+- **Target En Us** — `Split Team Alpha`.
+- **Target Ru Ru** — `Группа «Альфа»`.
+
+Save the table with `Ctrl+S` and build the translations with `Ctrl+B`.
+
+<LL_Screenshot
+  src={groupTranslation}
+  alt="TSS-Groups_SplitTeamAlpha added in String Editor with the English name Split Team Alpha."
+  caption="The group name in the translation table."
+  originalLabel="Open original image"
+/>
+
+Open `TSS_Group_US_GB_SplitTeamAlpha.et` with **Edit Prefab** and select the group entity. Enter `edita` in the component search, select **SCR_EditableGroupComponent**, and expand **Visualization → UI Info**.
+
+Set **Name** to `#TSS-Groups_SplitTeamAlpha`. Under **Authored Labels**, use `+` to add `GROUPSIZE_LARGE`, as in the example. This is a size category for the in-game editor.
+
+<LL_Screenshot
+  src={groupUiInfo}
+  alt="SCR_EditableGroupComponent with #TSS-Groups_SplitTeamAlpha as the name and GROUPSIZE_LARGE added."
+  caption="The group name and category in the in-game editor."
+  originalLabel="Open original image"
+/>
+
+### Military symbol {#group-symbol}
+
+Further down, enable **Use UI Info Name** so the group uses the text from **Name**. Under **Military Symbol**, set:
+
+- **Identity** — `BLUFOR`.
+- **Dimension** — `LAND`.
+- **Icons** — check `RECON`.
+
+This gives the group a BLUFOR ground reconnaissance symbol.
+
+<LL_Screenshot
+  src={groupMilitarySymbol}
+  alt="Use UI Info Name enabled, with BLUFOR, LAND and RECON selected under Military Symbol."
+  caption="Using the UI Info name and configuring the group symbol."
+  originalLabel="Open original image"
+/>
+
+### Group members {#group-members}
+
+Alpha has six characters. The previous chapters created the commander and communications sergeant. The completed mission includes four more specialists: an operations sergeant, machine gunner, engineer, and medic. Their prefabs were created the same way as those two characters.
+
+To reproduce Alpha's roster, first create these four prefabs using the names in the table below and equip them for their roles. For your own unit, choose [character prefabs](/lite-lobby-ar/create-mission/base-character/) with the roles and equipment you need. Add the characters to the group once all their prefabs are ready.
+
+Clear the component search and select the **SCR_AIGroup** entity itself. Expand **Group Members → Unit Prefab Slots** and add six entries with `+`.
+
+From your addon's `Prefabs/Characters/Factions/BLUFOR/US_Army/Green Berets` folder, drag the prefabs into the entries in this order:
+
+| Entry | Prefab |
+| --- | --- |
+| `0` | `TSS_Character_US_GB_DetachmentCommander.et` |
+| `1` | `TSS_Character_US_GB_OperationsSergeant.et` |
+| `2` | `TSS_Character_US_GB_WeaponsSergeant_M249.et` |
+| `3` | `TSS_Character_US_GB_EngineerSergeant.et` |
+| `4` | `TSS_Character_US_GB_MedicalSergeant.et` |
+| `5` | `TSS_Character_US_GB_CommsSergeant.et` |
+
+Each entry represents one character. For a different unit composition, assign your own prefabs.
+
+<LL_Screenshot
+  src={alphaMembers}
+  alt="SCR_AIGroup with six Split Team Alpha character prefabs in Unit Prefab Slots."
+  caption="The Split Team Alpha roster."
+  originalLabel="Open original image"
+/>
+
+### Formation {#group-formation}
+
+Enter `format` in the component search and select **AIFormationComponent**. Set **Default Formation** to `line`, as in the example.
+
+<LL_Screenshot
+  src={alphaFormation}
+  alt="AIFormationComponent with Default Formation set to line."
+  caption="The group's default formation."
+  originalLabel="Open original image"
+/>
+
+Save the group prefab with `Ctrl+S`.
+
+## Checking the group in Game Master {#group-catalog}
+
+Add the group prefab to the US faction catalog so it appears in Game Master.
+
+### Register the group {#register-group}
+
+In the **ArmaReforger** project, open `Configs/EntityCatalog/US`. Right-click `Groups_EntityCatalog_US.conf` and select **Override in → your addon**.
+
+<LL_Screenshot
+  src={overrideGroupCatalog}
+  alt="Override in selected for Groups_EntityCatalog_US.conf with the TriadShootingStar addon highlighted."
+  caption="Overriding the US group catalog."
+  originalLabel="Open original image"
+/>
+
+In your addon, double-click this file to open it. Under **Entity Entry List**, find `Group_US_EngineerTeam.et`, right-click the entry, and select **Duplicate**.
+
+<LL_Screenshot
+  src={duplicateGroupEntry}
+  alt="Duplicate selected for Group_US_EngineerTeam.et in Groups_EntityCatalog_US.conf."
+  caption="Copying an existing group entry."
+  originalLabel="Open original image"
+/>
+
+Expand the new entry. From your addon's `Prefabs/Groups/BLUFOR/Green Berets` folder, drag `TSS_Group_US_GB_SplitTeamAlpha.et` into its **Entity Prefab** field.
+
+<LL_Screenshot
+  src={assignGroupEntry}
+  alt="A group prefab is dragged from Resource Browser into Entity Prefab."
+  caption="Assigning a group prefab. The screenshot shows Company HQ; we are adding Alpha."
+  originalLabel="Open original image"
+/>
+
+The **Entity Data List** settings have already been copied from the existing entry. Save the catalog with `Ctrl+S`.
+
+### Check the group {#test-group}
+
+[Launch the mission and open Game Master](/lite-lobby-ar/create-mission/character-editor/#test-characters). Press `Tab`. In **Entity Browser**, select the **US** faction and **Group** type; clear the **Character** filter if it is still selected from the previous check.
+
+Find your group by name in **Search**. For the example, enter `Alpha`, or `Альфа` with the game set to Russian.
+
+<LL_Screenshot
+  src={groupBrowser}
+  alt="Company HQ, Split Team Alpha and Split Team Bravo visible in Entity Browser."
+  caption="The example mission's groups in the in-game catalog."
+  originalLabel="Open original image"
+/>
+
+Select your group and left-click the ground to place it. All characters listed in **Unit Prefab Slots** should appear; the Alpha example has six. Check the roster and equipment. If someone is missing, check the [group's prefab list](/lite-lobby-ar/create-mission/character-editor/#group-members).
+
+In the next chapter, [place the completed groups in the mission and configure playable slots](../groups-and-slots/).

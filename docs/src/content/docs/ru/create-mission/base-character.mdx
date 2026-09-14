@@ -1,0 +1,239 @@
+---
+title: "3. Базовый персонаж"
+description: "Создание общей основы персонажа: префаб, форма, личная радиостанция, инвентарь и часы."
+prev:
+  link: "/lite-lobby-ar/ru/create-mission/world/"
+  label: "2. Создание мира с Lite Lobby"
+next:
+  link: "/lite-lobby-ar/ru/create-mission/character-variants/"
+  label: "4. Вооружение и варианты персонажей"
+---
+
+import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
+import { Aside } from '@astrojs/starlight/components';
+import inheritCharacter from '../../../../assets/screenshots/create-mission/023.png';
+import nameCharacter from '../../../../assets/screenshots/create-mission/024.png';
+import characterFolder from '../../../../assets/screenshots/create-mission/025.png';
+import editCharacter from '../../../../assets/screenshots/create-mission/026.png';
+import loadoutSlots from '../../../../assets/screenshots/create-mission/027.png';
+import characterHat from '../../../../assets/screenshots/create-mission/028.png';
+import characterJacket from '../../../../assets/screenshots/create-mission/029.png';
+import characterBackpack from '../../../../assets/screenshots/create-mission/030.png';
+import duplicateRadio from '../../../../assets/screenshots/create-mission/031.png';
+import nameRadio from '../../../../assets/screenshots/create-mission/032.png';
+import removeTransceiver from '../../../../assets/screenshots/create-mission/033.png';
+import singleTransceiver from '../../../../assets/screenshots/create-mission/034.png';
+import inventorySetup from '../../../../assets/screenshots/create-mission/035.png';
+import inventoryFilled from '../../../../assets/screenshots/create-mission/036.png';
+import characterWatch from '../../../../assets/screenshots/create-mission/037.png';
+
+[К оглавлению руководства](../)
+
+Создадим персонажей для подразделения «зелёных беретов» в аддоне **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)**. Используем фракцию США, которая уже есть в игре. О выборе подразделения и подборе снаряжения можно прочитать в [отдельной справке](/lite-lobby-ar/ru/character-prefabs/planning/).
+
+**Префаб персонажа** — шаблон бойца: его внешний вид, снаряжение и другие настройки. Он хранится в файле `.et`. Сначала подготовим общий префаб с формой и личными вещами — `BaseLoadout`. На его основе создадим варианты с разным вооружением.
+
+## Названия и папки {#naming-and-folders}
+
+Чтобы отличать свои файлы от игровых, добавляйте в начало имени **префикс аддона** — короткое обозначение вашего проекта. Для аддона **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)** используем первые буквы его названия: `TSS_`. Для своего проекта выберите своё сокращение, например **Desert Storm** → `DS_`.
+
+Остальную часть имени оформляйте по образцу файлов игры: `Character_US_Rifleman.et` → `TSS_Character_US_Rifleman.et`. Сохраняйте заглавные буквы, подчёркивания и порядок частей имени. Один и тот же префикс используйте для всех префабов своего аддона.
+
+Структуру папок также повторяйте по образцу игры. Например, префабы армии США находятся в `Prefabs/Characters/Factions/BLUFOR/US_Army`. Размещайте свои варианты по тому же пути внутри аддона, чтобы их было легко найти и сопоставить с игровыми префабами.
+
+## Создание базового префаба {#create-base-prefab}
+
+В качестве исходного префаба возьмём игровой `Character_US_Base.et`. Создадим его [наследника](/lite-lobby-ar/ru/character-prefabs/prefab-operations/#inherit-prefab) — новый префаб, который получит настройки исходного персонажа. Форму и снаряжение будем менять уже в нём.
+
+В панели **Resource Browser** редактора **World Editor** откройте проект **ArmaReforger**, затем папку `Prefabs/Characters/Factions/BLUFOR/US_Army`. Щёлкните правой кнопкой мыши по `Character_US_Base.et` и выберите **Inherit in → ваш аддон**. На скриншоте наш аддон указан как **TriadShootingStar**.
+
+<LL_Screenshot
+  src={inheritCharacter}
+  alt="В Resource Browser выбран Character_US_Base.et; в контекстном меню открыт пункт Inherit in → TriadShootingStar."
+  caption="Создание префаба на основе Character_US_Base.et."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В окне **Create inherited file** введите `TSS_Character_US_GB_BaseLoadout` в поле **File Name** и нажмите **OK**. Для своего аддона замените `TSS_` на выбранный префикс. Здесь `GB` означает Green Berets, а `BaseLoadout` — базовый набор снаряжения.
+
+<LL_Screenshot
+  src={nameCharacter}
+  alt="В окне Create inherited file введено имя TSS_Character_US_GB_BaseLoadout."
+  caption="Название базового префаба персонажа."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Workbench создаст в вашем аддоне файл `TSS_Character_US_GB_BaseLoadout.et`. Он будет находиться в папке `Prefabs/Characters/Factions/BLUFOR/US_Army`: при наследовании редактор автоматически повторяет путь исходного префаба.
+
+<Aside type="tip" title="Как открыть папку префаба">
+Выберите объект в мире или префаб в **Resource Browser** и нажмите `L`. В **Resource Browser** откроется папка этого префаба.
+</Aside>
+
+### Папка подразделения {#unit-folder}
+
+Для префабов нашего подразделения создадим отдельную папку. В **Resource Browser** откройте `Prefabs/Characters/Factions/BLUFOR/US_Army` своего аддона. Щёлкните правой кнопкой мыши по пустому месту в списке файлов, выберите создание папки и назовите её `Green Berets`.
+
+Перетащите `TSS_Character_US_GB_BaseLoadout.et` в папку `Green Berets`, затем откройте её.
+
+<LL_Screenshot
+  src={characterFolder}
+  alt="В папке US_Army своего аддона рядом с базовым префабом создана папка Green Berets; стрелка указывает на неё."
+  caption="Папка Green Berets для префабов подразделения."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+## Форма персонажа {#base-outfit}
+
+Дважды щёлкните по `TSS_Character_US_GB_BaseLoadout.et` в **Resource Browser**. В открывшемся окне нажмите **Edit Prefab** справа. Откроется **World Editor** в режиме редактирования префаба.
+
+<LL_Screenshot
+  src={editCharacter}
+  alt="Открыт TSS_Character_US_GB_BaseLoadout.et; стрелка указывает на кнопку Edit Prefab справа."
+  caption="Переход к редактированию префаба."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В панели **Hierarchy** выберите персонажа. Затем в строке поиска компонентов панели **Object Properties** введите `load` и выберите **BaseLoadoutManagerComponent**. Этот компонент определяет, что надето на персонаже.
+
+Раскройте список **Slots**. Каждый его пункт — слот для определённого предмета экипировки. Например, **Hat** предназначен для головного убора, а **Jacket** — для куртки. Раскройте **Hat**. Поле **Prefab** задаёт предмет в этом слоте.
+
+<LL_Screenshot
+  src={loadoutSlots}
+  alt="Выбран BaseLoadoutManagerComponent; в списке Slots раскрыт Hat с пустым полем Prefab."
+  caption="Слот головного убора в настройках снаряжения."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Головной убор и куртка {#hat-and-jacket}
+
+В панели **Resource Browser** выберите проект **ArmaReforger** и откройте папку `Prefabs/Characters/HeadGear/Hat_Boonie_US_01`. Найдите `Hat_Boonie_US_TigerStripe.et` и перетащите его в поле **Prefab** слота **Hat**. На персонаже появится панама.
+
+<LL_Screenshot
+  src={characterHat}
+  alt="Префаб Hat_Boonie_US_TigerStripe.et назначен в поле Prefab слота Hat; на персонаже появилась панама."
+  caption="Панама с камуфляжем Tiger Stripe."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Раскройте слот **Jacket**. В папке `Prefabs/Characters/Uniforms` найдите `Jacket_US_BDU_TigerStripe.et` и перетащите его в поле **Prefab** этого слота.
+
+<LL_Screenshot
+  src={characterJacket}
+  alt="В слоте Jacket назначен Jacket_US_BDU_TigerStripe.et; на персонаже появилась куртка."
+  caption="Куртка с камуфляжем Tiger Stripe."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Брюки, ботинки и рюкзак {#pants-boots-backpack}
+
+Остальные предметы назначаются тем же способом: раскройте слот и перетащите нужный префаб в его поле **Prefab**. Заполните ещё три слота по таблице. Все перечисленные файлы находятся в проекте **ArmaReforger**:
+
+| Слот | Папка | Файл |
+| --- | --- | --- |
+| **Pants** — брюки | `Prefabs/Characters/Uniforms` | `Pants_US_BDU.et` |
+| **Boots** — ботинки | `Prefabs/Characters/Footwear` | `CombatBoots_US_01.et` |
+| **Back** — рюкзак | `Prefabs/Items/Equipment/Backpacks` | `Backpack_ALICE_Medium_assembled.et` |
+
+<LL_Screenshot
+  src={characterBackpack}
+  alt="Персонаж одет; в поле Prefab слота Back указан Backpack_ALICE_Medium_assembled.et."
+  caption="Базовая форма и рюкзак ALICE."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб.
+
+## Радиостанция {#radio-setup}
+
+У игровой радиостанции два канала. Боец может использовать первый для связи со своим подразделением, а второй — со всей стороной одновременно. В нашей миссии такая возможность не нужна: оставим один канал, чтобы упростить игру.
+
+Для этого создадим собственный вариант радиостанции. В **Resource Browser** откройте проект **ArmaReforger** и папку `Prefabs/Items/Equipment/Radios`. Щёлкните правой кнопкой мыши по `Radio_ANPRC68.et` и выберите **Duplicate to → ваш аддон**. Команда создаст копию префаба в вашем аддоне.
+
+<LL_Screenshot
+  src={duplicateRadio}
+  alt="В контекстном меню Radio_ANPRC68.et выбран пункт Duplicate to → TriadShootingStar."
+  caption="Копирование радиостанции в аддон миссии."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В окне **Duplicate File** укажите имя `TSS_Radio_ANPRC68` и нажмите **OK**.
+
+<LL_Screenshot
+  src={nameRadio}
+  alt="В окне Duplicate File введено имя TSS_Radio_ANPRC68."
+  caption="Название префаба радиостанции."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Откройте созданный `TSS_Radio_ANPRC68.et` через **Edit Prefab**. В **Hierarchy** выберите радиостанцию, затем в поиске компонентов введите `BaseRadio` и выберите **BaseRadioComponent**.
+
+Раскройте **Unsorted → Transceivers** — список приёмопередатчиков. Наведите курсор на второй **RadioTransceiver**, перечёркнутый на скриншоте, и нажмите `Delete` на клавиатуре.
+
+<LL_Screenshot
+  src={removeTransceiver}
+  alt="В BaseRadioComponent раскрыты два RadioTransceiver; второй перечёркнут."
+  caption="Удаление второго приёмопередатчика."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+После удаления в списке останется один **RadioTransceiver**. Нажмите `Ctrl+S`, чтобы сохранить префаб радиостанции.
+
+<LL_Screenshot
+  src={singleTransceiver}
+  alt="В списке Transceivers радиостанции остался один RadioTransceiver."
+  caption="Радиостанция с одним приёмопередатчиком."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+## Содержимое инвентаря {#initial-inventory}
+
+Добавим радиостанцию и остальные вещи в карманы брюк персонажа. Откройте `TSS_Character_US_GB_BaseLoadout.et` через **Edit Prefab**. Выберите персонажа в **Hierarchy**, в поиске компонентов введите `InventoryStora` и выберите **SCR_InventoryStorageManagerComponent**. Здесь задаются начальный набор предметов и места их хранения.
+
+1. В списке **Initial Inventory Items** нажмите `+`. Появится запись **ItemsInitConfigurationItem**; раскройте её.
+2. В поле **Target Storage** выберите `Pants/Pants_US_BDU.et`. Предметы из этой записи окажутся в карманах брюк.
+3. В списке **Prefabs To Spawn** добавьте 12 строк кнопкой `+`. Каждая строка задаёт один предмет из нашего набора.
+
+<LL_Screenshot
+  src={inventorySetup}
+  alt="В SCR_InventoryStorageManagerComponent выбран Target Storage Pants/Pants_US_BDU.et и добавлены пустые строки Prefabs To Spawn."
+  caption="Выбор места для предметов и добавление строк."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Заполните **Prefabs To Spawn** предметами из таблицы: найдите каждый префаб в **Resource Browser** и перетащите его в строку списка. Для поиска выберите нужный проект и введите имя файла. Радиостанция находится в вашем аддоне, остальные предметы — в проекте **ArmaReforger**.
+
+| Предмет | Префаб | Количество |
+| --- | --- | --- |
+| Радиостанция | `TSS_Radio_ANPRC68.et` | 1 |
+| Компас | `Compass_SY183.et` | 1 |
+| Карта | `PaperMap_01_folded_US.et` | 1 |
+| Бинт | `FieldDressing_US_01.et` | 4 |
+| Морфин | `MorphineInjection_01_base.et` | 2 |
+| Жгут | `Tourniquet_US_01.et` | 2 |
+| Сапёрная лопатка | `ETool_ALICE_FreeRoamBuilding_Gadget.et` | 1 |
+
+Чтобы добавить несколько одинаковых предметов, повторите их префаб в нескольких строках. Например, для четырёх бинтов нужно заполнить четыре строки одним и тем же файлом.
+
+<LL_Screenshot
+  src={inventoryFilled}
+  alt="В Prefabs To Spawn заполнены 12 строк: радиостанция, компас, карта, четыре бинта, два морфина, два жгута и лопатка."
+  caption="Базовый набор предметов персонажа."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+## Наручные часы {#wristwatch}
+
+Часы назначаются в отдельном слоте экипировки. В списке компонентов персонажа раскройте **SCR_CharacterInventoryStorageComponent** и выберите вложенный **SCR_EquipmentStorageComponent**. В его свойствах раскройте **Initial Storage Slots → WristwatchSlot** — слот наручных часов.
+
+В **Resource Browser** выберите **ArmaReforger** и найдите `Watch_SandY184A.et`. Перетащите его в поле **Prefab** слота **WristwatchSlot**.
+
+<LL_Screenshot
+  src={characterWatch}
+  alt="В SCR_EquipmentStorageComponent для WristwatchSlot назначен префаб Watch_SandY184A.et."
+  caption="Наручные часы персонажа."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб персонажа.
+
+В следующей главе [создадим наследника `TSS_Character_US_GB_BaseLoadout.et` с оружием и боекомплектом](../character-variants/).

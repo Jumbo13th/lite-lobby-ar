@@ -1,0 +1,39 @@
+---
+title: Configure a mission for Triad Tactics
+description: Prepare a mission for the Triad Tactics server.
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import triggerPoints from '../../../assets/screenshots/triad-tactics/001.png';
+import statZone from '../../../assets/screenshots/triad-tactics/002.png';
+
+Use this section once your mission is complete to configure it for the Triad Tactics server. Also read the [mission requirements](../requirements/), including the rules for assigning objective points.
+
+## 1. Trigger points {#trigger-points}
+
+In **World Editor**, select the capture trigger — `PortCapture` in this example. In **Object Properties**, open **LL_TriggerZoneCapture** and set:
+
+- **Stat Points** — the total point pool for the zone.
+- **Stat Max Per Player** — the per-participant limit used when distributing points between units.
+
+The screenshot shows `20` and `1`. Agree on values for your mission with the administrators, as specified in the [points requirements](../requirements/#points).
+
+<LL_Screenshot
+  src={triggerPoints}
+  alt="PortCapture with Stat Points set to 20 and Stat Max Per Player set to 1, both highlighted."
+  caption="Point settings in LL_TriggerZoneCapture."
+  originalLabel="Open original image"
+/>
+
+## 2. Statistics zone {#stat-zone}
+
+Select the object that defines the capture zone boundary — `PortTrigger` in this example. Use **Add Component** to add **LL_StatZoneComponent** to it.
+
+This component marks an area where enemy kills earn extra points. The victim must be inside the zone; the shooter's position does not determine the bonus. The point multiplier is configured on the server.
+
+<LL_Screenshot
+  src={statZone}
+  alt="LL_StatZoneComponent added to PortTrigger, the object defining the port zone boundary."
+  caption="LL_StatZoneComponent on the zone boundary object."
+  originalLabel="Open original image"
+/>

@@ -1,0 +1,154 @@
+---
+title: "6. Units in the mission"
+description: "Place completed groups in the world and configure playable slots, callsigns, vehicles, and starting zones."
+prev:
+  link: "/lite-lobby-ar/create-mission/character-editor/"
+  label: "5. Characters and groups in Game Master"
+next:
+  link: "/lite-lobby-ar/create-mission/objectives/"
+  label: "7. Mission objectives and triggers"
+---
+
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import step106 from '../../../assets/screenshots/create-mission/106.png';
+import step107 from '../../../assets/screenshots/create-mission/107.png';
+import step108 from '../../../assets/screenshots/create-mission/108.png';
+import step109 from '../../../assets/screenshots/create-mission/109.png';
+import step110 from '../../../assets/screenshots/create-mission/110.png';
+import step111 from '../../../assets/screenshots/create-mission/111.png';
+import step112 from '../../../assets/screenshots/create-mission/112.png';
+import step113 from '../../../assets/screenshots/create-mission/113.png';
+
+[Back to the guide contents](../)
+
+The previous chapter created and tested a group prefab. Now place units in the mission world, configure playable slots and callsigns, and add vehicles and starting zones.
+
+## Groups in the world and playable slots {#playable-forces}
+
+The group has been checked in Game Master. Stop the game and return to World Editor: units that should be present when the mission starts must be placed in the world itself.
+
+Use Alpha to learn placement and slot settings. The following screenshots also show **Company HQ** and **Split Team Bravo** from the completed mission. To reproduce the full roster, prepare those groups the same way as Alpha, using their own names and rosters.
+
+The example uses US and USSR. For your own mission, assemble the required factions’ groups from the game’s character prefabs. Later tests of triggers that compare character counts require playable units on both sides.
+
+### Making characters available in the lobby {#playable-characters}
+
+Open the character prefab in your addon. If your soldiers inherit settings from a shared base, open that base; in our example it is `TSS_Character_US_GB_BaseLoadout.et`. In **Object Properties**, find **LL_PlayableComponent** and enable **Is Playable**. Lite Lobby supplies this component; characters derived from the prefab inherit its setting.
+
+If you use the game’s original characters, first [create child prefabs in your addon](/lite-lobby-ar/create-mission/base-character/#create-base-prefab) and [assign them to the group roster](/lite-lobby-ar/create-mission/character-editor/#group-members). This keeps playable-slot settings on your own characters.
+
+<LL_Screenshot
+  src={step106}
+  alt="Is Playable is enabled in LL_PlayableComponent on the base character prefab."
+  caption="Making the character available as a lobby slot."
+  originalLabel="Open original image"
+/>
+
+Disable **Is Playable** for characters intended only as AI. Save the prefab and return to the mission world.
+
+### Placing groups and assigning callsigns {#group-callsigns}
+
+Create a `US` layer and make it active. In your addon's `Prefabs/Groups/BLUFOR/Green Berets` folder, find the Alpha prefab and drag it to the group's starting position. If you have also prepared Company HQ and Bravo, place them the same way.
+
+For each placed group, enter its object name at the top of **Object Properties**, then select **LL_GroupCallsign**. If the component is missing, add it through **Add Component**.
+
+Use Alpha’s row below to configure it. The other rows show the settings for the full example roster:
+
+| Group | Object name | **Company** | **Platoon** | **Squad** |
+| --- | --- | --- | --- | --- |
+| Company HQ | `AB_PL1` | `0` | `0` | `0` |
+| Alpha | `AB_S1` | `0` | `1` | `0` |
+| Bravo | `AB_S2` | `0` | `1` | `1` |
+
+The numbers select entries from the faction's callsign lists, starting at zero. In this example they produce **Atlas Red 1**, **Atlas White 1** and **Atlas White 2**. **Company**, **Platoon** and **Squad** are fields in the game's callsign system: we use them for the headquarters and the two ODA halves without adding a platoon to their organisation.
+
+<LL_Screenshot
+  src={step107}
+  alt="Company HQ AB_PL1 has Company 0, Platoon 0 and Squad 0."
+  caption="The headquarters callsign."
+  originalLabel="Open original image"
+/>
+<LL_Screenshot
+  src={step108}
+  alt="Alpha group AB_S1 has Company 0, Platoon 1 and Squad 0."
+  caption="Alpha's callsign."
+  originalLabel="Open original image"
+/>
+<LL_Screenshot
+  src={step109}
+  alt="Bravo group AB_S2 has Company 0, Platoon 1 and Squad 1."
+  caption="Bravo's callsign."
+  originalLabel="Open original image"
+/>
+
+Change these settings on the **placed groups**: several groups using the same prefab can have different callsigns. `AB_S1` is the editor object name used for references; **Atlas White 1** is the callsign players see.
+
+For additional ODAs, place more Alpha and Bravo groups with unique object names and callsign combinations. The next pair can use **Platoon** `2` and **Squad** `0`/`1`.
+
+If you have prepared Soviet groups for your mission, place them the same way in a separate `USSR` layer. Characters intended for players must also have **Is Playable** enabled. Alpha alone is enough for the slot-list check below; place groups on both sides before testing triggers that count characters.
+
+### Checking the slot list {#check-slots}
+
+Press the green launch button in **World Editor** and open the lobby with `U` if it is hidden. Check factions, callsigns, roles and character equipment.
+
+<LL_Screenshot
+  src={step110}
+  alt="The lobby shows Atlas Red 1, Atlas White 1 and Atlas White 2 with roles and a character preview."
+  caption="Groups and playable slots in the lobby. The screenshot already includes an expanded roster."
+  originalLabel="Open original image"
+/>
+
+If a group is missing, check its characters' **Is Playable** setting and the group prefab's **Unit Prefab Slots**. Characters must belong to a group and a faction.
+
+## Group vehicles {#squad-vehicles}
+
+Assign vehicles to a [group placed in the mission world](/lite-lobby-ar/create-mission/groups-and-slots/#playable-forces) so players can see their unit’s vehicles in the lobby. You will need the group’s object name from **Hierarchy**.
+
+If the world is running, stop the test and return to the editor. Find a vehicle in **Resource Browser** and drag it beside the group. The screenshot uses `S105_darkred.et` from **ArmaReforger**.
+
+Select the vehicle and **LL_VehicleSquadLinkComponent**. If it is missing, add it through **Add Component**. Set **Group Name** to the placed group's object name: `AB_S1` for Alpha, or `AB_S2` for Bravo if you have prepared and placed it. The vehicle will then appear under that group in the lobby.
+
+<LL_Screenshot
+  src={step111}
+  alt="The vehicle's LL_VehicleSquadLinkComponent references AB_S9 from the expanded mission roster."
+  caption="Linking a vehicle to a group. The screenshot uses AB_S9 from the expanded roster; use the name of your placed group."
+  originalLabel="Open original image"
+/>
+
+Select **SCR_VehicleFactionAffiliationComponent** and set **Faction affiliation** to `US`. Use `USSR` for Soviet vehicles.
+
+<LL_Screenshot
+  src={step112}
+  alt="The vehicle's SCR_VehicleFactionAffiliationComponent has Faction affiliation US."
+  caption="Assigning the vehicle to the US side."
+  originalLabel="Open original image"
+/>
+
+Repeat for the other vehicles. **Group Name** must match the object name in **Hierarchy**, not its callsign or prefab filename.
+
+## Starting zones and freeze time {#starting-zones-and-freeze-time}
+
+With the groups and vehicles placed, define their starting zones and the time allowed for players to prepare.
+
+### Starting zone {#freeze-zone}
+
+Freeze time is a preparation period after the game starts. A starting zone keeps players from leaving before that period ends.
+
+In **ArmaReforger → PrefabsEditable → RestrictionZone**, find `E_EditorRestrictionZoneLarge.et` and drag it onto the starting position. Position it so characters and vehicles are inside the inner circle. Add another zone for another starting position.
+
+<LL_Screenshot
+  src={step113}
+  alt="E_EditorRestrictionZoneLarge.et surrounds the starting characters and vehicles."
+  caption="A starting zone with warning and exit boundaries."
+  originalLabel="Open original image"
+/>
+
+The yellow boundary marks where players receive a warning; crossing the red boundary can kill the character. Lite Lobby removes these zones when freeze time ends.
+
+### Freeze duration {#freeze-duration}
+
+In **Hierarchy**, select the game mode, `LL_GameMode_Lobby1`, then **LL_GameModeCoop** in **Object Properties**. **Freeze Time** is in milliseconds: `120000` means two minutes. **Hard Freeze Time** is the initial pause that locks controls while the world loads; it is part of the overall freeze period.
+
+Press `Ctrl+S` to save the world.
+
+In the next chapter, [add map markings, configure triggers and prepare the briefing](../objectives/).

@@ -1,0 +1,29 @@
+---
+import Hero from '@astrojs/starlight/components/Hero.astro';
+
+const isHome = Astro.locals.starlightRoute.entry.data.template === 'splash';
+---
+
+{isHome ? (
+  <div class="ll-home-hero">
+    <Hero />
+  </div>
+) : <Hero />}
+
+<style>
+  .ll-home-hero { padding-block: 0 0.75rem; }
+  .ll-home-hero :global(.hero) { grid-template-columns: 1fr; padding: 0; }
+  .ll-home-hero :global(.stack) { text-align: start; }
+  .ll-home-hero :global(.copy) { align-items: flex-start; }
+  .ll-home-hero :global(h1) {
+    max-width: none;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .ll-home-hero :global(.ll-title-accent) { color: var(--sl-color-text-accent); }
+  @media (min-width: 50rem) {
+    .ll-home-hero { padding-top: 2rem; padding-bottom: 1.5rem; }
+  }
+</style>

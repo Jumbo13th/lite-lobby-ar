@@ -1,0 +1,177 @@
+---
+title: Git and Arma Reforger
+description: Create a mission repository, save changes, and work with GitHub Desktop.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_Screenshot from '../../components/LL_Screenshot.astro';
+import step1 from '../../assets/screenshots/git/001.png';
+import step2 from '../../assets/screenshots/git/002.png';
+import step3 from '../../assets/screenshots/git/003.png';
+import step4 from '../../assets/screenshots/git/004.png';
+import step5 from '../../assets/screenshots/git/005.png';
+import step6 from '../../assets/screenshots/git/006.png';
+import step7 from '../../assets/screenshots/git/007.png';
+import step8 from '../../assets/screenshots/git/008.png';
+import step9 from '../../assets/screenshots/git/009.png';
+import step10 from '../../assets/screenshots/git/010.png';
+import step11 from '../../assets/screenshots/git/011.png';
+
+[Back to the guide contents](../create-mission/)
+
+If you are creating a mission and have not used Git, start here to keep a history of your project changes.
+
+Git keeps a history of changes to your project. If an edit breaks the mission, you can review what changed and undo the faulty edit. GitHub stores a copy of the repository online; GitHub Desktop lets you work with it using windows and buttons.
+
+This guide uses a practice addon called **Triad Desert Storm**. The same steps work for your own mission. Install [GitHub Desktop](https://desktop.github.com/) and sign in to your [GitHub](https://github.com/) account. You also need Arma Reforger and Arma Reforger Tools to create the addon.
+
+## Create a repository {#create-repository}
+
+A **repository** is a project folder together with its change history. In GitHub Desktop, choose **File → New repository**.
+
+<LL_Screenshot src={step1} alt="The File menu with New repository selected." caption="Creating a repository in GitHub Desktop." originalLabel="Open original image" />
+
+Enter `triad-desert-storm-ar` in **Name**. Use lowercase Latin letters and separate words with hyphens:
+
+- `triad` identifies a Triad Tactics project;
+- `desert-storm` is the mission name;
+- `ar` stands for Arma Reforger.
+
+For a mission outside Triad Tactics, you could use `desert-storm-ar` or `silent-port-ar`. Consistent names make missions easier to find and identify the game they belong to. This is the naming convention used in our projects.
+
+For **Local path**, choose the parent folder:
+
+```text
+Documents\My Games\ArmaReforgerWorkbench\addons
+```
+
+GitHub Desktop creates the `triad-desert-storm-ar` folder inside it. Check the full path at the bottom of the window. You can add a short mission description in **Description**. Leave the remaining options as shown for now, then click **Create repository**.
+
+<LL_Screenshot src={step2} alt="Create a new repository with the name triad-desert-storm-ar and a location inside ArmaReforgerWorkbench addons." caption="The repository name and the folder where it will be created." originalLabel="Open original image" />
+
+## Create the addon inside the repository {#addon-folder}
+
+Launch **Arma Reforger Tools**. In the launcher, choose **Add Project → Create New Project**.
+
+<LL_Screenshot src={step3} alt="Workbench Launcher with Add Project open and Create New Project indicated." caption="Creating a project in Workbench." originalLabel="Open original image" />
+
+Enter `Triad Desert Storm` in **Project Name**. Click the folder button beside **Location**, select the `triad-desert-storm-ar` folder you created, then click **Select Folder**.
+
+<LL_Screenshot src={step4} alt="The folder picker is inside triad-desert-storm-ar, showing its .git folder." caption="Select the repository root for Location." originalLabel="Open original image" />
+
+Check the name and path, then click **Create**. Workbench creates the addon folder `Triad Desert Storm` inside the repository.
+
+<LL_Screenshot src={step5} alt="New Project has Triad Desert Storm as its name and a Location ending in triad-desert-storm-ar." caption="The addon name uses spaces; the repository name uses lowercase words separated by hyphens." originalLabel="Open original image" />
+
+The folder structure will be:
+
+```text
+triad-desert-storm-ar/
+├── .git/
+└── Triad Desert Storm/
+    └── addon.gproj
+```
+
+The `.git` folder stores the repository history. Mission files belong in the addon folder beside `addon.gproj` and in its subfolders.
+
+Further setup is covered in [How to create a mission](../create-mission/project/#lite-lobby-dependency). Here we will continue with Git. The following screenshots already include a world called `DemoWorld`; the files of the new project are enough for your first commit. You can add the world later.
+
+## Your first commit {#save-commit-push}
+
+A **commit** records selected changes in the project history. Save your files in Workbench, then open the repository in GitHub Desktop. New and modified files appear in **Changes**.
+
+### Ignore the resource database {#ignore-files}
+
+`resourceDatabase.rdb` is Workbench's resource database. It does not need to be stored in Git. Right-click the file and choose **Ignore file (add to .gitignore)**.
+
+<LL_Screenshot src={step6} alt="The context menu for resourceDatabase.rdb with Ignore file (add to .gitignore) highlighted." caption="Excluding resourceDatabase.rdb from the changes list." originalLabel="Open original image" />
+
+GitHub Desktop creates a `.gitignore` file with a rule for this path. Include `.gitignore` in the commit so the rule stays with the project. Ignored files remain on your computer. The rule applies to files that have not already been added to Git history.
+
+Keep `addon.gproj`, worlds, layers, prefabs, and their `.meta` files in the repository. The `.meta` files contain resource data, including identifiers; do not exclude all files with this extension.
+
+### Record the changes {#first-commit}
+
+1. Review **Changes**. Select a file to inspect its changes on the right. Checked files will be included in the commit.
+2. Describe the result briefly in **Summary**. The screenshot uses `Add Demo World`. If you have only created the addon, `Create mission project` is suitable.
+3. Click **Commit … files to main**. The file count depends on your project; `main` is the current branch, where this history is recorded.
+
+<LL_Screenshot src={step7} alt="Project files and .gitignore are checked in Changes; Add Demo World is entered above Commit 5 files to main." caption="Recording the project files in a commit." originalLabel="Open original image" />
+
+Your commit appears in **History**. It is still stored only on your computer.
+
+<Aside type="tip" title="Commit often, in small steps">
+After adding a group, configuring a trigger, or fixing equipment, check the result and make a commit. Commit the working state before experimenting. If you collect an entire evening's changes into one commit, finding the cause of an error and undoing just that edit becomes harder.
+</Aside>
+
+### Commit messages {#commit-messages}
+
+Say **what changed**. Messages such as `update`, `fix`, or `done` tell someone reviewing the history a week later very little.
+
+| Change | Example message |
+| --- | --- |
+| Added the mission world | `Add mission world` |
+| Fixed the radio operator's radio | `Fix radio operator equipment` |
+| Configured port capture | `Configure port capture` |
+
+You can also use your team's language. Choose one language for the project. Use **Description** to explain why you made the change when the title does not make that clear; leave it empty for a simple edit.
+
+## Publish the repository on GitHub {#publish-repository}
+
+Click **Publish repository** at the top of the window.
+
+<LL_Screenshot src={step8} alt="History shows Add Demo World, with Publish repository at the top." caption="The commit is saved; now publish the repository on GitHub." originalLabel="Open original image" />
+
+Check **Name** and **Description**. **Keep this code private** controls access: checked means private; unchecked lets other people view the files and history. The screenshot selects a public repository. Leave **Organization → None** to publish under your own account, then click **Publish repository**.
+
+<LL_Screenshot src={step9} alt="Publish repository with the name triad-desert-storm-ar and Keep this code private unchecked." caption="Publishing the repository and choosing its visibility." originalLabel="Open original image" />
+
+Open **Repository → View on GitHub** and check that the files are on the website.
+
+## Save your ongoing work {#daily-work}
+
+After each small step, repeat these three actions:
+
+1. **Save files in Workbench.** Git can only see changes written to disk.
+2. **Commit in GitHub Desktop.** Review the files and write a clear message.
+3. **Click Push origin.** This sends the commits to your repository on GitHub.
+
+<Aside type="tip" title="Remember to push">
+A commit is not sent to GitHub automatically. Push after finishing a step and always before ending your work session. You can commit offline and send the commits later. Until you click **Push origin**, the new version exists only on your computer.
+</Aside>
+
+If you work on several computers or with other authors, click **Fetch origin** before starting to check for changes on GitHub. If **Pull origin** appears, download those changes before editing the mission. Commit your own work and close Workbench before pulling, then reopen the project.
+
+## Revert a faulty commit {#revert-commit}
+
+If an error appeared after a particular commit, you can reverse that commit's changes. Git records the reversal in a new commit and keeps the original in the history.
+
+<Aside type="caution" title="An optional demonstration of reverting">
+The screenshots below revert `Add Demo World`, which added all the practice project's files. Reverting it removes those files from the working folder. In your mission, select the commit with the faulty edit; there is no reason to undo the creation of a working project.
+</Aside>
+
+Commit your current changes separately and close Workbench. In **History**, select the faulty commit and review its changes. Right-click the commit and choose **Revert changes in commit**.
+
+<LL_Screenshot src={step10} alt="The context menu for Add Demo World in History, with Revert changes in commit indicated." caption="Reversing the selected commit's changes." originalLabel="Open original image" />
+
+A `Revert "…"` commit appears in the history. Check the result in Workbench, then click **Push origin** to send the reversal to GitHub.
+
+<LL_Screenshot src={step11} alt="History shows Revert Add Demo World; deleted files are marked red and Push origin is available." caption="The reversal is recorded as a new commit, ready to push." originalLabel="Open original image" />
+
+This reverses the selected commit, not every action after it. If you later changed the same lines, a conflict may occur: Git will ask which version to keep. Read the error message before proceeding.
+
+## Get help from AI {#ai-help}
+
+If you get stuck with Git, give an AI assistant [a link to this guide](https://jumbo13th.github.io/lite-lobby-ar/git/) and a screenshot of GitHub Desktop or the full error message. Explain what you wanted to do and which changes you need to keep.
+
+For example: “I want to undo the radio edit but keep the group I added afterward. Here is the commit history. Explain which commit to select and what reverting it will change.”
+
+A coding agent can inspect the files and repository history, help resolve a conflict, or suggest a commit message based on the changes. Ask it to explain the steps and their effects first. Before deleting files or changing history, check that the work you need is saved.
+
+## Example repository {#repository-example}
+
+The [Triad Shooting Star repository](https://github.com/Jumbo13th/triad-shooting-star-ar) follows the conventions described here. Use it as a reference: look at its name, folder structure, and `.gitignore`, then compare them with your project.
+
+To explore the mission in Workbench, follow [Open an existing mission](../example-mission/).
+
+You can now continue [creating your mission](../create-mission/).

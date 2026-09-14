@@ -1,0 +1,53 @@
+---
+title: "Inheritance, duplicate and override"
+description: "Inheritance, duplicate and override — Lite Lobby guide."
+prev: false
+next: false
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_OrgChart from '../../../components/LL_OrgChart.astro';
+
+[Back to the guide contents](/lite-lobby-ar/create-mission/)
+
+This reference explains prefab creation commands. Use it when choosing a base or deciding how to make a copy.
+
+## Inheritance — a shared base {#inherit-prefab}
+
+Suppose a rifleman and a medic need the same uniform but different equipment. Create a shared uniform prefab, then use **Inherit in** to make rifleman and medic prefabs from it. The shared prefab is called the **parent**; the variants are its **children**.
+
+<LL_OrgChart caption="Set the uniform once in the shared base, then choose equipment for each role.">
+<ul>
+<li>
+<span><strong>Shared base: jacket, trousers, boots</strong></span>
+<ul>
+<li>
+<span>Rifleman: shared uniform + own weapon and ammunition</span>
+</li>
+<li>
+<span>Medic: shared uniform + own weapon and medical supplies</span>
+</li>
+</ul>
+</li>
+</ul>
+</LL_OrgChart>
+
+Change the jacket in the shared base and both characters get the new jacket. If you assign a different jacket in the medic's own prefab, the medic stops taking that setting from the base.
+
+<Aside type="caution" title="Check which prefab you are editing">
+Editing the shared base affects all its children. To change only the medic's outfit, edit the medic prefab. After changing the base, check every character created from it.
+</Aside>
+
+## Duplication — a copy to edit separately {#duplicate-prefab}
+
+**Duplicate to** copies a prefab. For example, copy a finished rifleman and change the copy's weapon — the original rifleman stays as it was.
+
+Duplication does not remove existing inheritance. If the original rifleman took its uniform from a shared base, the copy will also take it from that base.
+
+Do not duplicate a prefab just to rename it or make one for every soldier. You can assign an existing hat directly from the game. For characters sharing a uniform, inheritance is easier: you only need to configure that uniform in one place.
+
+## Override — changing the original prefab {#override-prefab}
+
+Use **Override in** when you want to change the original prefab itself. For example, overriding a vanilla rifleman's jacket gives the new jacket to every character using that prefab while your addon is loaded.
+
+For a separate rifleman variant in your mission, create a child or a duplicate. An override also affects other places where the original prefab is used.

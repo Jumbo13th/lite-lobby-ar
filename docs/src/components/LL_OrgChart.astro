@@ -1,0 +1,55 @@
+---
+interface Props {
+  caption: string;
+}
+const { caption } = Astro.props;
+---
+
+<figure class="ll-org-chart">
+  <div class="diagram"><slot /></div>
+  <figcaption>{caption}</figcaption>
+</figure>
+
+<style>
+  .ll-org-chart { margin-block: 1.5rem; }
+  .diagram {
+    padding: 1.25rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
+    background: var(--ll-color-surface);
+  }
+  .diagram :global(ul) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .diagram :global(li) { margin: 0; min-width: 0; }
+  .diagram :global(li > span) { display: block; padding-block: 0.35rem; }
+  .diagram :global(li > ul) {
+    margin-left: 0.5rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--sl-color-gray-4);
+  }
+  .diagram :global(li > ul > li) { position: relative; }
+  .diagram :global(li > ul > li)::before {
+    content: '';
+    position: absolute;
+    width: 0.8rem;
+    left: -1.25rem;
+    top: 1.1rem;
+    border-top: 1px solid var(--sl-color-gray-4);
+  }
+  .diagram :global(strong) { color: var(--sl-color-text-accent); }
+  @media (min-width: 50rem) {
+    .diagram :global(ul.branches) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .diagram :global(ul.branches > li)::before { content: none; }
+  }
+  figcaption { margin-top: 0.6rem; font-size: var(--sl-text-sm); color: var(--sl-color-gray-2); }
+</style>

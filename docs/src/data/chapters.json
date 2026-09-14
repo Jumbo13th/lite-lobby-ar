@@ -1,0 +1,136 @@
+{
+  "hubs": [
+    {
+      "slug": "create-mission",
+      "title": {
+        "ru": "Как создать миссию",
+        "en": "Create a mission"
+      },
+      "parent": null
+    }
+  ],
+  "chapters": [
+    {
+      "slug": "create-mission/project",
+      "title": {
+        "ru": "1. Подготовка проекта",
+        "en": "1. Prepare the project"
+      },
+      "parent": "create-mission",
+      "part": "preparation"
+    },
+    {
+      "slug": "create-mission/world",
+      "title": {
+        "ru": "2. Создание мира с Lite Lobby",
+        "en": "2. Create a world with Lite Lobby"
+      },
+      "parent": "create-mission",
+      "part": "preparation"
+    },
+    {
+      "slug": "create-mission/base-character",
+      "title": {
+        "ru": "3. Базовый персонаж",
+        "en": "3. The base character"
+      },
+      "parent": "create-mission",
+      "part": "characters"
+    },
+    {
+      "slug": "create-mission/character-variants",
+      "title": {
+        "ru": "4. Вооружение и варианты персонажей",
+        "en": "4. Weapons and character variants"
+      },
+      "parent": "create-mission",
+      "part": "characters"
+    },
+    {
+      "slug": "create-mission/character-editor",
+      "title": {
+        "ru": "5. Персонажи и группы в Game Master",
+        "en": "5. Characters and groups in Game Master"
+      },
+      "parent": "create-mission",
+      "part": "characters"
+    },
+    {
+      "slug": "create-mission/groups-and-slots",
+      "title": {
+        "ru": "6. Подразделения в миссии",
+        "en": "6. Units in the mission"
+      },
+      "parent": "create-mission",
+      "part": "mission"
+    },
+    {
+      "slug": "create-mission/objectives",
+      "title": {
+        "ru": "7. Задачи миссии и триггеры",
+        "en": "7. Mission objectives and triggers"
+      },
+      "parent": "create-mission",
+      "part": "mission"
+    },
+    {
+      "slug": "create-mission/publishing",
+      "title": {
+        "ru": "8. Проверка и публикация",
+        "en": "8. Test and publish"
+      },
+      "parent": "create-mission",
+      "part": "mission"
+    },
+    {
+      "slug": "character-prefabs/planning",
+      "title": {
+        "ru": "Выбор подразделения и снаряжения",
+        "en": "Choose a unit and its equipment"
+      },
+      "parent": "create-mission"
+    },
+    {
+      "slug": "character-prefabs/prefab-operations",
+      "title": {
+        "ru": "Наследование, дубликат и оверрайд",
+        "en": "Inheritance, duplicate and override"
+      },
+      "parent": "create-mission"
+    }
+  ],
+  "sequence": [
+    "create-mission",
+    "create-mission/project",
+    "create-mission/world",
+    "create-mission/base-character",
+    "create-mission/character-variants",
+    "create-mission/character-editor",
+    "create-mission/groups-and-slots",
+    "create-mission/objectives",
+    "create-mission/publishing"
+  ],
+  "parts": [
+    {
+      "id": "preparation",
+      "title": {
+        "ru": "Часть I. Подготовка",
+        "en": "Part I. Preparation"
+      }
+    },
+    {
+      "id": "characters",
+      "title": {
+        "ru": "Часть II. Персонажи и группы",
+        "en": "Part II. Characters and groups"
+      }
+    },
+    {
+      "id": "mission",
+      "title": {
+        "ru": "Часть III. Сборка и завершение миссии",
+        "en": "Part III. Assemble and finish the mission"
+      }
+    }
+  ]
+}

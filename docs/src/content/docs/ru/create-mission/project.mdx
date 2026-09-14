@@ -1,0 +1,160 @@
+---
+title: "1. Подготовка проекта"
+description: "Подготовка Workbench, создание аддона миссии и подключение Lite Lobby."
+prev:
+  link: "/lite-lobby-ar/ru/create-mission/"
+  label: "Как создать миссию"
+next:
+  link: "/lite-lobby-ar/ru/create-mission/world/"
+  label: "2. Создание мира с Lite Lobby"
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
+import repositoryLayout from '../../../../assets/screenshots/create-mission/repository-layout.png';
+import createProject from '../../../../assets/screenshots/create-mission/001.png';
+import projectSettings from '../../../../assets/screenshots/create-mission/002.png';
+import projectSettingsMenu from '../../../../assets/screenshots/create-mission/003.png';
+import dependencySettings from '../../../../assets/screenshots/create-mission/004.png';
+import missingAddonDependencies from '../../../../assets/screenshots/create-mission/missing-addon-dependencies.png';
+import workshopGuidSearch from '../../../../assets/screenshots/create-mission/workshop-guid-search.png';
+import scanForProjects from '../../../../assets/screenshots/create-mission/scan-for-projects.png';
+import workshopAddonsFolder from '../../../../assets/screenshots/create-mission/workshop-addons-folder.png';
+
+[К оглавлению руководства](../)
+
+Для миссии [Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar) создадим аддон — дополнение к игре. В нём будут храниться мир миссии, персонажи и настройки.
+
+## Подготовка {#preparation}
+
+Для создания миссии понадобятся:
+
+- Arma Reforger.
+- Arma Reforger Tools — редактор Workbench.
+- [Lite Lobby](https://reforger.armaplatform.com/workshop/699319AAA5BFC57F), установленный через Workshop.
+
+[Официальная инструкция Bohemia Interactive по настройке Workbench](https://community.bistudio.com/wiki/Arma_Reforger%3AMod_Project_Setup#Workbench_Launcher_Setup).
+
+<span id="create-project"></span>
+
+## Создание проекта в Workbench {#workbench-project}
+
+Запустите Arma Reforger Tools. В окне **Enfusion Workbench Launcher** откройте меню **Add Project** и выберите **Create New Project**.
+
+<LL_Screenshot
+  src={createProject}
+  alt="Enfusion Workbench Launcher: в меню Add Project выбран пункт Create New Project."
+  caption="Создание проекта в Workbench Launcher."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В окне **New Project** введите `Triad Shooting Star` в поле **Project Name**.
+
+<Aside type="tip" title="Соблюдайте единый стиль названий">
+Для своего проекта выберите название по тому же образцу: `Desert Storm`, а не `Desert_Storm` или `DesertStorm`. Название с пробелами легче читать. Workbench использует его и для папки проекта.
+
+Обращайте внимание на названия на скриншотах: в Arma правила именования зависят от типа файла или объекта. Соблюдайте эти правила, чтобы вам и другим авторам было проще находить файлы и разбираться в миссии.
+</Aside>
+
+В поле **Location** укажите, где Workbench должен создать папку нового аддона.
+
+Если вы используете Git, укажите папку репозитория: в ней хранятся файлы проекта и история их изменений. Рекомендуем размещать репозиторий в `Documents\My Games\ArmaReforgerWorkbench\addons`. Для нашего примера мы выбрали имя `triad-shooting-star-ar`. Работа с репозиториями описана в разделе [Git и Arma Reforger](/lite-lobby-ar/ru/git/).
+
+<LL_Screenshot
+  src={projectSettings}
+  alt="Окно New Project: название Triad Shooting Star, в поле Location выбрана папка репозитория triad-shooting-star-ar."
+  caption="Название проекта и место для папки аддона."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите **Create**. В указанном месте Workbench автоматически создаст папку `Triad Shooting Star`, взяв её имя из поля **Project Name**.
+
+### Папка проекта {#project-folder}
+
+В созданной папке будет находиться файл проекта `addon.gproj`. Если вы используете Git, папки будут устроены так:
+
+```text
+triad-shooting-star-ar/
+└── Triad Shooting Star/
+    └── addon.gproj
+```
+
+<LL_Screenshot
+  src={repositoryLayout}
+  alt="В папке triad-shooting-star-ar находятся созданная Workbench папка Triad Shooting Star, папка .git и файлы .gitattributes и .gitignore."
+  caption="Папка аддона после создания проекта."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Рядом с папкой аддона находится папка `.git`. В ней Git хранит историю изменений.
+
+## Подключение Lite Lobby {#lite-lobby-dependency}
+
+Зависимости проекта — это аддоны, необходимые для его работы. Добавим в этот список Lite Lobby, чтобы использовать его файлы в миссии.
+
+В Workbench откройте **File → Project Settings**.
+
+<LL_Screenshot
+  src={projectSettingsMenu}
+  alt="В меню File редактора Workbench выбран пункт Project Settings."
+  caption="Открытие настроек проекта."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+1. В разделе **Dependencies** нажмите `+`.
+2. В новой строке нажмите кнопку `…`.
+3. Откройте папку Lite Lobby, установленного через Workshop: `Documents\My Games\ArmaReforger\addons\LiteLobby_699319AAA5BFC57F`.
+4. Выберите в этой папке файл проекта с расширением `.gproj` и нажмите **Open**.
+
+<LL_Screenshot
+  src={dependencySettings}
+  alt="В Dependencies добавлена строка; открыто окно выбора файла проекта из папки LiteLobby_699319AAA5BFC57F."
+  caption="Выбор файла проекта Lite Lobby из папки Workshop."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите **OK**, чтобы сохранить настройки, и закройте Workbench.
+
+Снова откройте проект миссии. В панели **Resource Browser** должна появиться папка **LiteLobby**.
+
+### Если Workbench не находит мод {#missing-addon-dependencies}
+
+При повторном открытии проекта может появиться окно **Missing Addon Dependencies**. Оно сообщает, что лаунчер не нашёл один из необходимых аддонов. Возможно, Lite Lobby или другой мод ещё не установлен либо лаунчер не знает, где он находится.
+
+<LL_Screenshot
+  src={missingAddonDependencies}
+  alt="Окно Missing Addon Dependencies: не найден мод с GUID 699319AAA5BFC57F."
+  caption="Лаунчер не нашёл нужный мод."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Код в сообщении называется **GUID** — это идентификатор мода. Чтобы узнать, какой мод не найден, введите этот код в строку поиска на [сайте Workshop](https://reforger.armaplatform.com/workshop). В нашем примере идентификатор `699319AAA5BFC57F` принадлежит Lite Lobby.
+
+<LL_Screenshot
+  src={workshopGuidSearch}
+  alt="Поиск в Workshop по GUID 699319AAA5BFC57F показывает Lite Lobby."
+  caption="Поиск недостающего мода по GUID."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Если мод ещё не установлен, запустите Arma Reforger и скачайте его через Workshop в игре. Затем вернитесь в лаунчер и выберите **Add Project → Scan for Projects**, чтобы найти установленные моды. Если мод уже есть на компьютере, сразу переходите к этому поиску.
+
+<LL_Screenshot
+  src={scanForProjects}
+  alt="В меню Add Project окна Workbench Launcher указан пункт Scan for Projects."
+  caption="Поиск установленных модов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Выберите папку с установленными модами — обычно это `Documents\My Games\ArmaReforger\addons` — и нажмите **Select Folder**.
+
+<LL_Screenshot
+  src={workshopAddonsFolder}
+  alt="Выбрана папка Documents, My Games, ArmaReforger, addons; стрелка указывает на Select Folder."
+  caption="Папка модов Arma Reforger."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Когда лаунчер завершит поиск, снова откройте проект миссии.
+
+В следующей главе [создадим мир миссии](../world/).

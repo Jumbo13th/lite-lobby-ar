@@ -1,0 +1,325 @@
+---
+title: "4. Вооружение и варианты персонажей"
+description: "Вооружение общей основы, распределение боекомплекта и создание двух вариантов персонажа."
+prev:
+  link: "/lite-lobby-ar/ru/create-mission/base-character/"
+  label: "3. Базовый персонаж"
+next:
+  link: "/lite-lobby-ar/ru/create-mission/character-editor/"
+  label: "5. Персонажи и группы в Game Master"
+---
+
+import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
+import inheritOda from '../../../../assets/screenshots/create-mission/038.png';
+import nameOda from '../../../../assets/screenshots/create-mission/039.png';
+import odaArmor from '../../../../assets/screenshots/create-mission/040.png';
+import odaWebbing from '../../../../assets/screenshots/create-mission/041.png';
+import odaWeapon from '../../../../assets/screenshots/create-mission/042.png';
+import odaGrenade from '../../../../assets/screenshots/create-mission/043.png';
+import odaSmoke from '../../../../assets/screenshots/create-mission/044.png';
+import inheritedInventory from '../../../../assets/screenshots/create-mission/046.png';
+import odaInventorySetup from '../../../../assets/screenshots/create-mission/045.png';
+import firstPouch from '../../../../assets/screenshots/create-mission/047.png';
+import secondPouchAndButtpack from '../../../../assets/screenshots/create-mission/048.png';
+import backpackAmmo from '../../../../assets/screenshots/create-mission/049.png';
+import inheritComms from '../../../../assets/screenshots/create-mission/052.png';
+import duplicateBackpackRadio from '../../../../assets/screenshots/create-mission/053.png';
+import backpackRadioChannel from '../../../../assets/screenshots/create-mission/054.png';
+import commsRadio from '../../../../assets/screenshots/create-mission/055.png';
+import commsStorage from '../../../../assets/screenshots/create-mission/056.png';
+import inheritCommander from '../../../../assets/screenshots/create-mission/066.png';
+import nameCommander from '../../../../assets/screenshots/create-mission/067.png';
+import commanderLauncher from '../../../../assets/screenshots/create-mission/068.png';
+import commanderBinoculars from '../../../../assets/screenshots/create-mission/069.png';
+
+[К оглавлению руководства](../)
+
+На основе базового префаба подготовим бойца ODA — отряда «зелёных беретов» в нашей миссии. Добавим бронежилет, разгрузку, оружие и боекомплект. Затем создадим варианты для связиста и командира.
+
+## Общее вооружение подразделения {#oda-base}
+
+Изменения родительского префаба передаются его наследникам. При этом настройки, заданные в самом наследнике, сохраняются. Поэтому общее снаряжение зададим в родительском префабе, а снаряжение отдельных специалистов — в его наследниках. Подробнее об этом — в [справке по наследованию, дубликатам и оверрайдам](/lite-lobby-ar/ru/character-prefabs/prefab-operations/).
+
+В **Resource Browser** откройте папку `Green Berets` своего аддона. Щёлкните правой кнопкой мыши по `TSS_Character_US_GB_BaseLoadout.et` и выберите **Inherit**, чтобы создать его наследника.
+
+<LL_Screenshot
+  src={inheritOda}
+  alt="В контекстном меню TSS_Character_US_GB_BaseLoadout.et выбран пункт Inherit."
+  caption="Создание префаба для бойцов ODA."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В поле **File Name** введите `TSS_Character_US_GB_ODA_Base` и нажмите **OK**. На скриншотах осталось прежнее имя без `GB`. В руководстве используем имя из актуального примера миссии — с `GB`.
+
+<LL_Screenshot
+  src={nameOda}
+  alt="Окно Create inherited file с прежним названием TSS_Character_US_ODA_Base, без GB."
+  caption="Ввод имени нового префаба."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Бронежилет и разгрузка {#armor-and-webbing}
+
+Откройте `TSS_Character_US_GB_ODA_Base.et` через **Edit Prefab** и выберите персонажа. В поиске компонентов введите `load`, затем выберите **BaseLoadoutManagerComponent**.
+
+В списке **Slots** раскройте **ArmoredVest** — слот бронежилета. В **Resource Browser** выберите проект **ArmaReforger**, откройте папку `Prefabs/Characters/Vests/Vest_PASGT` и перетащите `Vest_PASGT.et` в поле **Prefab** этого слота.
+
+<LL_Screenshot
+  src={odaArmor}
+  alt="В слоте ArmoredVest назначен Vest_PASGT.et; на персонаже появился бронежилет."
+  caption="Бронежилет PASGT."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Затем раскройте **Vest** — слот разгрузки с подсумками для магазинов и других предметов. В папке `Prefabs/Characters/Vests/Vest_ALICE/Variants` найдите `Vest_ALICE_rifleman.et` и перетащите его в поле **Prefab** этого слота.
+
+<LL_Screenshot
+  src={odaWebbing}
+  alt="В слоте Vest назначен Vest_ALICE_rifleman.et; поверх бронежилета появилась разгрузка."
+  caption="Разгрузка ALICE."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Основное оружие {#primary-weapon}
+
+Оружие задаётся в отдельных компонентах. В строке поиска введите `weap`: редактор покажет несколько **CharacterWeaponSlotComponent**, каждый из которых отвечает за свой оружейный слот. Выберите компонент, у которого **Weapon Slot Type** равен `primary`, а **Weapon Slot Index** — `0`.
+
+В проекте **ArmaReforger** откройте папку `Prefabs/Weapons/Rifles/M16/Variants`. Перетащите `Rifle_M16A2_carbine_OliveGreen_Solid.et` в поле **Weapon Template** выбранного компонента.
+
+<LL_Screenshot
+  src={odaWeapon}
+  alt="В CharacterWeaponSlotComponent с типом primary и индексом 0 назначен Rifle_M16A2_carbine_OliveGreen_Solid.et."
+  caption="Карабин M16A2 в слоте основного оружия."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб.
+
+### Осколочная и дымовая гранаты {#grenade-slots}
+
+Гранаты настроим в том же префабе `TSS_Character_US_GB_ODA_Base.et`. В поиске компонентов введите `gre` и найдите **CharacterGrenadeSlotComponent**, у которого **Weapon Slot Type** — `grenade`, а **Weapon Slot Index** — `3`.
+
+В проекте **ArmaReforger**, в папке `Prefabs/Weapons/Grenades`, найдите `Grenade_M67.et`. Перетащите его в поле **Weapon Template**.
+
+<LL_Screenshot
+  src={odaGrenade}
+  alt="В CharacterGrenadeSlotComponent с типом grenade и индексом 3 назначен Grenade_M67.et."
+  caption="Осколочная граната M67."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Затем выберите второй **CharacterGrenadeSlotComponent**, у которого **Weapon Slot Type** равен `throwable`. Перетащите `Smoke_ANM8HC.et` из той же папки в поле **Weapon Template** этого компонента.
+
+<LL_Screenshot
+  src={odaSmoke}
+  alt="В CharacterGrenadeSlotComponent с типом throwable назначен Smoke_ANM8HC.et."
+  caption="Дымовая граната AN-M8."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб.
+
+## Боекомплект и подсумки {#oda-ammunition}
+
+В префабе `TSS_Character_US_GB_ODA_Base.et` разместим магазины и гранаты в подсумках и рюкзаке, а фонарь — в куртке. Этот набор затем получат связист и командир.
+
+Выберите персонажа и через поиск компонентов найдите **SCR_InventoryStorageManagerComponent**. Раскройте список **Initial Inventory Items**, в котором задаётся содержимое инвентаря.
+
+Запись для карманов брюк уже содержит рацию, компас, карту и остальные предметы. Эти настройки перешли из `TSS_Character_US_GB_BaseLoadout.et`, где мы [заполнили базовый инвентарь](/lite-lobby-ar/ru/create-mission/base-character/#initial-inventory). Повторно добавлять их не нужно.
+
+<LL_Screenshot
+  src={inheritedInventory}
+  alt="В Initial Inventory Items показан унаследованный набор из 12 предметов в Pants/Pants_US_BDU.et."
+  caption="Предметы в карманах брюк, заданные в базовом префабе."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Для каждого места хранения создадим отдельную запись. Нажмите `+` у **Initial Inventory Items** и раскройте появившийся **ItemsInitConfigurationItem**. В поле **Target Storage** выберите, куда положить предметы. Затем кнопкой `+` добавьте строки в **Prefabs To Spawn** и перетащите в них нужные префабы из **Resource Browser**.
+
+<LL_Screenshot
+  src={odaInventorySetup}
+  alt="В SCR_InventoryStorageManagerComponent показаны добавление записей, выбор Target Storage и заполнение Prefabs To Spawn."
+  caption="Добавление предметов в снаряжение бойца ODA."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Фонарь {#flashlight}
+
+Фонарь положим в карман куртки. Добавьте запись и в поле **Target Storage** выберите `Jacket/Jacket_US_BDU_TigerStripe.et`. В **Prefabs To Spawn** добавьте одну строку. Найдите `Flashlight_MX991.et` поиском в проекте **ArmaReforger** и перетащите его в эту строку.
+
+### Подсумки разгрузки {#magazine-pouches}
+
+Для карабина используем два вида магазинов из папки `Prefabs/Weapons/Magazines` проекта **ArmaReforger**:
+
+- `Magazine_556x45_STANAG_30rnd_M855_Ball.et` — 30 обычных патронов.
+- `Magazine_556x45_STANAG_30rnd_M856_Tracer.et` — 30 трассирующих патронов.
+
+Создайте запись для первого подсумка. В поле **Target Storage** выберите:
+
+`Vest/Vest_ALICE_rifleman.et/MagPouch/Pouch_ALICE_30rnd_STANAG.et`
+
+В **Prefabs To Spawn** добавьте четыре строки. В двух укажите магазины M855, в двух других — гранаты `Grenade_M67.et`.
+
+<LL_Screenshot
+  src={firstPouch}
+  alt="В подсумке MagPouch указаны два магазина M855 и две гранаты M67."
+  caption="Первый подсумок: магазины и осколочные гранаты."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Добавьте запись для второго подсумка и выберите в **Target Storage**:
+
+`Vest/Vest_ALICE_rifleman.et/MagPouch2/Pouch_ALICE_30rnd_STANAG.et`
+
+В список предметов этого подсумка добавьте два магазина M855 и две дымовые гранаты `Smoke_ANM8HC.et`.
+
+### Запасные магазины {#reserve-magazines}
+
+Для запаса магазинов используем поясную сумку и рюкзак. Создайте запись для сумки и в поле **Target Storage** выберите:
+
+`Vest/Vest_ALICE_rifleman.et/Buttpack/Vest_ALICE_buttpack.et`
+
+В **Prefabs To Spawn** добавьте три магазина M855 и один M856 с трассирующими патронами.
+
+<LL_Screenshot
+  src={secondPouchAndButtpack}
+  alt="В MagPouch2 находятся два магазина M855 и две дымовые гранаты; в Buttpack — три магазина M855 и один M856."
+  caption="Второй подсумок и поясная сумка."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Создайте ещё одну запись для рюкзака. В поле **Target Storage** выберите:
+
+`Back/Backpack_ALICE_Medium_assembled.et`
+
+Добавьте в его список предметов такой же запас: три магазина M855 и один M856.
+
+<LL_Screenshot
+  src={backpackAmmo}
+  alt="В рюкзаке Backpack_ALICE_Medium_assembled.et указаны три магазина M855 и один M856."
+  caption="Запас магазинов в рюкзаке."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб.
+
+## Персонаж с ранцевой радиостанцией {#comms-sergeant}
+
+На основе `TSS_Character_US_GB_ODA_Base.et` создадим связиста: заменим рюкзак ранцевой радиостанцией и выберем другую форму. Изменения внесём в отдельный префаб, чтобы они не затронули остальных бойцов.
+
+В **Resource Browser** своего аддона откройте папку `Green Berets`. Щёлкните правой кнопкой мыши по `TSS_Character_US_GB_ODA_Base.et` и выберите **Inherit**. Назовите новый префаб `TSS_Character_US_GB_CommsSergeant`.
+
+<LL_Screenshot
+  src={inheritComms}
+  alt="В контекстном меню TSS_Character_US_GB_ODA_Base.et выбран Inherit."
+  caption="Создание префаба сержанта связи."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Ранцевая радиостанция {#backpack-radio}
+
+Для связиста подготовим свой вариант ранцевой рации. В проекте **ArmaReforger** откройте папку `Prefabs/Items/Equipment/Radios`. Щёлкните правой кнопкой мыши по `Radio_ANPRC77.et`, выберите **Duplicate to → ваш аддон** и задайте имя `TSS_Radio_ANPRC77`.
+
+<LL_Screenshot
+  src={duplicateBackpackRadio}
+  alt="Для Radio_ANPRC77.et выбран пункт Duplicate to → TriadShootingStar."
+  caption="Копирование ранцевой радиостанции AN/PRC-77."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Откройте новую рацию через **Edit Prefab** и выберите её в **Hierarchy**. В поиске компонентов введите `BaseRadio` и выберите **BaseRadioComponent**. Раскройте список **Transceivers**, наведите курсор на второй **RadioTransceiver** и нажмите `Delete`. У ранцевой рации также оставим один канал, чтобы упростить игру. Сохраните её префаб нажатием `Ctrl+S`.
+
+<LL_Screenshot
+  src={backpackRadioChannel}
+  alt="В настройках TSS_Radio_ANPRC77.et перечёркнут второй RadioTransceiver."
+  caption="Удаление второго канала ранцевой рации."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Откройте `TSS_Character_US_GB_CommsSergeant.et` через **Edit Prefab**. Выберите персонажа, найдите **BaseLoadoutManagerComponent** и раскройте **Slots → Back**. Перетащите `TSS_Radio_ANPRC77.et` из своего аддона в поле **Prefab**. Рация займёт место рюкзака.
+
+<LL_Screenshot
+  src={commsRadio}
+  alt="В префабе сержанта связи в слоте Back назначен TSS_Radio_ANPRC77.et."
+  caption="Сержант связи с ранцевой радиостанцией."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Форма связиста {#comms-uniform}
+
+Для связиста выберем кепку, куртку с закатанными рукавами и брюки Tiger Stripe, как на скриншотах. В **BaseLoadoutManagerComponent → Slots** раскройте нужные слоты и укажите в их полях **Prefab**:
+
+- **Hat** — `Hat_Patrol_US_01_TigerStripe.et`.
+- **Jacket** — `Jacket_US_BDU_rolledup_TigerStripe.et`.
+- **Pants** — `Pants_US_BDU_TigerStripe.et`.
+
+Все три файла найдите поиском в проекте **ArmaReforger**.
+
+#### Инвентарь после замены снаряжения {#storage-after-changes}
+
+Настройки инвентаря ещё ссылаются на прежние брюки и куртку. После замены одежды нужно указать новые места хранения. В **SCR_InventoryStorageManagerComponent → Initial Inventory Items** откройте запись с предметами для брюк и выберите в **Target Storage** `Pants/Pants_US_BDU_TigerStripe.et`.
+
+<LL_Screenshot
+  src={commsStorage}
+  alt="У связиста в Target Storage выбран Pants/Pants_US_BDU_TigerStripe.et для прежнего набора предметов."
+  caption="Перенос набора предметов в новые брюки."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В записи с фонарём измените **Target Storage** на `Jacket/Jacket_US_BDU_rolledup_TigerStripe.et`, чтобы фонарь оказался в новой куртке.
+
+Рюкзака у связиста больше нет — его место заняла рация. Поэтому нужно убрать магазины, предназначенные для рюкзака. Найдите запись с **Target Storage** `Back/Backpack_ALICE_Medium_assembled.et`. В её списке **Prefabs To Spawn** по очереди наводите курсор на каждую строку и нажимайте `Delete`, пока список не станет пустым.
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб связиста.
+
+## Персонаж с дополнительным оружием {#detachment-commander}
+
+Создадим командира на основе `TSS_Character_US_GB_ODA_Base.et` и добавим ему гранатомёт M72A3 и бинокль M22.
+
+В **Resource Browser** своего аддона откройте папку `Green Berets`. Щёлкните правой кнопкой мыши по `TSS_Character_US_GB_ODA_Base.et` и выберите **Inherit**.
+
+<LL_Screenshot
+  src={inheritCommander}
+  alt="В контекстном меню префаба TSS_Character_US_GB_ODA_Base.et выбран пункт Inherit."
+  caption="Создание отдельного префаба командира."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Назовите префаб `TSS_Character_US_GB_DetachmentCommander` и нажмите **OK**.
+
+<LL_Screenshot
+  src={nameCommander}
+  alt="Окно Create inherited file с названием префаба командира."
+  caption="DetachmentCommander — командир отряда."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Откройте новый префаб через **Edit Prefab** и выберите персонажа.
+
+### Гранатомёт {#commander-launcher}
+
+Гранатомёт займёт второй слот основного оружия: в слоте `0` уже находится карабин. В поиске компонентов введите `weap` и найдите **CharacterWeaponSlotComponent**, у которого **Weapon Slot Type** — `primary`, а **Weapon Slot Index** — `1`.
+
+В проекте **ArmaReforger** откройте папку `Prefabs/Weapons/Launchers/M72`. Перетащите `Launcher_M72A3.et` в поле **Weapon Template** выбранного компонента.
+
+<LL_Screenshot
+  src={commanderLauncher}
+  alt="В CharacterWeaponSlotComponent с типом primary и индексом 1 назначен Launcher_M72A3.et."
+  caption="M72A3 во втором оружейном слоте."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Бинокль {#commander-binoculars}
+
+Для бинокля предусмотрен отдельный слот экипировки. В списке компонентов персонажа раскройте **SCR_CharacterInventoryStorageComponent** и выберите вложенный **SCR_EquipmentStorageComponent**. В его свойствах откройте **Initial Storage Slots → BinocularSlot**.
+
+Найдите `Binoculars_M22.et` поиском в проекте **ArmaReforger** и перетащите его в поле **Prefab** этого слота.
+
+<LL_Screenshot
+  src={commanderBinoculars}
+  alt="В SCR_EquipmentStorageComponent в слоте BinocularSlot назначен Binoculars_M22.et."
+  caption="Бинокль M22 в снаряжении командира."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить префаб командира. В следующей главе [зададим названия и роли персонажей, добавим их в Game Master и проверим в игре](../character-editor/).
