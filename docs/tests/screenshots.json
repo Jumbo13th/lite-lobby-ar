@@ -294,18 +294,6 @@
     "sha256": "e6c9c7a8f0178b5867e44acb36d982a0cb3f2b4c42da6a7b418f7c9f198f744e"
   },
   {
-    "path": "create-mission/050.png",
-    "originalPath": "guide/50.png",
-    "bytes": 155980,
-    "sha256": "5d11d13e223ec72c3794fe61dc995fcfc3bd3a5d9103811741a971a457fe80de"
-  },
-  {
-    "path": "create-mission/051.png",
-    "originalPath": "guide/51.png",
-    "bytes": 15011,
-    "sha256": "687504a3b4bb60bfbb40e23476fe35df211863d1294b76136401a3fd638428ea"
-  },
-  {
     "path": "create-mission/052.png",
     "originalPath": "guide/52.png",
     "bytes": 143806,
@@ -856,11 +844,5 @@
     "originalPath": "guide/TriadMission/02.png",
     "bytes": 1651313,
     "sha256": "60f163cd182c5f147415e458894cd095a842ff3c58cc809586d40a3739f3bbf3"
-  },
-  {
-    "path": "unit-planning/green-berets-reference.png",
-    "originalPath": "mission/green-berets-reference.png",
-    "bytes": 916909,
-    "sha256": "9971f0b53d213b65b4b33a0fa2ff98895d8158c0ec0bc5d1a3413695040c9848"
   }
 ]

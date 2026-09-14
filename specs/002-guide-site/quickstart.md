@@ -1,53 +1,62 @@
 # Develop and Validate the Guide Site
 
-For maintainers verifying this feature during maintenance or before publication.
+For maintainers changing guide content, checking a pull request or publishing updates.
 
-1. Use the latest stable Node.js release (`node` in docs/.nvmrc) and npm. Enter docs;
-   with nvm, run nvm install and nvm use. Install npm with npm install --global npm@latest.
-   npm ci uses the checked-in lockfile; npm update refreshes it within the manifest
-   constraints. TypeScript remains on 6.x until Astro Check supports 7.x.
-2. Run npm ci, then npx playwright install chromium.
-3. Run npm run validate. Expect bilingual route/link checks, image-integrity checks,
-   browser scenarios, and fixture-exclusion checks to pass.
-4. Run npm run dev for editing, or npm run build followed by npm run preview to inspect
-   production behavior. Open the /lite-lobby-ar/ path on the reported local address.
-5. Check Russian through the language selector, narrow the viewport, use keyboard
-   navigation and search, and confirm every homepage destination resolves. Expect
-   four aligned guide rows in the order listed in contracts/site.md, with no article
-   sidebar/contents panel. On narrow pages, open the navbar menu for language, theme,
-   and community links; check Escape, outside dismissal, and desktop resizing.
-   Article fixtures retain native navigation. Check that no empty footer adds scroll
-   space below the help panel.
-6. At repository root, run specify integration status --json. Claude must remain the
-   healthy default; Codex follows .claude/skills through AGENTS.md.
+## Toolchain and dependencies
 
-Search is generated during build and is verified through production preview. The
-automated browser fixtures exercise screenshots and code blocks without publishing
-sample guide prose. The workflow is prepared but Pages activation and publication
-belong to the later content launch.
+Use Node 26 and npm 12.0.2. docs/.nvmrc fixes the Node major; update that major
+deliberately after compatibility testing. Local validation uses Node 26.8.2.
+All dependencies and devDependencies use caret ranges. Dependabot checks weekly and
+can propose range changes for review. package-lock.json records exact resolutions:
+use npm ci for installation and npm update for intentional updates within the ranges.
+TypeScript remains on 6.x because Astro Check does not support 7.x. Do not bypass
+peer compatibility. GitHub Actions use maintained major tags; npm is explicitly
+selected in CI so its install-script behavior matches local validation.
 
-Validation saves desktop/mobile light/dark captures and illustrated fixture captures
-under docs/.validation-results/ (ignored by Git and excluded from publication).
-The design checks cover 390, 768, 1440, and 1920 px widths. Review homepage spacing,
-Russian title wrapping, article typography, screenshots/captions, tables, asides, and
-code blocks in the captures. Temporary article prose is only a layout fixture.
-See [research.md](research.md#website-runtime) for the dependency audit and TypeScript
-compatibility constraint.
+## Commands
 
-On Windows, a portable runtime can be used without changing the system installation.
-After extracting the matching official Node.js Windows ZIP under
-`$env:LOCALAPPDATA\Programs`, select it from docs in the current PowerShell terminal:
+From docs/:
 
-```powershell
-$nodeVersion = (Invoke-RestMethod 'https://nodejs.org/dist/index.json')[0].version.TrimStart('v')
-$nodeDirectory = "$env:LOCALAPPDATA\Programs\node-v$nodeVersion-win-x64"
+1. Select Node with nvm install and nvm use, or use the portable Windows runtime below.
+2. Run npm install --global npm@12.0.2 if needed, then npm ci.
+3. Run npx playwright install chromium.
+4. Run npm run validate. All source, build, browser and fixture checks must pass.
+5. Use npm run dev for editing. For search, run npm run build and npm run preview;
+   open the configured repository prefix on the reported local address.
+
+On Windows, after extracting the official Node ZIP to the user Programs directory:
+
+~~~powershell
+$nodeDirectory = "$env:LOCALAPPDATA\Programs\node-v26.8.2-win-x64"
 if (!(Test-Path -LiteralPath "$nodeDirectory\node.exe")) {
-  throw "Install Node.js $nodeVersion in $nodeDirectory first."
+  throw "Install the supported Node runtime in $nodeDirectory first."
 }
 $env:PATH = "$nodeDirectory;$env:PATH"
 node --version
 npm --version
-```
+~~~
 
-This selection applies to that terminal. Replacing a Node installation in Program
-Files requires administrator rights.
+Stop development and preview processes before npm ci if they hold native module
+files open. Changing PATH applies only to the current terminal.
+
+## Verification
+
+Review four aligned guide rows on both homepages. Check the course sidebar,
+previous/next links, supplementary return links, heading navigation and search.
+At 390, 768, 1440 and 1920 px, inspect both themes and languages for clipped controls,
+overflow, captions and readable code. Click original images in production preview
+and development.
+
+Validation clears old captures and writes the current run to .validation-results/.
+Temporary article sources and .validation-dist/ are removed after completion,
+failure or a handled interruption. These paths and logs are ignored by Git and
+excluded from publication. If stale fixture paths exist before a run, inspect them;
+validation refuses to overwrite them.
+
+## Publication
+
+Relevant pushes to main validate and publish automatically. Pull requests validate
+without publishing. Manual workflow runs can validate only or publish main with the
+publish option. Configure the repository's Pages source as GitHub Actions before
+its first deployment. A failed validation cannot deploy; download its failure
+artifact to inspect screenshots.

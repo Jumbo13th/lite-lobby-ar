@@ -4,7 +4,7 @@ updates:
     directory: /docs
     schedule:
       interval: weekly
-    versioning-strategy: lockfile-only
+    versioning-strategy: increase-if-necessary
     groups:
       site-dependencies:
         patterns:

@@ -1,6 +1,6 @@
 # Specification Quality Checklist: Lite Lobby Guide Site
 
-**Purpose**: Confirm the approved technical phase is ready for planning.
+**Purpose**: Verify the guide site's current requirements are complete and testable.
 **Created**: 2026-09-12
 **Feature**: [Specification](../spec.md)
 
@@ -18,14 +18,14 @@
 - [x] Success criteria are measurable.
 - [x] Acceptance scenarios cover each user journey.
 - [x] Edge cases, dependencies, and scope boundaries are stated.
-- [x] Design/tooling and collaborative guide authoring are separate stages within feature 002; public launch remains a separate decision.
+- [x] The completed guide and automatic publication of validated main pushes are within feature 002.
 
 ## Feature Readiness
 
 - [x] Functional requirements map to acceptance scenarios.
 - [x] Localization, screenshots, integration preservation, and publication controls are covered.
 - [x] Prior answers resolve the material scope decisions; Codex reuses Claude's skill files.
-- [x] The design refinement specifies the homepage layout, unpublished-guide behavior, and shared article elements before implementation.
+- [x] The requirements specify the homepage layout, active guide navigation and shared article elements.
 - [x] Acceptance covers wide and narrow layouts, translated controls, both themes, and temporary article exclusions.
-- [x] The refinement remains inside feature 002 and preserves the content/publication boundary.
-- [x] The complete guide scope and latest-compatible tooling requirement have mapped acceptance criteria and tasks.
+- [x] Website changes remain inside feature 002 and leave addon assets unchanged.
+- [x] The complete guide scope and supported toolchain have mapped acceptance criteria and tasks.

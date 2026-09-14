@@ -4,6 +4,8 @@ import { remarkHeadingId } from 'remark-custom-heading-id';
 import { unified } from '@astrojs/markdown-remark';
 import chapters from './src/data/chapters.json' with { type: 'json' };
 
+export const base = '/lite-lobby-ar/';
+
 function guideGroup(slug) {
   const hub = chapters.hubs.find((page) => page.slug === slug);
   return {
@@ -26,7 +28,7 @@ function guideGroup(slug) {
 
 export default defineConfig({
   site: 'https://jumbo13th.github.io',
-  base: '/lite-lobby-ar',
+  base,
   trailingSlash: 'always',
   image: { responsiveStyles: true },
   markdown: { processor: unified({ remarkPlugins: [remarkHeadingId] }) },

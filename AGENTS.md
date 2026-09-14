@@ -10,6 +10,5 @@ second skill collection under .agents. Specifications are shared in [specs](spec
 Follow specify → clarify → plan → tasks → analyze → implement. Existing operator
 decisions carry through these phases. The website and all guides live in docs
 and belong to feature [002](specs/002-guide-site/spec.md).
-Complete design and tooling first; write the guide content with the operator next.
-Public launch requires the separate content-launch decision. Keep website work
+Maintain the completed bilingual guide and its shared validation. Keep website work
 separate from the game addon.

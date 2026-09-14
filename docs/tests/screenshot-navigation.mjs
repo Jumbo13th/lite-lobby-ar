@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import { base } from '../astro.config.mjs';
 
-export async function validateScreenshotNavigation(origin) {
+export async function validateScreenshotNavigation(origin, browsers = new Set()) {
   const original = await readFile(new URL('../src/assets/screenshots/create-mission/109.png', import.meta.url));
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ handleSIGINT: false, handleSIGTERM: false });
+  browsers.add(browser);
   try {
     const context = await browser.newContext();
     const page = await context.newPage();
     for (const locale of ['ru/', '']) {
-      await page.goto(`${origin}/lite-lobby-ar/${locale}create-mission/groups-and-slots/`);
+      await page.goto(`${origin}${base}${locale}create-mission/groups-and-slots/`);
       const figure = page.locator('figure').filter({ has: page.locator('a.original[href*="/109."]') });
       await figure.locator('img').scrollIntoViewIfNeeded();
       await figure.locator('img').evaluate((image) => image.decode());
@@ -35,5 +37,6 @@ export async function validateScreenshotNavigation(origin) {
     console.log(`Original screenshot navigation passed in both locales: ${origin}`);
   } finally {
     await browser.close();
+    browsers.delete(browser);
   }
 }

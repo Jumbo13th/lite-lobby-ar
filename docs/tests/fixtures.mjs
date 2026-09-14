@@ -12,11 +12,11 @@ export const fixtureText = {
     tableHead: ['Element', 'Purpose'],
     tableRows: [['Section heading', 'Find a topic in the page contents'], ['Caption', 'Explain what the image shows']],
     noteTitle: 'Layout sample',
-    note: 'This text is for design review only. The actual guides will be written together in the content phase.',
+    note: 'This article exists only during layout validation and is never published.',
     screenshots: 'Screenshots',
     screenshotsText: 'A small dialog keeps its natural size. A full scene fits the available width; both images link to the unchanged original.',
-    smallAlt: 'Rename File dialog with a character prefab filename',
-    smallCaption: 'The file rename dialog.',
+    smallAlt: 'Create inherited file dialog with the base character prefab filename',
+    smallCaption: 'Creating the inherited character prefab.',
     largeAlt: 'Mission preview in Game Master showing a squad on a grassy hillside',
     largeCaption: 'A squad in the mission preview.',
     originalLabel: 'Open original image',
@@ -32,11 +32,11 @@ export const fixtureText = {
     tableHead: ['Элемент', 'Назначение'],
     tableRows: [['Заголовок раздела', 'Поиск темы в содержании страницы'], ['Подпись', 'Пояснение к изображению']],
     noteTitle: 'Образец оформления',
-    note: 'Этот текст нужен только для проверки дизайна. Сами руководства мы напишем вместе на этапе работы над содержанием.',
+    note: 'Эта статья существует только во время проверки оформления и не публикуется.',
     screenshots: 'Скриншоты',
     screenshotsText: 'Небольшое окно сохраняет исходный размер. Общий вид миссии подстраивается под ширину страницы. У обоих изображений есть ссылка на оригинал.',
-    smallAlt: 'Окно Rename File с именем файла префаба персонажа',
-    smallCaption: 'Окно переименования файла.',
+    smallAlt: 'Окно Create inherited file с именем базового префаба персонажа',
+    smallCaption: 'Создание унаследованного префаба персонажа.',
     largeAlt: 'Предпросмотр миссии в Game Master: группа бойцов на травянистом склоне',
     largeCaption: 'Группа бойцов в предпросмотре миссии.',
     originalLabel: 'Открыть оригинал изображения',
@@ -53,7 +53,7 @@ description: ${text.title}
 
 import LL_Screenshot from '${prefix}components/LL_Screenshot.astro';
 import { Aside } from '@astrojs/starlight/components';
-import small from '${prefix}assets/screenshots/create-mission/051.png';
+import small from '${prefix}assets/screenshots/create-mission/024.png';
 import large from '${prefix}assets/screenshots/create-mission/078.png';
 
 ${text.intro}

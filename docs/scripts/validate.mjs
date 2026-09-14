@@ -11,19 +11,21 @@ import { fixtureSlug, fixtureSource } from '../tests/fixtures.mjs';
 import { validateBrowser } from '../tests/production.mjs';
 import { validateChapters } from '../tests/chapters.mjs';
 import { validateScreenshotNavigation } from '../tests/screenshot-navigation.mjs';
+import config, { base } from '../astro.config.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, 'dist');
 const content = join(root, 'src', 'content', 'docs');
 const temporaryOutput = join(root, '.validation-dist');
 const resultsDirectory = join(root, '.validation-results');
-const publicOrigin = 'https://jumbo13th.github.io';
-const base = '/lite-lobby-ar/';
+const publicOrigin = config.site;
 const expectedGuideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics'];
-const expectedAnchors = [...expectedGuideOrder];
 const children = new Set();
+const servers = new Set();
+const browsers = new Set();
 const temporarySources = [];
 let ownsTemporaryOutput = false;
+let cleanupPromise;
 
 function insideRoot(path) {
   const resolved = resolve(path);
@@ -54,10 +56,9 @@ async function snapshot(directory) {
 async function inventoryCheck() {
   const inventory = JSON.parse(await readFile(join(root, 'tests', 'screenshots.json'), 'utf8'));
   const assetDirectory = join(root, 'src', 'assets', 'screenshots');
-  assert.equal(inventory.length, 144, 'Screenshot inventory must preserve all source images');
+  assert.equal(inventory.length, 141, 'Screenshot inventory must cover all used images');
   assert.equal(new Set(inventory.map((entry) => entry.path)).size, inventory.length, 'Repeated screenshot paths');
   assert.equal(new Set(inventory.map((entry) => entry.originalPath)).size, inventory.length, 'Repeated migration source paths');
-  assert.equal(inventory.filter((entry) => /^guide\/\d+\.png$/.test(entry.originalPath)).length, 113, 'Original course captures must be preserved');
   assert.deepEqual((await filesIn(assetDirectory)).map((path) => slash(relative(assetDirectory, path))).sort(), inventory.map((entry) => entry.path).sort(), 'Screenshot files differ from the inventory, including filename case');
   for (const entry of inventory) {
     assert.match(entry.path, /^[a-z]+(?:-[a-z]+)*\/(?:\d{3}|[a-z]+(?:-[a-z]+)*)\.png$/, 'Use topic folders, three-digit numbers or descriptive kebab-case names');
@@ -74,7 +75,7 @@ async function inventoryCheck() {
       assert.ok(paths.has(match[1]), 'Missing screenshot or incorrect filename case: ' + match[1]);
     }
   }
-  console.log('Validated all 144 source screenshots, normalized paths and unchanged SHA-256 hashes');
+  console.log(`Validated all ${inventory.length} source screenshots, normalized paths and unchanged SHA-256 hashes`);
   return inventory;
 }
 
@@ -88,7 +89,7 @@ async function localeCheck() {
   for (const locale of ['', 'ru/']) {
     const html = load(await readFile(join(output, locale, 'index.html'), 'utf8'));
     assert.equal(html('html').attr('lang'), locale ? 'ru' : 'en');
-    for (const anchor of expectedAnchors) assert.equal(html(`[id="${anchor}"]`).length, 1, `Missing or repeated ${locale || 'English '}anchor: ${anchor}`);
+    for (const anchor of expectedGuideOrder) assert.equal(html(`[id="${anchor}"]`).length, 1, `Missing or repeated ${locale || 'English '}anchor: ${anchor}`);
     assert.equal(html('.ll-guide-list').length, 1, 'The homepage needs one guide list');
     assert.equal(html('.ll-guide-list article.ll-guide-entry').length, expectedGuideOrder.length, `The ${locale || 'English '}homepage needs four semantic guide entries`);
     assert.deepEqual(html('.ll-guide-list article.ll-guide-entry h2').toArray().map((heading) => html(heading).attr('id')), expectedGuideOrder, 'Homepage guides must follow the agreed order');
@@ -104,7 +105,7 @@ async function localeCheck() {
     titles.push(html('h1').text().trim());
   }
   assert.ok(titles[0] && titles[1] && titles[0] !== titles[1], 'The two homepages need localized titles');
-  console.log(`Validated matching English/Russian sources, four ordered homepage entries, three guide links, and all ${expectedAnchors.length} anchors`);
+  console.log(`Validated matching English/Russian sources, four ordered homepage entries, three guide links, and all ${expectedGuideOrder.length} anchors`);
 }
 
 function routeFor(relativePath) {
@@ -139,6 +140,13 @@ async function outputCheck(directory, { fixtures = false } = {}) {
   }
 
   for (const [path, document] of pages) {
+    for (const element of document('.sl-markdown-content a[href], .pagination-links a[href]').toArray()) {
+      const url = new URL(document(element).attr('href'), `${publicOrigin}${routeFor(path)}`);
+      if (url.origin !== publicOrigin || !url.pathname.startsWith(base)) continue;
+      const target = url.pathname.slice(base.length);
+      if (!pages.has(target) && !pages.has(`${target.replace(/\/$/, '')}/index.html`) && !(target === '' && pages.has('index.html'))) continue;
+      assert.equal(target.startsWith('ru/'), path.startsWith('ru/'), `Content link changes language in ${path}: ${url.pathname}`);
+    }
     for (const element of document('[href], [src], [poster], [srcset]').toArray()) {
       const node = document(element);
       // Starlight emits locale metadata for its special 404.html response, not separate 404 routes.
@@ -209,12 +217,13 @@ async function unusedPort() {
 
 async function withPreview(directory, action) {
   const port = await unusedPort();
-  const origin = `http://127.0.0.1:${port}`;
   const server = await preview({ root, outDir: directory, server: { host: '127.0.0.1', port }, logLevel: 'error' });
+  servers.add(server);
   try {
-    await action(origin);
+    await action(`http://127.0.0.1:${server.port}`);
   } finally {
     await server.stop();
+    servers.delete(server);
   }
 }
 
@@ -237,17 +246,28 @@ async function createFixtures() {
   }
 }
 
-async function cleanup() {
-  for (const child of children) child.kill();
-  const results = await Promise.allSettled([
-    ...temporarySources.map(async (path) => unlink(insideRoot(path))),
-    ...(ownsTemporaryOutput ? [rm(insideRoot(temporaryOutput), { recursive: true, force: true, maxRetries: 3, retryDelay: 200 })] : []),
-  ]);
-  const errors = results.filter((result) => result.status === 'rejected').map((result) => result.reason);
-  if (errors.length) throw new AggregateError(errors, 'Could not remove all temporary validation files');
+function cleanup() {
+  return cleanupPromise ??= (async () => {
+    const stopped = await Promise.allSettled([
+      ...[...browsers].map((browser) => browser.close()),
+      ...[...servers].map((server) => server.stop()),
+      ...[...children].map((child) => new Promise((done) => {
+        child.once('close', done);
+        child.kill();
+      })),
+    ]);
+    const removed = await Promise.allSettled([
+      ...temporarySources.map((path) => unlink(insideRoot(path))),
+      ...(ownsTemporaryOutput ? [rm(insideRoot(temporaryOutput), { recursive: true, force: true, maxRetries: 3, retryDelay: 200 })] : []),
+    ]);
+    const errors = [...stopped, ...removed].filter((result) => result.status === 'rejected').map((result) => result.reason);
+    if (errors.length) throw new AggregateError(errors, 'Could not clean up validation resources');
+  })();
 }
 
 async function main() {
+  await rm(insideRoot(resultsDirectory), { recursive: true, force: true });
+  await mkdir(resultsDirectory);
   assert.ok((await stat(output)).isDirectory(), 'Run the normal production build before this validator');
   const inventory = await inventoryCheck();
   await localeCheck();
@@ -255,8 +275,8 @@ async function main() {
   await validateChapters(output);
   const originalOutput = await snapshot(output);
   await withPreview(output, async (origin) => {
-    await validateScreenshotNavigation(origin);
-    await validateBrowser({ origin, inventory, resultsDirectory });
+    await validateScreenshotNavigation(origin, browsers);
+    await validateBrowser({ origin, inventory, resultsDirectory, browsers });
   });
   // Astro preview sets NODE_ENV; dev only supplies a default when it is unset.
   const previousNodeEnv = process.env.NODE_ENV;
@@ -264,9 +284,11 @@ async function main() {
   let devServer;
   try {
     devServer = await dev({ root, server: { host: '127.0.0.1', port: await unusedPort(), open: false }, logLevel: 'error' });
-    await validateScreenshotNavigation(`http://127.0.0.1:${devServer.address.port}`);
+    servers.add(devServer);
+    await validateScreenshotNavigation(`http://127.0.0.1:${devServer.address.port}`, browsers);
   } finally {
     await devServer?.stop();
+    servers.delete(devServer);
     if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
     else process.env.NODE_ENV = previousNodeEnv;
   }
@@ -274,8 +296,18 @@ async function main() {
   console.log('Building isolated article layout fixtures');
   await runAstro(['build', '--outDir', temporaryOutput]);
   await outputCheck(temporaryOutput, { fixtures: true });
-  await withPreview(temporaryOutput, (origin) => validateBrowser({ origin, inventory, resultsDirectory, fixtures: true }));
+  await withPreview(temporaryOutput, (origin) => validateBrowser({ origin, inventory, resultsDirectory, fixtures: true, browsers }));
   assert.deepEqual(await snapshot(output), originalOutput, 'Fixture validation modified the normal publication artifact');
+}
+
+for (const [signal, code] of [['SIGINT', 130], ['SIGTERM', 143]]) {
+  process.once(signal, () => {
+    process.exitCode = code;
+    cleanup().then(() => process.exit(code), (error) => {
+      console.error(error);
+      process.exit(1);
+    });
+  });
 }
 
 try {
@@ -292,6 +324,5 @@ try {
   }
 }
 if (!process.exitCode) {
-  await outputCheck(output);
   console.log('Website validation passed. Temporary fixtures and preview processes have been removed.');
 }

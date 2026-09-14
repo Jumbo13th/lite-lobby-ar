@@ -5,7 +5,7 @@ interface Props {
 const { caption } = Astro.props;
 ---
 
-<figure class="ll-org-chart" aria-label={caption}>
+<figure class="ll-org-chart">
   <div class="diagram"><slot /></div>
   <figcaption>{caption}</figcaption>
 </figure>

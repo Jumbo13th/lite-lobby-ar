@@ -1,64 +1,45 @@
 # Content Model: Lite Lobby Guide Site
 
-## Localized homepage
+## Localized pages
 
-English and Russian each own one MDX homepage. Stable ASCII heading anchors identify
-the five guide entries in the order defined in contracts/site.md.
-The API heading has scripting and website-integration subheadings. Both locales expose
-the same seven anchors. Each page supplies five topic titles and two compact API audience
-labels to the shared homepage component.
-The guide order, stable IDs, and small title icons are shared.
-These are informational list entries without destination URLs until real pages exist.
-The mission, example, and Git entries are the three active guide links in both
-locales. Character/group creation belongs to the mission course rather than a
-separate homepage entry. Remaining entries have no destination yet.
+English pages live at the content root; Russian counterparts live under ru/ with
+the same relative filenames and section IDs. Each page owns its prose, localized
+metadata and figure text. Language controls connect corresponding pages.
 
-## Guide relationships
+## Homepage entries
 
-The mission-creation guide owns the project-to-playable-mission sequence. It links to
-opening the example and GitHub Desktop through ordinary preface paragraphs. The
-example is the recommended way to learn, reflecting the authors' experience. Neither workflow is
-required to continue. Character/group prefab creation is part of the required
-course sequence; Triad Tactics or API setup is linked where applicable. Supporting guides own their
-detailed procedures. Canonical Russian titles are recorded in contracts/site.md.
-The main guide owns the repository/addon-folder explanation and supplied screenshot;
-the Git introduction links back to that section.
+The homepage component receives localized titles for the ordered entries in
+[the site contract](contracts/site.md#homepage), including the two Triad Tactics
+child links. Both languages use the same stable heading IDs.
 
-## Screenshot figure
+## Course metadata
 
-The figure receives an imported Astro image, nonempty localized alternative text,
-nonempty localized caption, and a localized original-link label. Its source metadata
-provides dimensions and the original URL. Generated variants are build artifacts.
+docs/src/data/chapters.json contains:
 
-## Asset inventory
+- hubs: the introduction's slug, localized title and null parent;
+- chapters: a slug, localized title and parent; course chapters also have a part;
+- sequence: the introduction and ordered course chapter slugs;
+- parts: ordered identifiers and localized labels used to group sidebar chapters.
 
-The shared tests/screenshots.json manifest maps each current relative path to its
-original path, byte length and SHA-256 hash. It covers all 144 source PNGs, including
-the original 113 course captures. Both locales use the same source files.
-Screenshots live in docs/src/assets/screenshots/<topic>/, using lowercase kebab-case
-topic folders and three-digit capture numbers. Supplementary captures with descriptive
-names use kebab-case. Source bytes must remain unchanged during path migrations.
+Unit planning and prefab operations are supporting pages with the course as parent,
+without a part or sequential neighbors. Numbering is part of chapter titles.
+MDX previous/next links are validated against sequence. No legacy destination or
+fragment mapping is stored.
 
-## Build artifact
+## Screenshot figures and inventory
 
-During the design stage, normal output contains the two localized homepages,
-framework 404 output, generated search index, and only required assets. Completed
-guide routes join this output during content authoring. Temporary browser fixtures
-use separate output and are removed after validation. No database or API is added.
+A figure receives imported ImageMetadata, nonempty localized alt, caption and
+originalLabel strings. Metadata supplies intrinsic dimensions and the source URL;
+responsive variants are generated artifacts shared by both languages.
 
-## Chapter navigation (T097; replaces the T080–T096 page hierarchy)
+tests/screenshots.json records each retained PNG's current topic-relative path,
+original path, byte length and SHA-256 hash. Filenames use three-digit capture
+numbers or descriptive kebab-case names. The inventory defines the expected files;
+[spec.md](spec.md#acceptance-criteria) defines the accepted count.
 
-The only overview is create-mission. Each chapter has a stable slug, RU/EN titles,
-this overview as its parent, and sequential neighbors. Course chapters have a
-number and a part. Three ordered parts group the chapters
-(1–2, 3–5, 6–8) without adding landing pages. Retired routes have a
-default destination and an old-anchor map; active pages forward only moved anchors.
-The reading sequence is one introduction plus eight chapters. Their on-page sections
-contain the steps; no parallel tutorial/reference copy is stored. Supporting pages
-are outside the required sequence and link back to the main contents. The existing
-unit-planning and prefab-operations pages also use create-mission as their parent,
-without a part or sequential neighbors. No figure-count limit defines a chapter.
-Shared metadata drives sidebar and structural checks. Explicit frontmatter links
-define the single course reading path. A map of old heading ids
-to canonical chapters retains existing links, shared between locales. Hub hash
-forwarding respects the active locale and site base.
+## Build artifacts
+
+Normal dist contains localized pages, the framework error page, search index,
+sitemap and referenced assets. It contains no database, API or internal documents.
+Validation uses separate fixture sources and .validation-dist, and stores captures
+in .validation-results. Those temporary resources are not content records.

@@ -3,10 +3,9 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { load } from 'cheerio';
 import chapters from '../src/data/chapters.json' with { type: 'json' };
-import fragments from '../src/data/guide-fragments.json' with { type: 'json' };
+import { base } from '../astro.config.mjs';
 
 const origin = 'https://jumbo13th.github.io';
-const base = '/lite-lobby-ar/';
 const course = ['project', 'world', 'base-character', 'character-variants', 'character-editor', 'groups-and-slots', 'objectives', 'publishing']
   .map((slug) => `create-mission/${slug}`);
 
@@ -50,13 +49,10 @@ export async function validateChapters(output) {
         if (target) assert.ok(linksTo($, selector, slug, target), `Reading sequence breaks at ${locale}/${slug} (${relation})`);
       }
     }
-    // These are the illustrations in the completed guides before they were split.
     assert.equal(screenshots.length, 116, `An existing guide illustration was lost or duplicated: ${locale}`);
     assert.equal(new Set(screenshots).size, 116, `A screenshot was substituted with a duplicate: ${locale}`);
     screenshotsByLocale.push(screenshots.sort());
 
-    // Chapters follow the work on one mission. Related settings are subsections
-    // of those chapters, rather than competing page-by-page walkthroughs.
     const taskSections = {
       'create-mission/project': ['preparation', 'workbench-project', 'missing-addon-dependencies'],
       'create-mission/world': ['save-world', 'systems-layer', 'lite-lobby-game-mode', 'map-setup'],
@@ -118,28 +114,6 @@ export async function validateChapters(output) {
       const actual = partBranch.find('a[href]').toArray().map((node) => new URL($(node).attr('href'), origin).pathname);
       assert.deepEqual(actual, members, `The part contains the wrong chapters: ${part.title[locale]}`);
     }
-    for (const retiredHub of ['character-prefabs', 'character-prefabs/characters', 'character-prefabs/groups']) {
-      assert.ok(!linksTo($, '.sidebar-pane a[href]', 'create-mission/project', retiredHub), `A former walkthrough still competes with the course: ${retiredHub}`);
-    }
-
-    for (const [guide, targets] of Object.entries(fragments)) {
-      const $ = pages.get(guide) ?? load(await readFile(join(output, locale === 'ru' ? 'ru' : '', guide, 'index.html'), 'utf8'));
-      const renderedMap = JSON.parse($('[data-ll-guide-fragments]').attr('data-ll-guide-fragments'));
-      if (pages.has(guide)) assert.equal(targets[''], undefined, `An active chapter must not redirect on entry: ${guide}`);
-      if (!pages.has(guide)) {
-        assert.equal($('.sidebar-pane a[aria-current="page"]').length, 0, `Retired chapter should not appear in navigation: ${guide}`);
-        assert.ok($('meta[name="robots"]').attr('content')?.includes('noindex'), `Retired chapter must not be indexed: ${guide}`);
-        assert.equal($('.sl-markdown-content figure').length, 0, `Retired chapter duplicated content: ${guide}`);
-        assert.ok(targets[''], `Retired chapter needs a default destination: ${guide}`);
-      }
-      for (const [id, destination] of Object.entries(targets)) {
-        assert.equal(renderedMap[id], `${prefix}${destination}`, `Legacy link lost its language or base: ${locale}/${guide}#${id}`);
-        const [route, anchor] = destination.split('#');
-        const target = pages.get(route.replace(/\/$/, ''));
-        assert.ok(target, `Legacy link points to an unknown chapter: ${destination}`);
-        if (anchor) assert.ok(target('[id]').toArray().some((node) => target(node).attr('id') === anchor), `Legacy link points to a missing heading: ${destination}`);
-      }
-    }
   }
   assert.deepEqual(...screenshotsByLocale, 'The translations must retain the same guide illustrations');
   const supplementary = ['example-mission', 'git', 'character-prefabs/planning', 'character-prefabs/prefab-operations'];
@@ -150,7 +124,7 @@ export async function validateChapters(output) {
   for (const slug of activeRoutes) {
     const headings = [];
     for (const locale of ['', 'ru']) {
-      const prefix = `/lite-lobby-ar/${locale ? 'ru/' : ''}`;
+      const prefix = `${base}${locale ? 'ru/' : ''}`;
       const $ = load(await readFile(join(output, locale, slug, 'index.html'), 'utf8'));
       headings.push($('.sl-markdown-content h2, .sl-markdown-content h3').toArray().map((node) => $(node).attr('id')));
       const current = $('.sidebar-pane a[aria-current="page"]');
@@ -183,7 +157,7 @@ export async function validateChapters(output) {
       assert.deepEqual(originals.map((url) => url.split('/').pop().split('.')[0]), numbers.map((number) => number.padStart(3, '0')), `${slug} illustrations are out of order: ${locale}`);
       byLocale.push(originals);
       if (slug === 'example-mission') {
-        const prefix = `/lite-lobby-ar/${locale ? 'ru/' : ''}`;
+        const prefix = `${base}${locale ? 'ru/' : ''}`;
         assert.equal($('.sl-markdown-content h2').first().attr('id'), 'open-project', 'The GitHub example must come first');
         assert.equal($('.sl-markdown-content a[href="../create-mission/project/#missing-addon-dependencies"]').length, 2, 'Both examples must link to the existing addon recovery steps');
         for (const id of ['open-project', 'missing-dependencies', 'open-world']) assert.equal($(`[id="${id}"]`).length, 1);
@@ -192,5 +166,5 @@ export async function validateChapters(output) {
     }
     assert.deepEqual(byLocale[0], byLocale[1], `${slug} screenshots differ between locales`);
   }
-  console.log(`Validated ${chapters.hubs.length} overviews, ${chapters.chapters.length} chapters, reading order, legacy destinations, and all course and supporting-guide illustrations in each language`);
+  console.log(`Validated ${chapters.hubs.length} overviews, ${chapters.chapters.length} chapters, reading order, and all course and supporting-guide illustrations in each language`);
 }

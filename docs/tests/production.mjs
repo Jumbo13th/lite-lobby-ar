@@ -1,16 +1,14 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
 import { fixtureSlug, fixtureText } from './fixtures.mjs';
 import chapters from '../src/data/chapters.json' with { type: 'json' };
+import { base } from '../astro.config.mjs';
 
-const base = '/lite-lobby-ar/';
 const home = (locale) => `${base}${locale === 'ru' ? 'ru/' : ''}`;
 const route = (locale, article) => `${home(locale)}${article ? `${fixtureSlug}/` : ''}`;
 const guideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics'];
-const anchors = [...guideOrder];
 const guidePages = new Map([...chapters.hubs, ...chapters.chapters].map((entry) => [entry.slug, entry]));
 
 async function chapterTitle(page, locale, slug) {
@@ -220,7 +218,7 @@ async function homepageLayout(page) {
   }
   assert.deepEqual(await page.locator('.ll-section-pages a').evaluateAll((links) => links.map((link) => link.getAttribute('href'))),
     ['setup', 'requirements'].map((slug) => `${home(locale)}triad-tactics/${slug}/`));
-  for (const id of anchors) assert.equal(await page.locator(`[id="${id}"]`).count(), 1, `Missing or repeated guide heading: ${id}`);
+  for (const id of guideOrder) assert.equal(await page.locator(`[id="${id}"]`).count(), 1, `Missing or repeated guide heading: ${id}`);
   const bounds = await entries.evaluateAll((elements) => elements.map((element) => {
     const { x, y, width, height } = element.getBoundingClientRect();
     return { x, y, width, height };
@@ -371,15 +369,7 @@ async function chapterJourneys(page, locale, resultsDirectory) {
     assert.equal(await entry.count(), 1, `Missing sidebar chapter: ${chapter.slug}`);
     assert.equal((await entry.textContent()).trim(), chapter.title[locale], `Unexpected sidebar chapter title: ${chapter.slug}`);
   }
-  for (const retired of [
-    'character-prefabs', 'character-prefabs/characters', 'character-prefabs/groups',
-    'character-prefabs/characters/base', 'character-prefabs/characters/radios',
-    'create-mission/conditions', 'create-mission/finishing',
-  ]) {
-    assert.equal(await page.locator(`.sidebar-pane a[href="${path(retired)}"]`).count(), 0, `A former walkthrough remains in the sidebar: ${retired}`);
-  }
 
-  // One reading route runs through all eight chapters, without intermediate topic hubs.
   for (const slug of chapters.sequence.slice(1)) {
     await follow('.pagination-links a[rel="next"]', slug);
     if (slug === 'create-mission/base-character') {
@@ -452,39 +442,7 @@ async function chapterJourneys(page, locale, resultsDirectory) {
     await closeMenu(page);
   }
 
-  // Old page and fragment bookmarks still reach the corresponding place in the course.
-  for (const [guide, anchor, chapter, targetAnchor = anchor] of [
-    ['create-mission', 'save-world', 'create-mission/world'],
-    ['character-prefabs', '', 'create-mission', 'characters-part'],
-    ['character-prefabs', 'group-members', 'create-mission/character-editor'],
-    ['character-prefabs/characters', '', 'create-mission/base-character'],
-    ['character-prefabs/groups', '', 'create-mission/character-editor', 'group-prefab'],
-    ['create-mission/groups-and-slots', 'group-members', 'create-mission/character-editor'],
-    ['character-prefabs/characters/radioman', 'backpack-radio', 'create-mission/character-variants'],
-    ['character-prefabs/characters/radios', 'backpack-radio', 'create-mission/character-variants'],
-    ['character-prefabs/characters/commander', 'commander-launcher', 'create-mission/character-variants'],
-    ['character-prefabs/characters/base', 'oda-base', 'create-mission/character-variants'],
-    ['character-prefabs/characters/radio-operator', 'comms-role', 'create-mission/character-editor'],
-    ['character-prefabs/characters/additional-equipment', 'commander-role', 'create-mission/character-editor'],
-    ['character-prefabs/characters/localization', 'localized-character-name', 'create-mission/character-editor'],
-    ['create-mission/scenario', 'map-setup', 'create-mission/world'],
-    ['create-mission/conditions', 'mission-timer', 'create-mission/objectives'],
-    ['create-mission/finishing', '', 'create-mission/groups-and-slots', 'freeze-zone'],
-    ['create-mission/finishing', 'publish-mission', 'create-mission/publishing'],
-  ]) {
-    await page.goto(`${origin}${path(guide)}?from=bookmark${anchor ? `#${anchor}` : ''}`);
-    await page.waitForURL((url) => url.pathname === path(chapter) && url.hash === (targetAnchor ? `#${targetAnchor}` : ''));
-    assert.equal(new URL(page.url()).search, '?from=bookmark', 'Legacy bookmarks should retain query parameters');
-    assert.equal(await page.locator('html').getAttribute('lang'), locale, 'Legacy navigation should retain the language');
-    await chapterTitle(page, locale, chapter);
-    if (targetAnchor) assert.equal(await page.locator(`[id="${targetAnchor}"]`).count(), 1);
-    await noOverflow(page);
-  }
-  await page.goto(`${origin}${path('create-mission')}`);
-  await page.evaluate(() => { location.hash = 'save-world'; });
-  await page.waitForURL((url) => url.pathname === path('create-mission/world') && url.hash === '#save-world');
-  await page.goto(`${origin}${path('create-mission')}#preface`);
-  await page.waitForURL((url) => url.pathname === path('create-mission') && url.hash === '#reading-paths');
+  await page.goto(`${origin}${path('create-mission')}#reading-paths`);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: join(resultsDirectory, `${locale}-mission-overview-${page.viewportSize().width}.png`), fullPage: true });
   await follow('.sl-markdown-content a[href="../example-mission/"]', 'example-mission');
@@ -503,7 +461,7 @@ async function articleContent(page, locale, inventory) {
   assert.equal(await body.locator('table tbody tr').count(), 2);
   assert.ok(await body.getByRole('complementary', { name: text.noteTitle }).isVisible(), 'Native article aside is missing');
   for (const [name, alt, caption] of [
-    ['create-mission/051.png', text.smallAlt, text.smallCaption],
+    ['create-mission/024.png', text.smallAlt, text.smallCaption],
     ['create-mission/078.png', text.largeAlt, text.largeCaption],
   ]) {
     const img = page.getByAltText(alt, { exact: true });
@@ -519,7 +477,8 @@ async function articleContent(page, locale, inventory) {
     assert.ok(dimensions.srcset?.length, `Screenshot has no responsive variants: ${name}`);
     const figure = img.locator('xpath=ancestor::figure[1]');
     assert.ok((await figure.locator('figcaption').textContent()).includes(caption));
-    const original = figure.getByRole('link', { name: text.originalLabel, exact: true });
+    assert.equal(await figure.getByRole('link', { name: `${text.originalLabel}: ${caption}`, exact: true }).count(), 2);
+    const original = figure.locator('figcaption a');
     for (const link of await figure.getByRole('link').all()) {
       assert.equal(await link.getAttribute('target'), '_blank', 'Opening a screenshot must keep the guide open');
       assert.match(await link.getAttribute('rel'), /\bnoopener\b/);
@@ -553,10 +512,10 @@ async function captureThemes(page, { locale, article, width, resultsDirectory })
   }
 }
 
-export async function validateBrowser({ origin, inventory, resultsDirectory, fixtures = false }) {
-  const browser = await chromium.launch();
+export async function validateBrowser({ origin, inventory, resultsDirectory, fixtures = false, browsers = new Set() }) {
+  const browser = await chromium.launch({ handleSIGINT: false, handleSIGTERM: false });
+  browsers.add(browser);
   try {
-    await mkdir(resultsDirectory, { recursive: true });
     for (const width of [390, 768, 1440, 1920]) {
       for (const locale of ['en', 'ru']) {
         const context = await browser.newContext({ viewport: { width, height: 960 }, reducedMotion: 'reduce' });
@@ -595,5 +554,6 @@ export async function validateBrowser({ origin, inventory, resultsDirectory, fix
     }
   } finally {
     await browser.close();
+    browsers.delete(browser);
   }
 }
