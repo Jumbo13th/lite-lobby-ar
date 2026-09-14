@@ -1,5 +1,22 @@
 # Research: Lite Lobby Guide Site
 
+## Opening existing missions (T106)
+
+The operator requested one Workshop and one GitHub example on the same supporting
+page, and selected [Triad Danse Macabre](https://reforger.armaplatform.com/workshop/69F707F1824808A8-TriadDanseMacabre).
+The supplied ReadyMission/06.png confirms the TriadDanseMacabre project and its
+Worlds folder. Describe browsing that folder without inventing a particular world
+filename. ReadyMission/07–13 document the GitHub route and come first, as requested;
+01–04 and 06 document Workshop. The missing 05.png is not required for those steps.
+Capture 13 shows Missing Addon Dependencies for 6A4545CCB3516E86: refer readers to
+the existing recovery section rather than duplicating it. Capture 01 shows the mod
+already installed, so its caption must not describe a download button.
+GitHub's [archive instructions](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)
+confirm Code → Download ZIP and the distinction between a branch snapshot and a
+clone with history. Keep the established pinned course archive as an alternative.
+Bohemia's [project setup guide](https://community.bistudio.com/wiki/Arma_Reforger%3AMod_Project_Setup)
+confirms Add Existing Project and Scan for Projects, followed by opening a listed mod.
+
 ## Thematic regrouping (T087–T090)
 
 The content audit found settings split by the character being demonstrated rather
@@ -101,6 +118,23 @@ website description records the operator's declaration without changing reposito
 - The briefing describes five minutes of preparation plus 80 active minutes, but the world inherits a two-minute freeze from current Lite Lobby. Confirm intended timing and the round-ending procedure: trigger firing records/notifies an event rather than ending the round automatically.
 
 ## GitHub Desktop guide
+
+T105 uses the eleven operator-supplied screenshots in `docs/src/assets/guide/Git`
+without editing them. The naming convention is project guidance, not a GitHub naming
+restriction. Screenshots 6–8 already include DemoWorld; the text explains that a bare
+addon is enough for the reader's first commit. Screenshots 10–11 undo the commit that
+introduced the project, so warn about its file deletions before presenting the steps.
+The operator's new request explicitly adds AI-help advice to this supporting guide.
+
+Rechecked official GitHub Desktop instructions for [creation and publication](https://docs.github.com/en/desktop/overview/creating-your-first-repository-using-github-desktop),
+[reviewing and committing changes](https://docs.github.com/en/desktop/making-changes-in-a-branch/committing-and-reviewing-changes-to-your-project-in-github-desktop),
+[ignore rules](https://docs.github.com/en/get-started/git-basics/ignoring-files), and
+[reverting a commit](https://docs.github.com/en/desktop/managing-commits/reverting-a-commit-in-github-desktop).
+They confirm the screenshot workflow: commits remain local until pushed; reverting
+records an inverse commit rather than restoring an entire historical snapshot.
+Pre-implementation review: the existing screenshot-folder assertion must admit the
+new Git subfolder; Git figures must be checked separately from the unchanged course.
+No unresolved input, engine changes, new packages or publication actions are needed.
 
 **Decision**: Add an optional beginner supporting guide focused on saved mission files,
 local checkpoints, remote backup, and recovery, referenced through the preface in the main
@@ -618,3 +652,33 @@ this correction. User authorization includes every Russian page; no clarificatio
 or engine decision is needed. Disjoint editing ownership prevents conflicting
 rewrites. Acceptance is editorial review plus preservation of procedures/assets
 and existing production checks, not a sentence-length or word-count target.
+
+### T099: Russian editorial review and mission links
+
+Reviewed the available Russian excerpts, not entire books:
+
+- Robert Martin, *Clean Architecture*, introduction and opening discussion of design:
+  https://litres.com/book/robert-martin/chistaya-arhitektura-iskusstvo-razrabotki-programmnogo-obesp-39113892/read/
+- Martin Fowler, *Refactoring*, Russian publisher's introduction:
+  https://www.williamspublishing.com/PDF/978-5-9909445-1-0/intro.pdf
+- Kernighan and Ritchie, *The C Programming Language*, Russian introduction:
+  https://djvu.online/file/OZoSGIQQzgMhN
+- *Pro Git*, Russian explanation of version control:
+  https://git-scm.com/book/ru/v2/Введение-О-системе-контроля-версий
+
+Editorial application: explain through the mission example; introduce a term where
+the reader uses it; name the affected object and the result of an action. Retain
+causes and troubleshooting, but remove repeated stage summaries and abstract
+phrases. These references inform exposition only; no book passages were copied
+and no Arma behavior was inferred from programming books.
+
+Reviewed all 14 active Russian pages and the common text of 37 retired routes.
+Revised 11 active pages; the approved course introduction, homepage and Git page
+already follow the requested approach. Linked meaningful prose references to
+Triad Shooting Star in both locales, leaving filenames, interface values and image
+descriptions literal. The current repository link remains distinct from the pinned
+download used to reproduce the tutorial. No chapter restructuring or game changes.
+
+Compared Russian content with HEAD: headings, unique inline-code values and all
+116 screenshot components are preserved, as are organization diagrams and retired
+routes. Existing website validation supplies the build, link and rendering checks.

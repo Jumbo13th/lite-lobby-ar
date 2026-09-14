@@ -1,6 +1,6 @@
 # Develop and Validate the Guide Site
 
-For maintainers verifying this feature before guide authoring or future publication.
+For maintainers verifying this feature during maintenance or before publication.
 
 1. Use Node 26.8.2 and npm 12.0.2; enter the repository's docs directory. The runtime
    version is recorded in .nvmrc. Install npm 12.0.2 with npm install --global npm@12.0.2
@@ -12,7 +12,7 @@ For maintainers verifying this feature before guide authoring or future publicat
    production behavior. Open the /lite-lobby-ar/ path on the reported local address.
 5. Check Russian through the language selector, narrow the viewport, use keyboard
    navigation and search, and confirm every homepage destination resolves. Expect
-   six aligned guide rows in the order listed in contracts/site.md, with no article
+   four aligned guide rows in the order listed in contracts/site.md, with no article
    sidebar/contents panel. On narrow pages, open the navbar menu for language, theme,
    and community links; check Escape, outside dismissal, and desktop resizing.
    Article fixtures retain native navigation. Check that no empty footer adds scroll

@@ -87,15 +87,15 @@
     "test-characters": "create-mission/character-editor/#test-characters",
     "find-test-characters": "create-mission/character-editor/#find-test-characters",
     "place-test-characters": "create-mission/character-editor/#place-test-characters",
-    "group-prefab": "create-mission/groups-and-slots/#group-prefab",
-    "create-group-prefab": "create-mission/groups-and-slots/#create-group-prefab",
-    "group-name": "create-mission/groups-and-slots/#group-name",
-    "group-symbol": "create-mission/groups-and-slots/#group-symbol",
-    "group-members": "create-mission/groups-and-slots/#group-members",
-    "group-formation": "create-mission/groups-and-slots/#group-formation",
-    "group-catalog": "create-mission/groups-and-slots/#group-catalog",
-    "register-group": "create-mission/groups-and-slots/#register-group",
-    "test-group": "create-mission/groups-and-slots/#test-group",
+    "group-prefab": "create-mission/character-editor/#group-prefab",
+    "create-group-prefab": "create-mission/character-editor/#create-group-prefab",
+    "group-name": "create-mission/character-editor/#group-name",
+    "group-symbol": "create-mission/character-editor/#group-symbol",
+    "group-members": "create-mission/character-editor/#group-members",
+    "group-formation": "create-mission/character-editor/#group-formation",
+    "group-catalog": "create-mission/character-editor/#group-catalog",
+    "register-group": "create-mission/character-editor/#register-group",
+    "test-group": "create-mission/character-editor/#test-group",
     "": "create-mission/#characters-part"
   },
   "character-prefabs/characters/radioman": {
@@ -222,7 +222,7 @@
     "": "create-mission/base-character/"
   },
   "character-prefabs/groups": {
-    "": "create-mission/groups-and-slots/"
+    "": "create-mission/character-editor/#group-prefab"
   },
   "create-mission/dependencies": {
     "lite-lobby-dependency": "create-mission/project/#lite-lobby-dependency",
@@ -313,21 +313,32 @@
     "": "create-mission/character-editor/#character-catalog"
   },
   "character-prefabs/groups/setup": {
-    "group-prefab": "create-mission/groups-and-slots/#group-prefab",
-    "create-group-prefab": "create-mission/groups-and-slots/#create-group-prefab",
-    "group-name": "create-mission/groups-and-slots/#group-name",
-    "group-symbol": "create-mission/groups-and-slots/#group-symbol",
-    "": "create-mission/groups-and-slots/#group-prefab"
+    "group-prefab": "create-mission/character-editor/#group-prefab",
+    "create-group-prefab": "create-mission/character-editor/#create-group-prefab",
+    "group-name": "create-mission/character-editor/#group-name",
+    "group-symbol": "create-mission/character-editor/#group-symbol",
+    "": "create-mission/character-editor/#group-prefab"
   },
   "character-prefabs/groups/roster": {
-    "group-members": "create-mission/groups-and-slots/#group-members",
-    "group-formation": "create-mission/groups-and-slots/#group-formation",
-    "": "create-mission/groups-and-slots/#group-members"
+    "group-members": "create-mission/character-editor/#group-members",
+    "group-formation": "create-mission/character-editor/#group-formation",
+    "": "create-mission/character-editor/#group-members"
   },
   "character-prefabs/groups/catalog": {
-    "group-catalog": "create-mission/groups-and-slots/#group-catalog",
-    "register-group": "create-mission/groups-and-slots/#register-group",
-    "test-group": "create-mission/groups-and-slots/#test-group",
-    "": "create-mission/groups-and-slots/#group-catalog"
+    "group-catalog": "create-mission/character-editor/#group-catalog",
+    "register-group": "create-mission/character-editor/#register-group",
+    "test-group": "create-mission/character-editor/#test-group",
+    "": "create-mission/character-editor/#group-catalog"
+  },
+  "create-mission/groups-and-slots": {
+    "group-prefab": "create-mission/character-editor/#group-prefab",
+    "create-group-prefab": "create-mission/character-editor/#create-group-prefab",
+    "group-name": "create-mission/character-editor/#group-name",
+    "group-symbol": "create-mission/character-editor/#group-symbol",
+    "group-members": "create-mission/character-editor/#group-members",
+    "group-formation": "create-mission/character-editor/#group-formation",
+    "group-catalog": "create-mission/character-editor/#group-catalog",
+    "register-group": "create-mission/character-editor/#register-group",
+    "test-group": "create-mission/character-editor/#test-group"
   }
 }

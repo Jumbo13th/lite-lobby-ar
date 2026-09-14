@@ -1,567 +1,866 @@
 [
   {
-    "name": "01.png",
+    "path": "create-mission/001.png",
+    "originalPath": "guide/01.png",
     "bytes": 138971,
     "sha256": "f9ca0cf68e564468fbdfe6452ecd0ceb6b3b13d5eb50400732a4f124d71ddfbd"
   },
   {
-    "name": "02.png",
+    "path": "create-mission/002.png",
+    "originalPath": "guide/02.png",
     "bytes": 64803,
     "sha256": "b3d1d2649308da8e9c250bf3ec9ce08e6dbfd5c1956f9a139162dede4cb28ec7"
   },
   {
-    "name": "03.png",
+    "path": "create-mission/003.png",
+    "originalPath": "guide/03.png",
     "bytes": 60060,
     "sha256": "e82ffcf1da4cd8d629b4f4e6e515aa08c64dcc0b4f16baada9c238d331899c28"
   },
   {
-    "name": "04.png",
+    "path": "create-mission/004.png",
+    "originalPath": "guide/04.png",
     "bytes": 222778,
     "sha256": "4312e7b0838e4ec88e709b8ca8e4891cf0ed3f24117baf9e39bb84332ac44d4d"
   },
   {
-    "name": "05.png",
+    "path": "create-mission/005.png",
+    "originalPath": "guide/05.png",
     "bytes": 83794,
     "sha256": "611370df714816b70f9b3014f77708abda1bb0c9a79dc737304bcc75d73864f5"
   },
   {
-    "name": "06.png",
+    "path": "create-mission/006.png",
+    "originalPath": "guide/06.png",
     "bytes": 157241,
     "sha256": "6d9dddc0df0f56db24a31def3f1e2cf5b62d9ca066ebec268cff319cc1fb59ff"
   },
   {
-    "name": "07.png",
+    "path": "create-mission/007.png",
+    "originalPath": "guide/07.png",
     "bytes": 1242024,
     "sha256": "ea3cb8ce12c41a052989f7ebd33b32658e063bf45940659716ca1a485e37c94b"
   },
   {
-    "name": "08.png",
+    "path": "create-mission/008.png",
+    "originalPath": "guide/08.png",
     "bytes": 130110,
     "sha256": "8db0e76cc75f78c947eb7ac17fe5052bce5086a7742d63a785d614723c4e5064"
   },
   {
-    "name": "09.png",
+    "path": "create-mission/009.png",
+    "originalPath": "guide/09.png",
     "bytes": 220561,
     "sha256": "42759efc8676156db36594b2d5663c93c5e35b21b48f0bb274211d0d07538c61"
   },
   {
-    "name": "10.png",
+    "path": "create-mission/010.png",
+    "originalPath": "guide/10.png",
     "bytes": 667309,
     "sha256": "50b557ae4230b3fe83b307f0af2bdb52a63b39522dbdd585bbd15dda66cba89d"
   },
   {
-    "name": "11.png",
+    "path": "create-mission/011.png",
+    "originalPath": "guide/11.png",
     "bytes": 294526,
     "sha256": "204095da4bc5e402e811b443e8e20bf78123812e1c67aeed718308ea660df68c"
   },
   {
-    "name": "12.png",
+    "path": "create-mission/012.png",
+    "originalPath": "guide/12.png",
     "bytes": 236290,
     "sha256": "877baf3a7559866954aeb69f49788af9bf3cefc2efff89f0a64073a24973de3a"
   },
   {
-    "name": "13.png",
+    "path": "create-mission/013.png",
+    "originalPath": "guide/13.png",
     "bytes": 69503,
     "sha256": "6a80d1817d2d40c12c33012dda45ca1a0862516588314d957982fc077985e034"
   },
   {
-    "name": "14.png",
+    "path": "create-mission/014.png",
+    "originalPath": "guide/14.png",
     "bytes": 38787,
     "sha256": "865ee6daa76cb9dc64349ef94da7eae8df945068f020ac7dd16aae557758bdc7"
   },
   {
-    "name": "15.png",
+    "path": "create-mission/015.png",
+    "originalPath": "guide/15.png",
     "bytes": 23755,
     "sha256": "938d6fa6e378b2c52fec86d28beb2156a05c72152373ad96ac44859e98ada4ed"
   },
   {
-    "name": "16.png",
+    "path": "create-mission/016.png",
+    "originalPath": "guide/16.png",
     "bytes": 33726,
     "sha256": "691841567e79820c17eb6394d7072f54dde11e74aa5c25823a4a68aa50e868f6"
   },
   {
-    "name": "17.png",
+    "path": "create-mission/017.png",
+    "originalPath": "guide/17.png",
     "bytes": 24218,
     "sha256": "5e140cde2fd0d956bba75f5d1bcbb37ee5160f8cb7b4dd16bf46fa54c61111ea"
   },
   {
-    "name": "18.png",
+    "path": "create-mission/018.png",
+    "originalPath": "guide/18.png",
     "bytes": 130893,
     "sha256": "e51880e7126bba67a7d1cb7056886dba2739eb43c9448f4d4fb1fc9ec985937d"
   },
   {
-    "name": "19.png",
+    "path": "create-mission/019.png",
+    "originalPath": "guide/19.png",
     "bytes": 190606,
     "sha256": "c0d116fe110d6094556d00ba578bc7a122c67c84dce642d188dffe5c0e575edf"
   },
   {
-    "name": "20.png",
+    "path": "create-mission/020.png",
+    "originalPath": "guide/20.png",
     "bytes": 104253,
     "sha256": "0eedbfe458c68bbe6a92a30c4742a5ef1b51858a8c5601b9442b7c9e0be804a2"
   },
   {
-    "name": "21.png",
+    "path": "create-mission/021.png",
+    "originalPath": "guide/21.png",
     "bytes": 1626558,
     "sha256": "326733332c92aa3580d6b61973a7482f7d590dbc6b014a2a9799cd9585d256f3"
   },
   {
-    "name": "22.png",
+    "path": "create-mission/022.png",
+    "originalPath": "guide/22.png",
     "bytes": 1686941,
     "sha256": "995ba4c636a52fef0e39d236659da3e659a09784813496c7015bd258849c8851"
   },
   {
-    "name": "23.png",
+    "path": "create-mission/023.png",
+    "originalPath": "guide/23.png",
     "bytes": 1518600,
     "sha256": "73a5490ec12eb4f335d53943970f856b17de27f127504354726726c808b08187"
   },
   {
-    "name": "24.png",
+    "path": "create-mission/024.png",
+    "originalPath": "guide/24.png",
     "bytes": 188292,
     "sha256": "39e2ebfdb4945cc3cc123fc31663622ac33e2787cf5b4a09d3f35b2a74c21e7e"
   },
   {
-    "name": "25.png",
+    "path": "create-mission/025.png",
+    "originalPath": "guide/25.png",
     "bytes": 52724,
     "sha256": "6fab355cdbcc1397f943433b9e8d473504315752db0ef49c0f7f99984b6f1df4"
   },
   {
-    "name": "26.png",
+    "path": "create-mission/026.png",
+    "originalPath": "guide/26.png",
     "bytes": 225372,
     "sha256": "5fe896e96adb66702e13fc62d4902f03d4ed6f60926fac43cf24d8e582b8a9e7"
   },
   {
-    "name": "27.png",
+    "path": "create-mission/027.png",
+    "originalPath": "guide/27.png",
     "bytes": 311903,
     "sha256": "06a92aecbf7b000a6f98ff5dd328181dfbc90f06792fdb4408fdc4da0626ad11"
   },
   {
-    "name": "28.png",
+    "path": "create-mission/028.png",
+    "originalPath": "guide/28.png",
     "bytes": 315097,
     "sha256": "735aa1d565c427f09e15fe84854706097d21aeb77d53d015dcd4a26282503144"
   },
   {
-    "name": "29.png",
+    "path": "create-mission/029.png",
+    "originalPath": "guide/29.png",
     "bytes": 458109,
     "sha256": "b6b670f4359f3723a853b7a0b956b7d1a49ee108e55dfe97ee30f58136129074"
   },
   {
-    "name": "30.png",
+    "path": "create-mission/030.png",
+    "originalPath": "guide/30.png",
     "bytes": 441886,
     "sha256": "2e98691b9c7ec3e4c43f35c343a9a3eb678e2d3bc5e7f14bc33ad874c380bfd6"
   },
   {
-    "name": "31.png",
+    "path": "create-mission/031.png",
+    "originalPath": "guide/31.png",
     "bytes": 272970,
     "sha256": "77f25e9278507c96e619c9a946cb771cf44c7c04a1dfab2e4fb4b0f41806e6c4"
   },
   {
-    "name": "32.png",
+    "path": "create-mission/032.png",
+    "originalPath": "guide/32.png",
     "bytes": 19988,
     "sha256": "75f21ca81ff9a8a6a30750d9f90210838d9fdc15861a1f48dfd0d406509a3b36"
   },
   {
-    "name": "33.png",
+    "path": "create-mission/033.png",
+    "originalPath": "guide/33.png",
     "bytes": 253291,
     "sha256": "cfe5e5d5aec7f1d05474b3ca404efa356de2cd85b2949317e059302824d9a526"
   },
   {
-    "name": "34.png",
+    "path": "create-mission/034.png",
+    "originalPath": "guide/34.png",
     "bytes": 67148,
     "sha256": "d4cddebc26f35c7d8c916361eb9805760c4d39901bbc3f79cc0d46c93a208f76"
   },
   {
-    "name": "35.png",
+    "path": "create-mission/035.png",
+    "originalPath": "guide/35.png",
     "bytes": 308118,
     "sha256": "4d1f6ed71520ccf38d51ab41ed840707e13d09263aaa1d53400d812ee80297c8"
   },
   {
-    "name": "36.png",
+    "path": "create-mission/036.png",
+    "originalPath": "guide/36.png",
     "bytes": 287928,
     "sha256": "c6fbe984aad316d9eeb077574f69665394c58b7a7f938a0be1a684a67caa9021"
   },
   {
-    "name": "37.png",
+    "path": "create-mission/037.png",
+    "originalPath": "guide/37.png",
     "bytes": 352964,
     "sha256": "1028d73eed4ffed736437695bee8e964fadc6066c9ac8c377e9731d90a666e96"
   },
   {
-    "name": "38.png",
+    "path": "create-mission/038.png",
+    "originalPath": "guide/38.png",
     "bytes": 129253,
     "sha256": "1fcd47ecb0e6b9d426946208693f058653a139c0ad1b4c42aa73aaabd20de1ca"
   },
   {
-    "name": "39.png",
+    "path": "create-mission/039.png",
+    "originalPath": "guide/39.png",
     "bytes": 19615,
     "sha256": "581fd1bbc1e000ba0fc514f3db57ef9793639fb547c11cee1f09985dbd524a1c"
   },
   {
-    "name": "40.png",
+    "path": "create-mission/040.png",
+    "originalPath": "guide/40.png",
     "bytes": 360175,
     "sha256": "915c7a5394f37d85168028ef41df1b36850f752e80244baf74acd71ac19ae956"
   },
   {
-    "name": "41.png",
+    "path": "create-mission/041.png",
+    "originalPath": "guide/41.png",
     "bytes": 473181,
     "sha256": "79b01a9326c9c813494ba63b8f54accfd68d3bd2fd1a39fef05d7f1e5af4875c"
   },
   {
-    "name": "42.png",
+    "path": "create-mission/042.png",
+    "originalPath": "guide/42.png",
     "bytes": 362008,
     "sha256": "14d980cfe4d4f816ae63ce52d78b4ade9f0765523b368dad81737a5fd0164bc0"
   },
   {
-    "name": "43.png",
+    "path": "create-mission/043.png",
+    "originalPath": "guide/43.png",
     "bytes": 322256,
     "sha256": "d90ba4908bb26be1c1aea8bc1ec3b8df288ca8cbf6288e54655b2e1015e2b89b"
   },
   {
-    "name": "44.png",
+    "path": "create-mission/044.png",
+    "originalPath": "guide/44.png",
     "bytes": 354579,
     "sha256": "5f456041275aea0cf39919af31c2744b3bc8f43e5773acaaf5fb363605770eb8"
   },
   {
-    "name": "45.png",
+    "path": "create-mission/045.png",
+    "originalPath": "guide/45.png",
     "bytes": 449139,
     "sha256": "9f286d79c9f3985786483287cfa614fe9350bad21a7709bb2d1c67ccadacefe1"
   },
   {
-    "name": "46.png",
+    "path": "create-mission/046.png",
+    "originalPath": "guide/46.png",
     "bytes": 70445,
     "sha256": "b361a0f4c52b37371eda831d287a5e5f83d691dcf0e86107d68476a3a7d28218"
   },
   {
-    "name": "47.png",
+    "path": "create-mission/047.png",
+    "originalPath": "guide/47.png",
     "bytes": 57321,
     "sha256": "e976f8901ca972a980b7c04001a4b90e88c43aa3744dcfe17c00b85a76f6fb16"
   },
   {
-    "name": "48.png",
+    "path": "create-mission/048.png",
+    "originalPath": "guide/48.png",
     "bytes": 77561,
     "sha256": "ad447627b332234ecfae04d66644c2d7cf024752482c840899fc92a2ef674b49"
   },
   {
-    "name": "49.png",
+    "path": "create-mission/049.png",
+    "originalPath": "guide/49.png",
     "bytes": 39152,
     "sha256": "e6c9c7a8f0178b5867e44acb36d982a0cb3f2b4c42da6a7b418f7c9f198f744e"
   },
   {
-    "name": "50.png",
+    "path": "create-mission/050.png",
+    "originalPath": "guide/50.png",
     "bytes": 155980,
     "sha256": "5d11d13e223ec72c3794fe61dc995fcfc3bd3a5d9103811741a971a457fe80de"
   },
   {
-    "name": "51.png",
+    "path": "create-mission/051.png",
+    "originalPath": "guide/51.png",
     "bytes": 15011,
     "sha256": "687504a3b4bb60bfbb40e23476fe35df211863d1294b76136401a3fd638428ea"
   },
   {
-    "name": "52.png",
+    "path": "create-mission/052.png",
+    "originalPath": "guide/52.png",
     "bytes": 143806,
     "sha256": "6750b1d74000aec35480ef2fbb733153a31abea7a9f182cfbc8b16e34ef655aa"
   },
   {
-    "name": "53.png",
+    "path": "create-mission/053.png",
+    "originalPath": "guide/53.png",
     "bytes": 267551,
     "sha256": "4666adbada89f9923efcacce4d3ef260c6bba6d9b9c32dcab1a96503cd12ab13"
   },
   {
-    "name": "54.png",
+    "path": "create-mission/054.png",
+    "originalPath": "guide/54.png",
     "bytes": 263249,
     "sha256": "d35fb676d10bb3a4c4d861e00f8e90e52947193dc2922220798db830dea08ed5"
   },
   {
-    "name": "55.png",
+    "path": "create-mission/055.png",
+    "originalPath": "guide/55.png",
     "bytes": 259171,
     "sha256": "5d562fdc16c2e970e5a345bccedf11e0d81f14c624c131a4519216a2114d51cd"
   },
   {
-    "name": "56.png",
+    "path": "create-mission/056.png",
+    "originalPath": "guide/56.png",
     "bytes": 422075,
     "sha256": "ec8283c1e4522e69559e4ca0e55ad63577885c827545c14eb7ff685cff4d64cb"
   },
   {
-    "name": "57.png",
+    "path": "create-mission/057.png",
+    "originalPath": "guide/57.png",
     "bytes": 365361,
     "sha256": "3a9f854e4cdb0940822b76dc0de0837dea06450ee09be161e738e9eb86b6c6d4"
   },
   {
-    "name": "58.png",
+    "path": "create-mission/058.png",
+    "originalPath": "guide/58.png",
     "bytes": 325255,
     "sha256": "e5eea2aa7857f55423bd25fac471660d040fc9f2036d63c67c6a17176d0dbf0b"
   },
   {
-    "name": "59.png",
+    "path": "create-mission/059.png",
+    "originalPath": "guide/59.png",
     "bytes": 46749,
     "sha256": "5d76fa11c8648d58ef4c3e4997ed03a9d626fadbc8ceb0a5e0a74a6ff06861fd"
   },
   {
-    "name": "60.png",
+    "path": "create-mission/060.png",
+    "originalPath": "guide/60.png",
     "bytes": 37315,
     "sha256": "ee3f87713cd645de4ccbc3f56b3552161b75b8ce02e01f4d580900a5e9c0e49a"
   },
   {
-    "name": "61.png",
+    "path": "create-mission/061.png",
+    "originalPath": "guide/61.png",
     "bytes": 19480,
     "sha256": "e6f40fd0ea2d3d71e3c4286d95337f555842895b3967570c76944fe3163aa66d"
   },
   {
-    "name": "62.png",
+    "path": "create-mission/062.png",
+    "originalPath": "guide/62.png",
     "bytes": 110849,
     "sha256": "00652eb70648db5237a8e0be3415a3c62569f5753890191c50067400b17ee329"
   },
   {
-    "name": "63.png",
+    "path": "create-mission/063.png",
+    "originalPath": "guide/63.png",
     "bytes": 18978,
     "sha256": "a4f2e42c988e14fee86bf3079352e400d6af055af577c65b6bb912da8893f93f"
   },
   {
-    "name": "64.png",
+    "path": "create-mission/064.png",
+    "originalPath": "guide/64.png",
     "bytes": 101987,
     "sha256": "1a527128ec46a4e90fdc7f44319ab1055178b3ac9f21432d7820f7f67ecc97b6"
   },
   {
-    "name": "65.png",
+    "path": "create-mission/065.png",
+    "originalPath": "guide/65.png",
     "bytes": 256684,
     "sha256": "e457883a8860286ea76ca0a3a0c9ea1c773a00ec27c63194d1be9eefcdc65ade"
   },
   {
-    "name": "66.png",
+    "path": "create-mission/066.png",
+    "originalPath": "guide/66.png",
     "bytes": 167949,
     "sha256": "c4e89c4323c582596863a0ac853191d06ba3e209d6b40118df8192be2c4f7aaf"
   },
   {
-    "name": "67.png",
+    "path": "create-mission/067.png",
+    "originalPath": "guide/67.png",
     "bytes": 16013,
     "sha256": "3a3a9d62c71ca5f35c5ae09a9d78453936830ab2c70dbdc90a4bd092a1d249c4"
   },
   {
-    "name": "68.png",
+    "path": "create-mission/068.png",
+    "originalPath": "guide/68.png",
     "bytes": 382669,
     "sha256": "8a1f5a02e238e415527491ec253be8ff37278ff409c22921dad15ef7c952a4dd"
   },
   {
-    "name": "69.png",
+    "path": "create-mission/069.png",
+    "originalPath": "guide/69.png",
     "bytes": 348187,
     "sha256": "72b6fb1b836db1cfd28e50a3d14922c2101da3cb27936aa686edd9d39fd4cad7"
   },
   {
-    "name": "70.png",
+    "path": "create-mission/070.png",
+    "originalPath": "guide/70.png",
     "bytes": 118367,
     "sha256": "a4791f49755074da0543fc7e6632c24fe4a67717dc4cd2340776f534827e15f9"
   },
   {
-    "name": "71.png",
+    "path": "create-mission/071.png",
+    "originalPath": "guide/71.png",
     "bytes": 333929,
     "sha256": "c8bc1c2b1bf82ddd69665bb231322ba77bc7596a4971af6f32049e631668afb5"
   },
   {
-    "name": "72.png",
+    "path": "create-mission/072.png",
+    "originalPath": "guide/72.png",
     "bytes": 201294,
     "sha256": "81de27484fb4853fc51e3af23d24b2bedb048641513774a8acdd32d987f3fd6e"
   },
   {
-    "name": "73.png",
+    "path": "create-mission/073.png",
+    "originalPath": "guide/73.png",
     "bytes": 161443,
     "sha256": "49d857289515b8eaff919e2ef449f27802d375015dd38c82bb1045001f7692a2"
   },
   {
-    "name": "74.png",
+    "path": "create-mission/074.png",
+    "originalPath": "guide/74.png",
     "bytes": 204425,
     "sha256": "22c3a1c01af0c80ac5d901b2ae7860eea7eb8c95502ec22f2958e8eeae5a4b1c"
   },
   {
-    "name": "75.png",
+    "path": "create-mission/075.png",
+    "originalPath": "guide/75.png",
     "bytes": 271698,
     "sha256": "39d981c3f2dfd82727ff891825b38eccd1a931211a943e4d859154dc2fe1860e"
   },
   {
-    "name": "76.png",
+    "path": "create-mission/076.png",
+    "originalPath": "guide/76.png",
     "bytes": 1562910,
     "sha256": "c069515f01202363176ff80943df2d823f97adde6f79dcf4147f7d40cf5b2dba"
   },
   {
-    "name": "77.png",
+    "path": "create-mission/077.png",
+    "originalPath": "guide/77.png",
     "bytes": 1777997,
     "sha256": "4ca6090ca5aa0c84252aacce81e4fde348b2dcbf96cdb4276b20a7a238a981d8"
   },
   {
-    "name": "78.png",
+    "path": "create-mission/078.png",
+    "originalPath": "guide/78.png",
     "bytes": 5899818,
     "sha256": "6e5fe47e63595d3d5edcb5191b57db3c3a08253a184163f371118ae1c5ce4571"
   },
   {
-    "name": "79.png",
+    "path": "create-mission/079.png",
+    "originalPath": "guide/79.png",
     "bytes": 240881,
     "sha256": "bfff63a467048dbbb8b372a5653beb58787223f7206e6dd3307dfa69aba8618b"
   },
   {
-    "name": "80.png",
+    "path": "create-mission/080.png",
+    "originalPath": "guide/80.png",
     "bytes": 19102,
     "sha256": "7cb51a6ae8fcd4d71c1f300c45d9af130dc89bc406a3779e4d7f13ae23076b94"
   },
   {
-    "name": "81.png",
+    "path": "create-mission/081.png",
+    "originalPath": "guide/81.png",
     "bytes": 23970,
     "sha256": "5110634ef5b9042ee529368a176cab37fced87cbb6da20e846cb23a8388d94c1"
   },
   {
-    "name": "82.png",
+    "path": "create-mission/082.png",
+    "originalPath": "guide/82.png",
     "bytes": 140290,
     "sha256": "38fbbe5d0554c4a3f42e445be34b2d0945f75115cf90bb82d2889db2f2743fd2"
   },
   {
-    "name": "83.png",
+    "path": "create-mission/083.png",
+    "originalPath": "guide/83.png",
     "bytes": 129165,
     "sha256": "ce8b2217e4fb39ff297b450da093b00499ed94d68a284b1aff5c21af397119eb"
   },
   {
-    "name": "84.png",
+    "path": "create-mission/084.png",
+    "originalPath": "guide/84.png",
     "bytes": 128178,
     "sha256": "9a3e62de3a2136843edccce6a738dda3b2b167a839a5618d491692c1dca22572"
   },
   {
-    "name": "85.png",
+    "path": "create-mission/085.png",
+    "originalPath": "guide/85.png",
     "bytes": 194268,
     "sha256": "d5ca19d51d7507a20ca9672f05d5f140d2af14f06b8687124c2325d0d093ee34"
   },
   {
-    "name": "86.png",
+    "path": "create-mission/086.png",
+    "originalPath": "guide/86.png",
     "bytes": 88442,
     "sha256": "c050743d0300174c7c146115fc40afb2cdcfa2a3149a2f06bdd5808db85e5af3"
   },
   {
-    "name": "87.png",
+    "path": "create-mission/087.png",
+    "originalPath": "guide/87.png",
     "bytes": 135045,
     "sha256": "733b10d3201c6da8d8430d6de04eaebd41c95b829e8a3c25341eb17fd29f56f3"
   },
   {
-    "name": "88.png",
+    "path": "create-mission/088.png",
+    "originalPath": "guide/88.png",
     "bytes": 223458,
     "sha256": "3ca6b747090ccf9e998b39149452004284c0379d259760e12b15cd29d922163b"
   },
   {
-    "name": "89.png",
+    "path": "create-mission/089.png",
+    "originalPath": "guide/89.png",
     "bytes": 188452,
     "sha256": "98fa13b7f6cdafcea0bbeee00eded280b5026178398edac221d240248a5c1a74"
   },
   {
-    "name": "90.png",
+    "path": "create-mission/090.png",
+    "originalPath": "guide/90.png",
     "bytes": 2198927,
     "sha256": "882c92f5ebad8aa4f5b410bebbd1df564db12d11c493184ee09b1bbb744c5b6f"
   },
   {
-    "name": "91.png",
+    "path": "create-mission/091.png",
+    "originalPath": "guide/91.png",
     "bytes": 1458277,
     "sha256": "1b154fcdb7a36643557fd9bc72481f66cc35561a2141279d0bef4203aec8f3db"
   },
   {
-    "name": "92.png",
+    "path": "create-mission/092.png",
+    "originalPath": "guide/92.png",
     "bytes": 1348354,
     "sha256": "49e3088d3a90a073c5f78b29423767ee640f407756ce86e2f082fb743519cf58"
   },
   {
-    "name": "93.png",
+    "path": "create-mission/093.png",
+    "originalPath": "guide/93.png",
     "bytes": 1476831,
     "sha256": "43a34f49d5d14b05e25103f5a78dc4b018ccc33aceb9431f5aea38942bee8aa8"
   },
   {
-    "name": "94.png",
+    "path": "create-mission/094.png",
+    "originalPath": "guide/94.png",
     "bytes": 1331994,
     "sha256": "54a75a506b3d5fcc058e9fab3176a290dfc6898fd4e736cea1f88622a779c078"
   },
   {
-    "name": "95.png",
+    "path": "create-mission/095.png",
+    "originalPath": "guide/95.png",
     "bytes": 1960473,
     "sha256": "1cb8bcaab8104354049977fcd1ce98361f6c1b136a1513eaa34c573055b58b9f"
   },
   {
-    "name": "96.png",
+    "path": "create-mission/096.png",
+    "originalPath": "guide/96.png",
     "bytes": 2306820,
     "sha256": "146a3447b9d0651dbfeb9496329b4bf83ebb72a8a28d66dbdbad331061d238d1"
   },
   {
-    "name": "97.png",
+    "path": "create-mission/097.png",
+    "originalPath": "guide/97.png",
     "bytes": 1876065,
     "sha256": "f40604b211a22f85de313aaff04e1b0cc1f1d865707f1fdfe7ca71cb606f137e"
   },
   {
-    "name": "98.png",
+    "path": "create-mission/098.png",
+    "originalPath": "guide/98.png",
     "bytes": 2361761,
     "sha256": "d201bea6ab2b87feeb14a07370fa0eaed85beee2e23800bc895b87751f933072"
   },
   {
-    "name": "99.png",
+    "path": "create-mission/099.png",
+    "originalPath": "guide/99.png",
     "bytes": 1793969,
     "sha256": "6b9f1052cf3600c2fa110e016a7a5495a3a325964aca14784c793a361e7f288e"
   },
   {
-    "name": "100.png",
+    "path": "create-mission/100.png",
+    "originalPath": "guide/100.png",
     "bytes": 1723098,
     "sha256": "00ae4985c5b94157e20c451e3db463d35e21aac7c7b4f9de50bbcbd4aa24cf91"
   },
   {
-    "name": "101.png",
+    "path": "create-mission/101.png",
+    "originalPath": "guide/101.png",
     "bytes": 1671481,
     "sha256": "11c874da3ce7acd372920b87d8646bee2457622f290f40fba840501b7096b244"
   },
   {
-    "name": "102.png",
+    "path": "create-mission/102.png",
+    "originalPath": "guide/102.png",
     "bytes": 1726900,
     "sha256": "d2b5836dd3cb18ebde8dfd08aed882eff862373bc98174c3f88519533c15dad6"
   },
   {
-    "name": "103.png",
+    "path": "create-mission/103.png",
+    "originalPath": "guide/103.png",
     "bytes": 2038476,
     "sha256": "9f8b404ef6c48b2806111d37e5c558a13a923a4f26840dcd93596267bf069919"
   },
   {
-    "name": "104.png",
+    "path": "create-mission/104.png",
+    "originalPath": "guide/104.png",
     "bytes": 230739,
     "sha256": "55f3f533a8460a282a8c30c280caccb16414bd7eea60ee3da136def345784623"
   },
   {
-    "name": "105.png",
+    "path": "create-mission/105.png",
+    "originalPath": "guide/105.png",
     "bytes": 1533062,
     "sha256": "048fc980da94b48213a981551bcd456aee8118b76736de8ac56bcc148ff75c71"
   },
   {
-    "name": "106.png",
+    "path": "create-mission/106.png",
+    "originalPath": "guide/106.png",
     "bytes": 323638,
     "sha256": "ace119c4d1f092e512557e45b9dab62a919813abc075e1942789eb037beacf0b"
   },
   {
-    "name": "107.png",
+    "path": "create-mission/107.png",
+    "originalPath": "guide/107.png",
     "bytes": 2273835,
     "sha256": "f8a74d5ae3c55d4f79a91a84e1d735c8ee2f0d237804074d28a0e3586c8bcafa"
   },
   {
-    "name": "108.png",
+    "path": "create-mission/108.png",
+    "originalPath": "guide/108.png",
     "bytes": 1972506,
     "sha256": "8a0d49940663177eb1bff54b5eff81a696f1b229a1cbb7f7dc64f4e22b863dc4"
   },
   {
-    "name": "109.png",
+    "path": "create-mission/109.png",
+    "originalPath": "guide/109.png",
     "bytes": 1887989,
     "sha256": "c51ba6fcd4f3d44e1850e802339e494f474648687809958f4277bdbaf5e3b365"
   },
   {
-    "name": "110.png",
+    "path": "create-mission/110.png",
+    "originalPath": "guide/110.png",
     "bytes": 545542,
     "sha256": "5a6ad74b981be2bcb83043e1de6286af6ae3b3e3f073703367fe1cb67b1340ed"
   },
   {
-    "name": "111.png",
+    "path": "create-mission/111.png",
+    "originalPath": "guide/111.png",
     "bytes": 2041694,
     "sha256": "0e1fb71b5f9bab60aa3ba8c83b0521b71d340fa0606f58d0f9557c65b28e32ce"
   },
   {
-    "name": "112.png",
+    "path": "create-mission/112.png",
+    "originalPath": "guide/112.png",
     "bytes": 2107439,
     "sha256": "34a8e49ceb28df603571a25b98b6db69233761150a5355bf7958d603b8e236f0"
   },
   {
-    "name": "113.png",
+    "path": "create-mission/113.png",
+    "originalPath": "guide/113.png",
     "bytes": 2207171,
     "sha256": "682fbd177fa3b0ca36242a9eb66021114bf0c6ee05b8a3e7d69bb0e5ce214440"
+  },
+  {
+    "path": "create-mission/missing-addon-dependencies.png",
+    "originalPath": "mission/missing-addon-dependencies.png",
+    "bytes": 167172,
+    "sha256": "ef07c1b27dd54cbf060ef2e0896456be579c7d93ebace6fb9f00206c24378594"
+  },
+  {
+    "path": "create-mission/repository-layout.png",
+    "originalPath": "mission/repository-layout.png",
+    "bytes": 43170,
+    "sha256": "c5f95489ad1ae1777ad954bddb0b34471d7dc34741edee76e684d18c9f6a416b"
+  },
+  {
+    "path": "create-mission/scan-for-projects.png",
+    "originalPath": "mission/scan-for-projects.png",
+    "bytes": 151525,
+    "sha256": "8b569b310994c5445a8c4ba05a02b63460aaa14a1775b8a37b9741a84a3aabbd"
+  },
+  {
+    "path": "create-mission/workshop-addons-folder.png",
+    "originalPath": "mission/workshop-addons-folder.png",
+    "bytes": 68387,
+    "sha256": "df897cecf80faf91b6ed9eba7240377531e9801b6efd6afa4d05bce9bf322b28"
+  },
+  {
+    "path": "create-mission/workshop-guid-search.png",
+    "originalPath": "mission/workshop-guid-search.png",
+    "bytes": 1395749,
+    "sha256": "5f7c69f592eef5cdc0d9b857b05bbad9fe6b26515d587689de423d6b7e6da914"
+  },
+  {
+    "path": "example-mission/001.png",
+    "originalPath": "guide/ReadyMission/01.png",
+    "bytes": 2780311,
+    "sha256": "6613e21819765adf0a806b83053ceb7425371cda6fe64319fdb0bc2000bfb313"
+  },
+  {
+    "path": "example-mission/002.png",
+    "originalPath": "guide/ReadyMission/02.png",
+    "bytes": 321747,
+    "sha256": "30fd76b4a7e72279564f30af438d72838bf12095c3b72d899160966336f681ae"
+  },
+  {
+    "path": "example-mission/003.png",
+    "originalPath": "guide/ReadyMission/03.png",
+    "bytes": 66666,
+    "sha256": "475e9a91a75815a5c70c34c2c5618be0375fe055cff680ae9c5ffbf74366bab7"
+  },
+  {
+    "path": "example-mission/004.png",
+    "originalPath": "guide/ReadyMission/04.png",
+    "bytes": 33856,
+    "sha256": "a95ac7954bd80b9c5f1bf54b8e711be15bd61f4797d20385b609e18c1335e2e6"
+  },
+  {
+    "path": "example-mission/006.png",
+    "originalPath": "guide/ReadyMission/06.png",
+    "bytes": 242188,
+    "sha256": "bf1653d354d024a7fcc697e8df479e0bf1a3dd06386469e88f0f189640ba01db"
+  },
+  {
+    "path": "example-mission/007.png",
+    "originalPath": "guide/ReadyMission/07.png",
+    "bytes": 143061,
+    "sha256": "6a368e1455843d86bedbc7bfb47348d5da670d7ed9aeac010f50b8de60a32033"
+  },
+  {
+    "path": "example-mission/008.png",
+    "originalPath": "guide/ReadyMission/08.png",
+    "bytes": 40038,
+    "sha256": "7becc5efcbcc0d67f3a2f55d59f709b1d0d2bca817d8661f8ecc20bb3b9ada60"
+  },
+  {
+    "path": "example-mission/009.png",
+    "originalPath": "guide/ReadyMission/09.png",
+    "bytes": 31561,
+    "sha256": "393957498e452bfea544c92ae79cde65e619806f4271c1549f5eff281d65f7db"
+  },
+  {
+    "path": "example-mission/010.png",
+    "originalPath": "guide/ReadyMission/10.png",
+    "bytes": 164330,
+    "sha256": "bb4a5dc58e8297a92fd0edb106f7397bf1e07a3585f0f27b3caffedbbdb03934"
+  },
+  {
+    "path": "example-mission/011.png",
+    "originalPath": "guide/ReadyMission/11.png",
+    "bytes": 47321,
+    "sha256": "91eadf0ce9fea90e41cf7e64dd33b7dfb3f0215b849f266eb72ca6259e984a6e"
+  },
+  {
+    "path": "example-mission/012.png",
+    "originalPath": "guide/ReadyMission/12.png",
+    "bytes": 30440,
+    "sha256": "8f3560a35ffac6ce83af42b9e17664de39a6e3d89ef1022bdd8ba3030ac8973f"
+  },
+  {
+    "path": "example-mission/013.png",
+    "originalPath": "guide/ReadyMission/13.png",
+    "bytes": 14297,
+    "sha256": "c5b49a80845578dfd46623d688e25210c7c527a087abbe04d66b250cb8d575c3"
+  },
+  {
+    "path": "git/001.png",
+    "originalPath": "guide/Git/1.png",
+    "bytes": 97437,
+    "sha256": "050a516d29a79f668ce60a82160ad88ce4c2818c5bce6662aab7bc768b3820a5"
+  },
+  {
+    "path": "git/002.png",
+    "originalPath": "guide/Git/2.png",
+    "bytes": 38579,
+    "sha256": "7a660a0a3b113991eb3d72e44938bd40e585fd0e858a29a7c4a56b2e15a599bd"
+  },
+  {
+    "path": "git/003.png",
+    "originalPath": "guide/Git/3.png",
+    "bytes": 263398,
+    "sha256": "808c3339c1b49562f6177a89e9acdf248f25f0149309456090af6788ef11361e"
+  },
+  {
+    "path": "git/004.png",
+    "originalPath": "guide/Git/4.png",
+    "bytes": 30984,
+    "sha256": "afddd2dfdec6430c86a2d60654fe478ee37ef62fe124c8a4b37719d91412570c"
+  },
+  {
+    "path": "git/005.png",
+    "originalPath": "guide/Git/5.png",
+    "bytes": 155623,
+    "sha256": "b1330f9e93832c68ef8ab10b84e02a057242db37a1b8f1f95be741f6901b44cb"
+  },
+  {
+    "path": "git/006.png",
+    "originalPath": "guide/Git/6.png",
+    "bytes": 86175,
+    "sha256": "086bb01bf9129420d86414cc9104e70010da28b976e48ebf96658fe01e52637f"
+  },
+  {
+    "path": "git/007.png",
+    "originalPath": "guide/Git/7.png",
+    "bytes": 84210,
+    "sha256": "7e7bacbeb1e7f1667ada5642419165db456073df816158ba07a333ad100c43ef"
+  },
+  {
+    "path": "git/008.png",
+    "originalPath": "guide/Git/8.png",
+    "bytes": 86566,
+    "sha256": "e7c578fda57c462278c0c74d7991ea1eaeef3a687b2336f61801213498de5f65"
+  },
+  {
+    "path": "git/009.png",
+    "originalPath": "guide/Git/9.png",
+    "bytes": 27862,
+    "sha256": "5480ceebd1aaf9caf4090a2df32d553da0a45360c9a9bac1d01b7a3e6619ee22"
+  },
+  {
+    "path": "git/010.png",
+    "originalPath": "guide/Git/10.png",
+    "bytes": 79659,
+    "sha256": "aab74fb84540b3ea66bb04e27890495e219b98fb0ba22f885a5169c4ba60df2e"
+  },
+  {
+    "path": "git/011.png",
+    "originalPath": "guide/Git/11.png",
+    "bytes": 70069,
+    "sha256": "6cf99ce2062e3498e22f1f348e286e905ee36dfc7b536ce42f4b1d525d69e148"
+  },
+  {
+    "path": "triad-tactics/001.png",
+    "originalPath": "guide/TriadMission/01.png",
+    "bytes": 2252645,
+    "sha256": "830d09472699208b06bdc83fe58ddf131e96778e9af6ebbc7ffc436830b6202d"
+  },
+  {
+    "path": "triad-tactics/002.png",
+    "originalPath": "guide/TriadMission/02.png",
+    "bytes": 1651313,
+    "sha256": "60f163cd182c5f147415e458894cd095a842ff3c58cc809586d40a3739f3bbf3"
+  },
+  {
+    "path": "unit-planning/green-berets-reference.png",
+    "originalPath": "mission/green-berets-reference.png",
+    "bytes": 916909,
+    "sha256": "9971f0b53d213b65b4b33a0fa2ff98895d8158c0ec0bc5d1a3413695040c9848"
   }
 ]

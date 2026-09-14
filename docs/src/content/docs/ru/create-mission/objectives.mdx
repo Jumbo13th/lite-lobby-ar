@@ -3,7 +3,7 @@ title: "7. Задачи миссии и триггеры"
 description: "Обозначения на карте, триггеры захвата, потерь, времени и превосходства, а также текст брифинга."
 prev:
   link: "/lite-lobby-ar/ru/create-mission/groups-and-slots/"
-  label: "6. Группы и игровые слоты"
+  label: "6. Подразделения в миссии"
 next:
   link: "/lite-lobby-ar/ru/create-mission/publishing/"
   label: "8. Проверка и публикация"
@@ -11,34 +11,34 @@ next:
 
 import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
 import { Aside } from '@astrojs/starlight/components';
-import mapMarkings from '../../../../assets/guide/91.png';
-import mapLineSettings from '../../../../assets/guide/92.png';
-import mapLinePoints from '../../../../assets/guide/93.png';
-import mapRedLine from '../../../../assets/guide/94.png';
-import mapPort from '../../../../assets/guide/95.png';
-import step96 from '../../../../assets/guide/96.png';
-import step97 from '../../../../assets/guide/97.png';
-import step98 from '../../../../assets/guide/98.png';
-import step99 from '../../../../assets/guide/99.png';
-import step100 from '../../../../assets/guide/100.png';
-import step101 from '../../../../assets/guide/101.png';
-import step102 from '../../../../assets/guide/102.png';
-import step103 from '../../../../assets/guide/103.png';
-import step104 from '../../../../assets/guide/104.png';
-import step105 from '../../../../assets/guide/105.png';
+import mapMarkings from '../../../../assets/screenshots/create-mission/091.png';
+import mapLineSettings from '../../../../assets/screenshots/create-mission/092.png';
+import mapLinePoints from '../../../../assets/screenshots/create-mission/093.png';
+import mapRedLine from '../../../../assets/screenshots/create-mission/094.png';
+import mapPort from '../../../../assets/screenshots/create-mission/095.png';
+import step96 from '../../../../assets/screenshots/create-mission/096.png';
+import step97 from '../../../../assets/screenshots/create-mission/097.png';
+import step98 from '../../../../assets/screenshots/create-mission/098.png';
+import step99 from '../../../../assets/screenshots/create-mission/099.png';
+import step100 from '../../../../assets/screenshots/create-mission/100.png';
+import step101 from '../../../../assets/screenshots/create-mission/101.png';
+import step102 from '../../../../assets/screenshots/create-mission/102.png';
+import step103 from '../../../../assets/screenshots/create-mission/103.png';
+import step104 from '../../../../assets/screenshots/create-mission/104.png';
+import step105 from '../../../../assets/screenshots/create-mission/105.png';
 
 [К оглавлению руководства](../)
 
-В мире уже размещены подразделения и настроены игровые слоты. Теперь добавим ориентиры на карту, зададим условия захвата порта и другие задачи, затем подготовим брифинг для игроков. Продолжайте работу в World Editor.
+Продолжайте работу в **World Editor**. Добавим обозначения на карту, настроим условия выполнения задач и подготовим брифинг для игроков.
 
 ## Обозначения на карте {#map-markings}
 
-Добавим на карту ориентиры для игроков. В нашем примере красная линия проходит через остров, а зелёная обозначает границу порта.
+На скриншоте показана разметка, которую мы хотим получить. Игра будет проходить в районе, выделенном оранжевой рамкой. Красную линию пересекать запрещено правилами миссии.
 
 <LL_Screenshot
   src={mapMarkings}
-  alt="Карта северной части Эверона с жёлтой рамкой и красной линией возле Montignac."
-  caption="Пример разметки карты. Начнём с красной линии."
+  alt="Карта северной части Эверона: оранжевая рамка выделяет район игры, красная линия возле Montignac обозначает границу, которую нельзя пересекать."
+  caption="Район игры и запрещённая для пересечения граница. Начнём с красной линии."
   originalLabel="Открыть оригинал изображения"
 />
 
@@ -109,9 +109,9 @@ import step105 from '../../../../assets/guide/105.png';
 
 ## Триггеры {#triggers}
 
-Триггеры проверяют условия миссии и сообщают игрокам, когда они выполнены. В нашем примере настроим захват порта, критические потери, ограничение времени и численное превосходство. В своей миссии используйте те условия, которые нужны для её задач.
+Триггеры проверяют условия миссии и сообщают игрокам, когда они выполнены. Настроим захват порта, критические потери, ограничение времени и численное превосходство.
 
-Для проверки захвата, потерь и превосходства нужны [группы обеих сторон с игровыми слотами](/lite-lobby-ar/ru/create-mission/groups-and-slots/#playable-forces). Если вы пока разместили только Alpha, сначала подготовьте и разместите остальных участников.
+Для проверки захвата, потерь и превосходства нужны [группы обеих сторон с игровыми слотами](/lite-lobby-ar/ru/create-mission/groups-and-slots/#playable-forces). Если вы пока разместили только группу «Альфа», сначала подготовьте и разместите остальных участников.
 
 ### Размещение и сообщения {#mission-conditions}
 
@@ -226,7 +226,7 @@ import step105 from '../../../../assets/guide/105.png';
 
 Для американской стороны добавьте второй такой триггер и назовите его `USLoss`. В поле **Faction Key** укажите `US`, а в **Threshold** — `7`. Напишите сообщение о критических потерях американских войск.
 
-Значение **Threshold** выбирайте с учётом начальной численности стороны. В начале проверки живых персонажей, зарегистрированных в лобби, должно быть больше, чем указано в этом поле. Убедитесь, что сообщение появляется, когда после потерь их число опускается до заданного значения.
+В начале проверки живых бойцов в слотах лобби должно быть больше, чем указано в **Threshold**. Проверьте, что сообщение появляется, когда после потерь их численность снижается до этого порога.
 
 ### Триггер времени {#mission-timer}
 
@@ -304,4 +304,4 @@ import step105 from '../../../../assets/guide/105.png';
 
 Параметр **Order** определяет порядок записей в брифинге. Записи с меньшим значением отображаются раньше.
 
-Сохраните мир нажатием `Ctrl+S`. Задачи и брифинг готовы к общей проверке миссии.
+Сохраните мир нажатием `Ctrl+S`. В следующей главе [проверим миссию и подготовим её к публикации](../publishing/).

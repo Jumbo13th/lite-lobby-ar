@@ -32,10 +32,12 @@ provides dimensions and the original URL. Generated variants are build artifacts
 
 ## Asset inventory
 
-The test manifest maps all 113 original filenames to their byte lengths and SHA-256
-hashes. Both locales reference the same source files; no per-language image copies exist.
-Future GitHub Desktop captures use a separate docs/src/assets/git directory and do not
-replace or extend the fixed original screenshot inventory.
+The shared tests/screenshots.json manifest maps each current relative path to its
+original path, byte length and SHA-256 hash. It covers all 144 source PNGs, including
+the original 113 course captures. Both locales use the same source files.
+Screenshots live in docs/src/assets/screenshots/<topic>/, using lowercase kebab-case
+topic folders and three-digit capture numbers. Supplementary captures with descriptive
+names use kebab-case. Source bytes must remain unchanged during path migrations.
 
 ## Build artifact
 

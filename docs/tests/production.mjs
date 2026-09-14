@@ -9,8 +9,8 @@ import chapters from '../src/data/chapters.json' with { type: 'json' };
 const base = '/lite-lobby-ar/';
 const home = (locale) => `${base}${locale === 'ru' ? 'ru/' : ''}`;
 const route = (locale, article) => `${home(locale)}${article ? `${fixtureSlug}/` : ''}`;
-const guideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics', 'api'];
-const anchors = [...guideOrder, 'scripting', 'website-integration'];
+const guideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics'];
+const anchors = [...guideOrder];
 const guidePages = new Map([...chapters.hubs, ...chapters.chapters].map((entry) => [entry.slug, entry]));
 
 async function chapterTitle(page, locale, slug) {
@@ -209,7 +209,7 @@ async function homepageLayout(page) {
   const list = page.locator('.ll-guide-list');
   const entries = list.locator('article.ll-guide-entry');
   assert.equal(await list.count(), 1, 'Homepage must present one guide list');
-  assert.equal(await entries.count(), guideOrder.length, 'Homepage must present exactly five guide entries');
+  assert.equal(await entries.count(), guideOrder.length, 'Homepage must present exactly four guide entries');
   assert.deepEqual(await entries.locator('h2').evaluateAll((headings) => headings.map((heading) => heading.id)), guideOrder, 'Homepage guides must follow the agreed order');
   assert.equal(await page.locator('.sidebar, .sidebar-pane, starlight-toc, mobile-starlight-toc').count(), 0, 'Homepage should omit article navigation');
   assert.equal(await page.locator('#starlight__sidebar.ll-mobile-menu[popover]').count(), 1, 'Homepage needs its compact mobile menu');
@@ -218,7 +218,8 @@ async function homepageLayout(page) {
   for (const slug of ['create-mission', 'example-mission', 'git']) {
     assert.equal(await page.locator(`#${slug} > a`).getAttribute('href'), `${home(locale)}${slug}/`, `${slug} must link to its localized guide`);
   }
-  assert.equal(await page.locator('.ll-guide-entry:not(:has(#create-mission, #example-mission, #git))').locator('a, button, [role="button"], [role="link"]').count(), 0, 'Unwritten guides must not appear actionable');
+  assert.deepEqual(await page.locator('.ll-section-pages a').evaluateAll((links) => links.map((link) => link.getAttribute('href'))),
+    ['setup', 'requirements'].map((slug) => `${home(locale)}triad-tactics/${slug}/`));
   for (const id of anchors) assert.equal(await page.locator(`[id="${id}"]`).count(), 1, `Missing or repeated guide heading: ${id}`);
   const bounds = await entries.evaluateAll((elements) => elements.map((element) => {
     const { x, y, width, height } = element.getBoundingClientRect();
@@ -235,18 +236,8 @@ async function homepageLayout(page) {
     if (index) assert.ok(box.y >= bounds[index - 1].y + bounds[index - 1].height - 1, 'Guide entries overlap');
   }
   const width = page.viewportSize().width;
-  const apiEntry = entries.last();
-  const apiBounds = bounds.at(-1);
-  const apiTitle = titles.at(-1);
-  assert.equal(await apiEntry.locator('ul.ll-guide-audiences > li').count(), 2, 'API audiences should form a two-item bullet list');
-  assert.equal(await apiEntry.locator('ul.ll-guide-audiences > li > h3[id]').count(), 2, 'API audience headings should remain inside their list items');
-  const audiences = await Promise.all(['scripting', 'website-integration'].map((id) => page.locator(`#${id}`).boundingBox()));
-  for (const label of audiences) {
-    assert.ok(label && label.width > 0 && label.height > 0 && label.x >= apiBounds.x && label.x + label.width <= apiBounds.x + apiBounds.width + 1 && label.y + label.height <= apiBounds.y + apiBounds.height, 'API audience label should fit its guide entry');
-  }
-  assert.ok(audiences[0].y >= apiTitle.y + apiTitle.height - 1 && audiences[1].y >= audiences[0].y + audiences[0].height - 1, 'API audience bullets should occupy separate lines below their guide heading');
   if (width >= 1440) {
-    for (const box of bounds.slice(0, -1)) assert.ok(Math.abs(box.height - bounds[0].height) < 1, 'Desktop guide entries without subheadings should have equal heights');
+    for (const box of bounds.slice(0, 3)) assert.ok(Math.abs(box.height - bounds[0].height) < 1, 'Desktop guide entries without subheadings should have equal heights');
     assert.ok(Math.abs(bounds[0].x - (width - bounds[0].x - bounds[0].width)) < 2, 'Desktop guide list should be centered');
   }
   await noOverflow(page);
@@ -405,7 +396,10 @@ async function chapterJourneys(page, locale, resultsDirectory) {
       }
       assert.equal(await page.locator('.sl-markdown-content #comms-role').count(), 0, 'Editor display should not interrupt the equipment chapter');
     }
-    if (slug === 'create-mission/character-editor') await sectionInSameChapter(slug, 'comms-role');
+    if (slug === 'create-mission/character-editor') {
+      await sectionInSameChapter(slug, 'comms-role');
+      await sectionInSameChapter(slug, 'group-prefab');
+    }
   }
   assert.equal(await page.locator('.pagination-links a[rel="next"]').count(), 0, 'The final chapter should conclude the course');
 
@@ -462,9 +456,10 @@ async function chapterJourneys(page, locale, resultsDirectory) {
   for (const [guide, anchor, chapter, targetAnchor = anchor] of [
     ['create-mission', 'save-world', 'create-mission/world'],
     ['character-prefabs', '', 'create-mission', 'characters-part'],
-    ['character-prefabs', 'group-members', 'create-mission/groups-and-slots'],
+    ['character-prefabs', 'group-members', 'create-mission/character-editor'],
     ['character-prefabs/characters', '', 'create-mission/base-character'],
-    ['character-prefabs/groups', '', 'create-mission/groups-and-slots'],
+    ['character-prefabs/groups', '', 'create-mission/character-editor', 'group-prefab'],
+    ['create-mission/groups-and-slots', 'group-members', 'create-mission/character-editor'],
     ['character-prefabs/characters/radioman', 'backpack-radio', 'create-mission/character-variants'],
     ['character-prefabs/characters/radios', 'backpack-radio', 'create-mission/character-variants'],
     ['character-prefabs/characters/commander', 'commander-launcher', 'create-mission/character-variants'],
@@ -493,7 +488,7 @@ async function chapterJourneys(page, locale, resultsDirectory) {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: join(resultsDirectory, `${locale}-mission-overview-${page.viewportSize().width}.png`), fullPage: true });
   await follow('.sl-markdown-content a[href="../example-mission/"]', 'example-mission');
-  await follow(`.sl-markdown-content a[href^="${path('create-mission/objectives')}"]`, 'create-mission/objectives');
+  await follow('.sl-markdown-content a[href="../create-mission/project/#missing-addon-dependencies"]', 'create-mission/project');
   await page.goto(`${origin}${home(locale)}`);
 }
 async function articleContent(page, locale, inventory) {
@@ -508,8 +503,8 @@ async function articleContent(page, locale, inventory) {
   assert.equal(await body.locator('table tbody tr').count(), 2);
   assert.ok(await body.getByRole('complementary', { name: text.noteTitle }).isVisible(), 'Native article aside is missing');
   for (const [name, alt, caption] of [
-    ['51.png', text.smallAlt, text.smallCaption],
-    ['78.png', text.largeAlt, text.largeCaption],
+    ['create-mission/051.png', text.smallAlt, text.smallCaption],
+    ['create-mission/078.png', text.largeAlt, text.largeCaption],
   ]) {
     const img = page.getByAltText(alt, { exact: true });
     await img.scrollIntoViewIfNeeded();
@@ -533,7 +528,7 @@ async function articleContent(page, locale, inventory) {
     const response = await page.request.get(new URL(await original.getAttribute('href'), page.url()).href);
     assert.ok(response.ok(), `Original screenshot is unavailable: ${name}`);
     const bytes = await response.body();
-    const expected = inventory.find((entry) => entry.name === name);
+    const expected = inventory.find((entry) => entry.path === name);
     assert.equal(bytes.byteLength, expected.bytes, `Original screenshot size changed: ${name}`);
     assert.equal(createHash('sha256').update(bytes).digest('hex'), expected.sha256, `Original screenshot bytes changed: ${name}`);
     assert.ok(dimensions.rendered <= bytes.readUInt32BE(16) + 1, `Screenshot was enlarged beyond its original width: ${name}`);

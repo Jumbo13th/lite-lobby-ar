@@ -6,39 +6,39 @@ prev:
   label: "3. Базовый персонаж"
 next:
   link: "/lite-lobby-ar/ru/create-mission/character-editor/"
-  label: "5. Названия персонажей и проверка в Game Master"
+  label: "5. Персонажи и группы в Game Master"
 ---
 
 import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
-import inheritOda from '../../../../assets/guide/38.png';
-import nameOda from '../../../../assets/guide/39.png';
-import odaArmor from '../../../../assets/guide/40.png';
-import odaWebbing from '../../../../assets/guide/41.png';
-import odaWeapon from '../../../../assets/guide/42.png';
-import odaGrenade from '../../../../assets/guide/43.png';
-import odaSmoke from '../../../../assets/guide/44.png';
-import inheritedInventory from '../../../../assets/guide/46.png';
-import odaInventorySetup from '../../../../assets/guide/45.png';
-import firstPouch from '../../../../assets/guide/47.png';
-import secondPouchAndButtpack from '../../../../assets/guide/48.png';
-import backpackAmmo from '../../../../assets/guide/49.png';
-import inheritComms from '../../../../assets/guide/52.png';
-import duplicateBackpackRadio from '../../../../assets/guide/53.png';
-import backpackRadioChannel from '../../../../assets/guide/54.png';
-import commsRadio from '../../../../assets/guide/55.png';
-import commsStorage from '../../../../assets/guide/56.png';
-import inheritCommander from '../../../../assets/guide/66.png';
-import nameCommander from '../../../../assets/guide/67.png';
-import commanderLauncher from '../../../../assets/guide/68.png';
-import commanderBinoculars from '../../../../assets/guide/69.png';
+import inheritOda from '../../../../assets/screenshots/create-mission/038.png';
+import nameOda from '../../../../assets/screenshots/create-mission/039.png';
+import odaArmor from '../../../../assets/screenshots/create-mission/040.png';
+import odaWebbing from '../../../../assets/screenshots/create-mission/041.png';
+import odaWeapon from '../../../../assets/screenshots/create-mission/042.png';
+import odaGrenade from '../../../../assets/screenshots/create-mission/043.png';
+import odaSmoke from '../../../../assets/screenshots/create-mission/044.png';
+import inheritedInventory from '../../../../assets/screenshots/create-mission/046.png';
+import odaInventorySetup from '../../../../assets/screenshots/create-mission/045.png';
+import firstPouch from '../../../../assets/screenshots/create-mission/047.png';
+import secondPouchAndButtpack from '../../../../assets/screenshots/create-mission/048.png';
+import backpackAmmo from '../../../../assets/screenshots/create-mission/049.png';
+import inheritComms from '../../../../assets/screenshots/create-mission/052.png';
+import duplicateBackpackRadio from '../../../../assets/screenshots/create-mission/053.png';
+import backpackRadioChannel from '../../../../assets/screenshots/create-mission/054.png';
+import commsRadio from '../../../../assets/screenshots/create-mission/055.png';
+import commsStorage from '../../../../assets/screenshots/create-mission/056.png';
+import inheritCommander from '../../../../assets/screenshots/create-mission/066.png';
+import nameCommander from '../../../../assets/screenshots/create-mission/067.png';
+import commanderLauncher from '../../../../assets/screenshots/create-mission/068.png';
+import commanderBinoculars from '../../../../assets/screenshots/create-mission/069.png';
 
 [К оглавлению руководства](../)
 
-В базовом префабе уже заданы форма и личные вещи. Для бойцов ODA — отряда «зелёных беретов» в нашей миссии — подготовим его наследника с бронежилетом, разгрузкой, оружием и боекомплектом. Только после этого создадим связиста и командира с их дополнительным снаряжением.
+На основе базового префаба подготовим бойца ODA — отряда «зелёных беретов» в нашей миссии. Добавим бронежилет, разгрузку, оружие и боекомплект. Затем создадим варианты для связиста и командира.
 
 ## Общее вооружение подразделения {#oda-base}
 
-Если позже изменить родительский префаб, эти изменения перейдут и к его наследникам, кроме настроек, изменённых в самом наследнике. Поэтому общие настройки и индивидуальное снаряжение задаём в разных префабах. Подробнее об этом — в [справке по наследованию, дубликатам и оверрайдам](/lite-lobby-ar/ru/character-prefabs/prefab-operations/).
+Изменения родительского префаба передаются его наследникам. При этом настройки, заданные в самом наследнике, сохраняются. Поэтому общее снаряжение зададим в родительском префабе, а снаряжение отдельных специалистов — в его наследниках. Подробнее об этом — в [справке по наследованию, дубликатам и оверрайдам](/lite-lobby-ar/ru/character-prefabs/prefab-operations/).
 
 В **Resource Browser** откройте папку `Green Berets` своего аддона. Щёлкните правой кнопкой мыши по `TSS_Character_US_GB_BaseLoadout.et` и выберите **Inherit**, чтобы создать его наследника.
 
@@ -121,7 +121,7 @@ import commanderBinoculars from '../../../../assets/guide/69.png';
 
 ## Боекомплект и подсумки {#oda-ammunition}
 
-Продолжим работу с `TSS_Character_US_GB_ODA_Base.et`: разложим боекомплект и остальные предметы по снаряжению бойца. Этот набор затем получат оба его наследника.
+В префабе `TSS_Character_US_GB_ODA_Base.et` разместим магазины и гранаты в подсумках и рюкзаке, а фонарь — в куртке. Этот набор затем получат связист и командир.
 
 Выберите персонажа и через поиск компонентов найдите **SCR_InventoryStorageManagerComponent**. Раскройте список **Initial Inventory Items**, в котором задаётся содержимое инвентаря.
 
@@ -205,7 +205,7 @@ import commanderBinoculars from '../../../../assets/guide/69.png';
 
 ## Персонаж с ранцевой радиостанцией {#comms-sergeant}
 
-Общий префаб `TSS_Character_US_GB_ODA_Base.et` готов. На его основе создадим связиста: заменим рюкзак ранцевой радиостанцией, выберем другую форму и исправим места хранения предметов. Эти изменения внесём в префаб связиста, чтобы остальные бойцы сохранили общий набор.
+На основе `TSS_Character_US_GB_ODA_Base.et` создадим связиста: заменим рюкзак ранцевой радиостанцией и выберем другую форму. Изменения внесём в отдельный префаб, чтобы они не затронули остальных бойцов.
 
 В **Resource Browser** своего аддона откройте папку `Green Berets`. Щёлкните правой кнопкой мыши по `TSS_Character_US_GB_ODA_Base.et` и выберите **Inherit**. Назовите новый префаб `TSS_Character_US_GB_CommsSergeant`.
 
@@ -274,7 +274,7 @@ import commanderBinoculars from '../../../../assets/guide/69.png';
 
 ## Персонаж с дополнительным оружием {#detachment-commander}
 
-Для командира снова возьмём `TSS_Character_US_GB_ODA_Base.et` с общим снаряжением. В отдельном наследнике добавим гранатомёт M72A3 и бинокль M22.
+Создадим командира на основе `TSS_Character_US_GB_ODA_Base.et` и добавим ему гранатомёт M72A3 и бинокль M22.
 
 В **Resource Browser** своего аддона откройте папку `Green Berets`. Щёлкните правой кнопкой мыши по `TSS_Character_US_GB_ODA_Base.et` и выберите **Inherit**.
 
@@ -322,4 +322,4 @@ import commanderBinoculars from '../../../../assets/guide/69.png';
   originalLabel="Открыть оригинал изображения"
 />
 
-Нажмите `Ctrl+S`, чтобы сохранить префаб командира. Снаряжение обоих бойцов готово. В следующей главе [зададим их названия и роли, добавим в Game Master и проверим в игре](../character-editor/).
+Нажмите `Ctrl+S`, чтобы сохранить префаб командира. В следующей главе [зададим названия и роли персонажей, добавим их в Game Master и проверим в игре](../character-editor/).

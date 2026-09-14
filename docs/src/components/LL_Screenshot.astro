@@ -11,6 +11,11 @@ interface Props {
 
 const { src, alt, caption, originalLabel } = Astro.props;
 
+// Astro requires the base path when a dev asset is opened as a browser document.
+const originalSrc = src.src.startsWith('/@fs/')
+  ? `${import.meta.env.BASE_URL.replace(/\/$/, '')}${src.src}`
+  : src.src;
+
 for (const [name, value] of Object.entries({ alt, caption, originalLabel })) {
   if (typeof value !== 'string' || !value.trim()) {
     throw new Error(`LL_Screenshot requires nonempty ${name}.`);
@@ -19,7 +24,7 @@ for (const [name, value] of Object.entries({ alt, caption, originalLabel })) {
 ---
 
 <figure>
-  <a class="original" href={src.src} target="_blank" rel="noopener noreferrer" aria-label={`${originalLabel}: ${caption}`}>
+  <a class="original" href={originalSrc} target="_blank" rel="noopener noreferrer" aria-label={`${originalLabel}: ${caption}`}>
     <Image
       src={src}
       alt={alt}
@@ -33,7 +38,7 @@ for (const [name, value] of Object.entries({ alt, caption, originalLabel })) {
   </a>
   <figcaption>
     <span>{caption}</span>
-    <a href={src.src} target="_blank" rel="noopener noreferrer">{originalLabel}</a>
+    <a href={originalSrc} target="_blank" rel="noopener noreferrer">{originalLabel}</a>
   </figcaption>
 </figure>
 

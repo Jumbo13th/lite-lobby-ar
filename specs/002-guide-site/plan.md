@@ -1,9 +1,75 @@
 # Implementation Plan: Lite Lobby Guide Site
 
+T114: record source hashes and current rendered-page image sequences, move 144 PNGs to topic folders under assets/screenshots, retain unused reference sources without publishing them, consolidate checksum inventories and verify case-sensitive paths. Update RU/EN imports and fixture paths; compare old/new page image hashes, verify every rendered original and responsive image, then rebuild production preview.
+
+T113: add the missing top return links to Git and existing-mission pages; list all four supplementary materials in the overview; align two locale-dependent heading anchors with compatibility spans; remove the empty EN prefab-operations heading while retaining its anchor. Extend existing navigation validation, rebuild and verify production preview on port 4322.
+
+T112: add one exception paragraph directly after the unit-count requirement in RU/EN. Preserve all other requirements. Verify the documentation build.
+
+T111: link rotation to https://triad-tactics.com/en/games#rotation in both locales; link slot setup, unit planning, briefing formatting and triggers to canonical localized pages and anchors. Preserve rule wording and addon names as plain bold text.
+
+T110: group supplied requirements into concept, player composition, content, briefing and trigger sections in RU/EN. Preserve mandatory versus recommended wording and clarify 60/67 as the most uneven permitted split. Link setup directly to the points requirement; do not invent numerical scoring rules. Build and check localized requirements links.
+
+T109: add two short numbered setup sections with LL_Screenshot, matching locale anchors and requirements links. Use the existing PortCapture and PortTrigger example; preserve original captures and validate the new asset inventory, build and rendered pages. No new scoring policy or other setup topics.
+
+T108: remove the API topic, unused component properties and styles, and obsolete API layout checks. Keep four homepage entries and the two Triad Tactics child links.
+
 **Branch**: 002-guide-site | **Date**: 2026-09-12 | **Spec**: [spec.md](spec.md)
 **Input**: Approved complete guide-site scope within feature 002: design and current tooling first, collaborative guide content next, using shared Claude skills.
 
 ## Summary
+
+T107: retain the five homepage rows and triad-tactics anchor, adding two localized
+child links to /triad-tactics/setup/ and /triad-tactics/requirements/. The sidebar
+contains a separate matching group with only these two pages; no third overview page.
+Use existing MDX and list styling, brief introductory copy and reciprocal links.
+Update homepage link/layout checks, build and validate desktop/mobile navigation.
+
+T106: use the supplied ReadyMission captures to illustrate both locale pages, GitHub
+first and Workshop second. Explain the archive folder rename visible in 08–11; use
+the existing course world path only for Shooting Star. Danse Macabre capture 06 shows
+its Resource Browser project and Worlds folder, not a specific .ent. Keep dependency
+recovery as a short cross-link. Add a ReadyMission checksum inventory and verify
+supporting-page illustration order separately from the course's 116 illustrations.
+Preserve existing anchors, the course structure and the public-launch boundary.
+
+T105: replace the short RU/EN Git articles with one sequential guide per locale,
+using LL_Screenshot and Starlight Aside. Review all eleven supplied images and official
+GitHub Desktop instructions. Use Triad Desert Storm as this guide's self-contained
+example; connect to the mission course rather than duplicating world setup. Add a
+separate Git screenshot checksum inventory while preserving the existing 113-image
+inventory and course checks. Build, run validation, and inspect desktop/mobile Git
+pages and original links on the running server. No new UI, dependencies or game edits.
+
+T104: normalize only /@fs original-image URLs in LL_Screenshot using BASE_URL; both
+anchors must use the same URL. Reproduced Astro dev's HTML Accept-header base guard:
+unprefixed navigation is 404 while an image request succeeds. Add dev-browser
+regression coverage for both anchors, with PNG byte comparison, then run validation.
+
+T103: place the L shortcut tip after the base prefab has been created, before the
+unit-folder step. Use the existing Starlight Aside, preserve steps and rebuild.
+
+T102: move the group-prefab and group-catalog sections with screenshots 79–90 from
+chapter 6 to chapter 5. Rename chapters 5/6 and part II, revise chapter introductions
+and transitions, update navigation/links and forward the moved fragment IDs from
+chapter 6 through the existing fragment mechanism. Preserve sequence, section IDs,
+image assets and all game settings. Correct screenshot 91 introduction/caption in
+both locales. Update chapter-boundary checks and run the existing validation suite.
+
+T101: audit all 51 Russian source routes (14 active pages and 37 forwarding pages),
+shared Russian component text and navigation against T100. Correct contextual
+terminology, then compare code values, UI labels and screenshot sources with a
+pre-edit snapshot. Build and inspect edited pages; retain the course structure.
+
+T100: correct the course overview's product name and review Russian terminology.
+Make contextual prose edits only; retain UI labels, paths and beginner definitions.
+Rebuild and inspect the affected rendered text. No new behavior or tests are needed.
+
+T099: read every Russian page, revise prose in place, and link mission-name references
+where readers would use them to inspect the example. No chapter restructuring or new
+game instructions. Preserve anchors, figures, code and field values. Check the diff,
+build both locales and verify links, images and current preview. Use Russian book
+excerpts as editorial references, not material to copy into the guide.
 
 T098 is an editorial update to the existing RU/EN course introductions, following
 the six operator corrections in spec.md. Preserve the course structure, rebuild

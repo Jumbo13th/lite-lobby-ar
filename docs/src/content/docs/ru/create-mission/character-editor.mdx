@@ -1,41 +1,53 @@
 ---
-title: "5. Названия персонажей и проверка в Game Master"
-description: "Общая таблица переводов, названия и роли персонажей, каталог Game Master и проверка в игре."
+title: "5. Персонажи и группы в Game Master"
+description: "Названия и роли персонажей, каталог Game Master, создание префаба группы и проверка состава."
 prev:
   link: "/lite-lobby-ar/ru/create-mission/character-variants/"
   label: "4. Вооружение и варианты персонажей"
 next:
   link: "/lite-lobby-ar/ru/create-mission/groups-and-slots/"
-  label: "6. Группы и игровые слоты"
+  label: "6. Подразделения в миссии"
 ---
 
 import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
-import launchStringEditor from '../../../../assets/guide/58.png';
-import newStringTable from '../../../../assets/guide/59.png';
-import stringTableLocation from '../../../../assets/guide/60.png';
-import stringTableClass from '../../../../assets/guide/61.png';
-import commsTranslation from '../../../../assets/guide/62.png';
-import buildRuntimeTable from '../../../../assets/guide/63.png';
-import registerStringTable from '../../../../assets/guide/64.png';
-import commanderTranslation from '../../../../assets/guide/70.png';
-import commsRole from '../../../../assets/guide/57.png';
-import commsName from '../../../../assets/guide/65.png';
-import commanderRole from '../../../../assets/guide/71.png';
-import overrideCharacterCatalog from '../../../../assets/guide/72.png';
-import duplicateCatalogEntry from '../../../../assets/guide/73.png';
-import assignCatalogPrefab from '../../../../assets/guide/74.png';
-import characterCatalogRoster from '../../../../assets/guide/75.png';
-import launchCharacterTest from '../../../../assets/guide/76.png';
-import testCharacterBrowser from '../../../../assets/guide/77.png';
-import placedTestCharacters from '../../../../assets/guide/78.png';
+import inheritGroup from '../../../../assets/screenshots/create-mission/079.png';
+import nameGroup from '../../../../assets/screenshots/create-mission/080.png';
+import groupFolder from '../../../../assets/screenshots/create-mission/081.png';
+import groupTranslation from '../../../../assets/screenshots/create-mission/082.png';
+import groupUiInfo from '../../../../assets/screenshots/create-mission/083.png';
+import groupMilitarySymbol from '../../../../assets/screenshots/create-mission/084.png';
+import alphaMembers from '../../../../assets/screenshots/create-mission/085.png';
+import alphaFormation from '../../../../assets/screenshots/create-mission/086.png';
+import overrideGroupCatalog from '../../../../assets/screenshots/create-mission/087.png';
+import duplicateGroupEntry from '../../../../assets/screenshots/create-mission/088.png';
+import assignGroupEntry from '../../../../assets/screenshots/create-mission/089.png';
+import groupBrowser from '../../../../assets/screenshots/create-mission/090.png';
+import launchStringEditor from '../../../../assets/screenshots/create-mission/058.png';
+import newStringTable from '../../../../assets/screenshots/create-mission/059.png';
+import stringTableLocation from '../../../../assets/screenshots/create-mission/060.png';
+import stringTableClass from '../../../../assets/screenshots/create-mission/061.png';
+import commsTranslation from '../../../../assets/screenshots/create-mission/062.png';
+import buildRuntimeTable from '../../../../assets/screenshots/create-mission/063.png';
+import registerStringTable from '../../../../assets/screenshots/create-mission/064.png';
+import commanderTranslation from '../../../../assets/screenshots/create-mission/070.png';
+import commsRole from '../../../../assets/screenshots/create-mission/057.png';
+import commsName from '../../../../assets/screenshots/create-mission/065.png';
+import commanderRole from '../../../../assets/screenshots/create-mission/071.png';
+import overrideCharacterCatalog from '../../../../assets/screenshots/create-mission/072.png';
+import duplicateCatalogEntry from '../../../../assets/screenshots/create-mission/073.png';
+import assignCatalogPrefab from '../../../../assets/screenshots/create-mission/074.png';
+import characterCatalogRoster from '../../../../assets/screenshots/create-mission/075.png';
+import launchCharacterTest from '../../../../assets/screenshots/create-mission/076.png';
+import testCharacterBrowser from '../../../../assets/screenshots/create-mission/077.png';
+import placedTestCharacters from '../../../../assets/screenshots/create-mission/078.png';
 
 [К оглавлению руководства](../)
 
-У связиста и командира готовы префабы со снаряжением. Теперь настроим для обоих названия и роли в игровом редакторе, добавим их в каталог Game Master и проверим в мире миссии.
+Зададим названия и роли персонажей, добавим их в каталог Game Master и проверим в игре. Затем соберём из готовых персонажей группу и проверим её состав.
 
 ## Таблица переводов {#character-localization}
 
-**Таблица переводов** хранит варианты текста для разных языков. Создадим одну таблицу для персонажей и групп аддона **Triad Shooting Star**.
+**Таблица переводов** хранит варианты текста для разных языков. Создадим одну таблицу для персонажей и групп аддона **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)**.
 
 Первой записью в таблице станет название связиста: «Сержант связи» и **Communications Sergeant**. Игра выберет нужный вариант в зависимости от языка игрока.
 
@@ -109,7 +121,7 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
 
 ### Сборка файлов переводов {#build-runtime-table}
 
-Нажмите `Ctrl+S`, чтобы сохранить таблицу. Затем выберите **Table → Build Runtime Table** (`Ctrl+B`). Эта команда создаёт из таблицы отдельные файлы переводов, которые использует игра. После изменения текста снова сохраните таблицу и выполните эту команду.
+Нажмите `Ctrl+S`, чтобы сохранить таблицу. Затем выберите **Table → Build Runtime Table** (`Ctrl+B`). Редактор создаст файлы переводов для игры. После каждого изменения текста сохраняйте таблицу и повторяйте сборку.
 
 <LL_Screenshot
   src={buildRuntimeTable}
@@ -142,7 +154,7 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
 
 ## Названия и роли в префабах {#editor-character-properties}
 
-За эти сведения отвечает **SCR_EditableCharacterComponent → Visualization → UI Info**:
+Название и роль персонажа задаются в разделе **SCR_EditableCharacterComponent → Visualization → UI Info**:
 
 - **Name** — название персонажа.
 - **Authored Labels** — метки персонажа, в том числе его роль.
@@ -151,7 +163,7 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
 
 Откройте `TSS_Character_US_GB_CommsSergeant.et` через **Edit Prefab** и выберите персонажа. В поиске компонентов введите `edita`, выберите **SCR_EditableCharacterComponent** и раскройте **Visualization → UI Info**.
 
-В списке **Authored Labels** замените `ROLE_RIFLEMAN` на `ROLE_RADIOOPERATOR`. Так мы указываем для игрового редактора, что персонаж выполняет роль связиста.
+В списке **Authored Labels** замените `ROLE_RIFLEMAN` на `ROLE_RADIOOPERATOR`. Эта метка обозначает связиста в игровом редакторе.
 
 <LL_Screenshot
   src={commsRole}
@@ -195,7 +207,7 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
 
 ## Добавление персонажей в каталог {#character-catalog}
 
-Названия и роли настроены. Чтобы находить и размещать бойцов через **Game Master**, добавим их в каталог фракции США.
+Чтобы находить и размещать бойцов через **Game Master**, добавим их в каталог фракции США.
 
 Для каждого префаба персонажа нужна отдельная запись каталога. В ней указываются файл префаба и настройки его доступности в игровом редакторе.
 
@@ -234,7 +246,7 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
   originalLabel="Открыть оригинал изображения"
 />
 
-Вместе с записью скопированы настройки **Entity Data List**, необходимые для игрового редактора. Они подходят и нашим бойцам, поэтому менять их не нужно.
+Вместе с записью скопированы настройки **Entity Data List** для игрового редактора. Для наших бойцов подходят те же значения.
 
 Скопируйте полученную запись командой **Duplicate**. В копии замените значение **Entity Prefab** на `TSS_Character_US_GB_DetachmentCommander.et`. Теперь в каталоге есть две отдельные записи: для связиста и для командира.
 
@@ -277,7 +289,7 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
   originalLabel="Открыть оригинал изображения"
 />
 
-На карточках персонажей вместо миниатюр может отображаться `PLACE HOLDER`: изображения для этих префабов ещё не подготовлены. Такие карточки тоже можно выбирать и использовать для размещения бойцов.
+Надпись `PLACE HOLDER` вместо миниатюры означает, что для префаба ещё не подготовлено изображение. Выбрать такую карточку и разместить бойца можно обычным способом.
 
 Если бойца нет в списке, проверьте его запись в [каталоге персонажей](#catalog-entries). Если вместо названия виден ключ с `#`, проверьте [ссылку на перевод](#localized-character-name).
 
@@ -294,4 +306,174 @@ import placedTestCharacters from '../../../../assets/guide/78.png';
 
 Осмотрите обоих персонажей и сверьте их снаряжение с настройками префабов. У связиста должны быть ранцевая радиостанция, кепка и куртка с закатанными рукавами, а у командира — M72A3 и бинокль.
 
-Персонажи проверены. В следующей главе [объединим их в группу и разместим в миссии](../groups-and-slots/).
+## Префаб группы {#group-prefab}
+
+Префаб группы объединяет префабы персонажей и позволяет разместить всех бойцов сразу. Создадим группу «Альфа» (**Split Team Alpha**) — первую половину отряда ODA из миссии **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)**.
+
+### Создание префаба {#create-group-prefab}
+
+Остановите тестовый запуск игры и вернитесь в **World Editor**.
+
+В проекте **ArmaReforger** откройте папку `Prefabs/Groups/BLUFOR`. Щёлкните правой кнопкой мыши по `Group_US_Base.et` и выберите **Inherit in → ваш аддон**.
+
+<LL_Screenshot
+  src={inheritGroup}
+  alt="В контекстном меню Group_US_Base.et открыта команда Inherit in и выбран аддон TriadShootingStar."
+  caption="Создание префаба на основе базовой группы фракции США."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Введите имя `TSS_Group_US_GB_SplitTeamAlpha` и нажмите **OK**.
+
+<LL_Screenshot
+  src={nameGroup}
+  alt="В окне Create inherited file введено имя TSS_Group_US_GB_SplitTeamAlpha."
+  caption="Название префаба группы."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В своём аддоне откройте папку `Prefabs/Groups/BLUFOR`. Щёлкните правой кнопкой мыши по свободному месту в **Resource Browser**, создайте папку `Green Berets` и перетащите в неё новый префаб.
+
+<LL_Screenshot
+  src={groupFolder}
+  alt="В Prefabs/Groups/BLUFOR аддона создаётся папка Green Berets."
+  caption="Папка для префабов групп «зелёных беретов»."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Название группы {#group-name}
+
+Откройте `Language/tss_localization.st` в **String Editor**. [Добавьте строку](/lite-lobby-ar/ru/create-mission/character-editor/#localization-entry) с ключом `TSS-Groups_SplitTeamAlpha`:
+
+- **Target En Us** — `Split Team Alpha`.
+- **Target Ru Ru** — `Группа «Альфа»`.
+
+Сохраните таблицу нажатием `Ctrl+S`, затем нажмите `Ctrl+B`, чтобы обновить файлы переводов для игры.
+
+<LL_Screenshot
+  src={groupTranslation}
+  alt="В String Editor добавлена строка TSS-Groups_SplitTeamAlpha с английским названием Split Team Alpha."
+  caption="Название группы в таблице переводов."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Откройте `TSS_Group_US_GB_SplitTeamAlpha.et` через **Edit Prefab** и выберите объект группы. В поиске компонентов введите `edita`, выберите **SCR_EditableGroupComponent** и раскройте **Visualization → UI Info**.
+
+В поле **Name** укажите `#TSS-Groups_SplitTeamAlpha`. В списке **Authored Labels** нажмите `+` и добавьте метку `GROUPSIZE_LARGE`, как в примере. Эта метка задаёт категорию размера группы в игровом редакторе.
+
+<LL_Screenshot
+  src={groupUiInfo}
+  alt="В SCR_EditableGroupComponent в поле Name указан ключ #TSS-Groups_SplitTeamAlpha, а в Authored Labels добавлена метка GROUPSIZE_LARGE."
+  caption="Название и категория группы в игровом редакторе."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Условный знак {#group-symbol}
+
+Ниже включите параметр **Use UI Info Name**, чтобы для группы использовалось название из поля **Name**. Затем в разделе **Military Symbol** задайте параметры условного знака:
+
+- **Identity** — `BLUFOR`.
+- **Dimension** — `LAND`.
+- **Icons** — отметьте `RECON`.
+
+С этими настройками группа получит условный знак наземной разведки стороны BLUFOR.
+
+<LL_Screenshot
+  src={groupMilitarySymbol}
+  alt="Включён параметр Use UI Info Name. В разделе Military Symbol выбраны BLUFOR, LAND и RECON."
+  caption="Настройка условного знака группы."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Состав группы {#group-members}
+
+В группе «Альфа» шесть бойцов. В предыдущих главах мы создали префабы командира и связиста. В готовой миссии есть ещё четыре специалиста: сержант по оперативным вопросам, пулемётчик, инженер и медик. Их префабы созданы по аналогии с этими двумя персонажами.
+
+Для полного состава группы «Альфа» подготовьте ещё четыре [префаба персонажей](/lite-lobby-ar/ru/create-mission/base-character/) с именами из таблицы ниже. Подберите снаряжение для каждой должности, затем добавьте бойцов в группу.
+
+Очистите поле поиска компонентов и выберите сам объект **SCR_AIGroup**. Раскройте **Group Members → Unit Prefab Slots** и с помощью кнопки `+` добавьте шесть строк.
+
+Откройте в своём аддоне папку `Prefabs/Characters/Factions/BLUFOR/US_Army/Green Berets` и перетащите из неё префабы в строки списка в следующем порядке:
+
+| Строка | Префаб |
+| --- | --- |
+| `0` | `TSS_Character_US_GB_DetachmentCommander.et` |
+| `1` | `TSS_Character_US_GB_OperationsSergeant.et` |
+| `2` | `TSS_Character_US_GB_WeaponsSergeant_M249.et` |
+| `3` | `TSS_Character_US_GB_EngineerSergeant.et` |
+| `4` | `TSS_Character_US_GB_MedicalSergeant.et` |
+| `5` | `TSS_Character_US_GB_CommsSergeant.et` |
+
+Каждая строка соответствует одному бойцу. Если состав вашего подразделения отличается от примера, укажите префабы нужных вам персонажей.
+
+<LL_Screenshot
+  src={alphaMembers}
+  alt="В списке Unit Prefab Slots объекта SCR_AIGroup указаны шесть префабов персонажей группы Split Team Alpha."
+  caption="Состав группы «Альфа»."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+### Построение {#group-formation}
+
+В поле поиска компонентов введите `format` и выберите **AIFormationComponent**. В поле **Default Formation** укажите `line`, как в примере.
+
+<LL_Screenshot
+  src={alphaFormation}
+  alt="В компоненте AIFormationComponent для поля Default Formation указано значение line."
+  caption="Построение группы по умолчанию."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Сохраните префаб группы нажатием `Ctrl+S`.
+
+## Проверка группы в Game Master {#group-catalog}
+
+Чтобы группа появилась в Game Master, добавим её префаб в каталог фракции США.
+
+### Добавление группы в каталог {#register-group}
+
+В проекте **ArmaReforger** откройте папку `Configs/EntityCatalog/US`. Щёлкните правой кнопкой мыши по `Groups_EntityCatalog_US.conf` и выберите **Override in → ваш аддон**.
+
+<LL_Screenshot
+  src={overrideGroupCatalog}
+  alt="В контекстном меню Groups_EntityCatalog_US.conf открыта команда Override in и выбран аддон TriadShootingStar."
+  caption="Создание оверрайда каталога групп фракции США."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+В своём аддоне откройте этот файл двойным щелчком. В списке **Entity Entry List** найдите запись `Group_US_EngineerTeam.et`, щёлкните по ней правой кнопкой мыши и выберите **Duplicate**.
+
+<LL_Screenshot
+  src={duplicateGroupEntry}
+  alt="В каталоге Groups_EntityCatalog_US.conf для записи Group_US_EngineerTeam.et выбрана команда Duplicate."
+  caption="Копирование готовой записи группы."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Раскройте созданную копию записи. Откройте в своём аддоне папку `Prefabs/Groups/BLUFOR/Green Berets` и перетащите из неё `TSS_Group_US_GB_SplitTeamAlpha.et` в поле **Entity Prefab** этой записи.
+
+<LL_Screenshot
+  src={assignGroupEntry}
+  alt="Префаб группы перетаскивают из Resource Browser в поле Entity Prefab."
+  caption="Выбор префаба группы. На скриншоте показана Company HQ, но в нашем случае нужно выбрать группу «Альфа»."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Настройки списка **Entity Data List** скопированы вместе с записью. Сохраните каталог нажатием `Ctrl+S`.
+
+### Проверка группы {#test-group}
+
+[Запустите миссию и откройте Game Master](/lite-lobby-ar/ru/create-mission/character-editor/#test-characters). Нажмите `Tab`, чтобы открыть **Entity Browser**. Выберите фракцию **US** и тип **Group**. Если после проверки персонажей остался включён фильтр **Character**, отключите его.
+
+Найдите группу по её названию в поле **Search**. Для примера введите `Альфа` или `Alpha` — в зависимости от языка игры.
+
+<LL_Screenshot
+  src={groupBrowser}
+  alt="В Entity Browser видны группы Company HQ, Split Team Alpha и Split Team Bravo."
+  caption="Группы миссии Triad Shooting Star в игровом каталоге."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Выберите свою группу и щёлкните левой кнопкой мыши по земле, чтобы разместить её. Должны появиться все бойцы, указанные в списке **Unit Prefab Slots**; в группе «Альфа» их шесть. Проверьте их состав и снаряжение. Если кого-то не хватает, проверьте [список префабов группы](/lite-lobby-ar/ru/create-mission/character-editor/#group-members).
+
+В следующей главе [разместим готовые группы в миссии и настроим игровые слоты](../groups-and-slots/).

@@ -53,8 +53,8 @@ description: ${text.title}
 
 import LL_Screenshot from '${prefix}components/LL_Screenshot.astro';
 import { Aside } from '@astrojs/starlight/components';
-import small from '${prefix}assets/guide/51.png';
-import large from '${prefix}assets/guide/78.png';
+import small from '${prefix}assets/screenshots/create-mission/051.png';
+import large from '${prefix}assets/screenshots/create-mission/078.png';
 
 ${text.intro}
 

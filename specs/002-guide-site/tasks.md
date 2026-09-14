@@ -1,5 +1,40 @@
 # Tasks: Lite Lobby Guide Site
 
+- [x] T115 Prepared the reviewed guide changes for PR: reconciled current requirements and task status, corrected quickstart counts and trailing whitespace. Clean installation, full website validation, dependency audit and mergeability review passed before submission.
+
+- [x] T114 Normalized all 144 PNGs under assets/screenshots/topic folders with lowercase kebab-case names and three-digit numbering. Consolidated inventories with original/current paths and unchanged hashes; updated imports, fixtures and validation. Confirmed all 20 illustrated locale-page image sequences unchanged, all 921 original/responsive HTTP URLs valid, and 564 image occurrences decode across RU/EN desktop/mobile. Full validation passed (107 production routes). Preview on 4322 rebuilt; unused source references remain unpublished.
+
+- [x] T113 Audited navigation on all 16 active pages in RU/EN. Added top return links to Git and existing-mission articles, aligned all four supplementary entries in the overview/sidebar, preserved old anchors while aligning translated heading IDs, and removed the empty EN prefab heading. Extended existing validation for sidebar titles, supplementary navigation and heading parity. Full validation passed (107 routes); verified all four return journeys in RU/EN at 1440/390px on production preview port 4322. No local-development URLs or retired-page links found in active article navigation.
+
+- [x] T112 Added the large-squad exception, at least two backpack radios per squad and separate administrator approval in RU/EN. Production build passed (107 pages).
+
+- [x] T111 Added the supplied rotation URL and localized links to slot setup, unit planning, briefing formatting and triggers. Addon names remain unlinked. Full validation passed, including all local link and anchor destinations (107 pages).
+
+- [x] T110 [US4] Published the supplied requirements by topic in RU/EN and linked point settings directly to admin approval requirements. Full site validation passed (107 pages); checked five sections, reciprocal anchor navigation and layout at 1440/390px in both locales. Additional suggested rules remain outside the pages pending discussion.
+
+- [x] T109 [US4] Added both TriadMission setup examples in RU/EN with completed-mission introduction, requirements links and original-image inventory. Full validation passed (107 pages); both images, anchors, links and layout checked at 1440/390px in both locales.
+
+- [x] T108 Removed the postponed API homepage entry and both labels in RU/EN; updated the four-entry contract and existing validation. Full validation passed (107 pages), including bilingual desktop/mobile homepage checks.
+
+- [x] T107 [US4] Created the bilingual Triad Tactics missions section with exactly two introductory pages, homepage child links and a matching sidebar group. Full validation passed (107 pages). Verified both destinations, sidebar entries and reciprocal links on desktop/mobile in RU/EN. Server settings and requirements remain for collaborative authoring.
+
+- [x] T106a [US4] Renamed the existing-mission guide and referring homepage/Git labels in both locales. Added Code → Download ZIP, extraction and launcher steps while preserving the archived example and anchors. Build passed (103 pages).
+- [x] T106b [US4] Illustrated both examples with all 12 ReadyMission captures, ordered GitHub first and Workshop second. Linked Triad Shooting Star to the main course and both dependency errors to its existing recovery section. Used the shown TriadDanseMacabre Worlds folder without inventing a filename. Full validation passed (103 pages, preserved course and supporting images). Browser checks passed for both locales at 1440/390px: image order, original PNG bytes, opening in a new tab, recovery links and no overflow.
+
+- [x] T105 [US4] Expanded RU/EN Git guide using all eleven supplied screenshots: repository/addon naming, folder layout, resourceDatabase.rdb ignore, clear frequent commits, publication/push, revert and AI help. Explained the optional revert demonstration and preserved save-commit-push. Full validation passed (103 pages, 116 course illustrations plus 11 Git illustrations per locale). Inspected desktop/mobile pages; all Git images loaded and all originals matched source bytes on port 4321.
+
+- [x] T104 [US4] Fixed both original-image anchors by prefixing dev /@fs URLs with BASE_URL. Browser regression reproduced the 404 before the fix and passed afterward on port 4321. Full validation passed, including real screenshot/caption clicks in both locales on dev and production servers, with byte-for-byte original PNG verification.
+
+- [x] T103 [US4] Added the operator-confirmed L shortcut tip after creating the base prefab in RU/EN. Built 103 pages and verified both rendered tips, inline key formatting and live pages on port 4321.
+
+- [x] T102 [US4] Moved group creation/catalog/testing and screenshots 79–90 to chapter 5 in «Персонажи и группы»; chapter 6 now starts with world placement. Updated both locales, titles, overview, navigation, links and legacy fragment forwarding. Explained screenshot 91 as the intended orange play area and red prohibited boundary. Preserved all 116 screenshots per locale and literal chapter 5/6 settings. Full validation passed (103 pages; navigation, redirects, desktop/mobile and fixtures); restarted port 4321 to refresh cached sidebar metadata and visually verified both edited sections with loaded images.
+
+- [x] T101 [US4] Audited all 51 Russian routes (14 active, 37 forwarding), captions, diagrams, shared component text and navigation. Corrected four pages: use «Альфа»/«Браво» in prose with English equivalents for reference, clarify faction abbreviations and align one remaining addon alternative description. Kept prefab definitions and exact software/UI names. Pre-edit comparison confirmed unchanged code values, UI names, headings, links and 116 screenshot sources. Built 103 pages and verified all four edited pages in production HTML and on port 4321.
+
+- [x] T100 [US4] Named Arma Reforger Tools explicitly in the overview; reviewed Russian terminology and used «лаунчер», «аддон» and «мод» contextually while preserving product/UI names, «префаб» and brief definitions. Built 103 pages and verified all four edited pages in production HTML and on the running dev server. No new tests or dependencies.
+
+- [x] T099 [US4] Reviewed all 14 active Russian pages and 37 retired routes using the operator's corrections and Russian excerpts of Martin, Fowler, K&R and Pro Git. Revised 11 Russian pages and added appropriate mission-name links in both locales. Preserved headings, code values, diagrams and all 116 screenshot components. Full website validation passed (103 production pages, both locales, desktop/mobile and isolated fixtures); final prose cleanup rebuilt successfully. Verified updated text and 11 mission-name links on eight pages served at port 4321. Sources and editorial decisions are recorded in research.md.
+
 - [x] T098 [US4] Apply the six operator corrections to the course introduction in RU/EN: link the mission name, describe recreation from scratch, revise audience and reading advice, shorten Git rationale and remove AI-help prose. Production build passed (103 pages); rendered paragraphs, repository/example/Git links and four existing anchors verified in both locales. Port 4321 serves the updated introduction.
 
 - [x] T097a [US4] Design one sequential course after the user chose 6–8 book-like chapters; map all lesson content to eight completed-work milestones.
@@ -204,22 +239,22 @@ language was reviewed by reading the edited chapters and overviews.
 
 ## Phase 12: User Story 4 - Complete guide content
 
-**Goal**: Complete the main mission walkthrough and five supporting guides with the operator inside feature 002.
+**Goal**: Complete the mission course and agreed supporting guides inside feature 002; API content is deferred.
 **Independent test**: Review each guide against the example/source and use its actual route, images, and language counterpart.
 
-- [ ] T033 [US4] Prepare and review the mission-creation outline and prerequisites in specs/002-guide-site/plan.md using the example mission, original screenshots, and official Workbench documentation; preparation is approved, and remaining sections need operator review before drafting (FR-014, FR-015).
-- [ ] T034 [US4] Author and review Git and Arma Reforger in docs/src/content/docs/git.mdx and ru/git.mdx; verify checkpoint/push/recovery on a separate demo mission project, then capture only the necessary Desktop screens under docs/src/assets/git and link from mission creation (FR-014, FR-015, FR-017; SC-009, SC-011).
-- [ ] T025 [US4] Author and review the bilingual mission-creation guide in docs/src/content/docs/create-mission.mdx and ru/create-mission.mdx using the example mission and supplied screenshots; use canonical titles and optional example/Git recommendations in the preface (FR-014, FR-015; SC-009).
+- [x] T033 [US4] Completed the mission outline and prerequisites through the reviewed eight-chapter course (T097 and subsequent operator review).
+- [x] T034 [US4] Completed and reviewed the bilingual Git guide using the operator-supplied demo-project screenshots for commits, push and recovery (T105). Captures now live under assets/screenshots/git.
+- [x] T025 [US4] Completed the bilingual mission-creation course and operator content review; final structure, links and images verified through T113–T114.
 - [x] T042 [US4] Add the approved preparation section in both create-mission.mdx pages, link the Lite Lobby prerequisite to the operator-supplied Workshop listing, connect its homepage row and sidebar entry, and verify keyboard navigation, search destinations, and language counterparts. This completes the first slice of T025/T030; later guide sections remain open (FR-014, FR-015; SC-010).
 - [x] T044 [US4] Create bilingual example/Git introductory pages and connect them from the main guide, homepage, and sidebar. Preserve the supplied repository screenshot unchanged. Detailed supporting-guide procedures remain in T028/T034; the subsequent editorial revision is tracked in T045 (FR-014, FR-015, FR-017; SC-010).
 - [x] T045 [US4] Review Russian technical-book style references; rewrite both mission-guide prefaces as ordinary prose with authors plural, optional example/Git links, and concrete Git recovery benefits. Move the supplied screenshot and folder explanation from Git to main-guide project creation, preserving bytes. Align SDD requirements, check routes and rendering, and rebuild the preview (FR-015, FR-017; SC-010).
 - [x] T046 [US2] [US4] Keep the guide open when either screenshot link is activated; add original screenshots 01.png and 02.png beside bilingual project-creation instructions and describe the Location field (corrected in T047). Verify new-tab mouse/keyboard behavior, original bytes, responsive rendering, and production output (FR-006, FR-007, FR-014).
-- [ ] T026 [US4] Author and review character-prefab creation in docs/src/content/docs/character-prefabs.mdx and ru/character-prefabs.mdx (FR-014; SC-009).
-- [ ] T027 [US4] Author and review Triad Tactics mission tuning in docs/src/content/docs/triad-tactics.mdx and ru/triad-tactics.mdx (FR-014; SC-009).
-- [ ] T028 [US4] Author and review opening the example mission in docs/src/content/docs/example-mission.mdx and ru/example-mission.mdx (FR-014; SC-009).
-- [ ] T029 [US4] Author and review the two API audiences in docs/src/content/docs/api.mdx and ru/api.mdx with source-verified Enforce and website examples (FR-014; SC-009, SC-010).
-- [ ] T030 [US4] Connect completed guide pages in docs/src/components/LL_GuideHome.astro, localized homepage sources, and docs/astro.config.mjs; keep guide links in the left sidebar and current-page headings in the right contents panel. Extend validation to verify real navigation, search, locale routes, and chapter anchors (FR-015; SC-010).
-- [ ] T031 Complete operator content review and end-to-end validation, then record feature acceptance in specs/002-guide-site/tasks.md; retain manual publication until the explicit launch decision (FR-011, FR-014, FR-015; SC-009, SC-010).
+- [x] T026 [US4] Completed character and group prefab creation within course chapters 3–5; supporting explanations remain separate (T097–T113).
+- [x] T027 [US4] Completed the agreed Triad Tactics setup and requirements pages, including trigger points, StatZone and server rules (T107–T112).
+- [x] T028 [US4] Completed and reviewed the illustrated GitHub and Workshop mission-opening guide (T106b).
+- T029 [US4] Deferred by the operator in T108: API pages are outside the current delivery and hidden from navigation.
+- [x] T030 [US4] Connected the completed guides through localized homepage, sidebar, search and course navigation; verified through T113–T114.
+- [x] T031 Operator accepted the guide and authorized PR preparation. Clean-snapshot npm ci and full validation passed for 107 routes; public deployment remains a separate manual action.
 
 ## Phase 13: Cleanup review
 

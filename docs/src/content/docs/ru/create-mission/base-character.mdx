@@ -10,31 +10,32 @@ next:
 ---
 
 import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
-import inheritCharacter from '../../../../assets/guide/23.png';
-import nameCharacter from '../../../../assets/guide/24.png';
-import characterFolder from '../../../../assets/guide/25.png';
-import editCharacter from '../../../../assets/guide/26.png';
-import loadoutSlots from '../../../../assets/guide/27.png';
-import characterHat from '../../../../assets/guide/28.png';
-import characterJacket from '../../../../assets/guide/29.png';
-import characterBackpack from '../../../../assets/guide/30.png';
-import duplicateRadio from '../../../../assets/guide/31.png';
-import nameRadio from '../../../../assets/guide/32.png';
-import removeTransceiver from '../../../../assets/guide/33.png';
-import singleTransceiver from '../../../../assets/guide/34.png';
-import inventorySetup from '../../../../assets/guide/35.png';
-import inventoryFilled from '../../../../assets/guide/36.png';
-import characterWatch from '../../../../assets/guide/37.png';
+import { Aside } from '@astrojs/starlight/components';
+import inheritCharacter from '../../../../assets/screenshots/create-mission/023.png';
+import nameCharacter from '../../../../assets/screenshots/create-mission/024.png';
+import characterFolder from '../../../../assets/screenshots/create-mission/025.png';
+import editCharacter from '../../../../assets/screenshots/create-mission/026.png';
+import loadoutSlots from '../../../../assets/screenshots/create-mission/027.png';
+import characterHat from '../../../../assets/screenshots/create-mission/028.png';
+import characterJacket from '../../../../assets/screenshots/create-mission/029.png';
+import characterBackpack from '../../../../assets/screenshots/create-mission/030.png';
+import duplicateRadio from '../../../../assets/screenshots/create-mission/031.png';
+import nameRadio from '../../../../assets/screenshots/create-mission/032.png';
+import removeTransceiver from '../../../../assets/screenshots/create-mission/033.png';
+import singleTransceiver from '../../../../assets/screenshots/create-mission/034.png';
+import inventorySetup from '../../../../assets/screenshots/create-mission/035.png';
+import inventoryFilled from '../../../../assets/screenshots/create-mission/036.png';
+import characterWatch from '../../../../assets/screenshots/create-mission/037.png';
 
 [К оглавлению руководства](../)
 
-Мир миссии подготовлен. Теперь создадим персонажей для подразделения «зелёных беретов» в аддоне **Triad Shooting Star**. Используем фракцию США, которая уже есть в игре. О выборе подразделения и подборе снаряжения можно прочитать в [отдельной справке](/lite-lobby-ar/ru/character-prefabs/planning/).
+Создадим персонажей для подразделения «зелёных беретов» в аддоне **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)**. Используем фракцию США, которая уже есть в игре. О выборе подразделения и подборе снаряжения можно прочитать в [отдельной справке](/lite-lobby-ar/ru/character-prefabs/planning/).
 
-**Префаб персонажа** — шаблон бойца: его внешний вид, снаряжение и другие настройки. Он хранится в файле `.et`. Сначала подготовим общий префаб с формой и личными вещами — `BaseLoadout`. Позже от него будут наследоваться бойцы с разным вооружением.
+**Префаб персонажа** — шаблон бойца: его внешний вид, снаряжение и другие настройки. Он хранится в файле `.et`. Сначала подготовим общий префаб с формой и личными вещами — `BaseLoadout`. На его основе создадим варианты с разным вооружением.
 
 ## Названия и папки {#naming-and-folders}
 
-Чтобы отличать свои файлы от игровых, добавляйте в начало имени **префикс аддона** — короткое обозначение вашего проекта. В примере аддон называется **Triad Shooting Star**, поэтому используем его первые буквы: `TSS_`. Для своего проекта выберите своё сокращение, например **Desert Storm** → `DS_`.
+Чтобы отличать свои файлы от игровых, добавляйте в начало имени **префикс аддона** — короткое обозначение вашего проекта. Для аддона **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)** используем первые буквы его названия: `TSS_`. Для своего проекта выберите своё сокращение, например **Desert Storm** → `DS_`.
 
 Остальную часть имени оформляйте по образцу файлов игры: `Character_US_Rifleman.et` → `TSS_Character_US_Rifleman.et`. Сохраняйте заглавные буквы, подчёркивания и порядок частей имени. Один и тот же префикс используйте для всех префабов своего аддона.
 
@@ -64,6 +65,10 @@ import characterWatch from '../../../../assets/guide/37.png';
 
 Workbench создаст в вашем аддоне файл `TSS_Character_US_GB_BaseLoadout.et`. Он будет находиться в папке `Prefabs/Characters/Factions/BLUFOR/US_Army`: при наследовании редактор автоматически повторяет путь исходного префаба.
 
+<Aside type="tip" title="Как открыть папку префаба">
+Выберите объект в мире или префаб в **Resource Browser** и нажмите `L`. В **Resource Browser** откроется папка этого префаба.
+</Aside>
+
 ### Папка подразделения {#unit-folder}
 
 Для префабов нашего подразделения создадим отдельную папку. В **Resource Browser** откройте `Prefabs/Characters/Factions/BLUFOR/US_Army` своего аддона. Щёлкните правой кнопкой мыши по пустому месту в списке файлов, выберите создание папки и назовите её `Green Berets`.
@@ -90,7 +95,7 @@ Workbench создаст в вашем аддоне файл `TSS_Character_US_G
 
 В панели **Hierarchy** выберите персонажа. Затем в строке поиска компонентов панели **Object Properties** введите `load` и выберите **BaseLoadoutManagerComponent**. Этот компонент определяет, что надето на персонаже.
 
-Раскройте список **Slots**. Каждый его пункт — слот для определённого предмета экипировки. Например, **Hat** предназначен для головного убора, а **Jacket** — для куртки. Раскройте **Hat**: в поле **Prefab** нужно указать префаб нужного предмета.
+Раскройте список **Slots**. Каждый его пункт — слот для определённого предмета экипировки. Например, **Hat** предназначен для головного убора, а **Jacket** — для куртки. Раскройте **Hat**. Поле **Prefab** задаёт предмет в этом слоте.
 
 <LL_Screenshot
   src={loadoutSlots}
@@ -151,7 +156,7 @@ Workbench создаст в вашем аддоне файл `TSS_Character_US_G
   originalLabel="Открыть оригинал изображения"
 />
 
-В окне **Duplicate File** укажите имя `TSS_Radio_ANPRC68` и нажмите **OK**. Для своего аддона используйте свой префикс.
+В окне **Duplicate File** укажите имя `TSS_Radio_ANPRC68` и нажмите **OK**.
 
 <LL_Screenshot
   src={nameRadio}
@@ -182,10 +187,10 @@ Workbench создаст в вашем аддоне файл `TSS_Character_US_G
 
 ## Содержимое инвентаря {#initial-inventory}
 
-Рация готова; добавим её и остальные вещи в карманы брюк персонажа. Откройте `TSS_Character_US_GB_BaseLoadout.et` через **Edit Prefab**. Выберите персонажа в **Hierarchy**, в поиске компонентов введите `InventoryStora` и выберите **SCR_InventoryStorageManagerComponent**. Здесь задаются начальный набор предметов и места их хранения.
+Добавим радиостанцию и остальные вещи в карманы брюк персонажа. Откройте `TSS_Character_US_GB_BaseLoadout.et` через **Edit Prefab**. Выберите персонажа в **Hierarchy**, в поиске компонентов введите `InventoryStora` и выберите **SCR_InventoryStorageManagerComponent**. Здесь задаются начальный набор предметов и места их хранения.
 
 1. В списке **Initial Inventory Items** нажмите `+`. Появится запись **ItemsInitConfigurationItem**; раскройте её.
-2. В поле **Target Storage** выберите `Pants/Pants_US_BDU.et`. Так мы указываем, что предметы из этой записи нужно положить в карманы брюк.
+2. В поле **Target Storage** выберите `Pants/Pants_US_BDU.et`. Предметы из этой записи окажутся в карманах брюк.
 3. В списке **Prefabs To Spawn** добавьте 12 строк кнопкой `+`. Каждая строка задаёт один предмет из нашего набора.
 
 <LL_Screenshot
@@ -231,5 +236,4 @@ Workbench создаст в вашем аддоне файл `TSS_Character_US_G
 
 Нажмите `Ctrl+S`, чтобы сохранить префаб персонажа.
 
-Общая основа `TSS_Character_US_GB_BaseLoadout.et` готова: форма, рюкзак, личная рация, предметы в карманах и часы. В следующей главе [создадим её наследника с оружием и боекомплектом](../character-variants/).
-
+В следующей главе [создадим наследника `TSS_Character_US_GB_BaseLoadout.et` с оружием и боекомплектом](../character-variants/).

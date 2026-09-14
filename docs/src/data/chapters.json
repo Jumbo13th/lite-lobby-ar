@@ -53,8 +53,8 @@
     {
       "slug": "create-mission/character-editor",
       "title": {
-        "ru": "5. Названия персонажей и проверка в Game Master",
-        "en": "5. Character names and Game Master checks"
+        "ru": "5. Персонажи и группы в Game Master",
+        "en": "5. Characters and groups in Game Master"
       },
       "parent": "create-mission",
       "number": 5,
@@ -63,8 +63,8 @@
     {
       "slug": "create-mission/groups-and-slots",
       "title": {
-        "ru": "6. Группы и игровые слоты",
-        "en": "6. Groups and playable slots"
+        "ru": "6. Подразделения в миссии",
+        "en": "6. Units in the mission"
       },
       "parent": "create-mission",
       "number": 6,
@@ -129,8 +129,8 @@
     {
       "id": "characters",
       "title": {
-        "ru": "Часть II. Персонажи",
-        "en": "Part II. Characters"
+        "ru": "Часть II. Персонажи и группы",
+        "en": "Part II. Characters and groups"
       }
     },
     {

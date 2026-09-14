@@ -1,0 +1,39 @@
+---
+title: Настройка миссии для Triad Tactics
+description: Подготовка миссии для сервера Triad Tactics.
+---
+
+import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
+import triggerPoints from '../../../../assets/screenshots/triad-tactics/001.png';
+import statZone from '../../../../assets/screenshots/triad-tactics/002.png';
+
+Переходите к этому разделу, когда миссия уже готова. Здесь настроим её для сервера Triad Tactics. Также ознакомьтесь с [требованиями к миссиям](../requirements/): они определяют, в том числе, сколько очков назначать за задачи.
+
+## 1. Очки на триггере {#trigger-points}
+
+В **World Editor** выберите триггер захвата — в нашем примере это `PortCapture`. В панели **Object Properties** откройте компонент **LL_TriggerZoneCapture** и задайте:
+
+- **Stat Points** — общее количество очков за зону.
+- **Stat Max Per Player** — лимит очков на одного участника, который учитывается при распределении очков между отрядами.
+
+На скриншоте указаны `20` и `1`. Значения для своей миссии согласуйте с администрацией, как указано в [требованиях к очкам](../requirements/#points).
+
+<LL_Screenshot
+  src={triggerPoints}
+  alt="У триггера PortCapture выделены поля Stat Points со значением 20 и Stat Max Per Player со значением 1."
+  caption="Настройка очков в компоненте LL_TriggerZoneCapture."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+## 2. Зона статистики {#stat-zone}
+
+Выберите объект, который задаёт границы зоны захвата, — в нашем примере это `PortTrigger`. Через **Add Component** добавьте к нему **LL_StatZoneComponent**.
+
+Компонент отмечает область, в которой за убийство противника начисляются повышенные очки. Учитывается положение погибшего: он должен находиться внутри зоны. Множитель очков задаётся на сервере.
+
+<LL_Screenshot
+  src={statZone}
+  alt="На объект PortTrigger с границами зоны порта добавлен LL_StatZoneComponent."
+  caption="LL_StatZoneComponent добавлен на объект с границами зоны."
+  originalLabel="Открыть оригинал изображения"
+/>

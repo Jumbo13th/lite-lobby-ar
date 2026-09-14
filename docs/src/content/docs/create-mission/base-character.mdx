@@ -10,31 +10,32 @@ next:
 ---
 
 import LL_Screenshot from '../../../components/LL_Screenshot.astro';
-import inheritCharacter from '../../../assets/guide/23.png';
-import nameCharacter from '../../../assets/guide/24.png';
-import characterFolder from '../../../assets/guide/25.png';
-import editCharacter from '../../../assets/guide/26.png';
-import loadoutSlots from '../../../assets/guide/27.png';
-import characterHat from '../../../assets/guide/28.png';
-import characterJacket from '../../../assets/guide/29.png';
-import characterBackpack from '../../../assets/guide/30.png';
-import duplicateRadio from '../../../assets/guide/31.png';
-import nameRadio from '../../../assets/guide/32.png';
-import removeTransceiver from '../../../assets/guide/33.png';
-import singleTransceiver from '../../../assets/guide/34.png';
-import inventorySetup from '../../../assets/guide/35.png';
-import inventoryFilled from '../../../assets/guide/36.png';
-import characterWatch from '../../../assets/guide/37.png';
+import { Aside } from '@astrojs/starlight/components';
+import inheritCharacter from '../../../assets/screenshots/create-mission/023.png';
+import nameCharacter from '../../../assets/screenshots/create-mission/024.png';
+import characterFolder from '../../../assets/screenshots/create-mission/025.png';
+import editCharacter from '../../../assets/screenshots/create-mission/026.png';
+import loadoutSlots from '../../../assets/screenshots/create-mission/027.png';
+import characterHat from '../../../assets/screenshots/create-mission/028.png';
+import characterJacket from '../../../assets/screenshots/create-mission/029.png';
+import characterBackpack from '../../../assets/screenshots/create-mission/030.png';
+import duplicateRadio from '../../../assets/screenshots/create-mission/031.png';
+import nameRadio from '../../../assets/screenshots/create-mission/032.png';
+import removeTransceiver from '../../../assets/screenshots/create-mission/033.png';
+import singleTransceiver from '../../../assets/screenshots/create-mission/034.png';
+import inventorySetup from '../../../assets/screenshots/create-mission/035.png';
+import inventoryFilled from '../../../assets/screenshots/create-mission/036.png';
+import characterWatch from '../../../assets/screenshots/create-mission/037.png';
 
 [Back to the guide contents](../)
 
-The mission world is ready. Next, create characters for the Green Beret unit in the **Triad Shooting Star** addon, using the US faction already included in the game. See the [optional reference](/lite-lobby-ar/character-prefabs/planning/) for choosing a unit and its equipment.
+The mission world is ready. Next, create characters for the Green Beret unit in the **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)** addon, using the US faction already included in the game. See the [optional reference](/lite-lobby-ar/character-prefabs/planning/) for choosing a unit and its equipment.
 
 A **character prefab** is a soldier template containing appearance, equipment, and other settings. It is stored in an `.et` file. First, prepare the shared `BaseLoadout` prefab with a uniform and personal items. Characters with different weapons will later inherit from it.
 
 ## Names and folders {#naming-and-folders}
 
-Add an **addon prefix** to your prefab names — a short identifier at the start of the filename. The mission addon we are creating characters for in this guide is called **Triad Shooting Star**. Its initials give us `TSS_`. Choose an abbreviation for your own addon: for example, **Desert Storm** → `DS_`. This makes it clear which addon a file belongs to.
+Add an **addon prefix** to your prefab names — a short identifier at the start of the filename. The mission addon we are creating characters for in this guide is called **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)**. Its initials give us `TSS_`. Choose an abbreviation for your own addon: for example, **Desert Storm** → `DS_`. This makes it clear which addon a file belongs to.
 
 Follow the game's names: for example, `Character_US_Rifleman.et` → `TSS_Character_US_Rifleman.et`. Preserve capitalization, underscores, and the order of the name's parts. Use your chosen prefix for all your prefabs.
 
@@ -63,6 +64,10 @@ In **Create inherited file**, enter `TSS_Character_US_GB_BaseLoadout` in **File 
 />
 
 Workbench will create `TSS_Character_US_GB_BaseLoadout.et` in your addon under `Prefabs/Characters/Factions/BLUFOR/US_Army`. It recreates the folder structure automatically.
+
+<Aside type="tip" title="Open a prefab's folder">
+Select an object in the world or a prefab in **Resource Browser** and press `L`. **Resource Browser** will open the prefab's folder.
+</Aside>
 
 ### Unit folder {#unit-folder}
 
@@ -232,4 +237,3 @@ In **Resource Browser**, select **ArmaReforger** and find `Watch_SandY184A.et`. 
 Press `Ctrl+S` to save the character prefab.
 
 The shared `TSS_Character_US_GB_BaseLoadout.et` is complete: uniform, backpack, personal radio, pocket items, and watch. In the next chapter, [create its child with weapons and ammunition](../character-variants/).
-

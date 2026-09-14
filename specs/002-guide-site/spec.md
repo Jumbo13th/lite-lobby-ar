@@ -1,11 +1,90 @@
 # Feature Specification: Lite Lobby Guide Site
 
+T114: normalize screenshot folders and numbered filenames, authorized by the operator despite earlier original-filename preservation requirements. Preserve every source byte and every page image sequence; update imports and tests together. Canonical paths use assets/screenshots/<topic>/ with lowercase kebab-case folders, three-digit numbered captures and descriptive kebab-case supplementary filenames.
+
+T113: audit navigation consistency across all active RU/EN pages: supplementary return links, overview/sidebar membership, heading anchors, chapter transitions, current titles and legacy/internal destinations. Fix the four supplementary pages uniformly, preserve existing anchors and do not reorganize the course.
+
+T112: permit admin-approved exceptions to the eight-unit minimum for large squads such as USMC that cannot fit eight per side. Require at least two backpack radios per such squad so community units sharing it can operate independently.
+
+T111: add the operator-provided rotation URL and relevant existing guide links to both requirements pages. Include briefing formatting; do not link addon names.
+
+T110: publish only the operator-supplied Triad Tactics mission requirements: two sides, 127 playable slots for 128-person games, at least 60 fighters and eight non-small units per side; no ongoing-conflict themes or clearly analogous maps; aesthetic asset quality, historical accuracy, formatted conditions, mandatory triggers and admin-approved point values. Concept discussion and widely used addons remain recommendations. Additional proposals require discussion.
+
+T109: illustrate only trigger statistics points and StatZone from TriadMission/01.png and 02.png on the bilingual Triad Tactics setup page. Address authors of completed missions and link mission requirements, including point values. Screenshot values are examples, not server requirements.
+
+T108: hide the API homepage entry and its scripting/website-integration labels in both locales; API content is postponed.
+
 **Feature Branch**: 002-guide-site
 **Created**: 2026-09-12
 **Status**: Design and tooling verified; mission-guide preparation approved, remaining sections under collaborative review
 **Input**: Finish the bilingual Lite Lobby guide website and the agreed guide content within feature 002, using SDD. Complete the design and current tooling first; author guide content with the operator. Public launch remains a separate decision. T097 incorporates the former character/group guide into the mission course.
 
 ## Audience and writing requirements
+
+T107: replace the homepage topic "Tune a mission for Triad Tactics" with "Missions
+for Triad Tactics" / «Миссии для Triad Tactics». It contains exactly two requested
+pages: setup and mission requirements. Expose both as child links on the homepage
+and in their own sidebar group. Create matching EN/RU introductory pages without
+inventing server settings or requirements; content will be authored with the operator.
+This authorizes two introductory destinations alongside the three existing guides.
+
+T106: expand the existing example-mission page into "How to open an existing mission",
+with one Workshop example and one GitHub example, both ending at a world in Workbench.
+Keep the route and existing anchors. The GitHub example remains Triad Shooting Star;
+the operator selected Triad Danse Macabre (Workshop ID 69F707F1824808A8). The supplied
+ReadyMission screenshots are 01–04 and 06–13; preserve their names and bytes. Present
+GitHub first (07–13), explicitly identifying Triad Shooting Star as the mission built
+in the main course, then Workshop (01–04, 06). At Missing Addon Dependencies, link to
+create-mission/project/#missing-addon-dependencies rather than repeating its solution.
+Do not invent a missing 05.png or a specific Danse Macabre world filename.
+
+T105: expand the bilingual Git guide using the operator's eleven original PNGs in
+docs/src/assets/guide/Git. Teach repository creation, nesting the Workbench addon,
+ignoring resourceDatabase.rdb, commits, GitHub publication/push and reverting a commit.
+Explain lowercase hyphenated repository names and triad-desert-storm-ar (ar means
+Arma Reforger); encourage frequent coherent commits, clear messages, regular pushes
+and AI assistance with guide links and concrete errors. Keep beginner-friendly prose.
+Explain that screenshots 10–11 revert the example's project-creation commit and remove
+its added files; this is an optional demonstration, not a required step. Keep /git/
+and its save-commit-push anchor. Preserve supplied images and the mission course.
+
+T104: clicking a screenshot or its original-image link must open the original PNG
+in a new tab on the local dev server as well as in a production build. With the
+configured /lite-lobby-ar base, dev /@fs URLs need that prefix for browser navigation.
+Preserve responsive previews, image bytes and production asset URLs.
+
+T103: add a short tip to the base-character chapter explaining the operator-confirmed
+L shortcut: select an object in the world or a prefab in Resource Browser and press
+L to open the prefab's folder in Resource Browser. Include both locales.
+
+T102: finish group-prefab creation and Game Master testing in the character part,
+before placing units in the mission. Keep eight sequential chapters: chapter 5 owns
+character names/catalogs/testing and group creation/catalog/testing; chapter 6 owns
+world placement, playable slots, callsigns, vehicles and starting zones. Part II is
+«Персонажи и группы». Existing section links must continue to reach their content.
+Describe screenshot 91 as the intended map: play occurs in the orange-marked area;
+crossing the red line is prohibited by mission rules. Do not imply physical enforcement
+by a map marking. Apply content and navigation changes to both locales.
+
+T100 terminology: name Arma Reforger Tools explicitly when referring to the product.
+Use established Russian loanwords such as «префаб», «аддон», «лобби», «триггер»,
+«оверрайд» and «лаунчер» in explanations. Preserve exact product names and UI labels
+in instructions. Brief definitions remain useful; do not replace terms throughout
+the guide with generic descriptions or mechanically transliterate every English name.
+
+T101 extends this terminology audit to every Russian route, screenshot caption and
+alternative text, diagram, shared component and navigation label. In running prose,
+use the Russian group names «Альфа» and «Браво», introducing their English equivalents
+where needed to match the example. Preserve exact filenames, input values and UI labels.
+
+T099 applies the operator's editorial corrections across all Russian guide pages.
+Review the full text against Russian translations of programming books, including
+Robert Martin and Martin Fowler. Use concrete verbs, short explanations of unfamiliar
+terms, and examples next to the action they clarify. Remove repeated introductions,
+generic encouragement and cumbersome phrases without removing required steps or
+screenshot caveats. Retain the approved T098 introduction. Link meaningful prose
+mentions of Triad Shooting Star to its existing repository across both locales;
+leave literal UI labels, file paths, code and image alternative text unchanged.
 
 The guide is for confident computer users who have no prior knowledge of Arma Reforger,
 Workbench, modding, Git, or software development. Do not assume programming experience.
@@ -176,7 +255,7 @@ and expose full-resolution originals without duplicating source assets.
 1. Given a small dialog image, when displayed, then it is not enlarged beyond its natural width.
 2. Given a large screenshot, when displayed on a phone, then it fits the page and its original can be opened.
 3. Given translated captions and alternative text, when changing language, then the strings change while the original image bytes remain identical.
-4. Given the supplied assets, when consolidated, then all 113 names and file hashes match the originals.
+4. Given the supplied assets, when consolidated or renamed, then the inventory maps all original paths to current paths and every file hash still matches its original.
 5. Given the temporary article preview, when reading headings, paragraphs, lists, a table, an aside, code, and figures, then the typography, spacing, surfaces, and accents form a consistent hierarchy in both themes and languages.
 6. Given a temporary article, when using its navigation, then the standard article sidebar and contents controls work even though the homepage omits them.
 7. Given an article page on a wide screen, when using the right-hand contents panel, then it stays compact beside the readable article column instead of expanding with the viewport. Mobile chapter navigation remains available.
@@ -231,18 +310,18 @@ content together after the design pass.
 - **FR-001**: Make the existing SDD workflow usable by Codex while preserving Claude, its default selection, the constitution, existing specifications, and shared templates.
 - **FR-002**: Provide project instructions and complete the approved SDD sequence before site implementation.
 - **FR-003**: Provide English and Russian homepages with a language switcher and translated navigation.
-- **FR-004**: Present the five localized guide titles in the order defined in contracts/site.md and the API's two audience labels, without guide-list slogans, descriptions, prompts, decorative text, or preparation notices. Retain their seven stable anchors and avoid links or button affordances for unwritten guide pages; mission creation, the example and Git are the three active entries. The help panel and project introduction specified in FR-018/FR-019 sit outside the guide list.
+- **FR-004**: Present four localized homepage entries in the order defined in contracts/site.md: mission creation, existing missions, Git and Triad Tactics missions. The first three link to their guides; Triad Tactics has setup and requirements child links. Retain the four topic anchors. API content is deferred and hidden. Keep the help panel and project introduction outside the guide list.
 - **FR-005**: Provide responsive navigation, keyboard access, theme switching, code rendering, and local full-text search. Center the search field in the viewport on desktop headers (at least 64rem wide), retaining native compact controls below that width. Expose the supplied Discord, GitHub, and Telegram links as accessible icons on desktop and mobile; each opens a new tab while preserving the guide page. Use the Triad Tactics palette with minimal color overrides and readable light/dark variants.
-- **FR-006**: Preserve all supplied screenshot filenames and original bytes in one shared asset location.
+- **FR-006**: Preserve supplied screenshot bytes in assets/screenshots topic folders. Record original and current paths, byte lengths and hashes in the shared inventory; update every reference when renaming.
 - **FR-007**: Provide reusable figures with translated captions/alternative text, optimized responsive images, lazy loading, and an original-resolution link. Both the image and its original link open a new tab, keeping the guide and reading position intact.
 - **FR-008**: Provide repeatable development, validation, build, and production-preview commands. Use the latest stable compatible runtime and direct dependencies available during implementation, document compatibility limits, and make local and CI runtimes agree.
 - **FR-009**: Prepare validation automation and manual publication restricted to main at the agreed free project address.
 - **FR-010**: Exclude SDD files, addon files, unused source screenshots, and temporary validation pages from normal publication artifacts.
 - **FR-011**: Deliver a locally verified guide site; keep publication behind the explicit content-launch decision and do not change game assets. Complete the design/tooling pass before collaborative guide authoring.
-- **FR-012**: Center one compact list of five guide rows within a bounded reading area. Use consistent alignment, typography, and row spacing; omit article sidebars, separate card boxes, and empty grid cells. Place the two API audience labels in a bulleted list below the API heading at every screen width. Retain search/language/theme controls at all supported widths.
+- **FR-012**: Center four guide rows within a bounded reading area with consistent alignment, typography and spacing. The Triad Tactics row contains two child links. Omit article sidebars, separate card boxes and empty grid cells on the homepage. Retain search, language and theme controls at all supported widths.
 - **FR-013**: Use consistent typography, spacing, borders, and accent colors across the homepage and article body, including headings, lists, tables, asides, code, and screenshot captions. Preserve standard article navigation and verify the design with temporary article content excluded from publication.
 - **FR-014**: Complete the bilingual mission-creation course, including character/group creation, and the agreed supporting content with prerequisites, instructions, expected outcomes, relevant screenshots, and examples verified against the example mission, actual addon/integration source, or official tool documentation. The course has one introduction, three parts and eight numbered chapters with on-page sections; supporting material stays outside its required reading sequence. Review the outline and prerequisites first, then have the operator verify each section before finalizing both languages.
-- **FR-015**: Link supporting guides from the relevant steps of the main mission walkthrough without duplicating their detailed instructions. Explain opening the example and using Git in ordinary preface paragraphs, with both workflows optional; recommend studying existing missions as the best learning route and attribute that approach to the authors' experience. Explain Git through a concrete recovery example, distinguish explicit local commits from pushes to GitHub, and place the supplied folder screenshot in main-guide project creation. Use natural Russian technical-book prose: define unfamiliar terms, explain actions and results, and avoid slogans or redundant text. Use the exact Russian titles in contracts/site.md. Connect completed guides to the homepage list, localized sidebar navigation, language counterparts, and search; retain the API's two distinct audiences. Create supporting content when the walkthrough needs it.
+- **FR-015**: Link supporting guides from the relevant steps of the main mission walkthrough without duplicating their detailed instructions. Explain opening the example and using Git in ordinary preface paragraphs, with both workflows optional; recommend opening the example alongside the connected course chapters and consulting individual steps as needed. Explain Git through a concrete recovery example, distinguish explicit local commits from pushes to GitHub, and place the supplied folder screenshot in main-guide project creation. Use natural Russian technical-book prose: define unfamiliar terms, explain actions and results, and avoid slogans or redundant text. Use the exact Russian titles in contracts/site.md. Connect completed guides to the homepage list, localized sidebar navigation, language counterparts, and search. API content is deferred. Create supporting content when the walkthrough needs it.
 - **FR-016**: Review the website source, configuration, dependencies, validation scripts, workflow, and feature artifacts for dead code, stale references, inconsistent settings, and reproducibility or cleanup defects. Resolve demonstrated issues while preserving the agreed design, original screenshots, and deferred content/publication scope.
 - **FR-017**: Teach beginner GitHub Desktop use for a mission project: select the correct project folder, retain source assets/layers/metadata, ignore verified generated files, distinguish Workbench saves from local commits and remote pushes, verify a remote checkpoint, and demonstrate recovery on a separate tutorial project. Link this guide from the preface before project creation; any checkpoint reminders apply only to readers who choose Git. Screenshots may be added after text review; an existing configured Desktop installation must not need resetting.
 
@@ -263,16 +342,16 @@ content together after the design pass.
 
 ### Measurable Outcomes
 
-- **SC-001**: Both homepages expose all five guide titles in the agreed order and their three active guide links resolve.
+- **SC-001**: Both homepages expose four entries in the agreed order; all three direct guide links and both Triad Tactics child links resolve.
 - **SC-002**: At 390, 768, 1440, and 1920 px viewport widths, navigation, language switching, theme switching, and search work without horizontal page overflow or clipped controls.
-- **SC-003**: All 113 screenshots retain their filenames, lengths, and SHA-256 hashes after consolidation.
+- **SC-003**: All 144 source screenshots retain their byte lengths and SHA-256 hashes. The inventory preserves original-to-current path mappings, including the original 113 course captures, and all page image sequences remain unchanged after path migrations.
 - **SC-004**: Repeated normal builds contain no temporary validation pages, internal specifications, or addon files.
 - **SC-005**: The retained SDD integrations report healthy, with no modified or missing managed files.
 - **SC-006**: Validation succeeds locally; publication remains inactive and requires an explicit manual action on main.
-- **SC-007**: Both homepages display exactly five full-width guide rows with no article sidebar/contents panel. Rows share the same left edge, title position, and padding; the API row grows to fit its two bullets below the heading. Contents fit at every tested width. All seven topic/audience anchors remain unique.
+- **SC-007**: Both homepages display four aligned guide rows without article sidebars or a contents panel. The Triad Tactics row fits its two child links at every tested width. All four topic anchors remain unique.
 - **SC-008**: Desktop and mobile captures of the homepage and representative article are visually reviewed in both languages/themes; headings, captions, and controls do not overlap or clip, and original images remain accessible.
 - **SC-009**: At feature completion, the mission course and all agreed supporting content exist in English and Russian, contain no unfinished steps, and have been reviewed with the operator against their actual source/example/tool workflow. The course remains one introduction followed by eight chapters grouped into three parts.
-- **SC-010**: At feature completion, all completed guide links and language counterparts resolve, and API examples match the implemented scripting and website interfaces.
+- **SC-010**: All completed guide links, section anchors and language counterparts resolve. Deferred API content is absent from navigation.
 - **SC-011**: The GitHub Desktop guide is verified on a separate demo mission project: required source files are committed, the remote commit is confirmed, and reverting a demonstrated bad commit restores the expected project state after Workbench reload. The existing 113 screenshots remain unchanged.
 
 ## Assumptions

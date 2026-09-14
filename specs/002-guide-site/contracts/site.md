@@ -8,7 +8,7 @@
 - Russian home: /lite-lobby-ar/ru/
 - Mission guide: /lite-lobby-ar/create-mission/ and /lite-lobby-ar/ru/create-mission/.
 - Supporting introductions: example-mission/ and git/ under both locale roots.
-- Shared homepage anchors: create-mission, example-mission, git, triad-tactics, api, scripting, website-integration.
+- Shared homepage anchors: create-mission, example-mission, git, triad-tactics.
 - Content pages added later must have corresponding English and Russian sources.
 
 ## Guide references
@@ -18,15 +18,21 @@ Use this homepage order and these exact titles in headings and in-text reference
 | Anchor | English title | Russian title |
 | --- | --- | --- |
 | create-mission | Create a mission | Как создать миссию |
-| example-mission | Open the example mission | Как открыть пример миссии |
+| example-mission | Open an existing mission | Как открыть существующую миссию |
 | git | Git and Arma Reforger | Git и Arma Reforger |
-| triad-tactics | Tune a mission for Triad Tactics | Как настроить миссию для Triad Tactics |
-| api | Lite Lobby API | API Lite Lobby |
+| triad-tactics | Missions for Triad Tactics | Миссии для Triad Tactics |
 
 T097 removes the standalone character-prefab entry: that material is part of the
-mission course. The five rows expose seven anchors and three active guide links
+mission course. The four rows expose four anchors and three active guide links
 (mission creation, example mission and Git). Existing character/group URLs remain
 available as redirects to the course.
+
+T107 adds two child links under triad-tactics: `triad-tactics/setup/` (Configure a
+mission for Triad Tactics / Настройка миссии для Triad Tactics) and
+`triad-tactics/requirements/` (Triad Tactics mission requirements / Требования к
+миссиям Triad Tactics). The same two pages form a dedicated sidebar group. These
+operator-requested introductory pages are linked now; server-specific content will
+be added together later. There is no third section-overview page. T108 removes the API entry and its two labels until content is planned.
 
 The main guide references the example and Git in ordinary preface paragraphs.
 T098 links Triad Shooting Star to its existing repository and describes recreating
@@ -40,7 +46,7 @@ technical-book prose. Main-guide project creation recommends using the
 repository folder under ArmaReforgerWorkbench/addons as Location and
 refers to the Git guide for its setup and rationale. The supplied repository screenshot
 belongs in this main-guide section in both languages, stored unchanged under
-assets/mission/repository-layout.png. It illustrates the repository and addon folders
+assets/screenshots/create-mission/repository-layout.png. It illustrates the repository and addon folders
 for triad-shooting-star-ar/Triad Shooting Star/addon.gproj. The Git guide links back
 to this section instead of duplicating its screenshot.
 
@@ -59,13 +65,11 @@ reuse, modification, and sharing for noncommercial Arma use with attribution.
 All introduction links open new tabs with rel="noopener noreferrer". Russian license
 copy uses complete, natural sentences identifying the license before its permissions.
 
-Homepages use a centered splash layout with exactly five .ll-guide-entry articles
+Homepages use a centered splash layout with exactly four .ll-guide-entry articles
 inside one .ll-guide-list, without article sidebars or on-page contents. Rows share
-their width, title alignment, and padding. API audiences are compact muted
-items in a two-item bulleted list below the title at every width. The API row grows
-to fit this list. No split panel,
+their width, title alignment, and padding. Triad Tactics has two child links. No split panel,
 individual card boxes, or decorative ordinal numbering is used.
-Titles and API audience labels own the seven anchors above. The guide list contains no
+Titles own the four anchors above. The guide list contains no
 slogans, descriptions, prompts, decorative text, or preparation notices. Entries have
 no links/buttons suggesting unwritten guides can be opened.
 The mission guide contains its approved preparation section. Its homepage title is
@@ -124,6 +128,17 @@ Run npm commands from docs: dev, check, build, preview, validate. A clean machin
 npm ci and npx playwright install chromium before validate. Validation checks the
 normal production output, generates isolated fixture output for browser exercises,
 cleans temporary content even on failure, and never deploys.
+
+## Screenshot paths
+
+T114 screenshot paths: source PNGs live under `docs/src/assets/screenshots/<topic>/`.
+Use lowercase kebab-case topic folders, three-digit capture numbers (`001.png`) and
+kebab-case descriptive names for supplementary images. Both locales share originals.
+`docs/tests/screenshots.json` records current paths, original paths, byte lengths and
+SHA-256 hashes for all 144 images. Earlier filename-preservation requirements are
+superseded by the operator-authorized migration; image bytes remain unchanged.
+Unused reference captures remain source-only. Renames must update imports and preserve
+each page's image order, optimized image loading and original-image links.
 
 ## CI and release
 

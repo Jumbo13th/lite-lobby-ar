@@ -47,6 +47,15 @@ export default defineConfig({
         { slug: 'index', label: 'Guide', translations: { ru: 'Руководство' } },
         guideGroup('create-mission'),
         {
+          label: 'Missions for Triad Tactics',
+          translations: { ru: 'Миссии для Triad Tactics' },
+          collapsed: true,
+          items: [
+            { slug: 'triad-tactics/setup' },
+            { slug: 'triad-tactics/requirements' },
+          ],
+        },
+        {
           label: 'Additional material',
           translations: { ru: 'Дополнительные материалы' },
           collapsed: true,

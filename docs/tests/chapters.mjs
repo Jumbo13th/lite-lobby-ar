@@ -62,8 +62,8 @@ export async function validateChapters(output) {
       'create-mission/world': ['save-world', 'systems-layer', 'lite-lobby-game-mode', 'map-setup'],
       'create-mission/base-character': ['create-base-prefab', 'base-outfit', 'radio-setup', 'initial-inventory', 'wristwatch'],
       'create-mission/character-variants': ['oda-base', 'armor-and-webbing', 'primary-weapon', 'grenade-slots', 'oda-ammunition', 'flashlight', 'magazine-pouches', 'reserve-magazines', 'comms-sergeant', 'backpack-radio', 'comms-uniform', 'storage-after-changes', 'detachment-commander', 'commander-launcher', 'commander-binoculars'],
-      'create-mission/character-editor': ['create-string-table', 'register-localization', 'commander-name', 'comms-role', 'localized-character-name', 'commander-role', 'override-character-catalog', 'test-characters'],
-      'create-mission/groups-and-slots': ['create-group-prefab', 'group-members', 'register-group', 'test-group', 'playable-characters', 'group-callsigns', 'freeze-zone'],
+      'create-mission/character-editor': ['create-string-table', 'register-localization', 'commander-name', 'comms-role', 'localized-character-name', 'commander-role', 'override-character-catalog', 'test-characters', 'create-group-prefab', 'group-members', 'register-group', 'test-group'],
+      'create-mission/groups-and-slots': ['playable-characters', 'group-callsigns', 'freeze-zone'],
       'create-mission/objectives': ['map-markings', 'mission-conditions', 'capture-area', 'capture-settings', 'critical-losses', 'mission-timer', 'supremacy', 'mission-briefing'],
       'create-mission/publishing': ['final-test', 'multiplayer-test', 'publish-mission'],
     };
@@ -74,6 +74,13 @@ export async function validateChapters(output) {
     for (const id of ['oda-base', 'comms-sergeant', 'detachment-commander']) {
       assert.equal(pages.get('create-mission/base-character')(`.sl-markdown-content [id="${id}"]`).length, 0, `Base character prematurely introduces ${id}`);
     }
+    for (const id of ['group-prefab', 'group-members', 'group-catalog']) {
+      assert.equal(pages.get('create-mission/groups-and-slots')(`.sl-markdown-content [id="${id}"]`).length, 0,
+        `Group creation must finish in the character part before world placement: ${id}`);
+    }
+    assert.equal(chapters.chapters.find(({ slug }) => slug === 'create-mission/character-editor').part, 'characters');
+    assert.equal(pages.get('create-mission/character-editor')('.sl-markdown-content #playable-forces').length, 0,
+      'World placement belongs in the mission part');
     for (const slug of ['base-character', 'character-variants']) {
       const content = pages.get(`create-mission/${slug}`)('.sl-markdown-content');
       for (const field of ['SCR_EditableCharacterComponent', 'Authored Labels', 'ROLE_RADIOOPERATOR', 'ROLE_LEADER']) {
@@ -83,8 +90,8 @@ export async function validateChapters(output) {
     for (const [slug, ordered] of [
       ['base-character', ['create-base-prefab', 'base-outfit', 'radio-setup', 'initial-inventory', 'wristwatch']],
       ['character-variants', ['oda-base', 'primary-weapon', 'oda-ammunition', 'comms-sergeant', 'backpack-radio', 'comms-uniform', 'storage-after-changes', 'detachment-commander']],
-      ['character-editor', ['create-string-table', 'register-localization', 'localized-character-name', 'override-character-catalog', 'test-characters']],
-      ['groups-and-slots', ['create-group-prefab', 'group-members', 'register-group', 'test-group', 'group-callsigns']],
+      ['character-editor', ['create-string-table', 'register-localization', 'localized-character-name', 'override-character-catalog', 'test-characters', 'create-group-prefab', 'group-members', 'register-group', 'test-group']],
+      ['groups-and-slots', ['playable-forces', 'playable-characters', 'group-callsigns', 'freeze-zone']],
       ['objectives', ['capture-area', 'capture-settings', 'mission-briefing']],
     ]) {
       const $ = pages.get(`create-mission/${slug}`);
@@ -135,5 +142,55 @@ export async function validateChapters(output) {
     }
   }
   assert.deepEqual(...screenshotsByLocale, 'The translations must retain the same guide illustrations');
-  console.log(`Validated ${chapters.hubs.length} overviews, ${chapters.chapters.length} chapters, reading order, legacy destinations, and all 116 illustrations in each language`);
+  const supplementary = ['example-mission', 'git', 'character-prefabs/planning', 'character-prefabs/prefab-operations'];
+  const activeRoutes = [...new Set([
+    ...entries.map(({ slug }) => slug), ...supplementary,
+    'triad-tactics/setup', 'triad-tactics/requirements',
+  ])];
+  for (const slug of activeRoutes) {
+    const headings = [];
+    for (const locale of ['', 'ru']) {
+      const prefix = `/lite-lobby-ar/${locale ? 'ru/' : ''}`;
+      const $ = load(await readFile(join(output, locale, slug, 'index.html'), 'utf8'));
+      headings.push($('.sl-markdown-content h2, .sl-markdown-content h3').toArray().map((node) => $(node).attr('id')));
+      const current = $('.sidebar-pane a[aria-current="page"]');
+      assert.equal(current.length, 1, `Active page missing from sidebar: ${locale}/${slug}`);
+      // The overview is intentionally called Introduction in the sidebar.
+      if (slug !== 'create-mission') assert.equal(current.text().trim(), $('h1').text().trim(), `Sidebar title differs from page title: ${locale}/${slug}`);
+      if (supplementary.includes(slug)) {
+        const first = $('.sl-markdown-content').children().first();
+        assert.equal(first.text().trim(), locale ? 'К оглавлению руководства' : 'Back to the guide contents', `Missing top return link: ${locale}/${slug}`);
+        assert.equal(new URL(first.find('a').attr('href'), `https://example.test${prefix}${slug}/`).pathname, `${prefix}create-mission/`);
+        assert.equal($('.pagination-links a').length, 0, `Supplementary page must not imply a chapter sequence: ${locale}/${slug}`);
+      }
+      if (slug === 'create-mission') {
+        const related = $('#further-explanations').closest('.sl-heading-wrapper').next('ul');
+        const destinations = related.find('a').toArray().map((node) => new URL($(node).attr('href'), `https://example.test${prefix}${slug}/`).pathname);
+        assert.deepEqual(destinations, supplementary.map((page) => `${prefix}${page}/`), `Overview and sidebar supplementary lists differ: ${locale}`);
+      }
+    }
+    assert.deepEqual(headings[0], headings[1], `Section anchors differ between translations: ${slug}`);
+  }
+  for (const [slug, numbers] of [
+    ['git', Array.from({ length: 11 }, (_, index) => String(index + 1))],
+    ['example-mission', ['07', '08', '09', '10', '11', '12', '13', '01', '02', '03', '04', '06']],
+  ]) {
+    const byLocale = [];
+    for (const locale of ['', 'ru']) {
+      const $ = load(await readFile(join(output, locale, slug, 'index.html'), 'utf8'));
+      const originals = $('.sl-markdown-content figure > a.original').toArray().map((node) => $(node).attr('href'));
+      assert.equal(new Set(originals).size, numbers.length, `Missing or repeated ${slug} illustration: ${locale}`);
+      assert.deepEqual(originals.map((url) => url.split('/').pop().split('.')[0]), numbers.map((number) => number.padStart(3, '0')), `${slug} illustrations are out of order: ${locale}`);
+      byLocale.push(originals);
+      if (slug === 'example-mission') {
+        const prefix = `/lite-lobby-ar/${locale ? 'ru/' : ''}`;
+        assert.equal($('.sl-markdown-content h2').first().attr('id'), 'open-project', 'The GitHub example must come first');
+        assert.equal($('.sl-markdown-content a[href="../create-mission/project/#missing-addon-dependencies"]').length, 2, 'Both examples must link to the existing addon recovery steps');
+        for (const id of ['open-project', 'missing-dependencies', 'open-world']) assert.equal($(`[id="${id}"]`).length, 1);
+        assert.ok($('.sl-markdown-content a[href="../create-mission/"]').length, `${prefix}${slug} must link to the mission course`);
+      }
+    }
+    assert.deepEqual(byLocale[0], byLocale[1], `${slug} screenshots differ between locales`);
+  }
+  console.log(`Validated ${chapters.hubs.length} overviews, ${chapters.chapters.length} chapters, reading order, legacy destinations, and all course and supporting-guide illustrations in each language`);
 }

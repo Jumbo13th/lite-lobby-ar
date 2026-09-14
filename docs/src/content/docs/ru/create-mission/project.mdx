@@ -11,19 +11,19 @@ next:
 
 import { Aside } from '@astrojs/starlight/components';
 import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
-import repositoryLayout from '../../../../assets/mission/repository-layout.png';
-import createProject from '../../../../assets/guide/01.png';
-import projectSettings from '../../../../assets/guide/02.png';
-import projectSettingsMenu from '../../../../assets/guide/03.png';
-import dependencySettings from '../../../../assets/guide/04.png';
-import missingAddonDependencies from '../../../../assets/mission/missing-addon-dependencies.png';
-import workshopGuidSearch from '../../../../assets/mission/workshop-guid-search.png';
-import scanForProjects from '../../../../assets/mission/scan-for-projects.png';
-import workshopAddonsFolder from '../../../../assets/mission/workshop-addons-folder.png';
+import repositoryLayout from '../../../../assets/screenshots/create-mission/repository-layout.png';
+import createProject from '../../../../assets/screenshots/create-mission/001.png';
+import projectSettings from '../../../../assets/screenshots/create-mission/002.png';
+import projectSettingsMenu from '../../../../assets/screenshots/create-mission/003.png';
+import dependencySettings from '../../../../assets/screenshots/create-mission/004.png';
+import missingAddonDependencies from '../../../../assets/screenshots/create-mission/missing-addon-dependencies.png';
+import workshopGuidSearch from '../../../../assets/screenshots/create-mission/workshop-guid-search.png';
+import scanForProjects from '../../../../assets/screenshots/create-mission/scan-for-projects.png';
+import workshopAddonsFolder from '../../../../assets/screenshots/create-mission/workshop-addons-folder.png';
 
 [К оглавлению руководства](../)
 
-Для миссии создадим собственный аддон — дополнение к игре. В нём будут храниться мир миссии, персонажи и настройки.
+Для миссии [Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar) создадим аддон — дополнение к игре. В нём будут храниться мир миссии, персонажи и настройки.
 
 ## Подготовка {#preparation}
 
@@ -48,12 +48,12 @@ import workshopAddonsFolder from '../../../../assets/mission/workshop-addons-fol
   originalLabel="Открыть оригинал изображения"
 />
 
-В открывшемся окне **New Project** укажите название в поле **Project Name**. Проект, который мы создаём в руководстве, называется `Triad Shooting Star`.
+В окне **New Project** введите `Triad Shooting Star` в поле **Project Name**.
 
 <Aside type="tip" title="Соблюдайте единый стиль названий">
 Для своего проекта выберите название по тому же образцу: `Desert Storm`, а не `Desert_Storm` или `DesertStorm`. Название с пробелами легче читать. Workbench использует его и для папки проекта.
 
-Следуйте образцам названий на скриншотах. В Arma правила именования зависят от типа файла или объекта. Единый стиль важен: он помогает вам и другим авторам находить нужные файлы и разбираться в миссии.
+Обращайте внимание на названия на скриншотах: в Arma правила именования зависят от типа файла или объекта. Соблюдайте эти правила, чтобы вам и другим авторам было проще находить файлы и разбираться в миссии.
 </Aside>
 
 В поле **Location** укажите, где Workbench должен создать папку нового аддона.
@@ -90,7 +90,7 @@ triad-shooting-star-ar/
 
 ## Подключение Lite Lobby {#lite-lobby-dependency}
 
-Чтобы использовать файлы Lite Lobby в миссии, добавим его в зависимости проекта. Так называется список дополнений, необходимых для работы проекта.
+Зависимости проекта — это аддоны, необходимые для его работы. Добавим в этот список Lite Lobby, чтобы использовать его файлы в миссии.
 
 В Workbench откройте **File → Project Settings**.
 
@@ -115,16 +115,16 @@ triad-shooting-star-ar/
 
 Нажмите **OK**, чтобы сохранить настройки, и закройте Workbench.
 
-Снова откройте проект миссии. В панели **Resource Browser** должна появиться папка **LiteLobby**. Теперь вы можете использовать её файлы в своём проекте.
+Снова откройте проект миссии. В панели **Resource Browser** должна появиться папка **LiteLobby**.
 
 ### Если Workbench не находит мод {#missing-addon-dependencies}
 
-При повторном открытии проекта может появиться окно **Missing Addon Dependencies**. Оно сообщает, что Launcher не нашёл одно из необходимых дополнений. Возможно, Lite Lobby или другой мод ещё не установлен либо Launcher не знает, где он находится.
+При повторном открытии проекта может появиться окно **Missing Addon Dependencies**. Оно сообщает, что лаунчер не нашёл один из необходимых аддонов. Возможно, Lite Lobby или другой мод ещё не установлен либо лаунчер не знает, где он находится.
 
 <LL_Screenshot
   src={missingAddonDependencies}
-  alt="Окно Missing Addon Dependencies: не найдено дополнение с GUID 699319AAA5BFC57F."
-  caption="Launcher не нашёл нужный мод."
+  alt="Окно Missing Addon Dependencies: не найден мод с GUID 699319AAA5BFC57F."
+  caption="Лаунчер не нашёл нужный мод."
   originalLabel="Открыть оригинал изображения"
 />
 
@@ -137,12 +137,12 @@ triad-shooting-star-ar/
   originalLabel="Открыть оригинал изображения"
 />
 
-Если мод ещё не установлен, запустите Arma Reforger и скачайте его через Workshop в игре. Затем вернитесь в Launcher и выберите **Add Project → Scan for Projects**, чтобы найти установленные дополнения. Если мод уже есть на компьютере, сразу переходите к этому поиску.
+Если мод ещё не установлен, запустите Arma Reforger и скачайте его через Workshop в игре. Затем вернитесь в лаунчер и выберите **Add Project → Scan for Projects**, чтобы найти установленные моды. Если мод уже есть на компьютере, сразу переходите к этому поиску.
 
 <LL_Screenshot
   src={scanForProjects}
   alt="В меню Add Project окна Workbench Launcher указан пункт Scan for Projects."
-  caption="Поиск установленных дополнений."
+  caption="Поиск установленных модов."
   originalLabel="Открыть оригинал изображения"
 />
 
@@ -151,10 +151,10 @@ triad-shooting-star-ar/
 <LL_Screenshot
   src={workshopAddonsFolder}
   alt="Выбрана папка Documents, My Games, ArmaReforger, addons; стрелка указывает на Select Folder."
-  caption="Папка дополнений Arma Reforger."
+  caption="Папка модов Arma Reforger."
   originalLabel="Открыть оригинал изображения"
 />
 
-Когда Launcher завершит поиск, снова откройте проект миссии.
+Когда лаунчер завершит поиск, снова откройте проект миссии.
 
-Проект создан, Lite Lobby подключён. В следующей главе [создадим мир миссии](../world/).
+В следующей главе [создадим мир миссии](../world/).

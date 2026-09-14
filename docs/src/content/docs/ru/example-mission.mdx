@@ -1,41 +1,100 @@
 ---
-title: Как открыть пример миссии
-description: Пример миссии Arma Reforger на Lite Lobby.
+title: Как открыть существующую миссию
+description: Открытие миссии с GitHub или Workshop в Arma Reforger Workbench.
 ---
 
-**Triad Shooting Star** — миссия на Lite Lobby, на примере которой написано это руководство. Откройте её в Workbench, чтобы изучать объекты и их настройки, сверяясь с соответствующими главами руководства.
+import LL_Screenshot from '../../../components/LL_Screenshot.astro';
+import step01 from '../../../assets/screenshots/example-mission/001.png';
+import step02 from '../../../assets/screenshots/example-mission/002.png';
+import step03 from '../../../assets/screenshots/example-mission/003.png';
+import step04 from '../../../assets/screenshots/example-mission/004.png';
+import step06 from '../../../assets/screenshots/example-mission/006.png';
+import step07 from '../../../assets/screenshots/example-mission/007.png';
+import step08 from '../../../assets/screenshots/example-mission/008.png';
+import step09 from '../../../assets/screenshots/example-mission/009.png';
+import step10 from '../../../assets/screenshots/example-mission/010.png';
+import step11 from '../../../assets/screenshots/example-mission/011.png';
+import step12 from '../../../assets/screenshots/example-mission/012.png';
+import step13 from '../../../assets/screenshots/example-mission/013.png';
 
-Понадобятся Arma Reforger и Arma Reforger Tools.
+[К оглавлению руководства](../create-mission/)
 
-## Открытие проекта {#open-project}
+Сначала откроем с GitHub **[Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar)** — ту самую миссию, которую воссоздаём в руководстве [«Как создать миссию»](../create-mission/). Вы сможете изучать готовый проект и сравнивать его настройки с описанными шагами.
 
-1. [Скачайте архив с проектом миссии](https://github.com/Jumbo13th/triad-shooting-star-ar/archive/0288431eae2c423e31baaba295176a28be1ef873.zip) и распакуйте его. Рекомендуем поместить извлечённую папку проекта в `Documents\My Games\ArmaReforgerWorkbench\addons`.
-2. Запустите **Arma Reforger Tools**. В **Workbench Launcher** выберите **Add Project → Add Existing Project**.
-3. В окне выбора файла перейдите в распакованную папку проекта, откройте вложенную папку `Triad Shooting Star` и выберите `addon.gproj`.
-4. Выберите **Triad Shooting Star** в списке проектов и нажмите **Open**.
+Затем покажем, как открыть миссию из Workshop, на примере **[Triad Danse Macabre](https://reforger.armaplatform.com/workshop/69F707F1824808A8-TriadDanseMacabre)**. Для обоих способов понадобятся Arma Reforger и Arma Reforger Tools.
 
-Если вы уже пользуетесь Git, можно клонировать [репозиторий проекта](https://github.com/Jumbo13th/triad-shooting-star-ar) через GitHub Desktop. В архиве по ссылке выше сохранена версия, использованная в руководстве; текущая версия в репозитории может от неё отличаться.
+## Миссия с GitHub {#open-project}
 
-### Если не хватает дополнений {#missing-dependencies}
+### Скачивание и распаковка {#download-project}
 
-Для этой миссии нужны Lite Lobby и другие моды. Если появится окно **Missing Addon Dependencies**, Workbench не смог найти один или несколько из них. В сообщении указаны GUID — идентификаторы недостающих модов. Поочерёдно введите их в строку поиска на [сайте Workshop](https://reforger.armaplatform.com/workshop) и установите найденные моды через Workshop в игре.
+Откройте [репозиторий Triad Shooting Star](https://github.com/Jumbo13th/triad-shooting-star-ar). Над списком файлов нажмите **Code → Download ZIP**.
 
-В Launcher выберите **Add Project → Scan for Projects**, укажите папку установленных модов — обычно `Documents\My Games\ArmaReforger\addons` — и нажмите **Select Folder**. После сканирования снова откройте проект. [Эти действия показаны на скриншотах](/lite-lobby-ar/ru/create-mission/project/#missing-addon-dependencies).
+<LL_Screenshot src={step07} alt="В репозитории triad-shooting-star-ar раскрыто меню Code и указан пункт Download ZIP." caption="Скачивание проекта миссии с GitHub." originalLabel="Открыть оригинал изображения" />
 
-## Открытие мира {#open-world}
+Сохраните архив в папку `Documents\My Games\ArmaReforgerWorkbench\addons`. Выделите его в Проводнике и нажмите **Extract all** («Извлечь всё»).
+
+<LL_Screenshot src={step08} alt="Архив triad-shooting-star-ar-main находится в папке ArmaReforgerWorkbench addons; сверху видна кнопка Extract all." caption="Архив нужно распаковать перед открытием проекта." originalLabel="Открыть оригинал изображения" />
+
+После распаковки назовите папку репозитория `triad-shooting-star-ar`, как на скриншоте. Внутри неё должна находиться папка аддона `Triad Shooting Star` с файлом `addon.gproj`. Если Проводник создал ещё одну внешнюю папку, перенесите из неё папку репозитория в `addons`.
+
+<LL_Screenshot src={step09} alt="В ArmaReforgerWorkbench addons находится распакованная папка triad-shooting-star-ar." caption="Папка репозитория после распаковки." originalLabel="Открыть оригинал изображения" />
+
+**Download ZIP** скачивает текущую версию выбранной ветки.
+
+Если вы уже пользуетесь Git, вместо архива можно клонировать репозиторий через GitHub Desktop. Так вы получите и историю изменений проекта.
+
+### Добавление проекта в Workbench {#add-existing-project}
+
+Запустите **Arma Reforger Tools**. В лаунчере выберите **Add Project → Add Existing Project**.
+
+<LL_Screenshot src={step10} alt="В меню Add Project окна Workbench Launcher указан пункт Add Existing Project." caption="Добавление существующего проекта в лаунчер." originalLabel="Открыть оригинал изображения" />
+
+Откройте папку `triad-shooting-star-ar`, затем `Triad Shooting Star`. Выберите `addon.gproj` и нажмите **Open**.
+
+<LL_Screenshot src={step11} alt="В папке triad-shooting-star-ar, Triad Shooting Star выбран addon.gproj и указана кнопка Open." caption="Файл проекта находится внутри папки аддона." originalLabel="Открыть оригинал изображения" />
+
+В поиске лаунчера введите `shoot`, выберите **Triad Shooting Star** и нажмите **Open**.
+
+<LL_Screenshot src={step12} alt="Поиск по shoot в Workbench Launcher показывает проект Triad Shooting Star." caption="Открытие Triad Shooting Star." originalLabel="Открыть оригинал изображения" />
+
+### Если не хватает модов {#missing-dependencies}
+
+Окно **Missing Addon Dependencies** означает, что Workbench не нашёл нужный аддон. Следуйте инструкции [«Если Workbench не находит мод»](../create-mission/project/#missing-addon-dependencies), затем снова откройте проект.
+
+<LL_Screenshot src={step13} alt="Окно Missing Addon Dependencies сообщает об отсутствии аддона 6A4545CCB3516E86." caption="В сообщении указан идентификатор недостающего аддона." originalLabel="Открыть оригинал изображения" />
+
+### Открытие мира {#open-world}
 
 В Workbench нажмите **World Editor** в разделе **Quick Launch**. В панели **Resource Browser** выберите проект **TriadShootingStar**, найдите файл `Worlds/Eden/ShootingStar_Ep1.ent` и откройте его двойным щелчком мыши.
 
-В редакторе откроется готовый мир миссии. Как создать такой мир на основе игровой карты, объясняет глава [«Создание мира с Lite Lobby»](../create-mission/world/).
+В редакторе откроется мир миссии из основного руководства.
 
-## Как разбирать пример {#study-example}
+## Миссия из Workshop {#workshop-project}
 
-Выберите, какую часть миссии вы хотите разобрать, и найдите относящиеся к ней объекты. В панели **Hierarchy** раскройте нужный слой и выберите объект. Его свойства появятся в панели **Object Properties** — сравните их с настройками, описанными в соответствующей главе.
+### Установка миссии {#install-workshop-mission}
 
-| Что изучить | Где смотреть | Раздел руководства |
-| --- | --- | --- |
-| Захват порта | Слой `triggers`, объекты `PortTrigger` и `PortCapture` | [Триггер захвата](/lite-lobby-ar/ru/create-mission/objectives/#port-capture) |
-| Группы и позывные | Слой `US`, например группа `AB_PL1` | [Группы и игровые слоты](/lite-lobby-ar/ru/create-mission/groups-and-slots/#playable-forces) |
-| Снаряжение бойцов | Папка `Prefabs/Characters` аддона Triad Shooting Star в панели **Resource Browser** | [Часть II. Персонажи](/lite-lobby-ar/ru/create-mission/#characters-part) |
+Запустите Arma Reforger и откройте **Workshop**. Найдите **[Triad Danse Macabre](https://reforger.armaplatform.com/workshop/69F707F1824808A8-TriadDanseMacabre)** по названию или идентификатору `69F707F1824808A8`. Скачайте мод и дождитесь загрузки его зависимостей — других модов, необходимых для миссии.
 
-Полный список глав приведён на странице [«Как создать миссию»](../create-mission/). К ним можно обращаться при изучении примера или проходить их по порядку, создавая собственную миссию.
+<LL_Screenshot src={step01} alt="Страница Triad Danse Macabre в Workshop игры; мод уже установлен и включён." caption="Triad Danse Macabre в Workshop. На скриншоте мод уже установлен." originalLabel="Открыть оригинал изображения" />
+
+### Поиск проекта в Workbench {#scan-workshop-project}
+
+Запустите **Arma Reforger Tools**. В лаунчере выберите **Add Project → Scan for Projects**.
+
+<LL_Screenshot src={step02} alt="В Workbench Launcher раскрыто меню Add Project и указан пункт Scan for Projects." caption="Поиск установленных модов." originalLabel="Открыть оригинал изображения" />
+
+Выберите папку `Documents\My Games\ArmaReforger\addons` и нажмите **Select Folder**. Здесь игра хранит моды, скачанные из Workshop.
+
+<LL_Screenshot src={step03} alt="Выбрана папка Documents, My Games, ArmaReforger, addons; указана кнопка Select Folder." caption="Папка модов, установленных через Workshop." originalLabel="Открыть оригинал изображения" />
+
+После сканирования введите `danse` в поиске лаунчера. Выберите **Triad Danse Macabre** и нажмите **Open**.
+
+<LL_Screenshot src={step04} alt="Поиск по danse в Workbench Launcher показывает Triad Danse Macabre." caption="Открытие проекта Triad Danse Macabre." originalLabel="Открыть оригинал изображения" />
+
+Если появится **Missing Addon Dependencies**, воспользуйтесь той же инструкцией [по поиску недостающих модов](../create-mission/project/#missing-addon-dependencies).
+
+### Просмотр файлов миссии {#workshop-resources}
+
+В панели **Resource Browser** найдите **TriadDanseMacabre** и раскройте его папки. В **Prefabs** можно изучить префабы, в **Worlds** — найти файлы миров миссии. Чтобы открыть мир, найдите нужный файл `.ent` в **Worlds** или её вложенных папках и дважды щёлкните по нему.
+
+<LL_Screenshot src={step06} alt="В Resource Browser раскрыт проект TriadDanseMacabre с папками Assets, Missions, Prefabs и Worlds." caption="Файлы Triad Danse Macabre в Workbench." originalLabel="Открыть оригинал изображения" />

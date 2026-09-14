@@ -1,0 +1,38 @@
+---
+title: Triad Tactics mission requirements
+description: Requirements for missions on the Triad Tactics server.
+---
+
+Follow these requirements when developing a mission for the Triad Tactics server. For the World Editor settings, see [Configure a mission for Triad Tactics](../setup/).
+
+## Mission concept {#concept}
+
+Discussing the concept with the administrators before starting is recommended. This can prevent spending considerable time on a mission whose premise does not suit the server's games.
+
+Missions based on ongoing military conflicts are prohibited. Maps with clear parallels to those conflicts are also prohibited.
+
+## Sides and playable slots {#players}
+
+Triad Tactics uses a [rotation system](https://triad-tactics.com/en/games#rotation). Missions must support games with 128 participants and provide [**127 playable slots**](../../create-mission/groups-and-slots/#playable-forces).
+
+- Only **two sides** are allowed. Three-sided missions are prohibited.
+- Each side must have **at least 60 fighters**. With 127 playable slots, the most uneven permitted split is **60 versus 67**.
+- Each side must have **at least eight units**. Small groups of two or three people, such as armored vehicle crews, platoon command elements and special-purpose slots, do not count toward these eight.
+
+Exceptions to the eight-unit minimum are allowed. For example, large USMC squads may make it impossible to fit eight squads within a side's player count. In such cases, each squad must have **at least two backpack radios**, allowing community units sharing that squad to operate independently. **These exceptions require separate approval from the administrators.**
+
+## Historical accuracy and asset quality {#content}
+
+[Unit organization](../../character-prefabs/planning/), weapons, uniforms and equipment must match the chosen military unit and historical period. These will be checked during mission review.
+
+Pay attention to aesthetics: do not use poor-quality models of armored vehicles, weapons or other equipment. Widely used Arma addons such as **RHS**, **WCS** and **Tactical Flava** are recommended.
+
+## Mission rules and presentation {#briefing}
+
+State mission-specific rules clearly. Use headings, lists and emphasis for important conditions so that players can find the information they need. See [Briefing](../../create-mission/objectives/#mission-briefing) for formatting instructions and markup examples.
+
+## Triggers and points {#points}
+
+Missions must use [triggers](../../create-mission/objectives/#triggers). **Agree on trigger point values with the administrators.**
+
+For the point settings and statistics zone component, see [Configure a mission for Triad Tactics](../setup/#trigger-points).
