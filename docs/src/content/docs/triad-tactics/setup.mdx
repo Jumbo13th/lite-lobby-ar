@@ -9,7 +9,13 @@ import statZone from '../../../assets/screenshots/triad-tactics/002.png';
 
 Use this section once your mission is complete to configure it for the Triad Tactics server. Also read the [mission requirements](../requirements/), including the rules for assigning objective points.
 
-## 1. Trigger points {#trigger-points}
+## 1. Add Triad Tactics Core {#core-dependency}
+
+Add **[Triad Tactics Core](https://reforger.armaplatform.com/workshop/69FF2C2B633BBC25)** as a project dependency. **Project Settings → Dependencies** must list **Triad Tactics Core** with the identifier `69FF2C2B633BBC25`. This dependency is required for missions on the server.
+
+Download the addon from Workshop and add it [the same way as Lite Lobby](../../create-mission/project/#lite-lobby-dependency). For rules on other gameplay mods, see the [mission requirements](../requirements/#gameplay-mods).
+
+## 2. Trigger points {#trigger-points}
 
 In **World Editor**, select the capture trigger — `PortCapture` in this example. In **Object Properties**, open **LL_TriggerZoneCapture** and set:
 
@@ -25,7 +31,7 @@ The screenshot shows `20` and `1`. Agree on values for your mission with the adm
   originalLabel="Open original image"
 />
 
-## 2. Statistics zone {#stat-zone}
+## 3. Statistics zone {#stat-zone}
 
 Select the object that defines the capture zone boundary — `PortTrigger` in this example. Use **Add Component** to add **LL_StatZoneComponent** to it.
 

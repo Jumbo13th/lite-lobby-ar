@@ -9,7 +9,13 @@ import statZone from '../../../../assets/screenshots/triad-tactics/002.png';
 
 Переходите к этому разделу, когда миссия уже готова. Здесь настроим её для сервера Triad Tactics. Также ознакомьтесь с [требованиями к миссиям](../requirements/): они определяют, в том числе, сколько очков назначать за задачи.
 
-## 1. Очки на триггере {#trigger-points}
+## 1. Подключение Triad Tactics Core {#core-dependency}
+
+Добавьте **[Triad Tactics Core](https://reforger.armaplatform.com/workshop/69FF2C2B633BBC25)** в зависимости проекта: в **Project Settings → Dependencies** должна появиться строка **Triad Tactics Core** с идентификатором `69FF2C2B633BBC25`. Это обязательная зависимость для миссий сервера.
+
+Скачайте аддон в Workshop и подключите его [так же, как Lite Lobby](../../create-mission/project/#lite-lobby-dependency). Правила использования других геймплейных модов приведены в [требованиях к миссиям](../requirements/#gameplay-mods).
+
+## 2. Очки на триггере {#trigger-points}
 
 В **World Editor** выберите триггер захвата — в нашем примере это `PortCapture`. В панели **Object Properties** откройте компонент **LL_TriggerZoneCapture** и задайте:
 
@@ -25,7 +31,7 @@ import statZone from '../../../../assets/screenshots/triad-tactics/002.png';
   originalLabel="Открыть оригинал изображения"
 />
 
-## 2. Зона статистики {#stat-zone}
+## 3. Зона статистики {#stat-zone}
 
 Выберите объект, который задаёт границы зоны захвата, — в нашем примере это `PortTrigger`. Через **Add Component** добавьте к нему **LL_StatZoneComponent**.
 
