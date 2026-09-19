@@ -29,7 +29,8 @@ research.md whatever it is.
 Run with the engine records only, before any lobby record exists.
 
 1. Start the game phase, wait for two `[LL_Lobby] Snapshot AUTO ... ok in N ms` log
-   lines, kill the server.
+   lines (or force them with the admin chat command `/snapshot`, which logs
+   `Snapshot SCRIPTED ... ok`), then kill the server.
 2. Start it plainly. Expected: slot selection, and the log says
    `Resume: no snapshot loaded`.
 3. Kill it again. Start it with `-loadSessionSave`. Expected: the log shows
@@ -279,7 +280,8 @@ the twice-absent holder is put back after the second resume.
    loaded snapshot is always present.
 6c. Start a mission whose squad has no entity name, one with two squads sharing a
    name, one whose player prefab lacks the persistence component, and one with
-   two mission-end timers. Expected: one log line each when the game phase's
+   two mission-end timers, plus a timed announcement beside them. Expected: one
+   log line for the second timer and none for the announcement when the game phase's
    bodies have finished replacing, naming the squad, the slot or the timer.
    Then snapshot and resume the untracked-body mission. Expected: `Resume refused:
    slot <name> has no persistence id`.

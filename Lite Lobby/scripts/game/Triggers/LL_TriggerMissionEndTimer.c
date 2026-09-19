@@ -13,6 +13,11 @@ class LL_TriggerMissionEndTimer : LL_TriggerComponent
 	// Drained by CountdownTick, which skips during a hard freeze or outside GAME.
 	protected float m_fSecondsLeft;
 
+	int GetDuration()
+	{
+		return m_iSeconds;
+	}
+
 	override string GetObjectiveMarkup()
 	{
 		return Header("#LL-Trigger_HeaderTimeLimit")

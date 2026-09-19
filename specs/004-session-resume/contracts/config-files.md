@@ -62,6 +62,9 @@ operator ticks it on the demo world's game-mode entity to test.
 
 ## Server configuration (`config.json`, `persistence` block)
 
+The block lives at `game.gameProperties.persistence`; the schema rejects it at the
+top level (`Param "#/persistence" is not allowed`, verified 2026-09-19 on 1.8.0.13).
+
 | Key | Value | Why |
 |-----|-------|-----|
 | `loadSessionSave` | `false` | a plain restart is a fresh start |
@@ -72,6 +75,21 @@ operator ticks it on the demo world's game-mode entity to test.
 
 ## Launch line
 
+- the mission must be started from its header (`scenarioId` in the server
+  configuration, or `-server Missions/LobbyDemo.conf` on a development server): a
+  world started directly (`-server worlds/.../LobbyDemo.ent -MissionHeader ...`)
+  ignores the header's systems config and gets no persistence system (verified
+  2026-09-19); on a development server `-config` is accepted together with
+  `-addons` only when `-server` is also given
+- a world started with `-worldSystemsConfig` needs the GUID form of the resource
+  (`{<LL_LobbySystems.conf GUID>}Configs/Systems/LL_LobbySystems.conf`); a plain path or
+  an addon-prefixed path does not resolve (verified 2026-09-19)
+- a development server started with `-server` validates the configuration file but
+  applies neither its game settings (`fastValidation` stays false in the log) nor its
+  persistence block: no automatic snapshot in 11 minutes of GAME (2026-09-19). The
+  cadence and the launch-parameter precedence are therefore tested only on a server
+  started from the configuration's `scenarioId`; on a development server the admin
+  `/snapshot` command produces the snapshots
 - plain: fresh start
 - `-loadSessionSave`: continue from the newest snapshot
 - `-loadSessionSave <uuid>`: continue from the snapshot whose `meta-info.json`

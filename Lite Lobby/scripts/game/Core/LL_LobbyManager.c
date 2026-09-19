@@ -762,6 +762,52 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		Rpc(RpcDo_SetDamageState, slotRplId, damageState);
 	}
 
+	// Body replacements in flight. A session snapshot must not straddle one: the spawn,
+	// the deferred finish and the corpse deletion are three separate frames, so saving is
+	// disallowed synchronously on the acquisition, not by a poll.
+	protected int m_iPendingReplacements;
+
+	int GetPendingReplacements()
+	{
+		return m_iPendingReplacements;
+	}
+
+	protected void AcquireReplacement_S()
+	{
+		m_iPendingReplacements++;
+
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm)
+			gm.DisallowSaves_S();
+	}
+
+	// Once per replacement, on its terminal exit only; a registration retry is not one.
+	protected void ReleaseReplacement_S()
+	{
+		if (m_iPendingReplacements <= 0)
+		{
+			Print("[LL_Lobby] Replacement released with none pending", LogLevel.WARNING);
+			return;
+		}
+
+		m_iPendingReplacements--;
+		if (m_iPendingReplacements > 0)
+			return;
+
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm)
+			gm.AllowSavesIfReady_S();
+
+		LL_SaveWaiter.ReevaluateAll();
+	}
+
+	protected void DeferredRespawn_S(Managed context)
+	{
+		Tuple2<int, bool> args = Tuple2<int, bool>.Cast(context);
+		if (args)
+			RespawnSlotCharacter_S(args.param1, args.param2);
+	}
+
 	// Spawns a fresh body for the slot at the current body's transform and drops the old one.
 	// allowAlive=false is the Game Master revive (dead slots only); allowAlive=true is the
 	// possession path replacing a live loadtime body. Routed through TakeSlot_S so the fresh
@@ -820,6 +866,19 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 		bool wasLeader = group.GetLeaderEntity() == oldBody;
 
+		// A replacement during a save waits for the manager; the request is replayed whole
+		// so a slot that changed meanwhile is validated again.
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm && gm.IsSessionSavesEnabled() && GetGame().GetSaveGameManager().IsBusy())
+		{
+			LL_SaveWaiter waiter = new LL_SaveWaiter(new Tuple2<int, bool>(slotRplId, allowAlive));
+			waiter.GetOnReady().Insert(DeferredRespawn_S);
+			waiter.Start();
+			return;
+		}
+
+		AcquireReplacement_S();
+
 		EntitySpawnParams params = new EntitySpawnParams();
 		oldBody.GetWorldTransform(params.Transform);
 
@@ -827,6 +886,7 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		if (!newBody)
 		{
 			Print(string.Format("[LL_Lobby] Respawn failed: could not spawn body for slot %1", slotRplId), LogLevel.WARNING);
+			ReleaseReplacement_S();
 			return;
 		}
 
@@ -874,7 +934,10 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 	protected void RespawnFinish_S(int playerId, int oldSlotRplId, IEntity newBody, int attempt)
 	{
 		if (!newBody)
+		{
+			ReleaseReplacement_S();
 			return;
+		}
 
 		LL_PlayableComponent newPlayable = LL_PlayableComponent.Cast(newBody.FindComponent(LL_PlayableComponent));
 		int newSlotRplId = -1;
@@ -893,6 +956,7 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 			Print(string.Format("[LL_Lobby] Respawn aborted: fresh body never registered a slot (old slot %1) — cleaning up", oldSlotRplId), LogLevel.WARNING);
 			SCR_EntityHelper.DeleteEntityAndChildren(newBody);
+			ReleaseReplacement_S();
 			return;
 		}
 
@@ -905,6 +969,7 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 			{
 				Print(string.Format("[LL_Lobby] Respawn: hand-off failed for player %1 → slot %2 — cleaning up", playerId, newSlotRplId), LogLevel.WARNING);
 				SCR_EntityHelper.DeleteEntityAndChildren(newBody);
+				ReleaseReplacement_S();
 				return;
 			}
 		}
@@ -913,6 +978,8 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		IEntity corpse = GetSlotEntity_S(oldSlotRplId);
 		if (corpse)
 			SCR_EntityHelper.DeleteEntityAndChildren(corpse);
+
+		ReleaseReplacement_S();
 
 		Print(string.Format("[LL_Lobby] Revived slot: dead slot %1 → fresh slot %2 (player %3, -1 = bot)", oldSlotRplId, newSlotRplId, playerId), LogLevel.NORMAL);
 	}

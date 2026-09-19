@@ -69,8 +69,10 @@ and the save types, logs its cause, purges nothing, and asks the game to close.
 
 Trigger record: `started` (bool, the trigger's own countdown or evaluation was running, answered by the subclass: for the mission-end timer, its countdown tick was scheduled, not merely its freeze wait), `fired` (bool), plus,
 only when started, the subclass state written by the trigger's own hook, fired or
-not: nothing extra for the mission-end timer (its start reading lives in the
-session record), `held` and `captured` (zone capture, with
+not: nothing extra for the mission-end timer proper (its start reading lives in the
+session record); `startedAt` (the clock reading its countdown began) for every timed
+announcement, which inherits the timer's countdown, so any number of them resume
+correctly; `held` and `captured` (zone capture, with
 the derived defender flag), `progress` and `holder` (zone contest; the holder cannot
 be derived from progress because ownership has hysteresis), `bothSeen` (supremacy).
 A trigger that had not started initialises normally after the resume; a started one
@@ -113,7 +115,7 @@ Server-only unless marked.
 | `LL_GameModeCoop` | `m_bStartupBatchDispatched` | set at the end of the fresh-start entry and of the resume finaliser, cleared on leaving GAME; saving is allowed only with it set and no replacement pending |
 | `LL_VoNChannelsManager` | `RefreshParking_S(playerId)` | public wrapper over the protected parking update, for the claim's delayed possession |
 | `LL_GameModeCoop` | `OnNativeLoadResult_S(bool)` | declared in Phase 2 with the switch; a failure refuses at once and idempotently |
-| `LL_GameModeCoop` | `LL_SaveWaiter` (helper object) | one-shot wait re-evaluated on the save manager's busy-state event and on the replacement count reaching zero; used by the deferred replacement, the debriefing discard and the stop-time save; unsubscribes before running its action |
+| `LL_GameModeCoop` | `LL_SaveWaiter` (helper object) | one-shot wait re-evaluated on the save manager's busy-state event and on the replacement count reaching zero; created with a context, the callback inserted into its ready invoker, then started (a script method cannot take a func argument); used by the deferred replacement, the debriefing discard and the stop-time save; unsubscribes before running its action |
 | `LL_GameModeCoop` | `m_bStopSaveDone` | set when a shutdown-type save completes after the stop began; the addon requests none if set, and disables saving after its own completes |
 | `LL_GameModeCoop` | `m_bResumePending` | true from world start until the resume finaliser has run; gates the fresh start, the playable registration retry and the recorder start |
 | `LL_GameModeCoop` | `m_aPinnedVehicles` | aircraft pinned at finalisation, unpinned on release |

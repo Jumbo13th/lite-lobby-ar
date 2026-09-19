@@ -278,7 +278,9 @@ crew-lock gate rather than a new user action.
     full duration until started, standing still with the clock during any hard
     freeze, clamped to the duration) and the elapsed clock otherwise. Both values
     are in the session record. One positive-duration timer per mission is the
-    supported configuration; anything else is logged at the roster check.
+    supported configuration; anything else is logged at the roster check, which
+    counts the exact class only: timed announcements inherit the timer, are
+    unlimited and keep their own start reading in the trigger record.
 9. **Confirmation and spike first** (research R5, R7). Task order starts with the
    config files and the fresh-versus-resume run (Scenario 0, engine records only),
    then the lobby records; the aircraft pin is the first task of the hold phase, on

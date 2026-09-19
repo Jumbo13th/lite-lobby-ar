@@ -291,6 +291,12 @@ class LL_TriggerComponent : ScriptComponent
 		return string.Format("%1:%2", mins.ToString(), secs.ToString(2));
 	}
 
+	// Every trigger in the world, on every machine; the server's session-save checks read it.
+	static array<LL_TriggerComponent> GetAll()
+	{
+		return s_aBriefingTriggers;
+	}
+
 	static string BuildObjectivesMarkup()
 	{
 		string text = "";

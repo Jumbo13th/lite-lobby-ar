@@ -89,6 +89,14 @@ StringTable {
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }
+  CustomStringTableItem "{D8D93C27150B704E}" {
+   Id "LL-Command_HelpSnapshot"
+   Target_en_us "/snapshot — save a session snapshot now"
+   Target_ru_ru "/snapshot — сохранить снапшот сессии сейчас"
+   Modified 1789814072
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
   CustomStringTableItem "{1D31000000000045}" {
    Id "LL-Command_HelpFreeze"
    Target_en_us "/freeze <seconds> — adjust freeze time (+ / -)"

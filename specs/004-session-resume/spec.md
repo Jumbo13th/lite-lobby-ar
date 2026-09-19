@@ -281,7 +281,11 @@ Sequencing contracts around the previous corrections. The one product question
 - Q: How many mission-end timers does the spectator countdown represent? → A:
   one per mission, with a positive duration. The roster check logs a mission with
   more than one such timer or one with a zero duration; the first registered
-  timer drives the display in that case, with the log line saying so.
+  timer drives the display in that case, with the log line saying so. The
+  timed-message trigger inherits the timer's countdown but is an announcement, not
+  a mission end: any number of them is supported, none is counted here, and each
+  keeps its own start reading in the trigger record (real missions carry one
+  mission-end timer and several timed announcements, 2026-09-19 review).
 - Q: Which clock does the mission-end timer itself fire from? → A: the mission
   clock, the same one spectators read. The timer fires when the clock reaches its
   start reading plus its duration, checked each tick; its remaining time is that
@@ -752,7 +756,7 @@ Saving and starting:
   taken while a body replacement is pending: saving is disallowed synchronously
   before the replacement's first change and re-allowed after its last, and a
   replacement requested during a save waits for the save. The first save of a
-  game phase, fresh or resumed, is allowed only once no replacement is pending.
+  game phase, fresh or resumed, is allowed only once no replacement is pending. An admin MAY request a snapshot at any time with the `/snapshot` chat command (a test aid); the request obeys the same gate.
 - **FR-003**: A snapshot MUST capture the state the game itself can save for every
   tracked entity in the world: position, identity, hit-zone damage, inventory and
   equipment, seating, fuel, lights, magazines and attachments, armed mines, doors,
@@ -851,7 +855,9 @@ Saving and starting:
   spectator clock MUST show the time until the mission ends, derived on each
   client from the replicated clock and two once-set values, standing still
   whenever the clock does; the timer itself MUST fire from the same clock; a
-  mission without that timer MUST keep the elapsed clock; more than one timer or
+  mission without that timer MUST keep the elapsed clock; timed announcements
+  that inherit the timer are not mission-end timers, are unlimited and resume from
+  their own saved start reading; more than one timer or
   a zero duration MUST be logged at the roster check; alive players see nothing
   new.
 - **FR-018**: With the setting on but the mission unable to save (save types

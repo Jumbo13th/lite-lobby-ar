@@ -1066,6 +1066,22 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			gameMode.EndFreezeTime_S();
 	}
 
+	void AskSnapshot()
+	{
+		Rpc(RpcAsk_Snapshot);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_Snapshot()
+	{
+		if (!SCR_Global.IsAdmin(GetPlayerId()))
+			return;
+
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		if (gameMode)
+			gameMode.RequestSnapshot_S(GetPlayerId());
+	}
+
 	// The reply comes from the server so the admin sees the authoritative outcome.
 	void AskSetVerification(bool enable)
 	{
@@ -1207,6 +1223,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		chatMgr.GetCommandInvoker("freeze").Insert(OnChatCmd_Freeze);
 		chatMgr.GetCommandInvoker("endfreeze").Insert(OnChatCmd_EndFreeze);
 		chatMgr.GetCommandInvoker("hardfreeze").Insert(OnChatCmd_HardFreeze);
+		chatMgr.GetCommandInvoker("snapshot").Insert(OnChatCmd_Snapshot);
 		chatMgr.GetCommandInvoker("verify").Insert(OnChatCmd_Verify);
 		chatMgr.GetCommandInvoker("slotexport").Insert(OnChatCmd_SlotExport);
 		chatMgr.GetCommandInvoker("slotimport").Insert(OnChatCmd_SlotImport);
@@ -1228,6 +1245,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			chatMgr.GetCommandInvoker("freeze").Remove(OnChatCmd_Freeze);
 			chatMgr.GetCommandInvoker("endfreeze").Remove(OnChatCmd_EndFreeze);
 			chatMgr.GetCommandInvoker("hardfreeze").Remove(OnChatCmd_HardFreeze);
+			chatMgr.GetCommandInvoker("snapshot").Remove(OnChatCmd_Snapshot);
 			chatMgr.GetCommandInvoker("verify").Remove(OnChatCmd_Verify);
 			chatMgr.GetCommandInvoker("slotexport").Remove(OnChatCmd_SlotExport);
 			chatMgr.GetCommandInvoker("slotimport").Remove(OnChatCmd_SlotImport);
@@ -1247,6 +1265,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		help += "\n" + WidgetManager.Translate("#LL-Command_HelpFreeze");
 		help += "\n" + WidgetManager.Translate("#LL-Command_HelpEndFreeze");
 		help += "\n" + WidgetManager.Translate("#LL-Command_HelpHardFreeze");
+		help += "\n" + WidgetManager.Translate("#LL-Command_HelpSnapshot");
 		ShowCommandHelp(help);
 
 		string help2 = WidgetManager.Translate("#LL-Command_HelpHeader2");
@@ -1337,6 +1356,15 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			return;
 
 		AskEndFreezeTime();
+	}
+
+	// /snapshot — request a session snapshot now (test aid; the server gate still applies).
+	protected void OnChatCmd_Snapshot(SCR_ChatPanel panel, string data)
+	{
+		if (!RequireAdmin())
+			return;
+
+		AskSnapshot();
 	}
 
 	// /verify on|off: suspend or resume the website registration gate during an outage.
