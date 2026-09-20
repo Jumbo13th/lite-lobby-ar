@@ -396,6 +396,8 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		return false;
 	}
 
+	// Corpse slots outlive their AI agents; snapshots still need the named squad after
+	// its last living member dies, so vanilla must not delete that empty group.
 	void RegisterSlot_S(LL_SlotData slot, IEntity entity = null)
 	{
 		if (!Replication.IsServer())
@@ -405,6 +407,18 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		{
 			Print(string.Format("[LL_Lobby] Slot %1 already registered, skipping", slot.m_iRplId), LogLevel.WARNING);
 			return;
+		}
+
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		if (gameMode && gameMode.IsSessionSavesEnabled())
+		{
+			RplComponent groupRpl = RplComponent.Cast(Replication.FindItem(slot.m_iGroupId));
+			if (groupRpl)
+			{
+				SCR_AIGroup group = SCR_AIGroup.Cast(groupRpl.GetEntity());
+				if (group)
+					group.SetDeleteWhenEmpty(false);
+			}
 		}
 
 		Print(string.Format("[LL_Lobby] Registering slot: rplId=%1 name=%2 faction=%3",
