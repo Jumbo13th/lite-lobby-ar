@@ -145,14 +145,17 @@ class LL_VehicleHold
 		return true;
 	}
 
-	// The game's own recipe for a vehicle whose pilot dropped. A tracked vehicle has no
-	// persistent brake, so on a slope it may creep; the release logs it.
+	// The game's own recipe for a vehicle whose pilot dropped, plus the engine off on a
+	// grounded aircraft: its pilot is still seated, and only the engine-start gate holds
+	// them down. A tracked vehicle has no persistent brake, so on a slope it may creep;
+	// the release logs it.
 	protected void Stop_S(notnull IEntity vehicle, HelicopterControllerComponent heli)
 	{
 		if (heli)
 		{
 			heli.SetPersistentWheelBrake(true);
 			heli.SetAutohoverEnabled(true);
+			heli.StopEngine(false);
 			m_iStoppedAircraft++;
 		}
 		else

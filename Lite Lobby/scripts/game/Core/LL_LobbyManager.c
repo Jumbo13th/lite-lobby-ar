@@ -843,6 +843,30 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		SetSlotLocked_S(slotRplId, locked);
 	}
 
+	//! Server, once the reservations are seated: players who connected before they existed
+	//! claim now; a connected player with no slot spectates, as a late joiner would.
+	void ClaimResumedSlotsForConnected_S()
+	{
+		if (!Replication.IsServer())
+			return;
+
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		array<int> playerIds = {};
+		GetGame().GetPlayerManager().GetPlayers(playerIds);
+		foreach (int playerId : playerIds)
+		{
+			if (FindSlotByPlayerId(playerId))
+				continue;
+
+			string key = GetReconnectKeyForPlayer_S(playerId);
+			if (key != "" && ClaimResumedSlot_S(playerId, key))
+				continue;
+
+			if (gameMode)
+				gameMode.SendPlayerToSpectator_S(playerId);
+		}
+	}
+
 	// Replaces AssignSquadFrequencies_S on a resume: the nets stay what the snapshot had.
 	void RestoreSquadFrequencies_S(notnull map<string, int> byEntityName)
 	{

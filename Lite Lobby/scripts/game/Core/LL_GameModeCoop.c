@@ -78,9 +78,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	[RplProp()]
 	protected float m_fGameStartTimestamp;
 
-	// Hard freeze locks character controls, suspends the mission logic and the day/night
-	// clock. Script cannot stop AI, vehicles or physics (no vehicle-control disable, no
-	// world time-scale setter), so a hold engaged mid-round misses anyone already driving.
+	// Hard freeze locks character controls, suspends the mission logic, the mission clock
+	// and the day/night clock, and stops or pins every vehicle. Script cannot stop AI or
+	// physics (no world time-scale setter).
 	[RplProp()]
 	protected bool m_bHardFreeze;
 
@@ -96,7 +96,6 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	protected int m_iSnapshotStartTick;
 
 	// Planned stop (server): one stop-time snapshot, whichever path writes it.
-	protected bool m_bStopping;
 	protected bool m_bStopSaveRequested;
 	protected bool m_bStopSaveDone;
 
@@ -665,10 +664,11 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			if (mgr)
 				mgr.BroadcastAdminMessage_S("#LL-Resume_Released");
 
-			if (m_fPreHoldHardFreezeRemaining > 0)
+			// Leaving GAME releases everything; the saved remainder must not restart a hold there.
+			int remaining = Math.Ceil(m_fPreHoldHardFreezeRemaining);
+			m_fPreHoldHardFreezeRemaining = 0;
+			if (remaining > 0 && GetState() == SCR_EGameModeState.GAME)
 			{
-				int remaining = Math.Ceil(m_fPreHoldHardFreezeRemaining);
-				m_fPreHoldHardFreezeRemaining = 0;
 				StartHardFreeze_S(remaining);
 				return;
 			}
@@ -713,7 +713,6 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		return m_bHardFreeze && m_fHardFreezeRemaining < 0;
 	}
 
-	// The day/night clock is the one part of the world script can stop during a hold.
 	// SetIsDayAutoAdvanced is authority-only and the engine replicates it itself.
 	protected bool m_bDayAdvanceWasOn;
 
@@ -882,8 +881,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			typename.EnumToString(ESaveGameType, saveType), result,
 			System.GetTickCount() - m_iSnapshotStartTick), LogLevel.NORMAL);
 
-		// The engine's exit transition would otherwise write a second shutdown save.
-		if (m_bStopping && saveType == ESaveGameType.SHUTDOWN && success)
+		// The type alone marks an exit save, whichever side requested it and whether it ran
+		// before or after the game-end event; the engine's exit transition would otherwise
+		// write a second one.
+		if (saveType == ESaveGameType.SHUTDOWN && success)
 		{
 			m_bStopSaveDone = true;
 			GetGame().GetSaveGameManager().SetSavingAllowed(false);
@@ -1015,8 +1016,8 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	}
 
 	// The game's own exit flow minus the menu: wait for an idle manager, request the shutdown
-	// save once, and skip it when the engine's own exit save already completed. Whether the
-	// engine waits for the save before the process exits is the quickstart's gate.
+	// save once, and skip it when the engine's own exit save already completed. Nothing in
+	// script can delay the process exit, so the request is blocking.
 	override void OnGameEnd()
 	{
 		super.OnGameEnd();
@@ -1027,7 +1028,6 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			return;
 
 		m_bStopSaveRequested = true;
-		m_bStopping = true;
 
 		LL_SaveWaiter waiter = new LL_SaveWaiter();
 		waiter.GetOnReady().Insert(OnStopSaveReady_S);
@@ -1379,6 +1379,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		// The hold was engaged before the world existed; the restored bodies are here now.
 		m_VehicleHold.PinAll_S();
 		m_DamagePause.PauseAll_S();
+
+		// Whoever connected during the load found no reservation to claim.
+		mgr.ClaimResumedSlotsForConnected_S();
 
 		LL_StatsManager stats = LL_StatsManager.GetInstance();
 		if (stats)
