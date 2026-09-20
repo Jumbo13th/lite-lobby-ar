@@ -130,6 +130,10 @@ class LL_ZoneRestrictionComponent : ScriptComponent
 		if (!m_bHasEnteredZone)
 			return;
 
+		// Nobody can walk back during a hard freeze; the flag is replicated.
+		if (LL_GameModeCoop.IsHardFreezeActive())
+			return;
+
 		if (!m_bTimerActive)
 		{
 			m_bTimerActive = true;

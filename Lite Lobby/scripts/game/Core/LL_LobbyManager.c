@@ -396,6 +396,8 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		return false;
 	}
 
+	// Corpse slots outlive their AI agents; snapshots still need the named squad after
+	// its last living member dies, so vanilla must not delete that empty group.
 	void RegisterSlot_S(LL_SlotData slot, IEntity entity = null)
 	{
 		if (!Replication.IsServer())
@@ -405,6 +407,18 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		{
 			Print(string.Format("[LL_Lobby] Slot %1 already registered, skipping", slot.m_iRplId), LogLevel.WARNING);
 			return;
+		}
+
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		if (gameMode && gameMode.IsSessionSavesEnabled())
+		{
+			RplComponent groupRpl = RplComponent.Cast(Replication.FindItem(slot.m_iGroupId));
+			if (groupRpl)
+			{
+				SCR_AIGroup group = SCR_AIGroup.Cast(groupRpl.GetEntity());
+				if (group)
+					group.SetDeleteWhenEmpty(false);
+			}
 		}
 
 		Print(string.Format("[LL_Lobby] Registering slot: rplId=%1 name=%2 faction=%3",
@@ -762,6 +776,242 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		Rpc(RpcDo_SetDamageState, slotRplId, damageState);
 	}
 
+	// Session resume: absent holders are seated behind placeholder player ids, greyed out
+	// in the roster, and the claim on reconnect transfers the slot without a
+	// leave-and-take, which would fire two assignment events and free the slot briefly.
+	protected static const int PLACEHOLDER_ID_BASE = 1000000;
+	protected int m_iNextPlaceholderId = PLACEHOLDER_ID_BASE;
+
+	// Server-only: further resumed slots of an identity that already holds one.
+	protected ref map<string, ref array<int>> m_mResumeReservationQueue = new map<string, ref array<int>>();
+
+	static bool IsPlaceholderId(int playerId)
+	{
+		return playerId >= PLACEHOLDER_ID_BASE;
+	}
+
+	// Placeholders included: their key is what the snapshot writes for an absent holder.
+	string GetReconnectKeyForPlayer_S(int playerId)
+	{
+		string key;
+		if (m_mPlayerReconnectKeys.Find(playerId, key))
+			return key;
+		return "";
+	}
+
+	void SeatResumedHolder_S(string key, string name, int slotRplId)
+	{
+		if (!Replication.IsServer())
+			return;
+
+		int placeholder = m_iNextPlaceholderId;
+		m_iNextPlaceholderId++;
+
+		SetPlayerName_S(placeholder, name);
+		m_mPlayerReconnectKeys.Set(placeholder, key);
+
+		ApplyTakeSlot(placeholder, slotRplId);
+		Rpc(RpcDo_TakeSlot, placeholder, slotRplId);
+		NotifyPlayerConnection_S(placeholder, false);
+
+		// One reservation per identity; further slots under the same key (one account on
+		// two development peers, or a duplicated name) go to its next reconnects in order.
+		int alreadyReserved;
+		if (m_mDisconnectedPlayers.Find(key, alreadyReserved))
+		{
+			array<int> queue;
+			if (!m_mResumeReservationQueue.Find(key, queue))
+			{
+				queue = {};
+				m_mResumeReservationQueue.Set(key, queue);
+			}
+			queue.Insert(slotRplId);
+			Print(string.Format("[LL_Lobby] Resume: identity %1 already holds slot %2; slot %3 queued for its next reconnect", key, alreadyReserved, slotRplId), LogLevel.WARNING);
+			return;
+		}
+
+		m_mDisconnectedPlayers.Set(key, slotRplId);
+		int generation = 0;
+		m_mReconnectGeneration.Find(key, generation);
+		generation++;
+		m_mReconnectGeneration.Set(key, generation);
+
+		// The same window an ordinary disconnect gets; a value <= 0 holds the slot for good.
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		int reconnectTime = -1;
+		if (gameMode)
+			reconnectTime = gameMode.GetReconnectTime();
+		if (reconnectTime > 0)
+			GetGame().GetCallqueue().CallLater(ClearReconnectReservation, reconnectTime, false, key, generation);
+
+		Print(string.Format("[LL_Lobby] Resume: slot %1 held for '%2' (key: %3) as placeholder %4", slotRplId, name, key, placeholder), LogLevel.NORMAL);
+	}
+
+	void ApplyResumedSlotFlags_S(int slotRplId, bool kia, bool locked)
+	{
+		if (!Replication.IsServer())
+			return;
+
+		if (kia)
+			SetSlotDamageState_S(slotRplId, EDamageState.DESTROYED);
+		SetSlotLocked_S(slotRplId, locked);
+	}
+
+	//! Server, once the reservations are seated: players who connected before they existed
+	//! claim now; a connected player with no slot spectates, as a late joiner would.
+	void ClaimResumedSlotsForConnected_S()
+	{
+		if (!Replication.IsServer())
+			return;
+
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		array<int> playerIds = {};
+		GetGame().GetPlayerManager().GetPlayers(playerIds);
+		foreach (int playerId : playerIds)
+		{
+			if (FindSlotByPlayerId(playerId))
+				continue;
+
+			string key = GetReconnectKeyForPlayer_S(playerId);
+			if (key != "" && ClaimResumedSlot_S(playerId, key))
+				continue;
+
+			if (gameMode)
+				gameMode.SendPlayerToSpectator_S(playerId);
+		}
+	}
+
+	// Replaces AssignSquadFrequencies_S on a resume: the nets stay what the snapshot had.
+	void RestoreSquadFrequencies_S(notnull map<string, int> byEntityName)
+	{
+		if (!Replication.IsServer())
+			return;
+
+		foreach (string name, int frequency : byEntityName)
+		{
+			if (frequency <= 0)
+				continue;
+
+			SCR_AIGroup group = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(name));
+			if (group)
+				group.SetRadioFrequency(frequency);
+			else
+				Print(string.Format("[LL_Lobby] Resume: squad entity '%1' not found, its frequency is not restored", name), LogLevel.WARNING);
+		}
+	}
+
+	// Consumes the reservation only when its slot is held by a placeholder; ordinary
+	// disconnects keep their path. A lock never blocks the holder.
+	protected bool ClaimResumedSlot_S(int playerId, string key)
+	{
+		int slotRplId;
+		if (!m_mDisconnectedPlayers.Find(key, slotRplId))
+			return false;
+
+		LL_SlotData slot = FindSlotByRplId(slotRplId);
+		if (!slot || !IsPlaceholderId(slot.m_iPlayerId))
+			return false;
+
+		// The next queued slot of the same identity becomes its reservation.
+		array<int> queue;
+		if (m_mResumeReservationQueue.Find(key, queue) && !queue.IsEmpty())
+		{
+			int next = queue[0];
+			queue.RemoveOrdered(0);
+			m_mDisconnectedPlayers.Set(key, next);
+			if (queue.IsEmpty())
+				m_mResumeReservationQueue.Remove(key);
+		}
+		else
+		{
+			m_mDisconnectedPlayers.Remove(key);
+		}
+
+		RemovePlayer_S(slot.m_iPlayerId);
+
+		Print(string.Format("[LL_Lobby] Resume: player %1 claims slot %2 (%3)", playerId, slotRplId, slot.m_sName), LogLevel.NORMAL);
+
+		// The single assignment event; nothing is left and re-taken.
+		ApplyTakeSlot(playerId, slotRplId);
+		Rpc(RpcDo_TakeSlot, playerId, slotRplId);
+		SetPlayerEngineFaction_S(playerId, slot.m_sFactionKey);
+
+		if (slot.IsDestroyed())
+		{
+			LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+			if (gameMode)
+				gameMode.SendPlayerToSpectator_S(playerId);
+			return true;
+		}
+
+		// The same readiness delay the ordinary reconnect uses.
+		GetGame().GetCallqueue().CallLater(PossessClaimedSlot_S, 500, false, playerId, slotRplId);
+		return true;
+	}
+
+	protected void PossessClaimedSlot_S(int playerId, int slotRplId)
+	{
+		PlayerManager pm = GetGame().GetPlayerManager();
+		if (!pm || !pm.IsPlayerConnected(playerId))
+			return;
+
+		LL_SlotData slot = FindSlotByRplId(slotRplId);
+		if (!slot || slot.m_iPlayerId != playerId)
+			return;
+
+		PossessSlot_S(playerId, slotRplId);
+
+		// The assignment's next-frame voice resolution ran while the player had no body.
+		LL_VoNChannelsManager vonMgr = LL_VoNChannelsManager.GetInstance();
+		if (vonMgr)
+			vonMgr.RefreshParking_S(playerId);
+	}
+
+	// Body replacements in flight. A snapshot must not straddle one: spawn, deferred
+	// finish and corpse deletion are three frames, so saving is disallowed synchronously.
+	protected int m_iPendingReplacements;
+
+	int GetPendingReplacements()
+	{
+		return m_iPendingReplacements;
+	}
+
+	protected void AcquireReplacement_S()
+	{
+		m_iPendingReplacements++;
+
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm)
+			gm.DisallowSaves_S();
+	}
+
+	// Once per replacement, on its terminal exit only; a registration retry is not one.
+	protected void ReleaseReplacement_S()
+	{
+		if (m_iPendingReplacements <= 0)
+		{
+			Print("[LL_Lobby] Replacement released with none pending", LogLevel.WARNING);
+			return;
+		}
+
+		m_iPendingReplacements--;
+		if (m_iPendingReplacements > 0)
+			return;
+
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm)
+			gm.AllowSavesIfReady_S();
+
+		LL_SaveWaiter.ReevaluateAll();
+	}
+
+	protected void DeferredRespawn_S(Managed context)
+	{
+		Tuple2<int, bool> args = Tuple2<int, bool>.Cast(context);
+		if (args)
+			RespawnSlotCharacter_S(args.param1, args.param2);
+	}
+
 	// Spawns a fresh body for the slot at the current body's transform and drops the old one.
 	// allowAlive=false is the Game Master revive (dead slots only); allowAlive=true is the
 	// possession path replacing a live loadtime body. Routed through TakeSlot_S so the fresh
@@ -820,6 +1070,19 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 		bool wasLeader = group.GetLeaderEntity() == oldBody;
 
+		// A replacement during a save waits for the manager; the request is replayed whole
+		// so a slot that changed meanwhile is validated again.
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm && gm.IsSessionSavesEnabled() && GetGame().GetSaveGameManager().IsBusy())
+		{
+			LL_SaveWaiter waiter = new LL_SaveWaiter(new Tuple2<int, bool>(slotRplId, allowAlive));
+			waiter.GetOnReady().Insert(DeferredRespawn_S);
+			waiter.Start();
+			return;
+		}
+
+		AcquireReplacement_S();
+
 		EntitySpawnParams params = new EntitySpawnParams();
 		oldBody.GetWorldTransform(params.Transform);
 
@@ -827,6 +1090,7 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		if (!newBody)
 		{
 			Print(string.Format("[LL_Lobby] Respawn failed: could not spawn body for slot %1", slotRplId), LogLevel.WARNING);
+			ReleaseReplacement_S();
 			return;
 		}
 
@@ -874,7 +1138,10 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 	protected void RespawnFinish_S(int playerId, int oldSlotRplId, IEntity newBody, int attempt)
 	{
 		if (!newBody)
+		{
+			ReleaseReplacement_S();
 			return;
+		}
 
 		LL_PlayableComponent newPlayable = LL_PlayableComponent.Cast(newBody.FindComponent(LL_PlayableComponent));
 		int newSlotRplId = -1;
@@ -893,6 +1160,7 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 			Print(string.Format("[LL_Lobby] Respawn aborted: fresh body never registered a slot (old slot %1) — cleaning up", oldSlotRplId), LogLevel.WARNING);
 			SCR_EntityHelper.DeleteEntityAndChildren(newBody);
+			ReleaseReplacement_S();
 			return;
 		}
 
@@ -905,6 +1173,7 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 			{
 				Print(string.Format("[LL_Lobby] Respawn: hand-off failed for player %1 → slot %2 — cleaning up", playerId, newSlotRplId), LogLevel.WARNING);
 				SCR_EntityHelper.DeleteEntityAndChildren(newBody);
+				ReleaseReplacement_S();
 				return;
 			}
 		}
@@ -913,6 +1182,8 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		IEntity corpse = GetSlotEntity_S(oldSlotRplId);
 		if (corpse)
 			SCR_EntityHelper.DeleteEntityAndChildren(corpse);
+
+		ReleaseReplacement_S();
 
 		Print(string.Format("[LL_Lobby] Revived slot: dead slot %1 → fresh slot %2 (player %3, -1 = bot)", oldSlotRplId, newSlotRplId, playerId), LogLevel.NORMAL);
 	}
@@ -2057,17 +2328,20 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		if (!id.IsNull())
 			return id;
 
+		PlayerManager pm = GetGame().GetPlayerManager();
+		if (!pm)
+			return "";
+
+		string name = pm.GetPlayerName(playerId);
+		if (name == "")
+			return "";
+
+		if (LL_PlayerVerificationComponent.IsDevIdentityFromName())
+			return LL_DevIdentity.FromName(name);
+
 		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
 		if (gameMode && gameMode.IsNameReconnectAllowed())
-		{
-			PlayerManager pm = GetGame().GetPlayerManager();
-			if (pm)
-			{
-				string name = pm.GetPlayerName(playerId);
-				if (name != "")
-					return "name:" + name;
-			}
-		}
+			return "name:" + name;
 
 		return "";
 	}
@@ -2089,6 +2363,14 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 	{
 		super.OnPlayerAuditSuccess(playerId);
 		CacheReconnectKey_S(playerId);
+
+		// An identity that arrives after connect can still claim its resumed slot.
+		if (FindSlotByPlayerId(playerId))
+			return;
+
+		string key = GetReconnectKeyForPlayer_S(playerId);
+		if (key != "")
+			ClaimResumedSlot_S(playerId, key);
 	}
 
 	override void OnPlayerConnected(int playerId)
@@ -2115,6 +2397,10 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 		string key;
 		if (!m_mPlayerReconnectKeys.Find(playerId, key) || key == "")
+			return;
+
+		// A slot held for this identity since the snapshot is claimed, not re-taken.
+		if (ClaimResumedSlot_S(playerId, key))
 			return;
 
 		// -1 is the sentinel; valid RplIds can be negative as ints.

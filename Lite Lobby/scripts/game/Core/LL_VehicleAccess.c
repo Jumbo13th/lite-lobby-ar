@@ -160,6 +160,13 @@ class LL_VehicleAccess : SCR_BaseGameModeComponent
 	{
 		reason = string.Empty;
 
+		// Every hard freeze holds everyone in place; the seat lock below is per character.
+		if (LL_GameModeCoop.IsHardFreezeActive())
+		{
+			reason = "#LL-HardFreeze_Title";
+			return false;
+		}
+
 		// Runs every frame per prompt and the component is on by default; without the
 		// empty-list test a mission with no vehicles listed pays a prefab walk per prompt.
 		if (!m_bRestrictSeats || m_aVehiclePrefabs.IsEmpty() || !user || !compartment)

@@ -1,5 +1,7 @@
 // Fires a fixed number of seconds after the freeze period ends; the mission proper
 // begins when players unfreeze. Announces the deadline; it does not end the mission.
+// The countdown is a deadline on the mission clock, not a count of ticks: the clock stands
+// still through hard freezes and survives a session resume.
 
 class LL_TriggerMissionEndTimerClass : LL_TriggerComponentClass
 {
@@ -10,13 +12,45 @@ class LL_TriggerMissionEndTimer : LL_TriggerComponent
 	[Attribute("600", UIWidgets.EditBox, "Seconds after freeze ends before the trigger fires.", category: "Lite Lobby")]
 	protected int m_iSeconds;
 
-	// Drained by CountdownTick, which skips during a hard freeze or outside GAME.
-	protected float m_fSecondsLeft;
+	// The mission-clock reading the countdown began at; -1 while waiting for the freeze.
+	protected float m_fStartedAt = -1;
+	protected bool m_bCounting;
+
+	int GetDuration()
+	{
+		return m_iSeconds;
+	}
+
+	// Timed announcements inherit the countdown but must not feed the spectator clock.
+	protected bool IsMissionEndTimer()
+	{
+		return Type() == LL_TriggerMissionEndTimer;
+	}
 
 	override string GetObjectiveMarkup()
 	{
 		return Header("#LL-Trigger_HeaderTimeLimit")
 			+ WidgetManager.Translate("#LL-Trigger_TimeLimitBody", FormatDuration(m_iSeconds));
+	}
+
+	override void OnPostInit(IEntity owner)
+	{
+		super.OnPostInit(owner);
+
+		if (!Replication.IsServer() || !IsMissionEndTimer())
+			return;
+
+		// The game mode may init after this entity.
+		GetGame().GetCallqueue().CallLater(ReportDuration_S, 0, false);
+	}
+
+	protected void ReportDuration_S()
+	{
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm)
+			gm.SetMissionEndDuration_S(m_iSeconds);
+		else
+			GetGame().GetCallqueue().CallLater(ReportDuration_S, 500, false);
 	}
 
 	override protected void OnActivate()
@@ -34,10 +68,17 @@ class LL_TriggerMissionEndTimer : LL_TriggerComponent
 			return;
 
 		GetGame().GetCallqueue().Remove(WaitForFreezeEnd);
+		StartCountdown(gm.GetElapsedTime());
+	}
 
-		m_fSecondsLeft = m_iSeconds;
-		if (m_fSecondsLeft < 0)
-			m_fSecondsLeft = 0;
+	protected void StartCountdown(float clockReading)
+	{
+		m_fStartedAt = clockReading;
+		m_bCounting = true;
+
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm && IsMissionEndTimer())
+			gm.SetMissionEndStartedAt_S(m_fStartedAt);
 
 		GetGame().GetCallqueue().CallLater(CountdownTick, 1000, true);
 	}
@@ -48,19 +89,49 @@ class LL_TriggerMissionEndTimer : LL_TriggerComponent
 		GetGame().GetCallqueue().Remove(CountdownTick);
 	}
 
-	// A 1 s countdown rather than one CallLater at the full duration: an absolute
-	// deadline keeps running through a hard freeze, and refusing it in the handler
-	// would cancel the mission end rather than delay it.
 	protected void CountdownTick()
 	{
 		if (!IsEvaluationAllowed())
 			return;
 
-		m_fSecondsLeft -= 1.0;
-		if (m_fSecondsLeft > 0)
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (!gm)
+			return;
+
+		if (gm.GetElapsedTime() < m_fStartedAt + m_iSeconds)
 			return;
 
 		GetGame().GetCallqueue().Remove(CountdownTick);
 		Fire();
+	}
+
+	// Started = counting, not merely waiting for the freeze to end.
+	override bool HasStarted()
+	{
+		return m_bCounting;
+	}
+
+	override protected LL_TriggerState CreateState()
+	{
+		return new LL_TriggerTimedState();
+	}
+
+	override protected void SaveState(LL_TriggerState state)
+	{
+		LL_TriggerTimedState timed = LL_TriggerTimedState.Cast(state);
+		if (timed)
+			timed.startedAt = m_fStartedAt;
+	}
+
+	// Resumes directly in the countdown: no activation poll, no freeze wait.
+	override protected void LoadState(LL_TriggerState state)
+	{
+		LL_TriggerTimedState timed = LL_TriggerTimedState.Cast(state);
+		if (!timed)
+			return;
+
+		m_bActivated = true;
+		GetGame().GetCallqueue().Remove(TryActivate);
+		StartCountdown(timed.startedAt);
 	}
 }

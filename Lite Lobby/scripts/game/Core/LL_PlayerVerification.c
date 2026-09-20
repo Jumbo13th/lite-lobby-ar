@@ -23,6 +23,9 @@ class LL_PlayerVerificationConfig : JsonApiStruct
 	int TimeoutSeconds = 10;
 	bool EnforceBans = true;
 	ref array<string> Whitelist = {};
+	// Development only: a server without backend reach gives players no identity; with
+	// this on they get one derived from their name. Never on a real server.
+	bool DevIdentityFromName = false;
 
 	void LL_PlayerVerificationConfig()
 	{
@@ -36,6 +39,7 @@ class LL_PlayerVerificationConfig : JsonApiStruct
 		RegV("TimeoutSeconds");
 		RegV("EnforceBans");
 		RegV("Whitelist");
+		RegV("DevIdentityFromName");
 	}
 }
 
@@ -144,6 +148,14 @@ class LL_PlayerVerificationComponent : SCR_BaseGameModeComponent
 	static LL_PlayerVerificationComponent GetInstance()
 	{
 		return s_Instance;
+	}
+
+	// Read whether or not the gate is enabled: a server setting, not part of the gate.
+	protected static bool s_bDevIdentityFromName;
+
+	static bool IsDevIdentityFromName()
+	{
+		return s_bDevIdentityFromName;
 	}
 
 	void ~LL_PlayerVerificationComponent()
@@ -263,6 +275,10 @@ class LL_PlayerVerificationComponent : SCR_BaseGameModeComponent
 		}
 
 		m_bRealGateIntended = m_Config.Enabled;
+
+		s_bDevIdentityFromName = m_Config.DevIdentityFromName;
+		if (s_bDevIdentityFromName)
+			Print("[LL_Lobby] DevIdentityFromName is ON: players without an identity get one derived from their name. Development servers only.", LogLevel.WARNING);
 
 		if (!m_Config.Enabled)
 			return false;

@@ -23,6 +23,25 @@ class LL_TriggerSupremacy : LL_TriggerComponent
 	// A ratio below 1 fires the instant the sides are drawn up.
 	protected const float MIN_RATIO = 1;
 
+	override protected LL_TriggerState CreateState()
+	{
+		return new LL_TriggerSupremacyState();
+	}
+
+	override protected void SaveState(LL_TriggerState state)
+	{
+		LL_TriggerSupremacyState supremacy = LL_TriggerSupremacyState.Cast(state);
+		if (supremacy)
+			supremacy.bothSeen = m_bBothSeen;
+	}
+
+	override protected void LoadState(LL_TriggerState state)
+	{
+		LL_TriggerSupremacyState supremacy = LL_TriggerSupremacyState.Cast(state);
+		if (supremacy)
+			m_bBothSeen = supremacy.bothSeen;
+	}
+
 	override string GetObjectiveMarkup()
 	{
 		// Reuses the zone conditions' sentence so the wording is identical everywhere.

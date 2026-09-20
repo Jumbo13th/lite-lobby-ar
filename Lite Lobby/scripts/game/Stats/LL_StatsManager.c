@@ -67,10 +67,11 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 	protected string m_sWinner;
 	protected ref array<ref LL_StatsCommander> m_aCommanders = {};
 
-	// Advisory prefill for the commander pickers: faction → first slot holder, frozen at
-	// GAME start. The player is frozen, not their unit tag; verification may still be
-	// in flight.
-	protected ref map<string, int> m_mFirstSlotHolders = new map<string, int>();
+	// Advisory prefill for the commander pickers: faction → first slot holder's identity
+	// key, frozen at GAME start. The identity is frozen, not the unit tag (verification
+	// may still be in flight) and not the player id (a resume seats absent holders
+	// behind placeholder ids).
+	protected ref map<string, string> m_mFirstSlotHolders = new map<string, string>();
 	protected bool m_bSuggestionFrozen;
 
 	// Strong refs: the engine drops unreferenced RestCallbacks before the response arrives.
@@ -227,6 +228,15 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 
 	protected string ResolveGuid(int playerId)
 	{
+		// The lobby's key first: it covers a placeholder whose identity the engine never saw.
+		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+		if (mgr)
+		{
+			string key = mgr.GetReconnectKeyForPlayer_S(playerId);
+			if (key != "")
+				return key;
+		}
+
 		UUID uid = SCR_PlayerIdentityUtils.GetPlayerIdentityId(playerId);
 		if (!uid.IsNull())
 			return uid;
@@ -249,10 +259,16 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 		if (!m_bActive)
 			return;
 
-		if (state == SCR_EGameModeState.GAME)
+		// A resumed game continues its recording through ResumeRecording_S instead.
+		if (state == SCR_EGameModeState.GAME && !LL_GameModeCoop.IsResumePending())
 			StartRecording_S();
 		else if (state == SCR_EGameModeState.DEBRIEFING)
 			FinalizeGame_S();
+	}
+
+	string GetSessionId()
+	{
+		return m_sSessionId;
 	}
 
 	protected void StartRecording_S()
@@ -280,6 +296,94 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 		Print("[LL_Lobby] Stats: recording started", LogLevel.NORMAL);
 	}
 
+	// Null while not recording, so a snapshot outside the game phase writes nothing.
+	LL_StatsContinuation CaptureContinuation_S()
+	{
+		if (!m_bActive || !m_bRecording)
+			return null;
+
+		LL_StatsContinuation state = new LL_StatsContinuation();
+		state.sessionId = m_sSessionId;
+		state.startedAt = m_sStartedAt;
+		state.winner = m_sWinner;
+		state.suggestionFrozen = m_bSuggestionFrozen;
+		state.endResolved = m_bEndResolved;
+
+		foreach (string faction, string guid : m_mFirstSlotHolders)
+		{
+			LL_StatsHolder holder = new LL_StatsHolder();
+			holder.faction = faction;
+			holder.guid = guid;
+			state.firstHolders.Insert(holder);
+		}
+
+		foreach (string guid, LL_StatsPlayer entry : m_mByGuid)
+			state.players.Insert(entry);
+
+		state.events = m_aEvents;
+
+		foreach (string key, LL_StatsZoneObjective job : m_mZones)
+			state.zones.Insert(job);
+
+		state.commanders = m_aCommanders;
+		return state;
+	}
+
+	// Continues the saved recording instead of starting one; the participant sweep, the
+	// commander freeze and the immediate write do not run again. Player-id lookups rebuild
+	// as players reconnect.
+	void ResumeRecording_S(LL_StatsContinuation state)
+	{
+		if (!m_bActive || m_bRecording || m_bFinalized)
+			return;
+
+		if (!state)
+		{
+			Print("[LL_Lobby] Stats: the snapshot carries no recording, starting a new one", LogLevel.WARNING);
+			StartRecording_S();
+			return;
+		}
+
+		if (state.sessionId != "")
+			m_sSessionId = state.sessionId;
+		m_sStartedAt = state.startedAt;
+		m_sWinner = state.winner;
+		m_bSuggestionFrozen = state.suggestionFrozen;
+		m_bEndResolved = state.endResolved;
+
+		m_mFirstSlotHolders.Clear();
+		foreach (LL_StatsHolder holder : state.firstHolders)
+			m_mFirstSlotHolders.Set(holder.faction, holder.guid);
+
+		m_mByGuid.Clear();
+		m_mByPlayerId.Clear();
+		foreach (LL_StatsPlayer entry : state.players)
+			m_mByGuid.Set(entry.guid, entry);
+
+		m_aEvents = state.events;
+
+		m_mZones.Clear();
+		foreach (LL_StatsZoneObjective job : state.zones)
+			m_mZones.Set(job.entityName, job);
+
+		m_aCommanders = state.commanders;
+
+		m_bRecording = true;
+		m_iGameStartTick = System.GetTickCount();
+
+		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+		if (mgr && !m_bAssignHooked)
+		{
+			m_bAssignHooked = true;
+			mgr.GetOnPlayerAssigned().Insert(OnPlayerAssignedToSlot);
+		}
+
+		GetGame().GetCallqueue().CallLater(Autosave, m_Config.AutosaveSeconds * 1000, true);
+
+		Print(string.Format("[LL_Lobby] Stats: recording resumed — session %1, %2 player(s), %3 event(s), %4 zone(s)",
+			m_sSessionId, state.players.Count(), state.events.Count(), state.zones.Count()), LogLevel.NORMAL);
+	}
+
 	// Everyone holding a slot at GAME start is a participant (occupancy metric, not a score input).
 	protected void SweepParticipants_S()
 	{
@@ -303,8 +407,8 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 		m_bSuggestionFrozen = true;
 	}
 
-	// First occupied slot per faction in lobby display order.
-	protected void CollectFirstSlotHolders(notnull map<string, int> outHolders)
+	// First occupied slot per faction in lobby display order, by identity key.
+	protected void CollectFirstSlotHolders(notnull map<string, string> outHolders)
 	{
 		outHolders.Clear();
 
@@ -319,7 +423,7 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 			if (outHolders.Contains(slot.m_sFactionKey))
 				continue;
 
-			outHolders.Set(slot.m_sFactionKey, slot.m_iPlayerId);
+			outHolders.Set(slot.m_sFactionKey, ResolveGuid(slot.m_iPlayerId));
 		}
 	}
 
@@ -334,19 +438,19 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 	// with no known unit yields no line.
 	string BuildSuggestedCommandersEncoded()
 	{
-		map<string, int> holders = m_mFirstSlotHolders;
+		map<string, string> holders = m_mFirstSlotHolders;
 		if (!m_bSuggestionFrozen)
 		{
-			holders = new map<string, int>();
+			holders = new map<string, string>();
 			CollectFirstSlotHolders(holders);
 		}
 
 		array<ref LL_StatsCommander> suggested = {};
-		foreach (string factionKey, int playerId : holders)
+		foreach (string factionKey, string guid : holders)
 		{
 			// Non-creating lookup: a panel read must not invent identities in the snapshot.
 			LL_StatsPlayer entry;
-			if (!m_mByPlayerId.Find(playerId, entry) || entry.unitTag == "")
+			if (!m_mByGuid.Find(guid, entry) || entry.unitTag == "")
 				continue;
 
 			LL_StatsCommander cmd = new LL_StatsCommander();
@@ -1481,10 +1585,15 @@ class LL_StatsManager : SCR_BaseGameModeComponent
 		return string.Format("%1/%2-%3.json", OUTPUT_DIR, m_sSessionId, phase);
 	}
 
+	// Stamped with the mission clock: it stands still through holds and survives a resume.
 	protected LL_StatsEvent AddEvent(string type, string actor, string victim)
 	{
 		LL_StatsEvent ev = new LL_StatsEvent();
-		ev.t = (System.GetTickCount() - m_iGameStartTick) / 1000.0;
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (gm)
+			ev.t = gm.GetElapsedTime();
+		else
+			ev.t = (System.GetTickCount() - m_iGameStartTick) / 1000.0;
 		ev.type = type;
 		ev.actor = actor;
 		ev.victim = victim;

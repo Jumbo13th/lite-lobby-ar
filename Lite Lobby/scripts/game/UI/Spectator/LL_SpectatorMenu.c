@@ -240,13 +240,27 @@ class LL_SpectatorMenu : MenuBase
 	}
 
 	// Vanilla m_fTimeElapsed only advances in PREGAME and GAME and is engine-synced, so
-	// GetElapsedTime is the mission clock.
+	// GetElapsedTime is the mission clock. With a mission-end timer the same reading counts
+	// down to the end instead, from two once-set values, so it stands still whenever the
+	// clock does.
 	protected void UpdateGameTimer()
 	{
 		if (!m_wGameTimerText || !m_GameModeCoop)
 			return;
 
 		int seconds = m_GameModeCoop.GetElapsedTime();
+		int duration = m_GameModeCoop.GetMissionEndDuration();
+		if (duration > 0)
+		{
+			// Clamped: a clock reading briefly behind a newly received start reading must not
+			// show more than the duration.
+			float startedAt = m_GameModeCoop.GetMissionEndStartedAt();
+			if (startedAt < 0)
+				seconds = duration;
+			else
+				seconds = Math.Clamp(duration - (m_GameModeCoop.GetElapsedTime() - startedAt), 0, duration);
+		}
+
 		if (seconds == m_iLastTimerSeconds)
 			return;
 
