@@ -29,10 +29,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	[Attribute("120000", UIWidgets.EditBox, "Freeze time (ms) after GAME starts. Players can't leave spawn zone.", category: "Lite Lobby")]
 	protected int m_iFreezeTime;
 
-	[Attribute("1", UIWidgets.CheckBox, "Hard freeze at GAME start: hold everyone's controls for a moment so the world can stream in around them before anyone can move. Runs inside the freeze window.", category: "Lite Lobby")]
+	[Attribute("1", UIWidgets.CheckBox, "Hard freeze at GAME start: hold everyone's controls for a moment so the world can stream in around them before anyone can move. Time stands still during any hard freeze; the freeze time counts from its end.", category: "Lite Lobby")]
 	protected bool m_bHardFreezeEnabled;
 
-	[Attribute("60000", UIWidgets.EditBox, "Hard freeze duration (ms) at GAME start. Should stay well inside the freeze time above.", category: "Lite Lobby")]
+	[Attribute("60000", UIWidgets.EditBox, "Hard freeze duration (ms) at GAME start. The freeze time above starts counting when it ends.", category: "Lite Lobby")]
 	protected int m_iHardFreezeTime;
 
 	[Attribute("1", UIWidgets.CheckBox, "During freeze time players can't fire their weapons and take no damage (a protected setup period). They can still be killed by leaving the freeze zone.", category: "Lite Lobby")]
@@ -115,6 +115,11 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	// what the release restores.
 	protected float m_fPreHoldHardFreezeRemaining;
 	protected bool m_bPreHoldDayAdvance;
+
+	// The clock reading a hard freeze holds; while free it follows the clock, so a proxy that
+	// receives the flag before the value already anchors on its own estimate.
+	protected float m_fHeldElapsed;
+	protected float m_fLastSeenElapsed;
 
 	protected bool m_bFreezeTimerScheduled;
 
@@ -507,6 +512,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 	protected void UpdateFreezeTimer_S()
 	{
+		// Cancelled by every hard freeze; a tick that slips in still does not drain the freeze.
+		if (m_bHardFreeze)
+			return;
+
 		m_fFreezeTimeRemaining -= 1.0;
 
 		if (m_fFreezeTimeRemaining <= 0)
@@ -584,8 +593,16 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (!m_bHardFreeze)
 		{
 			StopDayAdvance_S();
+			m_fHeldElapsed = GetElapsedTime();
 			m_VehicleHold.PinAll_S();
 			m_DamagePause.PauseAll_S();
+		}
+		else if (IsResumeHoldActive())
+		{
+			// The admin's timed hold supersedes the saved remainder, but the daylight intent the
+			// snapshot recorded still has to come back when this one ends.
+			m_bDayAdvanceWasOn = m_bPreHoldDayAdvance;
+			m_fPreHoldHardFreezeRemaining = 0;
 		}
 
 		m_bHardFreeze = true;
@@ -630,6 +647,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 			Print("[LL_Lobby] Resume: hold released", LogLevel.NORMAL);
 
+			LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+			if (mgr)
+				mgr.BroadcastAdminMessage_S("#LL-Resume_Released");
+
 			if (m_fPreHoldHardFreezeRemaining > 0)
 			{
 				int remaining = Math.Ceil(m_fPreHoldHardFreezeRemaining);
@@ -650,9 +671,23 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			ScheduleFreezeCountdown_S();
 	}
 
+	// Time stands still during any hard freeze, on every machine, by writing the held reading
+	// back over the clock: the base adds time only under its own conditions (players present,
+	// GAME running), so subtracting the slice would run the clock backwards whenever it did not.
 	override void EOnFrame(IEntity owner, float timeSlice)
 	{
+		// A proxy's copy changes outside super only when the server corrects it; the correction
+		// must become the anchor before the base advances it.
+		if (!IsMaster() && m_fTimeElapsed != m_fLastSeenElapsed)
+			m_fHeldElapsed = m_fTimeElapsed;
+
 		super.EOnFrame(owner, timeSlice);
+
+		if (m_bHardFreeze)
+			m_fTimeElapsed = m_fHeldElapsed;
+		else
+			m_fHeldElapsed = m_fTimeElapsed;
+		m_fLastSeenElapsed = m_fTimeElapsed;
 
 		if (m_bHardFreeze && IsMaster())
 			m_VehicleHold.Tick_S();
@@ -1076,14 +1111,21 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		Print(string.Format("[LL_Lobby] Resume: failure recorded: %1", cause), LogLevel.WARNING);
 	}
 
+	// A negative remainder is the hold with no countdown: the HUD shows the resume text instead
+	// of a timer, and only the admin releases it (research R5).
+	protected void StartResumeHold_S()
+	{
+		m_bHardFreeze = true;
+		m_fHardFreezeRemaining = -1;
+		Replication.BumpMe();
+	}
+
 	// The hold is engaged before anything loads so the damage gate and the input lock cover
 	// every restored entity. No day-advance capture: the weather record is not applied yet.
 	protected void BeginResume_S()
 	{
 		m_bResumePending = true;
-		m_bHardFreeze = true;
-		m_fHardFreezeRemaining = -1;
-		Replication.BumpMe();
+		StartResumeHold_S();
 
 		SCR_PersistenceSystem scripted = SCR_PersistenceSystem.GetScriptedInstance();
 		if (scripted)
@@ -1229,6 +1271,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 		// After the state change: the base game mode resets the clock across it.
 		m_fTimeElapsed = record.elapsedSeconds;
+		m_fHeldElapsed = record.elapsedSeconds;
 		m_fGameStartTimestamp = System.GetTickCount() - record.elapsedSeconds * 1000;
 		m_fFreezeTimeRemaining = record.freezeRemaining;
 		m_fPreHoldHardFreezeRemaining = record.hardFreezeRemaining;
