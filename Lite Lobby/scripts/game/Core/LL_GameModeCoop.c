@@ -118,6 +118,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 	protected bool m_bFreezeTimerScheduled;
 
+	// Server: the aircraft held in the air and the damage effects paused during a hard freeze.
+	protected ref LL_VehicleHold m_VehicleHold = new LL_VehicleHold();
+	protected ref LL_DamagePause m_DamagePause = new LL_DamagePause();
+
 	protected ref ScriptInvokerInt m_OnGameStateChanged = new ScriptInvokerInt();
 
 	ScriptInvokerInt GetOnGameStateChanged()
@@ -578,7 +582,11 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 		// Re-timing a running hold must not re-read a state this already overwrote.
 		if (!m_bHardFreeze)
+		{
 			StopDayAdvance_S();
+			m_VehicleHold.PinAll_S();
+			m_DamagePause.PauseAll_S();
+		}
 
 		m_bHardFreeze = true;
 		m_fHardFreezeRemaining = seconds;
@@ -606,6 +614,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_bHardFreeze = false;
 		m_fHardFreezeRemaining = 0;
 		Replication.BumpMe();
+
+		m_VehicleHold.Release_S();
+		m_DamagePause.ResumeAll_S();
 
 		if (resumeHold)
 		{
@@ -637,6 +648,14 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		// The last hard freeze to end resumes the freeze countdown, exactly once.
 		if (GetState() == SCR_EGameModeState.GAME)
 			ScheduleFreezeCountdown_S();
+	}
+
+	override void EOnFrame(IEntity owner, float timeSlice)
+	{
+		super.EOnFrame(owner, timeSlice);
+
+		if (m_bHardFreeze && IsMaster())
+			m_VehicleHold.Tick_S();
 	}
 
 	//! A hold with no countdown: the resume hold, released by the admin.
@@ -1230,6 +1249,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		// The lobby's freeze zones follow the countdown; the stock zones need the removal.
 		if (m_fFreezeTimeRemaining <= 0)
 			RemoveVanillaRestrictionZones_S();
+
+		// The hold was engaged before the world existed; the restored bodies are here now.
+		m_VehicleHold.PinAll_S();
+		m_DamagePause.PauseAll_S();
 
 		LL_StatsManager stats = LL_StatsManager.GetInstance();
 		if (stats)

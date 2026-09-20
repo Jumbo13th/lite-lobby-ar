@@ -534,7 +534,12 @@ plan carries a spike for it.
   hold phase; if any criterion fails, the operator decides the fallback (spec edge
   case), the candidates being autohover only with its drift accepted, or ground
   placement at a defined safe spot with the crew kept aboard. Neither is chosen by
-  the plan.
+  the plan. **Spike outcome (2026-09-20)**: passed with three amendments, recorded in
+  tasks.md T023: trace-measured altitude (a restored body sleeps, the flight model reads
+  0), a forced engine start on a pinned aircraft (the native save keeps no engine state),
+  and a server-owned hold (the engine hands a vehicle to its pilot at possession; the
+  server takes ownership for the hold and returns it at release) instead of a client-side
+  re-pin.
 - **Alternatives considered**: `Physics.SetActive(ActiveState.INACTIVE)` (same
   ownership caveat, no vanilla caller at all); `NwkMovementComponent.EnableSimulation(false)`
   (vanilla uses it only on the editor camera and headgear items).

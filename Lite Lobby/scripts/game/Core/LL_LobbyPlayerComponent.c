@@ -990,6 +990,10 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		if (!damage || damage.GetState() == EDamageState.DESTROYED)
 			return;
 
+		// A client whose countdown ran out an instant before the hold replicated to it.
+		if (LL_GameModeCoop.IsHardFreezeActive())
+			return;
+
 		Print(string.Format("[LL_Lobby] Player %1 (%2) killed by zone-restriction timeout at %3",
 			pc.GetPlayerId(),
 			GetGame().GetPlayerManager().GetPlayerName(pc.GetPlayerId()),

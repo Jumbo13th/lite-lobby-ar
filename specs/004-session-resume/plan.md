@@ -109,6 +109,8 @@ Lite Lobby/
 └── scripts/game/
     ├── Core/
     │   ├── LL_GameModeCoop.c                    # attribute, save phase gate + cause warning, roster checks on entering GAME, resume entry + refusal, hold without countdown, clock hold for every hard freeze (EOnFrame), mission-end scalars, vehicle hold, zone reconciliation, debriefing discard, shutdown save, LL_SaveWaiter
+    │   ├── LL_VehicleHold.c                     # airborne helicopters pinned for the hold: trace altitude, server ownership, prefab damping restore, forced engine start, give-back at release (T023 outcome)
+    │   ├── LL_DamagePause.c                     # running damage effects deactivated for the hold and re-armed at release (T026 outcome)
     │   ├── LL_LobbyManager.c                    # placeholder holder ids, resume seating of reservations, resume claim owning its own transfer (TakeSlot_S untouched), squad frequency restore, synchronous replacement exclusion
     │   ├── LL_LobbyPlayerComponent.c            # client-side aircraft pin mirror (no new chat command); spectator entry re-checks for a living body
     │   └── LL_PlayableComponent.c               # one bounded resume retry: agent, squad re-attach, registration
