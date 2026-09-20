@@ -105,8 +105,13 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	protected string m_sResumeFailure;
 	protected ref LL_SessionRecord m_ResumeRecord;
 
-	// Mission-end countdown inputs, each set once per game.
+	// The resume's three replicated additions: each set once and bumped once, read by the
+	// hold text and the spectator countdown.
+	[RplProp()]
+	protected float m_fResumedSnapshotTime;
+	[RplProp()]
 	protected int m_iMissionEndDuration;
+	[RplProp()]
 	protected float m_fMissionEndStartedAt = -1;
 	protected bool m_bMissionEndDurationSet;
 	protected bool m_bMissionEndStartSet;
@@ -1051,6 +1056,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	float GetResumeDeadline()		{ return m_fResumeDeadline; }
 	int GetMissionEndDuration()		{ return m_iMissionEndDuration; }
 	float GetMissionEndStartedAt()	{ return m_fMissionEndStartedAt; }
+	float GetResumedSnapshotTime()	{ return m_fResumedSnapshotTime; }
 
 	// Set once: a second timer or a restarted countdown must not move the spectator clock.
 	void SetMissionEndDuration_S(int seconds)
@@ -1272,6 +1278,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		// After the state change: the base game mode resets the clock across it.
 		m_fTimeElapsed = record.elapsedSeconds;
 		m_fHeldElapsed = record.elapsedSeconds;
+		m_fResumedSnapshotTime = record.elapsedSeconds;
 		m_fGameStartTimestamp = System.GetTickCount() - record.elapsedSeconds * 1000;
 		m_fFreezeTimeRemaining = record.freezeRemaining;
 		m_fPreHoldHardFreezeRemaining = record.hardFreezeRemaining;

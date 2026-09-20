@@ -20,6 +20,14 @@ class LL_VehicleHold
 	protected static const float DRIFT_LOG_M = 1;
 	protected static const float TRACE_DOWN_M = 1000;
 
+	// The engine-start gate refuses every start during a hold except the pin's own.
+	protected static bool s_bStartingHeldEngine;
+
+	static bool IsStartingHeldEngine()
+	{
+		return s_bStartingHeldEngine;
+	}
+
 	protected ref array<ref LL_PinnedVehicle> m_aPinned = {};
 
 	// Measured with a trace, not read from the flight model: a body restored by a save
@@ -144,7 +152,9 @@ class LL_VehicleHold
 		{
 			ForceStartEngineParams params = new ForceStartEngineParams();
 			params.m_bAirborne = true;
+			s_bStartingHeldEngine = true;
 			heli.ForceStartEngine(params);
+			s_bStartingHeldEngine = false;
 		}
 
 		Print(string.Format("[LL_Lobby] Hold: pinned %1 at %2 m AGL", Describe(vehicle), Math.Round(agl)), LogLevel.NORMAL);

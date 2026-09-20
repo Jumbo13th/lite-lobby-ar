@@ -107,9 +107,9 @@ StringTable {
   }
   CustomStringTableItem "{5E1A7C40D2B9F312}" {
    Id "LL-Resume_HoldBody"
-   Target_en_us "The game continues from the last snapshot. Everyone is held in place until the admin releases the hold."
-   Target_ru_ru "Игра продолжается с последнего снапшота. Все удерживаются на месте, пока админ не снимет удержание."
-   Modified 1789816573
+   Target_en_us "The game continues from mission time %1. %2 of %3 players are back. Everyone is held in place until the admin releases the hold."
+   Target_ru_ru "Игра продолжается с отметки %1. Вернулись %2 из %3 игроков. Все удерживаются на месте, пока админ не снимет удержание."
+   Modified 1789899981
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }

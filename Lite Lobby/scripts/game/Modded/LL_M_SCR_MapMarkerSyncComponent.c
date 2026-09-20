@@ -16,6 +16,10 @@ modded class SCR_MapMarkerSyncComponent
 	// A faction (slot taken) and a living slot character.
 	protected bool LL_CanEditSharedMarkers()
 	{
+		// Nothing is placed or moved while the world is held.
+		if (LL_GameModeCoop.IsHardFreezeActive())
+			return false;
+
 		SCR_PlayerController playerController = SCR_PlayerController.Cast(GetOwner());
 		if (!playerController)
 			return false;
