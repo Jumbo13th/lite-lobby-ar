@@ -115,7 +115,12 @@ class LL_TriggerZoneContest : LL_TriggerZoneBase
 		if (GetDefenderFaction() == "")
 			m_bStartsNeutral = true;
 
-		if (m_bStartsNeutral)
+		// A restored zone keeps the holder and the bar where the snapshot left them.
+		if (m_bRestored)
+		{
+			m_bRestored = false;
+		}
+		else if (m_bStartsNeutral)
 		{
 			m_sHolder = "";
 			m_fProgress = 0;
@@ -130,6 +135,32 @@ class LL_TriggerZoneContest : LL_TriggerZoneBase
 		SetFlagRaise(RaiseLevel());
 
 		GetGame().GetCallqueue().CallLater(PollTick, TICK_MS, true);
+	}
+
+	override protected LL_TriggerState CreateState()
+	{
+		return new LL_TriggerZoneContestState();
+	}
+
+	override protected void SaveState(LL_TriggerState state)
+	{
+		LL_TriggerZoneContestState zone = LL_TriggerZoneContestState.Cast(state);
+		if (!zone)
+			return;
+
+		zone.progress = m_fProgress;
+		zone.holder = m_sHolder;
+	}
+
+	// The holder cannot be derived from the bar: ownership has hysteresis.
+	override protected void LoadState(LL_TriggerState state)
+	{
+		LL_TriggerZoneContestState zone = LL_TriggerZoneContestState.Cast(state);
+		if (!zone)
+			return;
+
+		m_fProgress = zone.progress;
+		m_sHolder = zone.holder;
 	}
 
 	// Never disarmed by a condition; the base's one-shot Fire latch is unused.

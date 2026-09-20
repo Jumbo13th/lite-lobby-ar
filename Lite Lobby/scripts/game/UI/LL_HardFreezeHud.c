@@ -52,8 +52,16 @@ class LL_HardFreezeHud : ScriptedWidgetComponent
 
 		if (holding)
 		{
+			// A hold with no countdown is the session-resume hold, released by the admin.
+			float remainingRaw = m_GameMode.GetHardFreezeRemaining();
+			if (remainingRaw < 0)
+			{
+				ShowBanner("#LL-Resume_HoldTitle", "#LL-Resume_HoldBody");
+				return;
+			}
+
 			// Ceil so the last whole second reads "1".
-			int remaining = Math.Ceil(m_GameMode.GetHardFreezeRemaining());
+			int remaining = Math.Ceil(remainingRaw);
 			ShowBanner("#LL-HardFreeze_Title", "#LL-HardFreeze_Detail", remaining);
 			return;
 		}

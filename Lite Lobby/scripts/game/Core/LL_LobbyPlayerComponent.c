@@ -868,6 +868,12 @@ class LL_LobbyPlayerComponent : ScriptComponent
 
 	protected void EnterSpectatorNow()
 	{
+		// A resume claim can possess a living body inside this second; the entry scheduled
+		// before it must not pull that player out again.
+		PlayerController pc = GetGame().GetPlayerController();
+		if (pc && LL_TriggerComponent.IsCharacterAlive(pc.GetControlledEntity()))
+			return;
+
 		LL_SpectatorManager spectatorMgr = LL_SpectatorManager.GetInstance();
 		if (spectatorMgr)
 			spectatorMgr.EnterSpectator();

@@ -306,3 +306,24 @@ class LL_StatsSeasonResponse : JsonApiStruct
 		RegV("standings");
 	}
 }
+// Recorder state embedded in every session snapshot, so the numbers describe the same
+// moment as the world. Holders travel as identity keys: player ids do not survive a resume.
+class LL_StatsHolder
+{
+	string faction;
+	string guid;
+}
+
+class LL_StatsContinuation
+{
+	string sessionId;
+	string startedAt;
+	string winner;
+	bool suggestionFrozen;
+	bool endResolved;
+	ref array<ref LL_StatsHolder> firstHolders = {};
+	ref array<ref LL_StatsPlayer> players = {};
+	ref array<ref LL_StatsEvent> events = {};
+	ref array<ref LL_StatsZoneObjective> zones = {};
+	ref array<ref LL_StatsCommander> commanders = {};
+}

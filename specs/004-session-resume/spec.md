@@ -96,11 +96,11 @@ were confirmed by the operator the same day.
   disk for diagnosis and rollback, and shuts itself down so that whoever restarted it
   starts again plainly or names an older snapshot. A partly restored world is never
   played on, and nothing is purged by a refusal.
-- Q: What if the statistics file named by the snapshot is missing or unreadable? →
-  A: the world still resumes; the statistics recorder starts from
-  what the snapshot carries in its own record (nothing, in that case) and the log and
-  the next statistics publish say that the game's statistics are incomplete. World
-  recovery outranks statistics.
+- Q: What if the snapshot carries no statistics? → A: the world still resumes; the
+  recorder starts a new recording and the log says so. World recovery outranks
+  statistics. (Amended 2026-09-19 at implementation: the recorder's state travels
+  inside the snapshot's own lobby record, so it can be neither newer nor older than
+  the world and no separate statistics file exists.)
 - Q: Does a restored slot lock block the slot's own holder? → A: no. A lock keeps
   strangers out; the holder identity saved with the slot is always put back.
 - Q: What does a reconnecting player who connected while the world was still loading
@@ -127,9 +127,9 @@ were confirmed by the operator the same day.
   addon fallback is built. The operator's alternative is the configuration value
   itself, flipped to true for that one start, which needs no code; the choice comes
   back to the operator with that option before anything else is considered.
-- Q: How are statistics files kept and pruned? → A: a statistics file lives as long
-  as the engine still lists the snapshot that names it; pruning follows the engine's
-  own retention, never a count of the addon's own.
+- Q: How are statistics files kept and pruned? → A: superseded 2026-09-19: there is
+  no per-snapshot statistics file; the recorder's state is part of the snapshot and
+  follows the engine's own retention.
 - Q: Which deployment path is the incident procedure? → A: the container launcher
   supplies the resume parameter for one start and drops it again;
   the exact entrypoint, signal, profile mount and stop budget are recorded in the
@@ -189,16 +189,12 @@ removed before the snapshot) follows existing behaviour.
   logs the cause and asks the game to close. A container that restarts the process
   afterwards starts a fresh game, because the launcher passes the resume parameter
   once; that is acceptable, the refusal line in the log is what the operator reads.
-- Q: How are statistics files pruned? → A: a file is deleted only after a
-  successful listing of the engine's save points, when it is older than the oldest
-  listed point by more than one minute, and never while a write is in flight. A
-  file from an abandoned branch after a rollback stays until it is that old; a
-  bounded leftover, accepted.
+- Q: How are statistics files pruned? → A: superseded 2026-09-19: nothing to prune,
+  the statistics live inside the snapshot.
 - Q: How does the statistics recorder handle absent holders? → A: it resolves
   every identity through the lobby's reconnect keys, placeholders included, so a
-  holder absent through the publish keeps their credit; on a resume it loads the
-  snapshot's file instead of starting a new recording, and the incomplete flag is
-  saved in the file so it survives another resume.
+  holder absent through the publish keeps their credit; on a resume it continues
+  from the state embedded in the snapshot instead of starting a new recording.
 - Q: When exactly is saving excluded around a body replacement? → A: one
   acquisition before the spawn and one release on each terminal exit: the spawn
   failure return, the finish's success, its abandonment after the retry limit and
@@ -735,12 +731,10 @@ Saving and starting:
   mission.
 - **Retention.** Ten snapshots at ten minutes is a hundred minutes of rollback; a
   longer event that wants deeper rollback raises the retention in the server
-  configuration, and the statistics files follow that retention automatically.
-- **The statistics file of a snapshot** is written before the world is saved and
-  named in the snapshot; if the file cannot be written, the snapshot names none and
-  a resume from it says so. If the world save fails after the file was written, the
-  orphan file is pruned with the rest. Two snapshots in the same second get distinct
-  names.
+  configuration; the statistics inside each snapshot follow it.
+- **The statistics of a snapshot** are part of its lobby record, read in the same
+  save as the rest of it, so they never describe a later moment than the world and
+  no file can go missing.
 
 ## Requirements *(mandatory)*
 
@@ -837,12 +831,10 @@ Saving and starting:
   the restored world is the only world, and no squad placed in the mission spawns its
   members again on top of the restored ones. The slot count after a resume equals the
   slot count at the snapshot, and every slot belongs to the squad it belonged to.
-- **FR-020**: A statistics file MUST be kept as long as the engine still lists a
-  snapshot at least as old as it, and pruned only after a successful listing and
-  never while a write is in flight; the addon MUST NOT apply a count of its own. A
-  missing or unreadable statistics file MUST NOT refuse the resume; it MUST be
-  logged and reported at the next publish, and that report MUST survive a further
-  snapshot and resume.
+- **FR-020**: The statistics recorder's continuation state MUST be part of every
+  snapshot's lobby record (amended 2026-09-19: no per-snapshot statistics file, no
+  pruning). A snapshot without it MUST NOT refuse the resume; the recorder MUST start
+  a new recording and log it.
 - **FR-021**: Every squad in a mission with session saves MUST have a unique entity
   name; the game mode MUST log any squad without one, and any registered body the
   game does not track, when the roster is complete at the start of the game phase,

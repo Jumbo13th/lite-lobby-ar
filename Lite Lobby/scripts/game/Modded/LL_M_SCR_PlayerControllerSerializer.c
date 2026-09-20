@@ -1,7 +1,6 @@
-// The controller record feeds controlled-entity ids to a respawn system the lobby
-// stubs to null, so on load it would only fail; the lobby's slot record carries the
-// body a player gets back. The base class is repeated because a bare modded
-// config-container class loads as "Unknown class".
+// The controller record feeds a respawn system the lobby stubs to null; the lobby's slot
+// record carries the body a player gets back. The base class is repeated because a bare
+// modded config-container class loads as "Unknown class".
 
 modded class SCR_PlayerControllerSerializer : ScriptedEntitySerializer
 {

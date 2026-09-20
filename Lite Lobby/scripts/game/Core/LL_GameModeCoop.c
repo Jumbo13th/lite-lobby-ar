@@ -88,13 +88,35 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	[RplProp()]
 	protected float m_fHardFreezeRemaining;
 
-	// Session saves (server). Saving opens only once the GAME entry has dispatched its
-	// whole body batch and no replacement is in flight; a zero replacement count reached
-	// inside the dispatch loop must not open it early.
+	// Session saves (server). Saving opens only after the GAME entry has dispatched its
+	// whole body batch: a replacement finishing inside the loop must not open it early.
 	protected bool m_bStartupBatchDispatched;
 	protected bool m_bRosterCheckedForSaves;
 	protected bool m_bResumeRefused;
 	protected int m_iSnapshotStartTick;
+
+	// Resume (server). The snapshot's lobby record is applied in one step at ACTIVE.
+	protected static const int RESUME_DEADLINE_MS = 10000;
+	protected bool m_bGameStarted;
+	protected bool m_bResumeBegun;
+	protected bool m_bResumePending;
+	protected bool m_bResumeFinalising;
+	protected float m_fResumeDeadline;
+	protected string m_sResumeFailure;
+	protected ref LL_SessionRecord m_ResumeRecord;
+
+	// Mission-end countdown inputs, each set once per game.
+	protected int m_iMissionEndDuration;
+	protected float m_fMissionEndStartedAt = -1;
+	protected bool m_bMissionEndDurationSet;
+	protected bool m_bMissionEndStartSet;
+
+	// What a snapshot during a resume hold writes instead of the hold's own values, and
+	// what the release restores.
+	protected float m_fPreHoldHardFreezeRemaining;
+	protected bool m_bPreHoldDayAdvance;
+
+	protected bool m_bFreezeTimerScheduled;
 
 	protected ref ScriptInvokerInt m_OnGameStateChanged = new ScriptInvokerInt();
 
@@ -187,7 +209,14 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (Replication.IsServer())
 		{
 			InitSessionSaves_S();
-			SetLobbyState(SCR_EGameModeState.SLOTSELECTION);
+
+			bool resume = WillResume();
+			m_bGameStarted = true;
+			m_bResumeBegun = resume;
+			if (resume)
+				BeginResume_S();
+			else
+				SetLobbyState(SCR_EGameModeState.SLOTSELECTION);
 		}
 	}
 
@@ -352,6 +381,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (state != SCR_EGameModeState.GAME)
 		{
 			EndHardFreeze_S();
+			CancelFreezeCountdown_S();
 			CloseSavePhase_S();
 		}
 
@@ -416,17 +446,13 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (m_bRemoveRedundantUnits)
 			RemoveRedundantUnits_S();
 
-		if (m_iFreezeTime > 0)
-		{
-			GetGame().GetCallqueue().CallLater(UpdateFreezeTimer_S, 1000, true);
-		}
+		ScheduleFreezeCountdown_S();
 
-		// Runs inside the freeze window; the freeze zones still confine movement once it lifts.
+		// Runs inside the freeze window and holds its countdown; the freeze zones still
+		// confine movement once it lifts.
 		if (m_bHardFreezeEnabled && m_iHardFreezeTime > 0)
 			StartHardFreeze_S(m_iHardFreezeTime / 1000);
 
-		// Set only now: a replacement finishing inside the loop above must not open saving
-		// before the rest of the batch is dispatched.
 		m_bStartupBatchDispatched = true;
 		AllowSavesIfReady_S();
 
@@ -455,6 +481,26 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		}
 	}
 
+	// Every path that starts or stops the freeze countdown goes through this pair, so no
+	// path can leave two ticks running or none.
+	protected void ScheduleFreezeCountdown_S()
+	{
+		if (m_bFreezeTimerScheduled || m_fFreezeTimeRemaining <= 0)
+			return;
+
+		m_bFreezeTimerScheduled = true;
+		GetGame().GetCallqueue().CallLater(UpdateFreezeTimer_S, 1000, true);
+	}
+
+	protected void CancelFreezeCountdown_S()
+	{
+		if (!m_bFreezeTimerScheduled)
+			return;
+
+		m_bFreezeTimerScheduled = false;
+		GetGame().GetCallqueue().Remove(UpdateFreezeTimer_S);
+	}
+
 	protected void UpdateFreezeTimer_S()
 	{
 		m_fFreezeTimeRemaining -= 1.0;
@@ -462,7 +508,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (m_fFreezeTimeRemaining <= 0)
 		{
 			m_fFreezeTimeRemaining = 0;
-			GetGame().GetCallqueue().Remove(UpdateFreezeTimer_S);
+			CancelFreezeCountdown_S();
 			OnFreezeTimeEnded_S();
 		}
 
@@ -538,6 +584,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_fHardFreezeRemaining = seconds;
 		Replication.BumpMe();
 
+		// Every hard freeze holds the freeze countdown too; the release resumes it.
+		CancelFreezeCountdown_S();
+
 		GetGame().GetCallqueue().CallLater(UpdateHardFreezeTimer_S, 1000, true);
 
 		Print(string.Format("[LL_Lobby] Hard freeze started (%1s)", seconds), LogLevel.NORMAL);
@@ -551,15 +600,49 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (!m_bHardFreeze)
 			return;
 
+		bool resumeHold = IsResumeHoldActive();
+
 		GetGame().GetCallqueue().Remove(UpdateHardFreezeTimer_S);
 		m_bHardFreeze = false;
 		m_fHardFreezeRemaining = 0;
 		Replication.BumpMe();
 
-		// Runs exactly once per hold: timer drain, admin /hardfreeze 0, and leaving GAME.
-		RestoreDayAdvance_S();
+		if (resumeHold)
+		{
+			// The release puts back what the snapshot recorded, not what the hold wrote.
+			if (m_bPreHoldDayAdvance)
+			{
+				TimeAndWeatherManagerEntity timeManager = GetTimeManager();
+				if (timeManager)
+					timeManager.SetIsDayAutoAdvanced(true);
+			}
 
-		Print("[LL_Lobby] Hard freeze ended", LogLevel.NORMAL);
+			Print("[LL_Lobby] Resume: hold released", LogLevel.NORMAL);
+
+			if (m_fPreHoldHardFreezeRemaining > 0)
+			{
+				int remaining = Math.Ceil(m_fPreHoldHardFreezeRemaining);
+				m_fPreHoldHardFreezeRemaining = 0;
+				StartHardFreeze_S(remaining);
+				return;
+			}
+		}
+		else
+		{
+			// Runs exactly once per hold: timer drain, admin /hardfreeze 0, and leaving GAME.
+			RestoreDayAdvance_S();
+			Print("[LL_Lobby] Hard freeze ended", LogLevel.NORMAL);
+		}
+
+		// The last hard freeze to end resumes the freeze countdown, exactly once.
+		if (GetState() == SCR_EGameModeState.GAME)
+			ScheduleFreezeCountdown_S();
+	}
+
+	//! A hold with no countdown: the resume hold, released by the admin.
+	bool IsResumeHoldActive()
+	{
+		return m_bHardFreeze && m_fHardFreezeRemaining < 0;
 	}
 
 	// The day/night clock is the one part of the world script can stop during a hold.
@@ -645,9 +728,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 		m_fFreezeTimeRemaining += seconds;
 
-		// CallLater does not de-duplicate.
-		GetGame().GetCallqueue().Remove(UpdateFreezeTimer_S);
-		GetGame().GetCallqueue().CallLater(UpdateFreezeTimer_S, 1000, true);
+		// A lapsed freeze revived here needs its tick back; during a hard freeze the release
+		// schedules it instead.
+		if (!m_bHardFreeze)
+			ScheduleFreezeCountdown_S();
 
 		Replication.BumpMe();
 		Print(string.Format("[LL_Lobby] Freeze time adjusted by %1s (now %2s)", seconds, m_fFreezeTimeRemaining), LogLevel.NORMAL);
@@ -662,18 +746,14 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			return;
 
 		m_fFreezeTimeRemaining = 0;
-		GetGame().GetCallqueue().Remove(UpdateFreezeTimer_S);
+		CancelFreezeCountdown_S();
 		OnFreezeTimeEnded_S();
 		Replication.BumpMe();
 	}
 
-	// Session saves. The engine's autosave does the saving; the addon only decides when a
-	// snapshot may land (the GAME phase, batch dispatched, no body replacement in flight)
-	// and refuses a resume it cannot complete.
-
-	// With the switch off the mission keeps the pre-feature behaviour: no save of any type,
-	// whatever the header says. With it on, every missing precondition is named in the log
-	// so a misconfigured mission never reads as a fresh start.
+	// With the switch off no save of any type happens, whatever the header says. With it
+	// on, every missing precondition is logged so a misconfiguration never reads as a
+	// fresh start.
 	protected void InitSessionSaves_S()
 	{
 		SaveGameManager saveManager = GetGame().GetSaveGameManager();
@@ -735,8 +815,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			System.GetTickCount() - m_iSnapshotStartTick), LogLevel.NORMAL);
 	}
 
-	// Reached through the modded persistence system. A failed native load is a broken
-	// world, so it refuses before any lobby record is read.
+	// A failed native load is a broken world: refused before any lobby record is read.
 	void OnNativeLoadResult_S(bool success)
 	{
 		if (success)
@@ -751,9 +830,8 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		RefuseResume_S("load failed");
 	}
 
-	// Every cause reaches this one exit; a second call is a no-op. Nothing is purged, so
-	// the operator can pick an older snapshot. Saving is disabled first: the close's own
-	// shutdown save would otherwise write a half-loaded world over the snapshots.
+	// Idempotent. Nothing is purged, so an older snapshot stays available; saving is
+	// disabled first so the close's own shutdown save cannot write the half-loaded world.
 	void RefuseResume_S(string cause)
 	{
 		if (m_bResumeRefused)
@@ -767,12 +845,18 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			saveManager.SetEnabledSaveTypes(0);
 		}
 
+		GetGame().GetCallqueue().Remove(ResumeCheck_S);
+
 		Print(string.Format("[LL_Lobby] Resume refused: %1", cause), LogLevel.ERROR);
+
+		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+		if (mgr)
+			mgr.BroadcastAdminMessage_S("#LL-Resume_Refused");
+
 		GetGame().RequestClose();
 	}
 
-	//! Opens saving when the batch is dispatched, nothing is in flight and the state is
-	//! GAME; safe from any release, in any state. The roster check runs once per phase.
+	//! Safe from any release in any state; the roster check runs once per game phase.
 	void AllowSavesIfReady_S()
 	{
 		if (!m_bSessionSaves || !Replication.IsServer())
@@ -801,8 +885,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		GetGame().GetSaveGameManager().SetSavingAllowed(false);
 	}
 
-	//! Admin /snapshot: a scripted save point now. The request queues behind the phase
-	//! gate like the autosave, so nothing lands outside GAME or during a replacement.
+	//! Admin /snapshot. The request queues behind the same gate as the autosave.
 	void RequestSnapshot_S(int playerId)
 	{
 		if (!Replication.IsServer())
@@ -825,9 +908,8 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		DisallowSaves_S();
 	}
 
-	// What a resume could not recover from is reported here, once, by name: squads are
-	// re-attached by entity name, bodies are found by persistence id, and the spectator
-	// countdown assumes one mission-end timer.
+	// What a resume cannot recover from, logged once by name: squads are re-attached by
+	// entity name, bodies found by persistence id, one mission-end timer assumed.
 	protected void CheckRosterForSaves_S()
 	{
 		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
@@ -835,7 +917,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		if (!mgr || !persistence)
 			return;
 
-		// Entity name → the callsign it was first seen under.
+		// Entity name → callsign it was first seen under.
 		map<string, string> namesSeen = new map<string, string>();
 		set<int> groupsChecked = new set<int>();
 		foreach (LL_SlotData slot : mgr.GetSlots())
@@ -881,6 +963,286 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			if (timer.GetDuration() <= 0)
 				Print(string.Format("[LL_Lobby] Session saves: mission-end timer '%1' has no positive duration", timer.GetStatKey()), LogLevel.WARNING);
 		}
+	}
+
+	static bool IsResumePending()
+	{
+		LL_GameModeCoop gameMode = GetInstance();
+		return gameMode && gameMode.m_bResumePending;
+	}
+
+	// Bodies and records arrive while the world loads, before the game start; after the
+	// start the decision is kept, because a snapshot taken later in this session is also
+	// the manager's active save.
+	protected bool WillResume()
+	{
+		if (m_bGameStarted)
+			return m_bResumeBegun;
+
+		return m_bSessionSaves && GetGame().GetSaveGameManager().GetActiveSave() != null;
+	}
+
+	//! True from world load until the record is applied or refused; bodies spawned later
+	//! register the ordinary way.
+	bool IsResumeInProgress()
+	{
+		if (m_bResumeRefused)
+			return false;
+		if (m_bResumeFinalising && !m_bResumePending)
+			return false;
+
+		return WillResume();
+	}
+
+	float GetResumeDeadline()		{ return m_fResumeDeadline; }
+	int GetMissionEndDuration()		{ return m_iMissionEndDuration; }
+	float GetMissionEndStartedAt()	{ return m_fMissionEndStartedAt; }
+
+	// Set once: a second timer or a restarted countdown must not move the spectator clock.
+	void SetMissionEndDuration_S(int seconds)
+	{
+		if (!Replication.IsServer() || m_bMissionEndDurationSet)
+			return;
+
+		m_bMissionEndDurationSet = true;
+		m_iMissionEndDuration = seconds;
+		Replication.BumpMe();
+	}
+
+	void SetMissionEndStartedAt_S(float clockReading)
+	{
+		if (!Replication.IsServer() || m_bMissionEndStartSet)
+			return;
+
+		m_bMissionEndStartSet = true;
+		m_fMissionEndStartedAt = clockReading;
+		Replication.BumpMe();
+	}
+
+	// The live remainder of a timed hard freeze, or the remainder a resume hold protects.
+	float GetSavedHardFreezeRemaining()
+	{
+		if (!m_bHardFreeze)
+			return 0;
+		if (IsResumeHoldActive())
+			return m_fPreHoldHardFreezeRemaining;
+
+		return m_fHardFreezeRemaining;
+	}
+
+	// The daylight intent, never the disabled value a hold writes.
+	bool GetPreHoldDayAdvance()
+	{
+		if (IsResumeHoldActive())
+			return m_bPreHoldDayAdvance;
+		if (m_bHardFreeze)
+			return m_bDayAdvanceWasOn;
+
+		TimeAndWeatherManagerEntity timeManager = GetTimeManager();
+		return timeManager && timeManager.GetIsDayAutoAdvanced();
+	}
+
+	void SetResumeRecord_S(LL_SessionRecord record)
+	{
+		m_ResumeRecord = record;
+	}
+
+	//! The first cause wins; the finaliser turns it into the refusal.
+	void ReportResumeFailure_S(string cause)
+	{
+		if (m_sResumeFailure != "")
+			return;
+
+		m_sResumeFailure = cause;
+		Print(string.Format("[LL_Lobby] Resume: failure recorded: %1", cause), LogLevel.WARNING);
+	}
+
+	// The hold is engaged before anything loads so the damage gate and the input lock cover
+	// every restored entity. No day-advance capture: the weather record is not applied yet.
+	protected void BeginResume_S()
+	{
+		m_bResumePending = true;
+		m_bHardFreeze = true;
+		m_fHardFreezeRemaining = -1;
+		Replication.BumpMe();
+
+		SCR_PersistenceSystem scripted = SCR_PersistenceSystem.GetScriptedInstance();
+		if (scripted)
+			scripted.GetOnStateChanged().Insert(OnPersistenceStateChanged_S);
+
+		Print("[LL_Lobby] Resume: hold engaged, waiting for the world to load", LogLevel.NORMAL);
+
+		// The order of ACTIVE against the game start is not established.
+		PersistenceSystem persistence = PersistenceSystem.GetInstance();
+		if (!persistence)
+			return;
+
+		EPersistenceSystemState state = persistence.GetState();
+		if (state == EPersistenceSystemState.ACTIVE)
+			FinaliseResume_S();
+		else if (state > EPersistenceSystemState.ACTIVE)
+			RefuseResume_S("persistence system failed before the game started");
+	}
+
+	protected void OnPersistenceStateChanged_S(EPersistenceSystemState oldState, EPersistenceSystemState newState)
+	{
+		if (newState == EPersistenceSystemState.ACTIVE)
+			FinaliseResume_S();
+		else if (newState == EPersistenceSystemState.FAILURE)
+			RefuseResume_S("persistence system failure");
+	}
+
+	//! Once at ACTIVE: arms the deadline and waits for every saved body to register.
+	void FinaliseResume_S()
+	{
+		if (m_bResumeFinalising || !m_bResumePending)
+			return;
+		m_bResumeFinalising = true;
+
+		m_fResumeDeadline = System.GetTickCount() + RESUME_DEADLINE_MS;
+
+		if (!m_ResumeRecord)
+		{
+			RefuseResume_S("no lobby record in the snapshot");
+			return;
+		}
+
+		GetGame().GetCallqueue().CallLater(ResumeCheck_S, 250, true);
+		ResumeCheck_S();
+	}
+
+	protected void ResumeCheck_S()
+	{
+		if (m_bResumeRefused)
+		{
+			GetGame().GetCallqueue().Remove(ResumeCheck_S);
+			return;
+		}
+
+		if (m_sResumeFailure != "")
+		{
+			RefuseResume_S(m_sResumeFailure);
+			return;
+		}
+
+		string pending = "";
+		int pendingCount = 0;
+		foreach (LL_SlotRecord slot : m_ResumeRecord.slots)
+		{
+			if (IsResumeBodyRegistered_S(slot))
+				continue;
+
+			pendingCount++;
+			if (pending != "")
+				pending += ", ";
+			pending += slot.name;
+		}
+
+		if (pendingCount > 0)
+		{
+			if (System.GetTickCount() < m_fResumeDeadline)
+				return;
+
+			RefuseResume_S(string.Format("%1 body(ies) did not register in time: %2", pendingCount, pending));
+			return;
+		}
+
+		GetGame().GetCallqueue().Remove(ResumeCheck_S);
+		CompleteResume_S();
+	}
+
+	// Done = the manager holds a slot for the body in the saved squad.
+	protected bool IsResumeBodyRegistered_S(LL_SlotRecord record)
+	{
+		PersistenceSystem persistence = PersistenceSystem.GetInstance();
+		if (!persistence)
+			return false;
+
+		IEntity body = IEntity.Cast(persistence.FindById(record.body));
+		if (!body)
+			return false;
+
+		LL_PlayableComponent playable = LL_PlayableComponent.Cast(body.FindComponent(LL_PlayableComponent));
+		return playable && playable.IsResumeRegistered(record.squad);
+	}
+
+	protected void CompleteResume_S()
+	{
+		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+		PersistenceSystem persistence = PersistenceSystem.GetInstance();
+		if (!mgr || !persistence)
+		{
+			RefuseResume_S("lobby manager missing");
+			return;
+		}
+
+		LL_SessionRecord record = m_ResumeRecord;
+
+		// Frequencies before any possession: a body's radio is tuned as its holder enters.
+		map<string, int> frequencies = new map<string, int>();
+		foreach (LL_SquadRecord squad : record.squads)
+			frequencies.Set(squad.name, squad.frequency);
+		mgr.RestoreSquadFrequencies_S(frequencies);
+
+		int seated = 0;
+		foreach (LL_SlotRecord slot : record.slots)
+		{
+			IEntity body = IEntity.Cast(persistence.FindById(slot.body));
+			if (!body)
+				continue;
+
+			LL_PlayableComponent playable = LL_PlayableComponent.Cast(body.FindComponent(LL_PlayableComponent));
+			if (!playable)
+				continue;
+
+			int slotRplId = playable.GetRplId();
+			mgr.ApplyResumedSlotFlags_S(slotRplId, slot.kia, slot.locked);
+			if (slot.holderKey != "")
+			{
+				mgr.SeatResumedHolder_S(slot.holderKey, slot.holderName, slotRplId);
+				seated++;
+			}
+		}
+
+		// Runs the components' GAME hooks; the recorder and the playable registration read
+		// the pending flag and stay out.
+		SetGameModeState(SCR_EGameModeState.GAME);
+
+		// After the state change: the base game mode resets the clock across it.
+		m_fTimeElapsed = record.elapsedSeconds;
+		m_fGameStartTimestamp = System.GetTickCount() - record.elapsedSeconds * 1000;
+		m_fFreezeTimeRemaining = record.freezeRemaining;
+		m_fPreHoldHardFreezeRemaining = record.hardFreezeRemaining;
+		m_bPreHoldDayAdvance = record.dayAdvance;
+
+		if (record.missionEndDuration > 0)
+			SetMissionEndDuration_S(record.missionEndDuration);
+		if (record.missionEndStartedAt >= 0)
+			SetMissionEndStartedAt_S(record.missionEndStartedAt);
+		Replication.BumpMe();
+
+		// Without a capture: the record's intent, not the restored live setting, is what
+		// the release puts back.
+		TimeAndWeatherManagerEntity timeManager = GetTimeManager();
+		if (timeManager)
+			timeManager.SetIsDayAutoAdvanced(false);
+
+		// The lobby's freeze zones follow the countdown; the stock zones need the removal.
+		if (m_fFreezeTimeRemaining <= 0)
+			RemoveVanillaRestrictionZones_S();
+
+		LL_StatsManager stats = LL_StatsManager.GetInstance();
+		if (stats)
+			stats.ResumeRecording_S(record.stats);
+
+		m_bStartupBatchDispatched = true;
+		m_bResumePending = false;
+		AllowSavesIfReady_S();
+
+		Print(string.Format("[LL_Lobby] Resume: %1 slot(s) restored, %2 holder(s) seated, clock at %3 s, hold active until released",
+			record.slots.Count(), seated, record.elapsedSeconds), LogLevel.NORMAL);
+
+		mgr.BroadcastAdminMessage_S("#LL-Resume_HoldBody", "#LL-Resume_HoldTitle");
 	}
 
 	override void OnPlayerConnected(int playerId)
@@ -950,11 +1312,9 @@ void LL_SaveWaiterCallback(Managed context);
 typedef func LL_SaveWaiterCallback;
 typedef ScriptInvokerBase<LL_SaveWaiterCallback> LL_SaveWaiterInvoker;
 
-// One-shot wait for the save manager to be idle with no body replacement in flight.
-// Evaluated on start, on every busy-state change and when a replacement count reaches
-// zero (which changes nothing on the manager). The after-save event is not an idle
-// signal: it fires for every save type, the shutdown one included. The callback goes
-// into the invoker before Start(): a script method cannot take a func argument.
+// One-shot wait for an idle save manager with no body replacement in flight. The
+// after-save event is not an idle signal: it fires for every save type, the shutdown one
+// included. The callback goes through an invoker: a script method cannot take a func.
 class LL_SaveWaiter
 {
 	protected static ref array<ref LL_SaveWaiter> s_aWaiters = {};
@@ -991,8 +1351,8 @@ class LL_SaveWaiter
 		return !mgr || mgr.GetPendingReplacements() == 0;
 	}
 
-	// In order: an earlier waiter's callback may start a replacement that keeps the rest
-	// waiting. The copy is strong because a waiter leaves the list as it runs.
+	// In order: an earlier callback may start a replacement that keeps the rest waiting.
+	// The copy is strong because a waiter leaves the list as it runs.
 	static void ReevaluateAll()
 	{
 		array<ref LL_SaveWaiter> pending = {};

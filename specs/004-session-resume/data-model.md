@@ -29,8 +29,7 @@ configuration's `persistence` block (default 10 minutes).
 | `elapsedSeconds` | float | the game's own elapsed clock (`GetElapsedTime()`), which stands still on every machine while any hard freeze is active |
 | `missionEndDuration` | int | the mission-end timer's configured seconds; 0 when the mission has no such timer (one positive-duration timer per mission is the supported configuration) |
 | `missionEndStartedAt` | float | the clock reading at which its countdown began; -1 when not yet started; the timer fires from this and the clock, so it is the whole saved timer state |
-| `statsSession` | string | the statistics session id |
-| `statsFile` | string | the statistics file written for this very snapshot (`<session>-save-<time>-<n>.json`), so the numbers never describe a later moment than the world; empty when the write failed |
+| `stats` | `LL_StatsContinuation` | the recorder's continuation (session id, start stamp, winner, one-time flags, first-slot holders by identity key, players, events, zones, commanders); null when the recorder was not recording (amended 2026-09-19: replaces the per-snapshot statistics file) |
 | `squads` | array of squad records | one per squad with slots, see below |
 | `slots` | array of slot records | one per registered slot, see below |
 
@@ -45,6 +44,7 @@ Slot record:
 
 | Field | Type | Notes |
 |-------|------|-------|
+| `name` | string | the slot's display name, for the log and the refusal cause |
 | `body` | UUID | `PersistenceSystem.GetId(slotEntity)`; empty (null UUID) when the body is not tracked, logged by slot name at save time, and a refusal cause on load |
 | `squad` | string | the squad entity's own name; the body is re-attached to it on load when the game did not |
 | `holderKey` | string | the reconnect key (identity GUID, or the name form when enabled), read through the reverse key map so a placeholder holder's key is saved again; empty for an empty slot |
@@ -127,21 +127,16 @@ Server-only unless marked.
 | `LL_LobbyPlayerComponent` | `EnterSpectatorNow` re-check | a pending spectator entry does nothing for a player who now controls a living body |
 | `LL_PlayableComponent` | one bounded resume operation (agent, squad attach, registration with a valid network id, observed) | deadline read from the game mode each tick, none until armed; done = the manager holds a slot for this entity in the saved squad; a fallback id is a refusal; stops on refusal |
 | `LL_M_SCR_PersistenceSystem` (modded) | `OnAfterLoad(bool success)` forwarded | the native load result reaches the game mode's resume state; a failure refuses |
-| `LL_StatsManager` | `ResumeRecording_S(sessionId, path)` | applies the saved session id, loads the file or flags incomplete, then arms the recorder once (flag, assignment hook, live-write timer) without the sweep, the commander freeze or the immediate write |
+| `LL_StatsManager` | `CaptureContinuation_S()`, `ResumeRecording_S(state)` | the first returns the embedded block (null while not recording); the second applies the saved session id and maps, then arms the recorder once (flag, assignment hook, live-write timer) without the sweep, the commander freeze or the immediate write; no block → a new recording, logged |
 | `LL_TriggerMissionEndTimer` | fires from the mission clock | `m_fSecondsLeft` removed; the tick fires when the clock reaches the start reading plus the duration; a restored started timer resumes directly in the countdown, no activation poll or freeze wait |
 | `LL_ZoneRestrictionComponent` (client) | countdown pause | the return countdown does not drain while the replicated hold flag is set |
 | `LL_TriggerComponent` | static server-side trigger list; `m_bRestored` | what `LL_TriggerSerializer` iterates; the flag that skips re-initialisation on the first activation after a load (only for triggers that had started) |
-| `LL_StatsManager` | continuation state: first-slot holders by identity, one-time flags, `m_bIncomplete` (also written to the file) | restored from the snapshot's statistics file; identities resolved through the lobby's reconnect keys; the recorder is not restarted on a resume |
+| `LL_StatsManager` | first-slot holders by identity key (`map<string, string>`), identity resolution through the lobby's reconnect keys first | placeholders keep the saved identity's credit; the recorder is not restarted on a resume |
 
 ## Files written to disk
 
 - The engine's session save, in the location the engine chooses for the server
   profile; not a Lite Lobby file.
-- The statistics live snapshot, already written today, plus one statistics file per
-  snapshot, written when the engine announces the save and named in the session
-  record; pruned after each successful save, once a successful listing of the
-  engine's save points is back, when older than the oldest listed point by more
-  than a minute and not in flight, so the addon keeps no retention count of its own
-  and orphans of failed world saves go too. A file from an abandoned branch stays
-  until it is that old.
+- The statistics live, final and approved files, as today. No per-snapshot
+  statistics file: the recorder's state is inside the engine's save (2026-09-19).
 - With `m_bSessionSaves` off: nothing.

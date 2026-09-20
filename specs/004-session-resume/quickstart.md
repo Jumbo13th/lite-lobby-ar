@@ -258,11 +258,11 @@ the twice-absent holder is put back after the second resume.
    the snapshot folder identical before and after (no new save, none removed),
    the process exited; note what the container did next (stayed stopped, or
    restarted plainly into a fresh game).
-4. Delete the statistics file named by the newest snapshot, resume. Expected: the
-   world resumes, the log says the statistics are incomplete, the publish panel
-   shows it; after the release, a new kill and a slot change are recorded and the
-   publish works, under the original statistics session id. Let another snapshot
-   land, resume from that one; expected: still marked incomplete, same session id.
+4. Resume from a snapshot whose lobby record carries no statistics block (a test
+   build blanks it). Expected: the world resumes, the log says a new recording
+   starts; after the release, a new kill and a slot change are recorded and the
+   publish works. In a normal resume: the log line `Stats: recording resumed`
+   names the original session id and the counts of players, events and zones.
 5. Take a snapshot while a resume hold is active; resume from it. Expected: the
    clocks are those of the moment before the first hold, daylight follows the
    pre-hold setting after release.
@@ -275,9 +275,9 @@ the twice-absent holder is put back after the second resume.
    failed`, snapshots untouched, server shut down; distinct from 7.3.
 6b. Set the server's retention to 1, take three snapshots, resume from the only
    one; then with retention 3 take three, roll back to the oldest, take two more.
-   Expected: after each successful save the statistics folder holds no file older
-   than the oldest listed snapshot by more than a minute, and the file of the
-   loaded snapshot is always present.
+   Expected: the statistics folder holds only the live, final and approved files of
+   each session; the resumed recording continues under the loaded snapshot's
+   session id.
 6c. Start a mission whose squad has no entity name, one with two squads sharing a
    name, one whose player prefab lacks the persistence component, and one with
    two mission-end timers, plus a timed announcement beside them. Expected: one
@@ -285,10 +285,7 @@ the twice-absent holder is put back after the second resume.
    bodies have finished replacing, naming the squad, the slot or the timer.
    Then snapshot and resume the untracked-body mission. Expected: `Resume refused:
    slot <name> has no persistence id`.
-6d. In a test build, make the save listing callback return an empty successful
-   list once and a failed list once, then let a save land each time. Expected:
-   no statistics file is pruned in either case; in a normal run, the file written
-   30 s before its own save point survives the next prune.
+6d. Removed 2026-09-19: there is no statistics file listing or pruning.
 6e. In a test build, delay one body's network id past the finaliser's deadline.
    Expected: `Resume refused` naming that slot, no fallback id in the log. Then
    make one body available during deserialisation, before `ACTIVE`, and register

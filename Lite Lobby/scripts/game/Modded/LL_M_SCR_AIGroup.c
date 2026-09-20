@@ -1,8 +1,6 @@
-// A world-placed squad spawns its member list on every world load, while a resumed
-// world also brings the saved members back through the persistence system: without
-// this guard every squad would exist twice. The game's own ambient patrols carry the
-// same check. The skipped branch mirrors the base class's own path for a group whose
-// members another system provides.
+// A world-placed squad spawns its member list on every load, and a resumed world brings
+// the saved members back as well: without this guard every squad exists twice. The
+// skipped branch mirrors the base class's path for members another system provides.
 
 modded class SCR_AIGroup
 {

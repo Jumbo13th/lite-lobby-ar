@@ -117,33 +117,21 @@ plan carries a spike for it.
   owner's identity and re-linking on reconnect was considered and dropped: it needs
   a per-marker identity map and a rewrite of ownership after every reconnect, for
   the one case of deleting an old marker.
-- **Statistics**: not serialised into the save, but tied to it. `LL_StatsManager`
+- **Statistics**: serialised into the save, as a block of the lobby session record
+  (decision 2026-09-19 at implementation, operator's choice). `LL_StatsManager`
   already writes `$profile:LL_GameStats/<session>-live.json` every 60 s with its
   JSON structs. Reloading that file on resume was rejected: at crash time it is up
   to nine minutes newer than the world and would credit kills of players who are
-  alive again. Instead, on `SCR_PersistenceSystem.GetOnBeforeSave()` the manager
-  writes `<session>-save-<yyyymmdd-hhmmss>-<n>.json` (`n` a per-session counter, so
-  two saves in one second never share a name) and the session record stores that
-  name, or an empty string when the write failed (`WriteSnapshot` is void and logs
-  its failure today, `LL_StatsManager.c` lines 1461-1476; it gains a bool result).
-  On resume the manager loads exactly that file and keeps the session id so later
-  files continue the family; a missing or unreadable file is logged, flagged in the
-  recorder so the next publish reports incomplete statistics, and does not refuse
-  the resume (spec clarification). Pruning: `GetSaves(mission, cb)` is
-  asynchronous (`SaveGameManager.c` lines 51-56, callback with a success flag,
-  `SaveGameObtainCallback.c` lines 12-22). After a successful callback, a file is
-  deleted when it is older than the oldest listed save point's
-  `GetSavePointCreatedUnix()` by more than sixty seconds (the margin covers a file
-  written just before its own save point's timestamp), never while a write is in
-  flight, and never on a failed or empty listing. This follows `saveRetention`
-  without a second count and removes orphans of failed world saves; a file from an
-  abandoned branch after a rollback stays until it is that old, a bounded leftover
-  that is accepted. Run once after each successful save.
-  **Point in time**: the before-save callback runs before the serializers read
-  (`PersistenceSystem.c` lines 118-125 distinguish before-read from after-commit);
-  a non-blocking save may read entities over its duration, so the statistics
-  describe the start of the save and the world the span of it, at most one save
-  duration apart. Accepted while SC-003 holds the duration under a second.
+  alive again. The plan's first design, one JSON file per snapshot named in the
+  record and pruned against the engine's save points, was dropped before it was
+  written: reading it back relies on the JSON reflection reader, which this codebase
+  found unable to read nested objects (`LL_StatsTypes.c` lines 150-152, the reason
+  the publish view is hand-registered), while the persistence context reads nested
+  objects, as the game's task-system record proves. `CaptureContinuation_S()`
+  returns an `LL_StatsContinuation` (session id, start stamp, winner, the one-time
+  flags, first-slot holders by identity key, players, events, zones, commanders) that
+  the session serializer writes; null while not recording. Read in the same save as
+  the world, so the two never disagree; nothing to name, retain or prune.
 - **Recorder continuation**: the live snapshot structs (`LL_StatsTypes.c` lines
   130-147) do not carry everything the recorder needs to continue. Inventory of
   what a resume must also restore, from `LL_StatsManager.c`: the recording start
@@ -152,12 +140,12 @@ plan carries a spike for it.
   assignment event, schedules and runs the live write); death recording,
   assignment handling, finalisation and publication all return while
   `m_bRecording` is false (lines 361-374, 389-390, 464-465, 880-881). The resume
-  therefore does not skip the start: it runs `ResumeRecording_S`, which applies
-  the session record's statistics session id first (the manager minted a fresh
-  one at start-up, lines 110 and 1495-1512, and a missing file cannot supply the
-  saved one), loads the snapshot's file (or sets the incomplete flag when it is
-  missing), then sets the flag, hooks the event and schedules the live write,
-  exactly once, without the sweep, the commander freeze or the immediate write;
+  therefore does not skip the start: it runs `ResumeRecording_S(state)`, which
+  applies the embedded state's session id first (the manager minted a fresh one at
+  start-up, lines 110 and 1495-1512), restores the maps from it, then sets the flag,
+  hooks the event and schedules the live write, exactly once, without the sweep,
+  the commander freeze or the immediate write; a snapshot with no block starts a
+  new recording and logs it;
   first-slot holders frozen as
   player ids at lines 300-303 (written by identity key instead, so placeholders
   never become first holders), survival resolution by player id at lines 432-448
@@ -166,10 +154,8 @@ plan carries a spike for it.
   `GetReconnectKeyForPlayer_S`, so an absent placeholder keeps the saved identity's
   credit), the one-time survival resolution guarded at lines 409-413, and the
   event timestamps at lines 1484-1491, which switch from a process tick to the
-  mission clock (R5) so they survive a resume. The incomplete flag is written into
-  the file so it survives another snapshot and resume. The nested-JSON readback
-  limitation noted at `LL_StatsTypes.c` lines 150-152 means the round trip is
-  demonstrated in the quickstart before it is relied on.
+  mission clock (R5) so they survive a resume. Player-id lookups are not saved:
+  they rebuild as players reconnect, through the identity keys the lobby holds.
 
 ## R4. When the record is applied, and how bodies become slots again
 

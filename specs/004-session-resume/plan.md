@@ -126,7 +126,7 @@ Lite Lobby/
     │   ├── LL_TriggerZoneContest.c              # hook: progress, holder
     │   └── LL_TriggerSupremacy.c                # hook: bothSeen
     ├── Stats/
-    │   ├── LL_StatsManager.c                    # per-snapshot statistics file on OnBeforeSave (bool result, unique name); reload the file named in the session record; recorder continuation; retention by listed save points
+    │   ├── LL_StatsManager.c                    # recorder continuation embedded in the session record (CaptureContinuation_S / ResumeRecording_S); identities by reconnect key; events on the mission clock
     │   └── LL_StatsTypes.c                      # first-slot holders by identity key; recorder clock and one-time flags in the snapshot struct
     ├── ../../docs/src/content/docs/create-mission/world.mdx      # guide: leave Save Types, set Systems Config (FR-019)
     ├── ../../docs/src/content/docs/ru/create-mission/world.mdx   # same, Russian
@@ -252,18 +252,16 @@ crew-lock gate rather than a new user action.
    types are zero, when `PersistenceSystem.GetInstance()` is null, and when the
    persistence config lacks the lobby's collection, and logs which snapshot is
    active or that none is, so a misconfiguration never looks like a fresh start.
-7. **Statistics per snapshot** (`LL_StatsManager`, `LL_StatsTypes`, FR-004, FR-020,
-   US4). On `OnBeforeSave` the manager writes a uniquely named file and hands the
-   name (or empty on failure) to the session serializer; on resume `ResumeRecording_S`
-   loads that file (or sets the incomplete flag), restores the recorder's
-   continuation state (session, first-slot holders by identity, one-time flags),
-   then arms recording exactly once (flag, assignment hook, live-write timer)
-   without the participant sweep, the commander freeze or the immediate write;
-   every identity resolves through the lobby's reconnect keys so absent
-   placeholders keep their credit; events are timestamped with the mission clock;
-   the incomplete flag is saved with every later file. After each successful
-   save, files older than the oldest listed save point by more than a minute are
-   pruned.
+7. **Statistics in the snapshot** (`LL_StatsManager`, `LL_StatsTypes`, FR-004,
+   FR-020, US4; amended 2026-09-19). The session serializer embeds
+   `CaptureContinuation_S()` (session, start stamp, winner, one-time flags,
+   first-slot holders by identity key, players, events, zones, commanders); on
+   resume `ResumeRecording_S(state)` restores it and arms recording exactly once
+   (flag, assignment hook, live-write timer) without the participant sweep, the
+   commander freeze or the immediate write; every identity resolves through the
+   lobby's reconnect keys so absent placeholders keep their credit; events are
+   timestamped with the mission clock. No statistics file per snapshot, nothing
+   to prune.
 8. **Guide** (FR-019). The world chapter's "untick all four Save Types" step becomes
    "leave Save Types, set Systems Config to the lobby's config", EN and RU, with the
    screenshot note updated, plus one line for script-created squads, one for the
