@@ -304,17 +304,37 @@ plan carries a spike for it.
   path. The game's ambient patrol system carries the guard for its own case:
   `if (SCR_PersistenceSystem.IsLoadInProgress()) return;` "otherwise full-size
   groups get spawned even if they are marked as eliminated in the save file"
-  (`Game/Systems/SCR_AmbientPatrolSystem.c` line 91). Fix: a modded
-  `SCR_AIGroup` in `scripts/game/Modded/LL_M_SCR_AIGroup.c` whose `EOnInit`
-  skips the member spawn when `SCR_PersistenceSystem.IsLoadInProgress()` is true
-  and otherwise calls the vanilla one. Loaded groups are still tracked
+  (`Game/Systems/SCR_AmbientPatrolSystem.c` line 91). The dedicated-server
+  casualty runs on 2026-09-20 exposed a narrower failure: 127 restored slots grew
+  to 131, then a later snapshot restored 131 and grew to 137. The extra roles and
+  positions match `SCR_AIGroup.ExpandOneMember`: its next prefab index is the
+  living-agent count, so a queued request fills casualties with fresh members.
+  `IsLoadInProgress()` can return false before persistence exists and stops
+  reporting the load after its short time window; guarding only `EOnInit` leaves
+  queued work able to run after restoration. The exact initial enqueue timing
+  is not established by those logs.
+  Fix: `LL_M_SCR_AIGroup` limits suppression to map entities (`IEntity.IsLoaded`,
+  `Core/generated/Entities/IEntity.c` line 486). `PersistenceSystem.WasDataLoaded`
+  records whether the world started from saved data; before that system reaches
+  `ACTIVE`, the active save identifies a pending load even if the system does not
+  yet exist. Unlike an active-save-only check, this allows a fresh world's first
+  autosave without disabling its squads. The decision is latched per map squad
+  and logged once; it adds no replication. `EOnInit` sets vanilla
+  `IgnoreSpawning(true)` and calls its superclass, preserving the native common
+  setup and one-shot flag. The same guard returns false from `ExpandOneMember`
+  and true from `IsExpandComplete`, so native queued work is discarded instead
+  of retried. Both skipped queue paths call the idempotent `InvokeEventOnInit`,
+  as the vanilla ignore branch does. The guard persists beyond resume completion
+  for the original map squads; dynamically spawned squads, including later Game
+  Master placements, retain vanilla behavior. These methods and signatures match
+  tags 1.8.0.10 and 1.8.0.13. Loaded groups are still tracked
   (`AIGroup.conf` matches `EntityClass "AIGroup"`, and loaded entities get
   deterministic ids), so the group's own record re-joins the restored members
   through `WhenAvailable`, exactly as for an engine-spawned group. Members whose
   bodies were deleted before the save (fresh-body swap, redundant-unit removal)
-  have no record and are not spawned by anyone. The `IsLoadInProgress` window is
-  the load phase plus one second of world time, so groups a Game Master places
-  later in a resumed session spawn normally. Squads a mission creates from script
+  have no record and are not spawned by anyone. Suppression does not depend on
+  a saved group record, so wholly eliminated map squads also remain empty.
+  Squads a mission creates from script
   are outside this guard; the guide tells makers to create them from the lobby's
   game-start hook, which a resume does not run.
 - **Squad frequencies**: the game saves a group's frequency only for groups flagged

@@ -135,7 +135,7 @@ Lite Lobby/
     ├── UI/LL_HardFreezeHud.c                    # resume text: "N of M players back"
     ├── UI/Spectator/LL_SpectatorMenu.c          # clock widget: mission-end countdown when the mission has the timer
     └── Modded/
-        ├── LL_M_SCR_AIGroup.c                         # new: EOnInit skips member spawn while a save is being applied
+        ├── LL_M_SCR_AIGroup.c                         # new: suppresses initial and queued member spawns for restored map squads
         ├── LL_M_SCR_PersistenceSystem.c               # new: forwards the native after-load result to the game mode
         ├── LL_M_SCR_PlayerReconnectDataSerializer.c   # new: writes and reads nothing
         ├── LL_M_SCR_PlayerControllerSerializer.c      # new: writes and reads nothing
@@ -186,8 +186,10 @@ crew-lock gate rather than a new user action.
    returning `DEFAULT` on save and true on load.
 4. **Resume** (`LL_GameModeCoop`, `LL_LobbyManager`, `LL_PlayableComponent`,
    `LL_M_SCR_AIGroup`, FR-005, FR-006, FR-014, FR-017). World-placed squads do not
-   spawn their prefab members while the save is being applied (research R4), so
-   the restored bodies are the only bodies. `OnGameStart` with a save active: skip
+   spawn their prefab members on resume, including queued expansion after the
+   load completes (research R4). The guard uses map-entity identity and the world's
+   persistence load origin; fresh starts and later dynamic squads use vanilla
+   spawning. The restored bodies are the only bodies. `OnGameStart` with a save active: skip
    SLOTSELECTION, set `m_bResumePending`, set the hard-freeze flag at once so the
    damage gate and input lock cover everything that loads, and subscribe to the
    persistence state change, so a missing lobby record is detected at `ACTIVE`;

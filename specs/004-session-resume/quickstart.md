@@ -80,6 +80,17 @@ first kill and not the second, their event timestamps are mission-clock seconds,
 and after the release a new kill is recorded and the publish works. Count the
 assignment broadcasts in the server log: exactly one per returning holder.
 
+Casualty regression: before the snapshot, leave one named squad with one living
+member and several corpses; eliminate another squad and remove its corpses. After
+resume, keep the hold for at least ten seconds, connect a client, then release it.
+The logged restored-slot count and subsequent `RplSave` slot count must agree;
+the first squad keeps its casualties, and the eliminated squad stays empty.
+Repeat from a new snapshot without further casualties: the count must stay fixed.
+Expect one `Resume: member spawning suppressed for map squad` diagnostic per
+suppressed squad. Place a new squad through Game Master after resume and verify
+its members spawn. Also check a plain fresh start, then a new Game Master squad
+after that world's first autosave; neither may lose its normal members.
+
 ## Scenario 2: dead players, seats, aircraft (US1 edge cases; the pin spike)
 
 1. Kill one player's character. Seat the other in the helicopter's pilot seat, take
