@@ -13,6 +13,12 @@ class LL_PinnedVehicle
 	float m_fMaxDrift;
 }
 
+class LL_StoppedVehicle
+{
+	IEntity m_Entity;
+	vector m_vOrigin;
+}
+
 class LL_VehicleHold
 {
 	// Skids on the ground read a few centimetres; anything above this is flying.
@@ -29,6 +35,10 @@ class LL_VehicleHold
 	}
 
 	protected ref array<ref LL_PinnedVehicle> m_aPinned = {};
+	protected ref array<ref LL_StoppedVehicle> m_aStopped = {};
+	protected int m_iStoppedCars;
+	protected int m_iStoppedTracked;
+	protected int m_iStoppedAircraft;
 
 	// Measured with a trace, not read from the flight model: a body restored by a save
 	// sleeps until something touches it, and the flight model reports nothing meanwhile.
@@ -96,31 +106,80 @@ class LL_VehicleHold
 		return null;
 	}
 
-	//! Server: every airborne helicopter in the world.
+	//! Server: every vehicle in the world; airborne helicopters are pinned, the rest stopped.
 	void PinAll_S()
 	{
 		BaseWorld world = GetGame().GetWorld();
 		if (!world)
 			return;
 
+		m_iStoppedCars = 0;
+		m_iStoppedTracked = 0;
+		m_iStoppedAircraft = 0;
+
 		vector mins, maxs;
 		world.GetBoundBox(mins, maxs);
-		world.QueryEntitiesByAABB(mins, maxs, PinIfAirborne_S, null, EQueryEntitiesFlags.DYNAMIC);
+		world.QueryEntitiesByAABB(mins, maxs, HoldVehicle_S, null, EQueryEntitiesFlags.DYNAMIC);
+
+		Print(string.Format("[LL_Lobby] Hold: stopped %1 car(s), %2 tracked, %3 grounded aircraft; %4 pinned",
+			m_iStoppedCars, m_iStoppedTracked, m_iStoppedAircraft, m_aPinned.Count()), LogLevel.NORMAL);
 	}
 
-	protected bool PinIfAirborne_S(IEntity entity)
+	protected bool HoldVehicle_S(IEntity entity)
 	{
 		if (!Vehicle.Cast(entity))
 			return true;
 
 		HelicopterControllerComponent heli = HelicopterControllerComponent.Cast(entity.FindComponent(HelicopterControllerComponent));
-		if (!heli)
-			return true;
+		if (heli)
+		{
+			float agl = MeasureAltitudeAGL(entity);
+			if (agl > AIRBORNE_AGL_M)
+			{
+				Pin_S(entity, heli, agl);
+				return true;
+			}
+		}
 
-		float agl = MeasureAltitudeAGL(entity);
-		if (agl > AIRBORNE_AGL_M)
-			Pin_S(entity, heli, agl);
+		Stop_S(entity, heli);
 		return true;
+	}
+
+	// The game's own recipe for a vehicle whose pilot dropped. A tracked vehicle has no
+	// persistent brake, so on a slope it may creep; the release logs it.
+	protected void Stop_S(notnull IEntity vehicle, HelicopterControllerComponent heli)
+	{
+		if (heli)
+		{
+			heli.SetPersistentWheelBrake(true);
+			heli.SetAutohoverEnabled(true);
+			m_iStoppedAircraft++;
+		}
+		else
+		{
+			CarControllerComponent car = CarControllerComponent.Cast(vehicle.FindComponent(CarControllerComponent));
+			TrackedControllerComponent tracked = TrackedControllerComponent.Cast(vehicle.FindComponent(TrackedControllerComponent));
+			if (car)
+			{
+				car.Shutdown();
+				car.StopEngine(false);
+				car.SetPersistentHandBrake(true);
+				m_iStoppedCars++;
+			}
+			else if (tracked)
+			{
+				tracked.Shutdown();
+				tracked.StopEngine(false);
+				m_iStoppedTracked++;
+			}
+			else
+				return;
+		}
+
+		LL_StoppedVehicle stopped = new LL_StoppedVehicle();
+		stopped.m_Entity = vehicle;
+		stopped.m_vOrigin = vehicle.GetOrigin();
+		m_aStopped.Insert(stopped);
 	}
 
 	protected void Pin_S(notnull IEntity vehicle, notnull HelicopterControllerComponent heli, float agl)
@@ -187,10 +246,28 @@ class LL_VehicleHold
 		}
 	}
 
+	// The brakes stay on, as the game leaves a dropped vehicle; only the drift is reported.
+	protected void ReleaseStopped_S()
+	{
+		foreach (LL_StoppedVehicle stopped : m_aStopped)
+		{
+			IEntity vehicle = stopped.m_Entity;
+			if (!vehicle)
+				continue;
+
+			float drift = vector.Distance(vehicle.GetOrigin(), stopped.m_vOrigin);
+			if (drift > DRIFT_LOG_M)
+				Print(string.Format("[LL_Lobby] Hold: %1 moved %2 m while stopped", Describe(vehicle), Math.Round(drift)), LogLevel.WARNING);
+		}
+		m_aStopped.Clear();
+	}
+
 	//! Server: physics back to the prefab, autohover on (the game's own recipe for an aircraft
 	//! whose pilot dropped), then the aircraft goes back to whoever holds the pilot seat.
 	void Release_S()
 	{
+		ReleaseStopped_S();
+
 		foreach (LL_PinnedVehicle pinned : m_aPinned)
 		{
 			IEntity vehicle = pinned.m_Entity;

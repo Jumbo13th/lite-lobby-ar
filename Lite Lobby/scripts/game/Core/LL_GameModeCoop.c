@@ -95,6 +95,11 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	protected bool m_bResumeRefused;
 	protected int m_iSnapshotStartTick;
 
+	// Planned stop (server): one stop-time snapshot, whichever path writes it.
+	protected bool m_bStopping;
+	protected bool m_bStopSaveRequested;
+	protected bool m_bStopSaveDone;
+
 	// Resume (server). The snapshot's lobby record is applied in one step at ACTIVE.
 	protected static const int RESUME_DEADLINE_MS = 10000;
 	protected bool m_bGameStarted;
@@ -403,6 +408,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		{
 			case SCR_EGameModeState.GAME:
 				OnEnterGame_S();
+				break;
+
+			case SCR_EGameModeState.DEBRIEFING:
+				DiscardSnapshots_S();
 				break;
 		}
 	}
@@ -872,6 +881,13 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		Print(string.Format("[LL_Lobby] Snapshot %1 %2 in %3 ms",
 			typename.EnumToString(ESaveGameType, saveType), result,
 			System.GetTickCount() - m_iSnapshotStartTick), LogLevel.NORMAL);
+
+		// The engine's exit transition would otherwise write a second shutdown save.
+		if (m_bStopping && saveType == ESaveGameType.SHUTDOWN && success)
+		{
+			m_bStopSaveDone = true;
+			GetGame().GetSaveGameManager().SetSavingAllowed(false);
+		}
 	}
 
 	// A failed native load is a broken world: refused before any lobby record is read.
@@ -965,6 +981,66 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_bStartupBatchDispatched = false;
 		m_bRosterCheckedForSaves = false;
 		DisallowSaves_S();
+	}
+
+	// The mission is over, so nothing stays resumable. The game's own end-of-game handler is
+	// protected and skipped outside a dedicated build, so its body runs here, after any save
+	// in flight, and for the current playthrough only. A refusal never comes through here.
+	protected void DiscardSnapshots_S()
+	{
+		if (!m_bSessionSaves || !Replication.IsServer())
+			return;
+
+		SaveGameManager saveManager = GetGame().GetSaveGameManager();
+		if (!saveManager)
+			return;
+		saveManager.SetSavingAllowed(false);
+
+		LL_SaveWaiter waiter = new LL_SaveWaiter();
+		waiter.GetOnReady().Insert(OnDiscardReady_S);
+		waiter.Start();
+	}
+
+	protected void OnDiscardReady_S(Managed context)
+	{
+		PersistenceSystem persistence = PersistenceSystem.GetInstance();
+		if (persistence)
+			persistence.ClearStorage(PersistenceSessionStorage);
+
+		SaveGameManager saveManager = GetGame().GetSaveGameManager();
+		if (saveManager)
+			saveManager.Purge(SaveGameManager.GetCurrentMissionResource(), saveManager.GetCurrentPlaythroughNumber());
+
+		Print("[LL_Lobby] Session saves: snapshots discarded at debriefing", LogLevel.NORMAL);
+	}
+
+	// The game's own exit flow minus the menu: wait for an idle manager, request the shutdown
+	// save once, and skip it when the engine's own exit save already completed. Whether the
+	// engine waits for the save before the process exits is the quickstart's gate.
+	override void OnGameEnd()
+	{
+		super.OnGameEnd();
+
+		if (!Replication.IsServer() || !m_bSessionSaves || m_bStopSaveRequested)
+			return;
+		if (GetState() != SCR_EGameModeState.GAME)
+			return;
+
+		m_bStopSaveRequested = true;
+		m_bStopping = true;
+
+		LL_SaveWaiter waiter = new LL_SaveWaiter();
+		waiter.GetOnReady().Insert(OnStopSaveReady_S);
+		waiter.Start();
+	}
+
+	protected void OnStopSaveReady_S(Managed context)
+	{
+		if (m_bStopSaveDone)
+			return;
+
+		Print("[LL_Lobby] Stop: requesting the shutdown snapshot", LogLevel.NORMAL);
+		GetGame().GetSaveGameManager().RequestSavePoint(ESaveGameType.SHUTDOWN, string.Empty, ESaveGameRequestFlags.BLOCKING);
 	}
 
 	// What a resume cannot recover from, logged once by name: squads are re-attached by
