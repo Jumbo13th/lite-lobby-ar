@@ -836,11 +836,12 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		generation++;
 		m_mReconnectGeneration.Set(key, generation);
 
-		// The same window an ordinary disconnect gets; a value <= 0 holds the slot for good.
+		// Seated before the state reaches GAME, so the state-dependent window would be the
+		// slot-selection one; a resumed slot always gets the in-game window (<= 0 holds for good).
 		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
 		int reconnectTime = -1;
 		if (gameMode)
-			reconnectTime = gameMode.GetReconnectTime();
+			reconnectTime = gameMode.GetReconnectTimeAfterBriefing();
 		if (reconnectTime > 0)
 			GetGame().GetCallqueue().CallLater(ClearReconnectReservation, reconnectTime, false, key, generation);
 

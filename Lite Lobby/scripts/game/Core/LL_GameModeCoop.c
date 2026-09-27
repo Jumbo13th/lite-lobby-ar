@@ -159,6 +159,8 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		return m_iReconnectTime;
 	}
 
+	int GetReconnectTimeAfterBriefing()	{ return m_iReconnectTimeAfterBriefing; }
+
 	bool IsAdminMode()			{ return m_bAdminMode; }
 	int GetFreezeTimeDuration()	{ return m_iFreezeTime; }
 	float GetFreezeTimeRemaining() { return m_fFreezeTimeRemaining; }
