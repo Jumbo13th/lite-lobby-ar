@@ -15,13 +15,33 @@ plus the three once-set scalars this feature adds, listed under runtime state.
 The save cadence is not an attribute: it is the `autoSaveInterval` of the server
 configuration's `persistence` block (default 10 minutes).
 
+## Mission-maker attributes (deployment entity, category "Lite Lobby")
+
+Amendment of 2026-10-11. `LL_RandomDeploymentComponent` sits on a world entity the
+mission maker places once per deploying squad (prefab
+`Prefabs/Spawn/LL_RandomDeployment.et`). Nothing here is replicated or saved.
+
+| Field | Type | Default | Read by |
+|-------|------|---------|---------|
+| `m_sGroupEntityName` | string | empty | the start-time check, the draw, the body enumeration, the spawn-marker rule |
+| `m_aPointNames` | array of string | empty | the start-time check and the draw; each is the entity name of a spawn point, only its position is read; the addon's `Prefabs/Spawn/LL_SpawnPoint.et` is the entity to place, and any other named entity works too |
+| `m_bAtFreezeEnd` | bool | `1` | the game mode's two hooks and the spawn-marker rule; on = when freeze time ends, off = when the game phase starts |
+| `m_fHeight` | float, metres | `0` | the placement; added above the ground position for a body with a connected player; `0` = on the ground |
+| `m_fRadius` | float, metres | `10` | the positions; the dispersion radius around the drawn point |
+
+Validation at the start of the game phase, logged, never fatal (FR-035): a squad
+name that resolves to no squad makes the deployment inert; a point name that
+resolves to no entity is dropped; a deployment left with no point is inert; a point
+named by two deployments is reported and still used by both. An inert deployment
+leaves its squad at the placed position.
+
 ## Persistent states (server, written into the session save)
 
 ### `LL_SessionData` (serializer `LL_SessionSerializer`)
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `version` | int | `1` |
+| `version` | int | `2`; raised from `1` by the amendment of 2026-10-11, which appends `freezeEndDeployed` |
 | `state` | int | the lobby state at save time; only GAME is ever written |
 | `freezeRemaining` | float | seconds; 0 when the freeze had ended |
 | `hardFreezeRemaining` | float | the timed hard freeze's live remainder when one is running; the remainder a resume hold protects when a hold is active; 0 otherwise |
@@ -32,6 +52,7 @@ configuration's `persistence` block (default 10 minutes).
 | `stats` | `LL_StatsContinuation` | the recorder's continuation (session id, start stamp, winner, one-time flags, first-slot holders by identity key, players, events, zones, commanders); null when the recorder was not recording (amended 2026-09-19: replaces the per-snapshot statistics file) |
 | `squads` | array of squad records | one per squad with slots, see below |
 | `slots` | array of slot records | one per registered slot, see below |
+| `freezeEndDeployed` | bool | amendment of 2026-10-11, last field of the record: the end-of-freeze deployments have run in this game; restored so a resume neither repeats nor skips them |
 
 Squad record:
 
@@ -133,6 +154,18 @@ Server-only unless marked.
 | `LL_ZoneRestrictionComponent` (client) | countdown pause | the return countdown does not drain while the replicated hold flag is set |
 | `LL_TriggerComponent` | static server-side trigger list; `m_bRestored` | what `LL_TriggerSerializer` iterates; the flag that skips re-initialisation on the first activation after a load (only for triggers that had started) |
 | `LL_StatsManager` | first-slot holders by identity key (`map<string, string>`), identity resolution through the lobby's reconnect keys first | placeholders keep the saved identity's credit; the recorder is not restarted on a resume |
+
+### Random squad deployment (amendment of 2026-10-11)
+
+Server-only unless marked; nothing replicated.
+
+| Owner | Field | Purpose |
+|-------|-------|---------|
+| `LL_RandomDeploymentComponent` | static list of the world's deployments | what the game mode's hooks and the spawn-marker rule iterate; filled at component init on the server, flushed on a world change |
+| `LL_RandomDeploymentComponent` | the drawn point and whether it has been drawn | set once per game; read by the placement and, for a start-of-game deployment, by the game-phase spawn-marker snapshot |
+| `LL_RandomDeploymentComponent` | pending spawn transforms, keyed by placed body | filled before the game-start body loop for slots with a connected player, taken by `RespawnSlotCharacter_S`, dropped at the end of `OnEnterGame_S` |
+| `LL_GameModeCoop` | `m_bFreezeEndDeployed` | the end-of-freeze deployments have run; set on the first run, saved in the session record, never cleared within a game |
+| `LL_LobbyPlayerComponent` | `Deploy_S(vector)` and `RpcDo_OwnerDeploy(vector)` | **the one message added**: server to the moved player, once per end-of-freeze deployment; the owner leaves a vehicle seat if seated (bounded retry), then runs the game's own player teleport |
 
 ## Files written to disk
 

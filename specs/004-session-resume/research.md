@@ -739,3 +739,182 @@ Velocity of anything, towed and slung loads, small destructibles (no serializer 
 craters, debris, projectiles, ragdoll pose, the ownership of player-placed markers,
 AI and physics pause during the hold. The spec's edge cases state them; the plan
 does nothing about them.
+
+## R10. Random squad deployment (amendment of 2026-10-11)
+
+Read from `Arma-Reforger-Script-Diff` at 1.8.0.10 and from the addon's own scripts.
+Nothing here needed a spike: every engine call below has a caller in the game's
+scripts doing the same job.
+
+### R10.1 How a spawn point is linked to a squad
+
+- **Decision**: entity names. The deployment entity names its squad
+  (`m_sGroupEntityName`) and lists the entity names of its spawn points
+  (`m_aPointNames`); both are resolved with `FindEntityByName`.
+- **Rationale**: the operator's instruction was to follow the addon's own practice,
+  and the practice has no exception. Every link a mission maker sets today is an
+  entity name: a vehicle's squad (`LL_VehicleSquadLinkComponent.m_sGroupName`), a
+  trigger's squad (`LL_TriggerDefeatGroup.m_sGroupEntityName`), the squads a trigger
+  message is shown to (`LL_TriggerComponent.m_aMessageGroups`), a zone trigger's
+  shape and its flags (`LL_TriggerZoneBase`, `m_aFlagNames`), a destroy trigger's
+  targets, the map links in a mission description, and the squad names of the
+  session record (FR-021). Thirteen call sites of `FindEntityByName`; no script in
+  the addon reads an entity's hierarchy children.
+- **Alternatives considered**: points as hierarchy children of the deployment
+  entity (no names to type and a point can have one parent only, but an idiom the
+  addon has never used); the settings on the squad itself (every mission maker
+  would need a prefab override or a per-instance component); the settings on each
+  point (one fact in several places).
+
+### R10.2 Moving a body nobody controls
+
+- **Decision**: `SCR_EditableEntityComponent.SetTransform(transform)` on the server,
+  `changedByUser` left false.
+- **Facts**: for a `ChimeraCharacter` it sends `SetTransformOwner`, an owner RPC
+  ("Execute on owner, even server doesn't have the authority to do so"); an owner
+  RPC called on the authority runs locally when the authority is the owner (the
+  replication documentation's receiver table). `SetTransformOwner` is
+  `BaseGameEntity.Teleport` plus zeroed velocities, and deliberately no `Update()`
+  ("it would make characters fall through ground"). `SetTransform` then calls
+  `ForceNodeMovement` on the body's replication component so the scheduler learns
+  of the jump. With `changedByUser` false there is no bounds check and the entity
+  is not marked for the editor's own bookkeeping.
+- **Rationale**: it is what a Game Master's move of an AI character runs.
+- **Alternatives considered**: a bare `BaseGameEntity.Teleport` (omits the
+  scheduler call); `SCR_Global.TeleportPlayer` (needs a player).
+
+### R10.3 Moving a player's body
+
+- **Decision**: one owner message from the server; the owner calls
+  `SCR_Global.TeleportLocalPlayer(position)`.
+- **Facts**: `SCR_PlayersManagerEditorComponent.RPC_TeleportPlayerToPositionServer`
+  does exactly this for a player on foot ("Player not attached to anything, execute
+  where the player is local": `Rpc(TeleportPlayerToPositionOwner, …)`).
+  `SCR_Global.TeleportPlayer` refuses a position outside the terrain bounds;
+  `IsPositionWithinTerrainBounds` accepts any height on or above the surface, so a
+  position in the air passes. It then teleports and zeroes the velocities; the
+  default reason shows no notification. One line matters: "When in a vehicle,
+  teleport the vehicle instead" (R10.4).
+- **Rationale**: the game's own player teleport, one vector to one player.
+- **Alternatives considered**: `SetTransform` for players as well (its owner RPC
+  would move a player on foot with no message of the addon's, but it has no answer
+  for a seated one, and two paths for players is one too many); a fresh body at the
+  point, as at the start of the game phase (rejected for the end of freeze: a fresh
+  body carries the prefab's loadout, and freeze time is when players re-arm).
+
+### R10.4 A member sitting in a vehicle
+
+- **Decision**: the owner leaves the seat with
+  `GetOutVehicle(EGetOutType.TELEPORT, -1, ECloseDoorAfterActions.INVALID, false)`,
+  checks `IsInCompartment()` again every half second, ten times at most, and
+  teleports once out. A seated body without a player gets the same call on the
+  server, then R10.2.
+- **Facts**: `SCR_TutorialGamemodeComponent.OnFastTravelFadeoutCompleted` is this
+  sequence: the teleporting get-out, "Call later for repeated attempt to finalize
+  Fast Travel, after player leaves the vehicle", then `Teleport`.
+  `SCR_DisembarkContextAction` makes the same call on the server for characters
+  without a player and skips players ("Ignore Players"), so a player's seat exit
+  belongs on the owner's machine. `GetOutVehicle_NoDoor(targetTransform, …)` exists
+  ("character is teleported to targetTransform"), but the game only ever passes it a
+  position beside the vehicle.
+- **Alternatives considered**: `GetOutVehicle_NoDoor` straight to the spawn point
+  (no caller with a distant target); leaving seated members where they are, or
+  moving the vehicle with them (both answered by the operator, spec session
+  2026-10-11).
+
+### R10.5 Start of the game phase: create the body at the point
+
+- **Decision**: the placed bodies are moved to their ground positions (R10.2), and
+  the existing replacement spawns each slotted player's fresh body at a pending
+  transform the deployment keeps for that placed body.
+- **Facts**: `OnEnterGame_S` already replaces every slotted, present player's
+  placed body with a fresh one, spawned at the placed body's transform
+  (`RespawnSlotCharacter_S`); the placed body is deleted at the hand-over.
+  `LL_ZoneRestrictionComponent` runs on each client for its own controlled entity:
+  a zone is lethal to leave only after that entity has been inside it
+  (`m_bHasEnteredZone`), and the state resets when the controlled entity changes.
+  A body created at the point has never been inside the zone around the placed
+  position.
+- **Rationale**: FR-029 holds by construction, with no message and no teleport
+  under a player. The pending transform is used, rather than reading the placed
+  body's transform back after its move, because nothing in the scripts states that
+  a teleport is visible to `GetWorldTransform` within the same frame.
+- **Alternatives considered**: teleporting each player after possession (the
+  freeze zone starts its countdown on them, and it needs a message per player).
+
+### R10.6 Positions around the point
+
+- **Decision**: per body, up to ten candidates from
+  `SCR_Math2D.GenerateRandomPointInRadius(0, radius, point)`, each settled by
+  `SCR_WorldTools.FindEmptyTerrainPosition(out position, candidate, 2)`, accepted
+  when at least 1.5 m from every position already given out; otherwise the last
+  candidate, logged.
+- **Facts**: `FindEmptyTerrainPosition` searches a hexagonal grid for a free
+  cylinder (0.5 m radius, 2 m high by default, entities and ocean traced), returns
+  the surface position, and returns false with the centre when it finds none. It
+  tests against what is in the world at the call; the other bodies of the same
+  deployment are not there yet, which is why the separation is the addon's own
+  check.
+- **Alternatives considered**: a fixed ring or formation (not a dispersion); no
+  clearance test (bodies inside walls and trunks).
+
+### R10.7 When the draw happens, and the spawn markers
+
+- **Facts**: `SetLobbyState` calls `SetGameModeState`, which calls
+  `OnGameStateChanged` at once, which invokes the state invoker, on which
+  `LL_SpawnMarkers` rebuilds and broadcasts its snapshot; only then does
+  `OnEnterState_S` reach `OnEnterGame_S`. A squad's marker is the mean position of
+  its slot entities at that moment, and the fresh bodies register some 600 ms
+  later.
+- **Decision**: start-of-game deployments draw before `SetGameModeState`; the
+  marker of such a squad uses the drawn point in the game-phase snapshot; a squad
+  with an end-of-freeze deployment is left out of both snapshots.
+- **Alternatives considered**: rebuilding the markers after the placement (a second
+  broadcast to every client, against SC-013).
+
+### R10.8 Once per game, and the resume
+
+- **Facts**: `AdjustFreezeTime_S` revives a lapsed freeze, and both
+  `EndFreezeTime_S` and the countdown reach `OnFreezeTimeEnded_S`, so that hook can
+  run more than once in a game. With a freeze time of zero the countdown is never
+  scheduled and the hook never runs. Saving is allowed only in the game phase and
+  only after the fresh-start entry has finished, so every start-of-game deployment
+  lies before any snapshot. `LL_SessionRecord` is written by field reflection.
+- **Decision**: `m_bFreezeEndDeployed` on the game mode, set when the
+  end-of-freeze deployments run, written to the session record as
+  `freezeEndDeployed` at the end of the record, record version 2.
+- **Alternatives considered**: deriving it from the saved freeze remainder (wrong
+  after a revived freeze).
+
+### R10.9 Outside the addon's knowledge
+
+- **The parachute.** No script of the game names one. The operator states that the
+  one a mission uses opens by itself when a body starts in mid-air; that is checked
+  on such a mission, not in the demo world, which has none. Under freeze
+  protection the hit-zone gate zeroes fall damage, which is collision damage
+  (`SCR_CharacterDamageManagerComponent`), so an air drop during freeze is not
+  lethal either way. The game's impact path can also force unconsciousness as
+  scripted damage, which the gate lets through; whether a long fall takes that
+  path is observed in Scenario 8, not assumed.
+- **Arrival at the end of freeze is not held.** The game's own player teleport
+  does not wait for the destination to stream in, and neither does this; the
+  spec adds no hold.
+- **Which entity types exist by name on a dedicated server** is not stated by the
+  scripts for every class, which is one reason the addon ships its own spawn point
+  (R10.10).
+
+### R10.10 The spawn point a mission maker places
+
+- **Decision**: the addon ships `Prefabs/Spawn/LL_SpawnPoint.et`, whose entity is
+  the game's `SCR_Position` with no component. A deployment still names its points
+  (R10.1), and any other named entity still works.
+- **Facts**: `SCR_Position` is a `GenericEntity` that, in Workbench only, draws a
+  sphere and an arrow at its position, and in the game does nothing but exist. The
+  game ships a prefab of that class (`Tutorial_FastTravel_Pos.et`), and its
+  tutorial finds such positions by entity name and teleports the player to them.
+- **Rationale**: the operator asked for a spawn point to place, as the addon ships
+  a flag pole for the flags a zone trigger names. A vanilla class gives the editor
+  marker for free, with no script of the addon's own.
+- **Alternatives considered**: a class of the addon's own with a coloured label
+  (a script for a cosmetic); a bare generic entity (nothing to see in the editor);
+  a prop (visible in the game).

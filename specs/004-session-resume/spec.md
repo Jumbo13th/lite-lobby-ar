@@ -8,6 +8,8 @@
 
 **Input**: User description: "Design a persistence system based on the Conflict persistence system. Focus on the state of the world (broken things, destroyed buildings), positions of characters, moving helicopters, vehicles, etc. Find the other edge cases too."
 
+**Amended**: 2026-10-11, random squad deployment added on the operator's request (User Story 5, FR-024 to FR-035). It shares this branch and its pull request with session resume, and nothing else.
+
 ## Current State
 
 A Lite Lobby event runs once. When the dedicated server dies mid-game, as it did on
@@ -51,6 +53,17 @@ The addon already has the half of a resume that the engine does not provide. A p
 who drops mid-game keeps their body in the world, their slot is held on their identity,
 and on return they are put straight back into the same body. A resume is that flow
 applied to everyone at once, after the world itself has been put back.
+
+Random squad deployment, added by the amendment of 2026-10-11, starts from a different
+gap. A squad begins the game exactly where the mission maker placed it, and each side
+sees its own squads' start positions on the briefing map. A mission built on not
+knowing where someone is (a downed aircrew to be found, a patrol scattered in the
+night, a squad dropped from the air) has no uncertainty unless somebody moves those
+players by hand once the game runs. The addon already owns the two moments a
+deployment can hang on: the start of the game phase, when every slotted player is
+given a fresh body where the placed one stood, and the end of freeze time. The game
+has no parachute; a mission that drops a squad from the air equips it with one of its
+own choosing.
 
 ## Clarifications
 
@@ -345,6 +358,28 @@ and the specification goes to implementation.
   in the tasks: a public parking refresh on the voice manager, and the existing
   slot lookup on the playable component for the registration observation.
 
+### Session 2026-10-11 (amendment: random squad deployment)
+
+- Q: Where is random squad deployment specified? → A: in this specification, as an
+  amendment; it is delivered on this branch and in this pull request.
+- Q: How is a squad's random position chosen? → A: from spawn points the mission
+  maker places and links to the squad; the server draws one at random. A random
+  position inside an area is not part of the feature.
+- Q: Which bodies of the squad go to the drawn point? → A: the whole squad, spread
+  around the point rather than stacked on it.
+- Q: How does a squad dropped from the air survive? → A: the mission equips it with
+  a parachute that opens by itself when a body starts in mid-air. The addon only
+  sets the height.
+- Q: Does a squad with random deployment keep its squad spawn marker? → A: a squad
+  that deploys at the end of freeze has no spawn marker at all (revised the same
+  day; the first answer kept it on the placed position). A squad that deploys at
+  the start of freeze keeps its marker like any other squad.
+- Q: What happens to a member sitting in a vehicle at an end-of-freeze deployment?
+  → A: taken out of the seat and deployed with the squad; the vehicle stays.
+- Q: Does the mission-maker guide change? → A: not in this change.
+- Q: Does the addon give the mission maker a spawn point to place? → A: yes, a
+  prefab of its own, as it does for the flags of a zone trigger.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The game continues where it stopped (Priority: P1)
@@ -552,6 +587,61 @@ disconnect reasons from the server log.
 
 ---
 
+### User Story 5 - A squad starts where nobody can predict (Priority: P3)
+
+A mission maker builds a search mission: an aircrew has gone down somewhere in a
+wide area, one side must find and extract it, the other must get there first, and a
+squad of paratroopers is dropped over the area to help. The maker places a handful
+of spawn points for the aircrew and another handful for the paratroopers, links each
+set to its squad, and sets when the squad goes there (as freeze time starts or as it
+ends) and whether it arrives on the ground or in the air at a given height. In every
+game the server draws one point per squad. The aircrew spends freeze time at its
+placed position and, the moment freeze ends, stands scattered around a point neither
+side could have known. The paratroopers appear in the air above theirs and come down
+under their own parachutes.
+
+**Why this priority**: it replaces moving players by hand during a running game,
+which is the only way to run such a mission today. It is independent of session
+resume and blocks nothing else.
+
+**Independent Test**: in the demo world, link three spawn points to a named squad,
+start the game several times and read where the squad stands after the configured
+moment and which point the server log names.
+
+**Acceptance Scenarios**:
+
+1. **Given** a squad linked to several spawn points and set to deploy at the end of
+   freeze, **When** freeze time ends, **Then** every living body of the squad is
+   within the configured dispersion radius of one of those points, the same point
+   for the whole squad, standing on the ground with no two bodies overlapping, and
+   until that moment the squad was at its placed position under the normal freeze
+   rules.
+2. **Given** a squad set to deploy at the start of freeze, **When** the game phase
+   begins, **Then** its players control bodies that are already at the drawn point,
+   and no freeze zone around the squad's placed position treats them as having left
+   it.
+3. **Given** a squad set to deploy in the air at a height, **When** the deployment
+   happens, **Then** every body with a connected player is at that height above the
+   ground over its own spread position, and every body without one is on the ground
+   under the point.
+4. **Given** the same mission started ten times, **When** the drawn points are
+   compared, **Then** the squad did not arrive at the same point every time, and the
+   server log names the squad, the point and the number of bodies deployed each
+   time.
+5. **Given** a deployed squad, **When** a player reconnects into one of its slots or
+   takes a free one, **Then** they are in that slot's body where it now stands, not
+   at the squad's placed position.
+6. **Given** an end-of-freeze deployment and a member sitting in a vehicle, **When**
+   freeze ends, **Then** the member is out of the seat and with the squad, and the
+   vehicle is where it was.
+7. **Given** a mission with no spawn points, **When** it is played, **Then** nothing
+   about it differs from before the amendment.
+8. **Given** a squad with an end-of-freeze deployment, **When** any player or
+   spectator opens the briefing map or the game map, **Then** that squad has no
+   spawn marker, while the other squads of its side have theirs.
+
+---
+
 ### Edge Cases
 
 Motion and vehicles:
@@ -736,6 +826,49 @@ Saving and starting:
   save as the rest of it, so they never describe a later moment than the world and
   no file can go missing.
 
+Random deployment:
+
+- **Freeze ended early, extended or revived.** An end-of-freeze deployment happens
+  when the freeze actually ends, by its countdown or by an admin, and once per game:
+  a freeze an admin revives after it ended deploys nobody when it ends again.
+- **A mission with no freeze time** deploys its end-of-freeze squads at the start of
+  the game phase.
+- **Freeze ended by an admin during a hard freeze.** The squads deploy at that
+  moment; controls stay held and nothing takes damage until the hard freeze ends.
+- **An air drop while freeze protection is on** (a start-of-freeze deployment in a
+  mission that forbids damage during freeze) is protected from the fall like from
+  any other damage during freeze; the feature adds no protection of its own. Every
+  other air drop relies on the mission's parachute.
+- **A member with no parachute in an air drop** falls and dies once damage is on.
+  The addon does not check equipment.
+- **A member who died before the deployment** is not moved; the slot stays KIA.
+- **Bodies without a player** (a free slot, or a slot held for a disconnected
+  player) go with the squad and are always put on the ground, also in an air drop,
+  so whoever enters one later stands under the point.
+- **A player who takes a free slot of the squad during freeze**, before an
+  end-of-freeze deployment, is deployed with the squad.
+- **A squad whose free slots are removed at game start** deploys the bodies that
+  remain.
+- **A spawn point linked to a squad that does not exist, or a squad set to deploy
+  with no spawn point**, is logged at the start of the game phase; the squad stays
+  where it was placed.
+- **A spawn point on water, a roof, a slope or among trees** is the mission maker's
+  choice. The addon keeps the bodies apart and puts ground arrivals on the terrain
+  surface; it does not judge the place.
+- **The squad spawn marker.** A squad that deploys at the end of freeze has none, on
+  the briefing map or the game map, for anyone, and its name in the roster leads to
+  no position. A squad that deploys at the start of freeze has one like any squad:
+  its placed position on the briefing map, and where it stands when the game phase
+  begins on the game map.
+- **Live map markers a mission enables** (squad-leader markers, trackers) keep
+  working as configured; whether a deployed squad is visible to its own side on the
+  map is the mission's setting, not this feature's.
+- **A resume from a snapshot taken after a deployment** restores every body where
+  the snapshot has it and deploys nobody again.
+- **A resume from a snapshot taken during freeze, before an end-of-freeze
+  deployment**, deploys the squad once, when the freeze ends after the release. The
+  point is drawn then; nothing about a pending draw is saved.
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
@@ -858,6 +991,54 @@ Saving and starting:
   replaced by the instruction to leave them and to set the systems config, in both
   languages, as part of this feature.
 
+- **FR-024**: A mission maker MUST be able to give a squad random deployment by
+  placing spawn points in the world and linking them to the squad, any number of
+  points per squad, each point serving one squad. A squad with no spawn point, and
+  a mission with none, MUST behave as before the amendment, whatever the
+  session-saves setting.
+- **FR-025**: Per squad, the mission maker MUST be able to set the moment of the
+  deployment (the start of freeze time, which is the start of the game phase, or
+  the end of freeze time), the height above the ground at which bodies arrive
+  (none means on the ground) and the dispersion radius around the point.
+- **FR-026**: At the configured moment the server MUST draw one of the squad's spawn
+  points at random, each with the same chance, once per squad and once per game.
+  The choice MUST be the server's alone and MUST NOT be known to any client before
+  the squad is there.
+- **FR-027**: A deployment MUST place every living body of the squad, with or
+  without a player, within the dispersion radius of the drawn point, with no two
+  bodies overlapping. A body arriving on the ground MUST stand on the terrain
+  surface. The squad MUST remain the same squad: its roster rows, callsign, radio
+  net, statistics and the triggers that name it are unaffected.
+- **FR-028**: With a height set, every body with a connected player MUST arrive at
+  that height above the ground over its own spread position, and every body without
+  one MUST arrive on the ground. The addon MUST NOT provide, open or require a
+  parachute and MUST NOT slow the fall.
+- **FR-029**: A squad with an end-of-freeze deployment MUST spend freeze time at its
+  placed position under the normal freeze rules. A start-of-freeze deployment MUST
+  have the squad at the drawn point from the first moment its players control
+  bodies, and MUST NOT cause a freeze zone to count any member as having left it.
+- **FR-030**: At an end-of-freeze deployment a member seated in a vehicle MUST be
+  taken out of the seat and deployed with the squad; the vehicle MUST stay where it
+  is.
+- **FR-031**: A player who reconnects into, or takes, a slot of a deployed squad
+  MUST get that slot's body where it stands.
+- **FR-032**: A squad with an end-of-freeze deployment MUST have no squad spawn
+  marker on any map, for any player or spectator, from briefing on; the marker MUST
+  be left out by the server, not hidden on the client. A squad with a
+  start-of-freeze deployment MUST keep its marker as any other squad does.
+- **FR-033**: A resumed game MUST NOT deploy a squad that had deployed before the
+  snapshot, and MUST deploy a squad whose end-of-freeze deployment was still ahead
+  exactly once, when the freeze ends in the resumed game.
+- **FR-034**: Random deployment MUST add no replicated property, no replicated
+  collection and no join-in-progress payload; FR-015's count of scalars stands. The
+  draw and every placement are decided on the server. If moving a player's body
+  needs a message to that player's machine, it is one message per deployment to
+  that player only, never a broadcast and never repeated.
+- **FR-035**: The server log MUST name the squad, the drawn point and the number of
+  bodies placed for every deployment, and at the start of the game phase MUST name
+  every spawn point whose squad does not exist and every squad set to deploy with
+  no spawn point; such a squad MUST stay at its placed position.
+
 ### Key Entities
 
 - **Snapshot**: one complete save point of the world, the addon's game state and the
@@ -876,6 +1057,12 @@ Saving and starting:
   computed on each client from the held clock.
 - **Resume choice**: made outside the game by whoever restarts the server: none (fresh
   start), newest snapshot, or a named snapshot.
+
+- **Spawn point**: a position the mission maker places in the world and links to one
+  squad; a candidate for that squad's deployment.
+- **Deployment**: the one-time move of a whole squad to a spawn point drawn by the
+  server, at the start or at the end of freeze time, on the ground or at a height,
+  spread within a radius; its moment, height and radius are set per squad.
 
 ## Success Criteria *(mandatory)*
 
@@ -916,6 +1103,23 @@ Saving and starting:
 - **SC-007**: A plain restart of a mission with snapshots comes up at slot selection;
   a restart with the resume parameter comes up held in the game phase; one check each.
 
+- **SC-010**: In the demo world, over ten starts of a mission whose squad is linked
+  to three spawn points, the squad arrives at one of its points every time and at
+  more than one point overall; in every start no member is further from the drawn
+  point than the dispersion radius, no two members overlap, and the server log names
+  the point.
+- **SC-011**: In the demo world, a squad set to deploy in the air at the end of
+  freeze has every member with a player at the set height above the ground, within
+  five metres, at the moment freeze ends, and every member whose equipment includes
+  a self-opening parachute lands alive; a member seated in a vehicle at that moment
+  is among them and the vehicle has not moved.
+- **SC-012**: In the demo world with session saves on, a resume from a snapshot
+  taken after a deployment has every member within one metre of its saved position
+  and deploys nobody, and a resume from a snapshot taken during freeze deploys the
+  squad once when the freeze ends; one check each.
+- **SC-013**: SC-006 holds for a mission with random deployment configured: no
+  traffic is added for players outside a deploying squad.
+
 ## Assumptions
 
 - The mission maker opts in per mission; the addon ships with saves off because a
@@ -949,3 +1153,17 @@ Saving and starting:
   sure its configuration includes them.
 - Snapshots belong to the server profile that wrote them; sharing them between
   machines is out of scope.
+- Random deployment draws from placed points only; the mission maker answers for
+  each point being a place a squad can stand or land.
+- The addon has no parachute and the game has none; an air drop is survivable
+  because the mission gives the squad a parachute that opens by itself from a
+  mid-air start (operator, 2026-10-11).
+- A spawn point serves one squad; two squads that should arrive together are not a
+  case this feature covers.
+- Players are not told at the moment of a deployment; the mission's briefing is
+  where they learn of it.
+- Placing the deployment and its spawn points in the demo world is Workbench work
+  for the operator. The deployment prefab and the spawn-point prefab were written
+  by the agent on the operator's word of 2026-10-11, an exception for those two
+  files.
+- The mission-maker guide is not changed by the amendment (operator, 2026-10-11).

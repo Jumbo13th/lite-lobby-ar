@@ -311,3 +311,63 @@ the twice-absent holder is put back after the second resume.
 8. Seat a character in a vehicle a Game Master then deletes before the snapshot;
    resume. Expected (unverified): the character is on the ground at the vehicle's
    last position; record the outcome.
+
+## Scenario 8: random squad deployment (US5, FR-024 to FR-035, SC-010 to SC-013)
+
+Amendment of 2026-10-11. Demo world, dedicated server, two clients, one of them
+admin. Session saves are needed for step 9 only.
+
+Setup in Workbench (plan, operator steps 7 and 8):
+
+- Two squads with entity names, called squad A and squad B below, each inside a
+  freeze zone, a car beside squad A.
+- Six `LL_SpawnPoint` entities, each with an entity name, three per squad, at
+  least 300 m from the squads and from each other.
+- Deployment A: squad A, its three points, end of freeze on, height 0, radius 10.
+- Deployment B: squad B, its three points, end of freeze off, height 150,
+  radius 30.
+- Game mode: freeze time two minutes or more, freeze protection on, the opening
+  hard freeze on.
+
+1. **Briefing map** (FR-032). Both clients slotted, client 1 in squad A, client 2 in
+   squad B. At briefing: squad A has no spawn marker for either client; squad B and
+   every other squad have theirs at the placed positions.
+2. **Start of the game phase, in the air** (FR-026, FR-028, FR-029). Start the game.
+   Expected in the log: no deployment warning, and one line naming squad B, the
+   drawn point, the bodies placed and the height. Client 2 takes control in the air
+   above that point and falls through the opening hard freeze; no zone warning
+   appears for it. The bodies of squad B nobody holds stand on the ground under the
+   point (Game Master camera). The game map shows squad B's spawn marker at the
+   drawn point and still none for squad A. Record how client 2 lands: unharmed,
+   unconscious or dead (research R10.9).
+3. **End of freeze, on the ground** (FR-027, FR-029). Client 1 spends the freeze at
+   the placed position, confined by its freeze zone as before. End the freeze with
+   `/endfreeze`. Expected: one log line naming squad A, the drawn point and the
+   bodies placed; client 1 stands on the ground within 10 m of that point; the other
+   bodies of squad A stand around it, none overlapping another, none inside an
+   object.
+4. **In a seat** (FR-030). New game; client 1 sits in the car when the freeze ends.
+   Expected: client 1 is out of the car at the drawn point; the car has not moved.
+5. **Late entry** (FR-031). After step 3, move client 2 into a free slot of squad A
+   and reconnect client 1. Expected: both are at the drawn point, not at the placed
+   position.
+6. **Once per game.** After the freeze has ended, revive it with `/freeze 60` and
+   let it end. Expected: no second deployment line, nobody moved.
+7. **Variation** (SC-010). Ten starts. Expected: the log names one of the squad's
+   own points every time and more than one point over the ten.
+8. **Misconfiguration** (FR-035). Point deployment A at a squad name that does not
+   exist, add a point name that does not exist to deployment B, place a third
+   deployment with no point, and name one point in two deployments. Expected: one
+   log line each at the start of the game phase; squad A stays at its placed
+   position; squad B deploys to one of its three real points.
+9. **Resume** (FR-033, SC-012; session saves on). Take a snapshot with `/snapshot`
+   after squad A has deployed, kill the server, resume. Expected: every member
+   within a metre of its saved position, no deployment line, nothing moves at the
+   release. Then a fresh game: snapshot during the freeze, kill, resume, release
+   the hold, end the freeze. Expected: squad A deploys once.
+10. **No freeze time.** Set the freeze time to zero. Expected: squad A is at a drawn
+    point from the first moment, with its log line at the start of the game phase.
+
+Outside the demo world, on a mission whose squad carries a parachute that opens by
+itself: an end-of-freeze deployment at a height. Expected: every member with a
+player lands alive (SC-011). Record the height used and the result.

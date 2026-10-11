@@ -132,6 +132,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 	protected bool m_bFreezeTimerScheduled;
 
+	// Server, saved: the end-of-freeze squad deployments have run. The admin adjustment can
+	// revive a lapsed freeze, and its second end must not deploy anyone again.
+	protected bool m_bFreezeEndDeployed;
+
 	// Server: the aircraft held in the air and the damage effects paused during a hard freeze.
 	protected ref LL_VehicleHold m_VehicleHold = new LL_VehicleHold();
 	protected ref LL_DamagePause m_DamagePause = new LL_DamagePause();
@@ -166,6 +170,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	float GetFreezeTimeRemaining() { return m_fFreezeTimeRemaining; }
 	bool ForbidShootingDuringFreeze() { return m_bForbidShootingDuringFreeze; }
 	bool IsSessionSavesEnabled()	{ return m_bSessionSaves; }
+	bool HasFreezeEndDeployed()	{ return m_bFreezeEndDeployed; }
 
 	// The countdown reads > 0 only during the post-start freeze.
 	bool IsFreezeSafetyActive()
@@ -365,6 +370,11 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			typename.EnumToString(SCR_EGameModeState, oldState),
 			typename.EnumToString(SCR_EGameModeState, newState)), LogLevel.NORMAL);
 
+		// Before the state turns: the change itself triggers the spawn-marker snapshot, which
+		// reads the points drawn for the squads that deploy as the game starts.
+		if (newState == SCR_EGameModeState.GAME)
+			LL_RandomDeploymentComponent.DrawStart_S(m_iFreezeTime <= 0);
+
 		// SetGameModeState is a modded addition; m_eGameState is private in vanilla.
 		SetGameModeState(newState);
 
@@ -422,6 +432,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_fGameStartTimestamp = System.GetTickCount();
 		m_fFreezeTimeRemaining = m_iFreezeTime / 1000.0;
 
+		// A mission with no freeze time has no freeze end; its end-of-freeze squads deploy now.
+		m_bFreezeEndDeployed = m_iFreezeTime <= 0;
+
 		Replication.BumpMe();
 
 		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
@@ -429,6 +442,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		{
 			// Before possession so each body's squad radio can be tuned as players enter.
 			mgr.AssignSquadFrequencies_S();
+
+			// Before the body loop: each fresh body is created where its squad deploys.
+			LL_RandomDeploymentComponent.CheckAll_S();
+			LL_RandomDeploymentComponent.PlaceStart_S(m_iFreezeTime <= 0);
 
 			// Every slotted, present player enters a fresh runtime body (see PossessSlot_S).
 			// A disconnected-but-reserved holder has no controller to receive one; the
@@ -448,6 +465,8 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 			foreach (int slotRplId : toSpawn)
 				mgr.RespawnSlotCharacter_S(slotRplId, true);
+
+			LL_RandomDeploymentComponent.ClearPending_S();
 
 			Print(string.Format("[LL_Lobby] GAME start: spawned %1 bodies", toSpawn.Count()), LogLevel.NORMAL);
 
@@ -549,6 +568,12 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	{
 		Print("[LL_Lobby] Freeze time ended", LogLevel.NORMAL);
 		RemoveVanillaRestrictionZones_S();
+
+		if (!m_bFreezeEndDeployed)
+		{
+			m_bFreezeEndDeployed = true;
+			LL_RandomDeploymentComponent.PlaceFreezeEnd_S();
+		}
 	}
 
 	// Stock editor restriction zones (SCR_EditorRestrictionZoneEntity) stop confining once
@@ -1361,6 +1386,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_fFreezeTimeRemaining = record.freezeRemaining;
 		m_fPreHoldHardFreezeRemaining = record.hardFreezeRemaining;
 		m_bPreHoldDayAdvance = record.dayAdvance;
+		m_bFreezeEndDeployed = record.freezeEndDeployed;
 
 		if (record.missionEndDuration > 0)
 			SetMissionEndDuration_S(record.missionEndDuration);

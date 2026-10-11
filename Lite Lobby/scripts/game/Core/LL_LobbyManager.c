@@ -1087,6 +1087,9 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		EntitySpawnParams params = new EntitySpawnParams();
 		oldBody.GetWorldTransform(params.Transform);
 
+		// A squad that deploys as the game starts gets its fresh bodies at the drawn point.
+		LL_RandomDeploymentComponent.TakeSpawnTransform_S(oldBody, params.Transform);
+
 		IEntity newBody = GetGame().SpawnEntityPrefab(resource, GetGame().GetWorld(), params);
 		if (!newBody)
 		{

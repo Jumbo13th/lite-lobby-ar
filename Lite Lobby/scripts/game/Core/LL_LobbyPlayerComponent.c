@@ -942,6 +942,53 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			GetGame().GetCallqueue().CallLater(ApplySquadRadioFrequency, 250, false, frequency, attempt + 1);
 	}
 
+	// Random squad deployment. The game moves a player's character on the machine that owns
+	// it, so the server only sends the position.
+
+	void Deploy_S(vector position)
+	{
+		// Rpc never runs on the sender.
+		if (GetGame().GetPlayerController() == GetOwner())
+			ApplyDeploy(position, 0);
+		else
+			Rpc(RpcDo_OwnerDeploy, position);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_OwnerDeploy(vector position)
+	{
+		ApplyDeploy(position, 0);
+	}
+
+	// Owner-side. A seated character leaves its seat first and is checked again: the game's
+	// player teleport moves the vehicle of a character that is still inside one.
+	protected void ApplyDeploy(vector position, int attempt)
+	{
+		PlayerController pc = PlayerController.Cast(GetOwner());
+		if (!pc)
+			return;
+
+		ChimeraCharacter character = ChimeraCharacter.Cast(pc.GetControlledEntity());
+		if (!character || !LL_TriggerComponent.IsCharacterAlive(character))
+			return;
+
+		CompartmentAccessComponent access = character.GetCompartmentAccessComponent();
+		if (access && access.IsInCompartment())
+		{
+			if (attempt >= 10)
+			{
+				Print("[LL_Lobby] Deployment: could not leave the vehicle seat, not moved", LogLevel.WARNING);
+				return;
+			}
+
+			access.GetOutVehicle(EGetOutType.TELEPORT, -1, ECloseDoorAfterActions.INVALID, false);
+			GetGame().GetCallqueue().CallLater(ApplyDeploy, 500, false, position, attempt + 1);
+			return;
+		}
+
+		SCR_Global.TeleportLocalPlayer(position);
+	}
+
 	// Faction-scoped channels are sealed to that faction; see CanPlayerJoinChannel.
 
 	void AskJoinVoNChannel(string channelKey)

@@ -4,6 +4,8 @@
 
 **Input**: Feature specification from `/specs/004-session-resume/spec.md`
 
+**Amended**: 2026-10-11, random squad deployment (spec User Story 5, FR-024 to FR-035): Design item 11, research R10, quickstart Scenario 8, the amendment tables below.
+
 ## Summary
 
 Build on the game's own session-save system (the persistence world system, the
@@ -23,6 +25,16 @@ nothing else. Two behaviours apply to every mission from now on: time stands sti
 during any hard freeze, and spectators see the mission-end countdown. A snapshot
 that cannot be resumed as a whole shuts the server down with a logged cause and
 purges nothing.
+
+The amendment of 2026-10-11 adds random squad deployment, which shares nothing with
+the above but two hooks and one saved flag. A world entity per deploying squad names
+the squad and its spawn points; the server draws one point and places the whole
+squad around it, at the start of the game phase or when freeze time ends, on the
+ground or at a height. Bodies nobody controls are moved by the game's own entity
+move; a player's body is moved on that player's machine, as the game's own player
+teleport does, through one owner message. At the start of the game phase no body is
+moved under a player at all: the fresh body every slotted player already receives
+is created at the point. No replicated value is added.
 
 ## Technical Context
 
@@ -44,6 +56,8 @@ purges nothing.
 
 **Scale/Scope**: about twelve new script files, edits to twelve existing ones, two `.conf` files, about ten localization keys, two guide pages, three operator steps (Workbench, server configuration, launch line), one deployment procedure recorded in the contract after measurement; two behaviours that apply to every mission, saves on or off: time stands still during any hard freeze, and spectators see the mission-end countdown
 
+**Amendment 2026-10-11 (random squad deployment)**: one new script file, edits to five existing ones, two new prefabs, the demo-world placement by the operator; no config file, no layout, no localization key, no guide page. Dependencies: `SCR_EditableEntityComponent.SetTransform`, `SCR_Global.TeleportPlayer`, `CompartmentAccessComponent.GetOutVehicle`, `SCR_WorldTools.FindEmptyTerrainPosition`, `SCR_Math2D.GenerateRandomPointInRadius`, the existing body replacement in `LL_LobbyManager`. One owner message and one saved bool are added. Tested in the demo world on a dedicated server (quickstart Scenario 8); the landing under a parachute is checked on a mission that has one, since the game and the demo world have none.
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -61,6 +75,22 @@ purges nothing.
 | User Interface | One HUD text change on the existing hard-freeze HUD (resume mode); the existing spectator clock widget shows the mission-end countdown when the mission has that timer (FR-023), no new layout. Chat replies and broadcasts through the existing admin message path. | PASS |
 | Localization | New keys `LL-Resume_*` in `ll_localization.st`, EN + RU, runtime tables regenerated. | PASS |
 | Testability | Every functional requirement has a quickstart scenario that fails when it is broken (Scenarios 0 to 7); the fault cases (interrupted save, addon change, missing record, missing statistics, hold snapshot, repeat resume) are Scenario 7 in the demo world. SC-001, SC-003 and SC-006 need 127 players and are acknowledged as event-server runs; a failed measurement stays failed until it passes or the operator changes the criterion. | PASS |
+
+Amendment 2026-10-11, random squad deployment (Design item 11):
+
+| Principle | Check | Result |
+|-----------|-------|--------|
+| I. Engine Fidelity | Every step is the game's: a body nobody controls is moved by `SCR_EditableEntityComponent.SetTransform` (the Game Master's entity move, which teleports where the body is owned and informs the replication scheduler); a player's body is moved on the owner's machine by `SCR_Global.TeleportPlayer`, reached by an owner message exactly as `SCR_PlayersManagerEditorComponent` reaches it; a seated player leaves the seat first with `GetOutVehicle(EGetOutType.TELEPORT, …)` and a retry, the sequence of `SCR_TutorialGamemodeComponent`'s fast travel, because the teleport would otherwise move the vehicle; a seated body without a player is taken out as `SCR_DisembarkContextAction` does; positions come from `SCR_Math2D.GenerateRandomPointInRadius` and `SCR_WorldTools.FindEmptyTerrainPosition`; a position above the surface passes `SCR_Global.IsPositionWithinTerrainBounds`. The fresh body at the start of the game phase is the addon's existing replacement with a different spawn transform. Nothing is spiked. | PASS |
+| II. Ask, Never Assume | Eight product answers from the operator are in the spec's session of 2026-10-11. The linking idiom was decided on the operator's instruction to follow the addon's own practice: every existing link is an entity name (R10). | PASS |
+| III. KISS | One component on a world entity, one static list, one owner message, one saved flag. No manager component, no moment enum (a checkbox), no spawn-point class or component of the addon's own (the prefab to place is the game's `SCR_Position`), no second body-replacement path. | PASS |
+| IV. YAGNI | Five attributes, each read. No random position inside an area, no per-point settings, no announcement, no parachute, no guide page, no admin command. | PASS |
+| V. Replication | Replicated values added: none. RPCs added: one, `RpcDo_OwnerDeploy(vector)` on `LL_LobbyPlayerComponent`, server to the moved player only, once per end-of-freeze deployment, one vector; visibility: that player. `RplSave`/`RplLoad`: unchanged. The spawn-marker broadcast carries fewer entries for a mission with an end-of-freeze deployment (the squad is left out on the server) and is not sent a second time. The draw is server-only; the component does nothing on a client. | PASS |
+| VI. Comments and Hygiene | `LL_RandomDeploymentComponent`, `LL_` prefix. WHY comments on: the pending spawn transform (a freeze zone counts a body that leaves), the once-per-game flag (a revived freeze), the owner-side execution, the draw before the state change. No other addon is named; the parachute is "the mission's". | PASS |
+| VII. Optional Integrations | Not an integration. A mission without the entity is unchanged. | PASS |
+| Engine and Asset Constraints | Two new prefabs: `LL_RandomDeployment.et` (a generic entity with the component, like the trigger prefabs) and `LL_SpawnPoint.et` (the game's `SCR_Position` with nothing on it, asked for by the operator so a mission maker has a spawn point to place, as the addon ships a flag pole for zone flags). The operator waived the Workbench-only rule for these two files on 2026-10-11, so the agent wrote them and their `.meta` files by hand with fresh ids; the operator opens them in Workbench and confirms the GUIDs. No existing `.et` is touched and no script references the new GUIDs. Demo-world entities placed by the operator. | PASS on the operator's waiver |
+| User Interface | None. | PASS |
+| Localization | None: no user-visible string; attribute descriptions are not localized. | PASS |
+| Testability | Scenario 8 runs in the demo world on a dedicated server and fails on every broken requirement. One check cannot run there: the landing under a parachute (SC-011's last clause), because neither the game nor the demo world has one; it runs on a mission that equips it. The air placement itself (who is in the air, at what height, who is on the ground) is checked in the demo world. | PASS with one check outside the demo world |
 
 **Workbench steps for the operator** (also in [contracts/config-files.md](contracts/config-files.md)):
 
@@ -82,6 +112,16 @@ purges nothing.
    the contract: entrypoint, stop signal, profile mount, how the resume parameter is
    added for one start and removed, how a snapshot UUID is found, and the stop
    budget with margin.
+7. Amendment 2026-10-11: open `Prefabs/Spawn/LL_RandomDeployment.et` (a generic
+   entity carrying `LL_RandomDeploymentComponent` and nothing else) and
+   `Prefabs/Spawn/LL_SpawnPoint.et` (the game's `SCR_Position`), both written by
+   the agent on the operator's waiver for these files; confirm they load and that
+   Workbench kept the GUIDs of their `.meta` files. No script references either
+   prefab, so moving them to another folder breaks nothing.
+8. Amendment 2026-10-11: in the demo world, give two squads an entity name if they
+   have none, place six `LL_SpawnPoint` entities and name them (three per squad),
+   place two `LL_RandomDeployment` entities with the attributes of quickstart
+   Scenario 8, and put a car next to the first squad's placed position.
 
 ## Project Structure
 
@@ -142,6 +182,22 @@ Lite Lobby/
         ├── LL_M_SCR_HitZone.c                         # damage gate also checks the hard freeze (the hold)
         ├── LL_M_SCR_MapMarkerSyncComponent.c          # server marker gate also checks the hard freeze
         └── LL_M_VehicleControllerComponent.c          # new: OnBeforeEngineStart refuses during the hold
+```
+
+Amendment 2026-10-11, random squad deployment:
+
+```text
+Lite Lobby/
+├── Prefabs/Spawn/LL_RandomDeployment.et         # new: generic entity + the component (hand-written on the operator's waiver)
+├── Prefabs/Spawn/LL_SpawnPoint.et               # new: the game's SCR_Position, the spawn point a mission maker places and names
+└── scripts/game/
+    ├── Core/
+    │   ├── LL_RandomDeploymentComponent.c       # new: attributes, server-side list, draw, positions, placement, start-time log
+    │   ├── LL_GameModeCoop.c                    # draw before the state turns GAME, placement before the body loop, end-of-freeze run behind a once-per-game flag, the flag's getter and restore
+    │   ├── LL_LobbyManager.c                    # the body replacement takes a pending spawn transform when one is waiting
+    │   └── LL_LobbyPlayerComponent.c            # one owner message: leave the seat if seated, then the game's own player teleport
+    ├── Markers/LL_SpawnMarkers.c                # no marker for an end-of-freeze squad; the drawn point for a start-of-game squad
+    └── Persistence/LL_SessionData.c             # freezeEndDeployed, record version 2
 ```
 
 **Structure Decision**: persistence code gets its own `Persistence/` folder because
@@ -289,6 +345,81 @@ crew-lock gate rather than a new user action.
    a dedicated server with an ownership transfer, before the rest of the hold is
    built on it.
 
+11. **Random squad deployment** (amendment of 2026-10-11; FR-024 to FR-035;
+    research R10).
+    - **Authoring.** One world entity per deploying squad carries
+      `LL_RandomDeploymentComponent` with five attributes
+      ([data-model.md](data-model.md)): the squad's entity name, the entity names
+      of its spawn points, the moment (a checkbox: end of freeze, on by default;
+      off is the start of the game phase), the height and the dispersion radius.
+      A link is an entity name resolved with `FindEntityByName`, as every link in
+      the addon is. A spawn point is any named entity; only its position is read. The addon
+      ships `LL_SpawnPoint.et` to place, as it ships a flag pole for zone flags:
+      the game's `SCR_Position`, which draws a sphere and an arrow in the World
+      Editor and does nothing in the game.
+      The component registers in a static server-side list that is flushed on a
+      world change, the trigger list's pattern, carries no replication and does
+      nothing on a client.
+    - **Draw.** `Math.RandomInt` over the points that resolved, on the server.
+      Start-of-game deployments draw in `SetLobbyState` before the state turns
+      GAME, because the state change itself triggers the spawn-marker snapshot,
+      which must already know the point. End-of-freeze deployments draw in
+      `OnFreezeTimeEnded_S`. A mission with no freeze time never reaches that
+      hook, so its end-of-freeze deployments are drawn and placed with the
+      start-of-game ones.
+    - **Positions.** One ground position per living slot body of the squad (the
+      slots whose group id is the squad's, the enumeration the spawn markers
+      use): up to ten tries of `SCR_Math2D.GenerateRandomPointInRadius` inside
+      the radius, each settled by `SCR_WorldTools.FindEmptyTerrainPosition`
+      within two metres, accepted when at least 1.5 m from every position already
+      given out; when no try passes, the last candidate is used and logged. A
+      body with a connected player gets the height added; a body without one
+      stays on the ground.
+    - **Start of the game phase** (FR-029). In `OnEnterGame_S`, before its body
+      loop, every placed body of the squad is moved to its ground position with
+      `SCR_EditableEntityComponent.SetTransform`, which runs the teleport where
+      the body is owned, here the server, and informs the replication scheduler.
+      For each slot with a connected player the component also keeps a pending
+      spawn transform keyed by the placed body, the ground position plus the
+      height; `RespawnSlotCharacter_S` takes it in place of the placed body's
+      transform. The fresh body is therefore created at the point, on the ground
+      or in the air, and its player never stood in a freeze zone around the
+      placed position. The pending transforms are dropped at the end of
+      `OnEnterGame_S`. A slot nobody holds, or one held for a disconnected
+      player, keeps its placed body at the ground position; whoever enters it
+      later gets a fresh body there through the unchanged possession path
+      (FR-031).
+    - **End of freeze** (FR-029, FR-030). `OnFreezeTimeEnded_S` runs the
+      end-of-freeze deployments once per game behind `m_bFreezeEndDeployed`; a
+      freeze the admin adjustment revives cannot clear it. A body a connected
+      player controls is moved on that player's machine:
+      `LL_LobbyPlayerComponent.Deploy_S(position)` sends one owner message and
+      the owner calls `SCR_Global.TeleportLocalPlayer`. When the owner's
+      character sits in a vehicle, the owner first leaves the seat with
+      `GetOutVehicle(EGetOutType.TELEPORT, …)` and checks again every half
+      second, ten times at most, because the teleport of a seated player moves
+      the vehicle. A body without a connected player is server-owned: seated, it
+      is taken out the same way on the server; then it is moved with
+      `SetTransform`. A get-out that never completes is logged and that body
+      stays where it is.
+    - **Spawn markers** (FR-032). `BuildSquadMarkers_S` leaves out a squad with
+      an end-of-freeze deployment in both of its snapshots, so the marker is
+      never sent. For a squad with a start-of-game deployment the game-phase
+      snapshot uses the drawn point, because the bodies are replaced after the
+      snapshot is taken.
+    - **Resume** (FR-033). `m_bFreezeEndDeployed` is written into the session
+      record (`freezeEndDeployed`, record version 2) and restored by
+      `CompleteResume_S`. A resume never runs `OnEnterGame_S`, so nothing is
+      drawn or placed by the resume itself; a deployment still ahead runs when
+      the restored freeze ends after the release.
+    - **Log** (FR-035). At the start of the game phase, one line per deployment
+      whose squad name resolves to no squad, per point name that resolves to no
+      entity, per deployment left with no point, and per point named by two
+      deployments. Per deployment run: the squad, the drawn point, the bodies
+      placed and the height.
+    - **Not built**: a parachute or any fall control, a message to players, a
+      guide page, a random position inside an area, settings per point.
+
 ## Constitution Check (post-design)
 
 Re-run after the five external reviews of 2026-09-18 and 2026-09-19 (the fifth: "ready with the listed corrections", all recorded): three
@@ -298,6 +429,12 @@ parameter listed for the operator, vanilla patterns named per mechanism, one spi
 that returns to the operator on failure, the reviews' operator questions answered
 in the spec's second and third clarification sessions. PASS on the documents; the
 dedicated-server gates in the quickstart remain open until run.
+
+Amendment 2026-10-11, re-run after Design item 11: no replicated value, one owner
+message to the moved player, one saved bool with a version bump, two new
+prefabs, a vanilla source named for every engine call, no spike. PASS on the
+documents; Scenario 8 on a dedicated server is the open gate, and the parachute
+landing stays open until it is run on a mission that has one.
 
 ## Complexity Tracking
 

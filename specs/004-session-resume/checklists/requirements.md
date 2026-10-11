@@ -35,3 +35,7 @@
   Clarifications section; the spec is ready for `/speckit-plan`.
 - The planning phase must first establish how a dedicated server selects a save to
   continue from, since the game scripts do not show it.
+- Amendment of 2026-10-11 (random squad deployment: User Story 5, FR-024 to FR-035,
+  SC-010 to SC-013): seven questions answered by the operator the same day and folded
+  into the Clarifications section; no markers remain. The checklist was re-run over
+  the amended sections and holds; the amendment is ready for `/speckit-plan`.

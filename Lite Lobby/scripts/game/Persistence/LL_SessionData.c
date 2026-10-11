@@ -36,6 +36,8 @@ class LL_SessionRecord
 	ref LL_StatsContinuation stats;
 	ref array<ref LL_SquadRecord> squads = {};
 	ref array<ref LL_SlotRecord> slots = {};
+	// The end-of-freeze squad deployments have run, so a resume neither repeats nor skips them.
+	bool freezeEndDeployed;
 }
 
 // Proxy state the persistence system instantiates from the config; the serializer reads
@@ -46,7 +48,7 @@ class LL_SessionData : PersistentState
 
 class LL_SessionSerializer : ScriptedStateSerializer
 {
-	static const int VERSION = 1;
+	static const int VERSION = 2;
 
 	override static typename GetTargetType()
 	{
@@ -69,6 +71,7 @@ class LL_SessionSerializer : ScriptedStateSerializer
 		record.elapsedSeconds = gm.GetElapsedTime();
 		record.missionEndDuration = gm.GetMissionEndDuration();
 		record.missionEndStartedAt = gm.GetMissionEndStartedAt();
+		record.freezeEndDeployed = gm.HasFreezeEndDeployed();
 
 		LL_StatsManager stats = LL_StatsManager.GetInstance();
 		if (stats)
