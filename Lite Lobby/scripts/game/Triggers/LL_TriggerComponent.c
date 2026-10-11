@@ -52,6 +52,10 @@ class LL_TriggerComponent : ScriptComponent
 		if (!Replication.IsServer())
 			return;
 
+		// The trigger record is keyed by the entity name; a sequence id changes per load.
+		if (owner.GetName() == "")
+			Print(string.Format("[LL_Trigger] '%1' has no entity name; its state cannot be restored by a session resume", GetStatKey()), LogLevel.WARNING);
+
 		// Triggers live on world entities the game mode does not know about, so they pull
 		// the state instead of being pushed it.
 		GetGame().GetCallqueue().CallLater(TryActivate, TICK_MS, true);
@@ -289,6 +293,76 @@ class LL_TriggerComponent : ScriptComponent
 		int mins = seconds / 60;
 		int secs = seconds - mins * 60;
 		return string.Format("%1:%2", mins.ToString(), secs.ToString(2));
+	}
+
+	static array<LL_TriggerComponent> GetAll()
+	{
+		return s_aBriefingTriggers;
+	}
+
+	static LL_TriggerComponent FindByStatKey(string key)
+	{
+		foreach (LL_TriggerComponent trigger : s_aBriefingTriggers)
+		{
+			if (trigger && trigger.GetStatKey() == key)
+				return trigger;
+		}
+		return null;
+	}
+
+	// Snapshot state. Only a started trigger writes its own fields; on load the subclass
+	// reads m_bRestored in its activation and skips its own initialisation.
+	protected bool m_bRestored;
+
+	LL_TriggerState CaptureState()
+	{
+		LL_TriggerState state = CreateState();
+		state.key = GetStatKey();
+		state.started = HasStarted();
+		state.fired = m_bFired;
+		if (state.started)
+			SaveState(state);
+		return state;
+	}
+
+	void ApplyState(LL_TriggerState state)
+	{
+		if (!state.started)
+			return;
+
+		m_bRestored = true;
+		LoadState(state);
+		if (state.fired)
+			RestoreFired();
+	}
+
+	protected LL_TriggerState CreateState()
+	{
+		return new LL_TriggerState();
+	}
+
+	protected void SaveState(LL_TriggerState state)
+	{
+	}
+
+	protected void LoadState(LL_TriggerState state)
+	{
+	}
+
+	// Activation has run. Subclasses whose activation only queues a wait answer whether
+	// their own countdown or evaluation is running.
+	bool HasStarted()
+	{
+		return m_bActivated;
+	}
+
+	// Fired before the snapshot: latched and torn down, no second broadcast.
+	protected void RestoreFired()
+	{
+		m_bFired = true;
+		m_bActivated = true;
+		GetGame().GetCallqueue().Remove(TryActivate);
+		OnDisarm();
 	}
 
 	static string BuildObjectivesMarkup()

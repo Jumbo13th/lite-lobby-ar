@@ -1,0 +1,7 @@
+GenericEntity {
+ ID "6ACB474C894EF332"
+ components {
+  LL_RandomDeploymentComponent "{6ACB474C73E206BB}" {
+  }
+ }
+}

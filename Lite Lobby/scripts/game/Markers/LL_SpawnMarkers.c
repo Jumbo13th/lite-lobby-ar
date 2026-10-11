@@ -140,6 +140,11 @@ class LL_SpawnMarkers : SCR_BaseGameModeComponent
 				continue;
 			doneGroups.Insert(seed.m_iGroupId);
 
+			// Left out here, so the position of a squad that deploys at the end of freeze is
+			// never sent rather than hidden on the client.
+			if (LL_RandomDeploymentComponent.HidesSpawnMarker_S(seed.m_iGroupId))
+				continue;
+
 			int occupied = 0;
 			int total = 0;
 			int posCount = 0;
@@ -170,6 +175,9 @@ class LL_SpawnMarkers : SCR_BaseGameModeComponent
 
 			LL_SpawnMarkerData m = new LL_SpawnMarkerData();
 			vector centre = sum / posCount;
+			vector drawnPoint;
+			if (LL_RandomDeploymentComponent.GetDrawnPoint_S(seed.m_iGroupId, drawnPoint))
+				centre = drawnPoint;
 			m.m_vPos = Vector(centre[0], 0, centre[2]);
 			m.m_sCallsign = seed.m_sGroupName;
 			m.m_sFaction = seed.m_sFactionKey;

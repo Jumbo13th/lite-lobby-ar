@@ -1,6 +1,10 @@
 // On every playable character. Zero replication: per-character traffic multiplies by
 // the playable count. Registers the character with LL_LobbyManager on the server and
 // bridges entity → slot data locally.
+//
+// Session resume: the game's save restores a body but not a player body's squad, and a
+// body cannot join a squad before its AI agent exists, so the resume path attaches the
+// squad first and registers after; the post-init registration stays out meanwhile.
 
 class LL_PlayableComponentClass : ScriptComponentClass
 {
@@ -75,11 +79,159 @@ class LL_PlayableComponent : ScriptComponent
 		}
 	}
 
+	protected string m_sResumeSquad;
+	protected bool m_bResuming;
+	protected bool m_bResumeRegistering;
+	protected bool m_bResumeCorpse;
+	protected SCR_AIGroup m_ResumeGroup;
+
+	//! Called by the session record once the body is available, possibly before ACTIVE.
+	void BeginResume(string squadEntityName, int sortKey, bool kia)
+	{
+		if (m_bResuming)
+			return;
+
+		m_bResuming = true;
+		m_sResumeSquad = squadEntityName;
+		m_bResumeCorpse = kia;
+		MarkRuntimeSpawned();
+		SetSortOrder(sortKey);
+
+		GetGame().GetCallqueue().CallLater(ResumeTick, 250, true);
+		ResumeTick();
+	}
+
+	// In order: agent, squad, valid network id, registration, then the registered slot is
+	// observed. No timeout until ACTIVE arms one.
+	protected void ResumeTick()
+	{
+		// Bodies arrive while the world loads, before the game mode exists.
+		LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+		if (!gm)
+			return;
+
+		if (!gm.IsResumeInProgress())
+		{
+			GetGame().GetCallqueue().Remove(ResumeTick);
+			m_bResuming = false;
+			return;
+		}
+
+		IEntity owner = GetOwner();
+		if (!owner)
+		{
+			GetGame().GetCallqueue().Remove(ResumeTick);
+			return;
+		}
+
+		if (IsResumeRegistered(m_sResumeSquad))
+		{
+			GetGame().GetCallqueue().Remove(ResumeTick);
+			return;
+		}
+
+		float deadline = gm.GetResumeDeadline();
+		if (deadline > 0 && System.GetTickCount() > deadline)
+		{
+			GetGame().GetCallqueue().Remove(ResumeTick);
+			gm.ReportResumeFailure_S(string.Format("body of squad '%1' did not register before the deadline (prefab %2)", m_sResumeSquad, GetPrefabName(owner)));
+			return;
+		}
+
+		if (!m_ResumeGroup)
+		{
+			m_ResumeGroup = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(m_sResumeSquad));
+			if (!m_ResumeGroup)
+			{
+				GetGame().GetCallqueue().Remove(ResumeTick);
+				gm.ReportResumeFailure_S(string.Format("squad entity '%1' not found", m_sResumeSquad));
+				return;
+			}
+		}
+
+		// A corpse holds no agent and no squad membership; its slot is KIA from the record.
+		bool corpse = m_bResumeCorpse || !LL_TriggerComponent.IsCharacterAlive(owner);
+		if (!corpse)
+		{
+			AIControlComponent control = AIControlComponent.Cast(owner.FindComponent(AIControlComponent));
+			if (!control)
+			{
+				GetGame().GetCallqueue().Remove(ResumeTick);
+				gm.ReportResumeFailure_S(string.Format("body of squad '%1' has no AI control (prefab %2)", m_sResumeSquad, GetPrefabName(owner)));
+				return;
+			}
+
+			// A body the game did not re-attach has no agent until its AI is activated once.
+			AIAgent agent = control.GetControlAIAgent();
+			if (!agent)
+			{
+				control.ActivateAI();
+				agent = control.GetControlAIAgent();
+				if (!agent)
+					return;
+				control.DeactivateAI();
+			}
+
+			// The attach activates the AI as a side effect; a slot body stands inert.
+			if (!agent.GetParentGroup())
+			{
+				m_ResumeGroup.AddAIEntityToGroup(owner);
+				control.DeactivateAI();
+				return;
+			}
+		}
+
+		RplComponent rpl = RplComponent.Cast(owner.FindComponent(RplComponent));
+		if (!rpl || !rpl.Id().IsValid())
+			return;
+
+		if (!m_bRegistered)
+		{
+			m_bResumeRegistering = true;
+			RegisterWithManager();
+			m_bResumeRegistering = false;
+		}
+	}
+
+	//! Done = the manager holds a slot for this body in the saved squad.
+	bool IsResumeRegistered(string squadEntityName)
+	{
+		LL_SlotData slot = GetSlotData();
+		if (!slot)
+			return false;
+
+		SCR_AIGroup group = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(squadEntityName));
+		if (!group)
+			return false;
+
+		RplComponent groupRpl = RplComponent.Cast(group.FindComponent(RplComponent));
+		if (!groupRpl)
+			return false;
+
+		int groupId = groupRpl.Id();
+		return slot.m_iGroupId == groupId;
+	}
+
 	protected void RegisterWithManager()
 	{
 		IEntity owner = GetOwner();
 		if (!owner)
 			return;
+
+		// A restored world registers through the resume loop only. The game mode may not
+		// exist yet when the post-init timer fires.
+		if (!m_bResumeRegistering && GetGame().GetSaveGameManager().GetActiveSave())
+		{
+			LL_GameModeCoop gm = LL_GameModeCoop.GetInstance();
+			if (!gm)
+			{
+				GetGame().GetCallqueue().CallLater(RegisterWithManager, 500, false);
+				return;
+			}
+
+			if (gm.IsResumeInProgress())
+				return;
+		}
 
 		// Preview/template characters can be spawned into another world context.
 		if (owner.GetWorld() != GetGame().GetWorld())
@@ -253,6 +405,10 @@ class LL_PlayableComponent : ScriptComponent
 				group = SCR_AIGroup.Cast(agent.GetParentGroup());
 			}
 		}
+
+		// A resumed corpse has no agent to answer for its squad.
+		if (!group && m_bResumeRegistering)
+			group = m_ResumeGroup;
 
 		m_bHasGroup = group != null;
 

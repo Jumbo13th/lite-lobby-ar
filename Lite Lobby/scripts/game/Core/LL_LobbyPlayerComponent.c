@@ -868,6 +868,12 @@ class LL_LobbyPlayerComponent : ScriptComponent
 
 	protected void EnterSpectatorNow()
 	{
+		// A resume claim can possess a living body inside this second; the entry scheduled
+		// before it must not pull that player out again.
+		PlayerController pc = GetGame().GetPlayerController();
+		if (pc && LL_TriggerComponent.IsCharacterAlive(pc.GetControlledEntity()))
+			return;
+
 		LL_SpectatorManager spectatorMgr = LL_SpectatorManager.GetInstance();
 		if (spectatorMgr)
 			spectatorMgr.EnterSpectator();
@@ -936,6 +942,53 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			GetGame().GetCallqueue().CallLater(ApplySquadRadioFrequency, 250, false, frequency, attempt + 1);
 	}
 
+	// Random squad deployment. The game moves a player's character on the machine that owns
+	// it, so the server only sends the position.
+
+	void Deploy_S(vector position)
+	{
+		// Rpc never runs on the sender.
+		if (GetGame().GetPlayerController() == GetOwner())
+			ApplyDeploy(position, 0);
+		else
+			Rpc(RpcDo_OwnerDeploy, position);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_OwnerDeploy(vector position)
+	{
+		ApplyDeploy(position, 0);
+	}
+
+	// Owner-side. A seated character leaves its seat first and is checked again: the game's
+	// player teleport moves the vehicle of a character that is still inside one.
+	protected void ApplyDeploy(vector position, int attempt)
+	{
+		PlayerController pc = PlayerController.Cast(GetOwner());
+		if (!pc)
+			return;
+
+		ChimeraCharacter character = ChimeraCharacter.Cast(pc.GetControlledEntity());
+		if (!character || !LL_TriggerComponent.IsCharacterAlive(character))
+			return;
+
+		CompartmentAccessComponent access = character.GetCompartmentAccessComponent();
+		if (access && access.IsInCompartment())
+		{
+			if (attempt >= 10)
+			{
+				Print("[LL_Lobby] Deployment: could not leave the vehicle seat, not moved", LogLevel.WARNING);
+				return;
+			}
+
+			access.GetOutVehicle(EGetOutType.TELEPORT, -1, ECloseDoorAfterActions.INVALID, false);
+			GetGame().GetCallqueue().CallLater(ApplyDeploy, 500, false, position, attempt + 1);
+			return;
+		}
+
+		SCR_Global.TeleportLocalPlayer(position);
+	}
+
 	// Faction-scoped channels are sealed to that faction; see CanPlayerJoinChannel.
 
 	void AskJoinVoNChannel(string channelKey)
@@ -982,6 +1035,10 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		SCR_DamageManagerComponent damage = SCR_DamageManagerComponent.Cast(
 			controlled.FindComponent(SCR_DamageManagerComponent));
 		if (!damage || damage.GetState() == EDamageState.DESTROYED)
+			return;
+
+		// A client whose countdown ran out an instant before the hold replicated to it.
+		if (LL_GameModeCoop.IsHardFreezeActive())
 			return;
 
 		Print(string.Format("[LL_Lobby] Player %1 (%2) killed by zone-restriction timeout at %3",
@@ -1064,6 +1121,22 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
 		if (gameMode)
 			gameMode.EndFreezeTime_S();
+	}
+
+	void AskSnapshot()
+	{
+		Rpc(RpcAsk_Snapshot);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_Snapshot()
+	{
+		if (!SCR_Global.IsAdmin(GetPlayerId()))
+			return;
+
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		if (gameMode)
+			gameMode.RequestSnapshot_S(GetPlayerId());
 	}
 
 	// The reply comes from the server so the admin sees the authoritative outcome.
@@ -1207,6 +1280,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		chatMgr.GetCommandInvoker("freeze").Insert(OnChatCmd_Freeze);
 		chatMgr.GetCommandInvoker("endfreeze").Insert(OnChatCmd_EndFreeze);
 		chatMgr.GetCommandInvoker("hardfreeze").Insert(OnChatCmd_HardFreeze);
+		chatMgr.GetCommandInvoker("snapshot").Insert(OnChatCmd_Snapshot);
 		chatMgr.GetCommandInvoker("verify").Insert(OnChatCmd_Verify);
 		chatMgr.GetCommandInvoker("slotexport").Insert(OnChatCmd_SlotExport);
 		chatMgr.GetCommandInvoker("slotimport").Insert(OnChatCmd_SlotImport);
@@ -1228,6 +1302,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			chatMgr.GetCommandInvoker("freeze").Remove(OnChatCmd_Freeze);
 			chatMgr.GetCommandInvoker("endfreeze").Remove(OnChatCmd_EndFreeze);
 			chatMgr.GetCommandInvoker("hardfreeze").Remove(OnChatCmd_HardFreeze);
+			chatMgr.GetCommandInvoker("snapshot").Remove(OnChatCmd_Snapshot);
 			chatMgr.GetCommandInvoker("verify").Remove(OnChatCmd_Verify);
 			chatMgr.GetCommandInvoker("slotexport").Remove(OnChatCmd_SlotExport);
 			chatMgr.GetCommandInvoker("slotimport").Remove(OnChatCmd_SlotImport);
@@ -1247,6 +1322,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		help += "\n" + WidgetManager.Translate("#LL-Command_HelpFreeze");
 		help += "\n" + WidgetManager.Translate("#LL-Command_HelpEndFreeze");
 		help += "\n" + WidgetManager.Translate("#LL-Command_HelpHardFreeze");
+		help += "\n" + WidgetManager.Translate("#LL-Command_HelpSnapshot");
 		ShowCommandHelp(help);
 
 		string help2 = WidgetManager.Translate("#LL-Command_HelpHeader2");
@@ -1337,6 +1413,15 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			return;
 
 		AskEndFreezeTime();
+	}
+
+	// /snapshot — request a session snapshot now (test aid; the server gate still applies).
+	protected void OnChatCmd_Snapshot(SCR_ChatPanel panel, string data)
+	{
+		if (!RequireAdmin())
+			return;
+
+		AskSnapshot();
 	}
 
 	// /verify on|off: suspend or resume the website registration gate during an outage.

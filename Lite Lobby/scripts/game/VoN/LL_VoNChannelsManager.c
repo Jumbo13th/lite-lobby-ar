@@ -322,11 +322,21 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 		array<ref LL_SlotData> slots = mgr.GetSlots();
 		foreach (LL_SlotData slot : slots)
 		{
-			if (slot.m_iPlayerId < 0)
+			// A placeholder holds a resumed slot for an absent player and has no voice.
+			if (slot.m_iPlayerId < 0 || LL_LobbyManager.IsPlaceholderId(slot.m_iPlayerId))
 				continue;
 
 			SetPlayerChannel_S(slot.m_iPlayerId, GetGroupChannelKey(slot.m_iGroupId, slot.m_sFactionKey));
 		}
+	}
+
+	//! For a possession that happens after the assignment's own next-frame resolution.
+	void RefreshParking_S(int playerId)
+	{
+		if (!Replication.IsServer())
+			return;
+
+		UpdateParked_S(playerId);
 	}
 
 	// Spectators sit in the global channel.

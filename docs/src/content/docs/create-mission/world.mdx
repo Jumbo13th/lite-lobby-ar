@@ -238,14 +238,21 @@ In your addon's **Resource Browser**, open `Missions/ShootingStar_Ep1.conf`, cre
 | **Description** | A short description of who takes part in the mission and where it takes place. |
 | **Player Count** | How many players the mission is designed for. The example uses `128`. |
 
-Under **Save Types**, clear all four checkboxes: **MANUAL**, **AUTO**, **SCRIPTED**, and **SHUTDOWN**. These control progress saves during gameplay.
+Leave **Save Types** as they are. Set **Systems Config** to `LL_LobbySystems.conf`; the game mode's **Session saves** checkbox decides whether snapshots are written.
 
 <LL_Screenshot
   src={missionDetails}
-  alt="ShootingStar_Ep1.conf with World, Name, Author, Description and Player Count filled in, and all Save Types disabled."
+  alt="ShootingStar_Ep1.conf with World, Name, Author, Description and Player Count filled in, Save Types left as they are and Systems Config set to LL_LobbySystems.conf."
   caption="Mission name, description, and settings."
   originalLabel="Open original image"
 />
+
+A few rules the session resume depends on:
+
+- Every squad needs a unique entity name: a resumed session finds its squads by name.
+- Squads created from script must be created from the lobby's game-start hook, which a resume does not run.
+- Freeze time counts from the end of the hard freeze: time stands still during any hard freeze.
+- Lobby missions set no game duration on the game-mode state component.
 
 Press `Ctrl+S` to save the scenario file.
 
