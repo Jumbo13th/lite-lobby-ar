@@ -986,8 +986,25 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			return;
 		}
 
+		// A parachute pose puts both hands on the risers but leaves a held weapon or gadget at
+		// the hand position, floating beside the jumper; it has to be on the body before the drop.
+		if (position[1] - GetGame().GetWorld().GetSurfaceY(position[0], position[2]) > AIRBORNE_DEPLOY_HEIGHT)
+		{
+			CharacterControllerComponent controller = character.GetCharacterController();
+			if (controller)
+			{
+				if (controller.IsGadgetInHands())
+					controller.RemoveGadgetFromHand(true);
+
+				controller.TryEquipRightHandItem(null, EEquipItemType.EEquipTypeUnarmedDeliberate, true);
+			}
+		}
+
 		SCR_Global.TeleportLocalPlayer(position);
 	}
+
+	// Ground deployments land on the terrain surface, so any real height means a drop.
+	protected static const float AIRBORNE_DEPLOY_HEIGHT = 10;
 
 	// Faction-scoped channels are sealed to that faction; see CanPlayerJoinChannel.
 

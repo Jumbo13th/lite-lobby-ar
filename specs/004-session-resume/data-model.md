@@ -26,7 +26,12 @@ mission maker places once per deploying squad (prefab
 | `m_sGroupEntityName` | string | empty | the start-time check, the draw, the body enumeration, the spawn-marker rule |
 | `m_aPointNames` | array of string | empty | the start-time check and the draw; each is the entity name of a spawn point, only its position is read; the addon's `Prefabs/Spawn/LL_SpawnPoint.et` is the entity to place, and any other named entity works too |
 | `m_bAtFreezeEnd` | bool | `1` | the game mode's two hooks and the spawn-marker rule; on = when freeze time ends, off = when the game phase starts |
-| `m_fHeight` | float, metres | `0` | the placement; added above the ground position for a body with a connected player; `0` = on the ground |
+| `m_fHeight` | float, metres | `0` | the placement; added above the ground position of every body, with or without a player (amendment 2026-10-21); `0` = on the ground |
+| `m_bLinear` | bool | `0` | the positions; on = a line from the drawn point along its forward axis, the radius unused (amendment 2026-10-21) |
+| `m_fLineSpacing` | float, metres | `40` | the line; mean distance between bodies |
+| `m_fLineJitter` | float, metres | `10` | the line; random shift of each body along it, plus or minus |
+| `m_fLineSpread` | float, metres | `12` | the line; random offset of each body across it, plus or minus |
+| `m_fLineRise` | float, metres | `5` | the placement; extra height per body in a line, the first lowest |
 | `m_fRadius` | float, metres | `10` | the positions; the dispersion radius around the drawn point |
 
 Validation at the start of the game phase, logged, never fatal (FR-035): a squad
@@ -34,6 +39,27 @@ name that resolves to no squad makes the deployment inert; a point name that
 resolves to no entity is dropped; a deployment left with no point is inert; a point
 named by two deployments is reported and still used by both. An inert deployment
 leaves its squad at the placed position.
+
+## Mission-maker attributes (timed particle effect, category "Lite Lobby")
+
+Amendment of 2026-10-21. `LL_TimedParticleComponent` sits on a particle effect
+entity the mission maker places (the game's
+`Prefabs/Particles/EnvironmentParticle_Base.et` with its effect path set). Nothing
+here is replicated or saved.
+
+| Field | Type | Default | Read by |
+|-------|------|---------|---------|
+| `m_bAtFreezeEnd` | bool | `1` | the tick; on = the effect starts when freeze time ends, off = when the game phase starts |
+| `m_fBurnSeconds` | float, seconds | `900` | the tick; how long the effect plays on the mission clock |
+
+## Mission-maker attribute (map zone, category "Lite Lobby")
+
+Amendment of 2026-10-21, second part. On `LL_MapZoneComponent`, beside the existing
+`m_bHideAfterFreezeTime`. Not replicated or saved.
+
+| Field | Type | Default | Read by |
+|-------|------|---------|---------|
+| `m_fHideDelaySeconds` | float, seconds | `0` | the zone's visibility check; above `0`, on its own, how long after the end of freeze the zone stays on the map; `0` = off. `m_bHideAfterFreezeTime` on still hides the zone the moment freeze ends |
 
 ## Persistent states (server, written into the session save)
 
@@ -166,6 +192,17 @@ Server-only unless marked; nothing replicated.
 | `LL_RandomDeploymentComponent` | pending spawn transforms, keyed by placed body | filled before the game-start body loop for slots with a connected player, taken by `RespawnSlotCharacter_S`, dropped at the end of `OnEnterGame_S` |
 | `LL_GameModeCoop` | `m_bFreezeEndDeployed` | the end-of-freeze deployments have run; set on the first run, saved in the session record, never cleared within a game |
 | `LL_LobbyPlayerComponent` | `Deploy_S(vector)` and `RpcDo_OwnerDeploy(vector)` | **the one message added**: server to the moved player, once per end-of-freeze deployment; the owner leaves a vehicle seat if seated (bounded retry), then runs the game's own player teleport |
+
+### Timed particle effects (amendment of 2026-10-21)
+
+Local to each machine that draws particles; nothing replicated or saved.
+
+| Owner | Field | Purpose |
+|-------|-------|---------|
+| `LL_TimedParticleComponent` | the start reading on the mission clock | set when the effect lights: the game mode's freeze-end reading, or zero for the game phase |
+| `LL_GameModeCoop` | `m_fFreezeEndSeenAt` | the clock at the first end of freeze this machine saw, -1 until then; set by `OnFreezeTimeEnded_S` on the server and by the countdown's `onRplName` callback on a client; read by `GetFreezeEndedAt()` after the mission-end timer's start |
+| `LL_GameModeCoop` | `m_bFreezeSeenRunning` | a client saw the countdown above zero, so its arrival at zero is a real end of freeze and not a late join |
+| `LL_TimedParticleComponent` | lit, and done | the effect burns once; after its stop the tick ends |
 
 ## Files written to disk
 

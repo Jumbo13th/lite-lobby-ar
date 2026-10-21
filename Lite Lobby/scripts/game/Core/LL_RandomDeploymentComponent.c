@@ -1,6 +1,7 @@
 // Sends a whole squad to one of its spawn points, drawn by the server: when the game
-// phase starts or when freeze time ends, on the ground or at a height. Lives on a world
-// entity the mission maker places once per squad. No replication: the draw and every
+// phase starts or when freeze time ends, on the ground or at a height, spread around the
+// point or in a line along its arrow. Lives on a world entity the mission maker places
+// once per squad. No replication: the draw and every
 // placement are the server's, and the component does nothing on a client.
 
 class LL_RandomDeploymentComponentClass : ScriptComponentClass
@@ -18,11 +19,26 @@ class LL_RandomDeploymentComponent : ScriptComponent
 	[Attribute("1", UIWidgets.CheckBox, "Deploy when freeze time ends. Off = when the game starts, before freeze. A squad that deploys at the end of freeze has no squad spawn marker.", category: "Lite Lobby")]
 	protected bool m_bAtFreezeEnd;
 
-	[Attribute("0", UIWidgets.EditBox, "Height above the ground (m) at which bodies with a player arrive. 0 = on the ground. The squad needs its own parachute; bodies without a player always arrive on the ground.", category: "Lite Lobby")]
+	[Attribute("0", UIWidgets.EditBox, "Height above the ground (m) at which the squad arrives, bodies without a player included. 0 = on the ground. The squad needs its own parachute.", category: "Lite Lobby")]
 	protected float m_fHeight;
 
 	[Attribute("10", UIWidgets.EditBox, "Dispersion radius (m): the squad is spread around the drawn point within this distance.", category: "Lite Lobby")]
 	protected float m_fRadius;
+
+	[Attribute("0", UIWidgets.CheckBox, "Drop the squad in a line that starts at the drawn point and runs along the point's arrow (its forward axis). The radius is not used.", category: "Lite Lobby")]
+	protected bool m_bLinear;
+
+	[Attribute("40", UIWidgets.EditBox, "Mean distance (m) between bodies in a line drop.", category: "Lite Lobby")]
+	protected float m_fLineSpacing;
+
+	[Attribute("10", UIWidgets.EditBox, "Random shift (m, plus or minus) of each body along the line.", category: "Lite Lobby")]
+	protected float m_fLineJitter;
+
+	[Attribute("12", UIWidgets.EditBox, "Random sideways offset (m, plus or minus) of each body across the line.", category: "Lite Lobby")]
+	protected float m_fLineSpread;
+
+	[Attribute("5", UIWidgets.EditBox, "Extra height (m) per body in a line drop. The first out, at the point, is lowest and the last is highest, as in a real stick.", category: "Lite Lobby")]
+	protected float m_fLineRise;
 
 	protected static const int POSITION_TRIES = 10;
 	protected static const float BODY_SPACING = 1.5;
@@ -41,6 +57,7 @@ class LL_RandomDeploymentComponent : ScriptComponent
 	protected bool m_bDrawn;
 	protected bool m_bPlaced;
 	protected vector m_vPoint;
+	protected vector m_vPointDirection;
 	protected string m_sPointName;
 
 	override void OnPostInit(IEntity owner)
@@ -228,6 +245,7 @@ class LL_RandomDeploymentComponent : ScriptComponent
 
 		BaseWorld world = GetGame().GetWorld();
 		array<vector> positions = {};
+		array<vector> directions = {};
 		array<string> names = {};
 		foreach (string pointName : m_aPointNames)
 		{
@@ -239,6 +257,7 @@ class LL_RandomDeploymentComponent : ScriptComponent
 				continue;
 
 			positions.Insert(point.GetOrigin());
+			directions.Insert(point.GetTransformAxis(2));
 			names.Insert(pointName);
 		}
 
@@ -247,6 +266,7 @@ class LL_RandomDeploymentComponent : ScriptComponent
 
 		int index = Math.RandomInt(0, positions.Count());
 		m_vPoint = positions[index];
+		m_vPointDirection = directions[index];
 		m_sPointName = names[index];
 		m_bDrawn = true;
 		return true;
@@ -271,10 +291,16 @@ class LL_RandomDeploymentComponent : ScriptComponent
 			MoveUnowned_S(body, ground[i], 0);
 
 			if (playerIds[i] < 0)
+			{
+				vector aiSpawn = ground[i];
+				aiSpawn[1] = aiSpawn[1] + m_fHeight + LineRise(i);
+				HolsterForDrop_S(body);
+				MoveUnowned_S(body, aiSpawn, 0);
 				continue;
+			}
 
 			vector spawn = ground[i];
-			spawn[1] = spawn[1] + m_fHeight;
+			spawn[1] = spawn[1] + m_fHeight + LineRise(i);
 			s_aPendingBodies.Insert(body);
 			s_aPendingPositions.Insert(spawn);
 		}
@@ -306,16 +332,37 @@ class LL_RandomDeploymentComponent : ScriptComponent
 
 			if (!playerComponent)
 			{
-				MoveUnowned_S(body, ground[i], 0);
+				vector aiTarget = ground[i];
+				aiTarget[1] = aiTarget[1] + m_fHeight + LineRise(i);
+				HolsterForDrop_S(body);
+				MoveUnowned_S(body, aiTarget, 0);
 				continue;
 			}
 
 			vector target = ground[i];
-			target[1] = target[1] + m_fHeight;
+			target[1] = target[1] + m_fHeight + LineRise(i);
 			playerComponent.Deploy_S(target);
 		}
 
 		LogPlaced(bodies.Count());
+	}
+
+	// Bodies without a player are moved on the server, which owns them, so the holster that a
+	// player's drop does on the player's machine happens here for them.
+	protected void HolsterForDrop_S(IEntity body)
+	{
+		ChimeraCharacter character = ChimeraCharacter.Cast(body);
+		if (!character)
+			return;
+
+		CharacterControllerComponent controller = character.GetCharacterController();
+		if (!controller)
+			return;
+
+		if (controller.IsGadgetInHands())
+			controller.RemoveGadgetFromHand(true);
+
+		controller.TryEquipRightHandItem(null, EEquipItemType.EEquipTypeUnarmedDeliberate, true);
 	}
 
 	// The living slot bodies of the squad. The player id is -1 for a slot nobody holds and
@@ -347,10 +394,45 @@ class LL_RandomDeploymentComponent : ScriptComponent
 		}
 	}
 
+	protected float LineRise(int index)
+	{
+		if (!m_bLinear)
+			return 0;
+
+		return index * m_fLineRise;
+	}
+
+	// The spacing keeps the bodies of a line apart, so it needs no clearance search.
+	protected void BuildLine_S(int count, notnull array<vector> outGround)
+	{
+		BaseWorld world = GetGame().GetWorld();
+		vector direction = m_vPointDirection;
+		direction[1] = 0;
+		direction.Normalize();
+		vector side = Vector(direction[2], 0, -direction[0]);
+		float jitter = Math.Max(m_fLineJitter, 0);
+		float spread = Math.Max(m_fLineSpread, 0);
+
+		for (int i = 0; i < count; i++)
+		{
+			float along = i * m_fLineSpacing + Math.RandomFloat(-jitter, jitter);
+			float across = Math.RandomFloat(-spread, spread);
+			vector position = m_vPoint + direction * along + side * across;
+			position[1] = world.GetSurfaceY(position[0], position[2]);
+			outGround.Insert(position);
+		}
+	}
+
 	// One ground position per body. The clearance search only sees what is in the world
 	// now, not the other bodies of this deployment, so the spacing is checked here.
 	protected void BuildPositions_S(int count, notnull array<vector> outGround)
 	{
+		if (m_bLinear)
+		{
+			BuildLine_S(count, outGround);
+			return;
+		}
+
 		BaseWorld world = GetGame().GetWorld();
 		float radius = Math.Max(m_fRadius, 0);
 		float spacingSq = BODY_SPACING * BODY_SPACING;

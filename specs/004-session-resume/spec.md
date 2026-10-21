@@ -10,6 +10,10 @@
 
 **Amended**: 2026-10-11, random squad deployment added on the operator's request (User Story 5, FR-024 to FR-035). It shares this branch and its pull request with session resume, and nothing else.
 
+**Amended**: 2026-10-21, timed particle effects and the timed hiding of a map zone added on the operator's request (User Stories 6 and 7, FR-036 to FR-046). They share this branch with session resume and random deployment, and nothing else.
+
+**Amended**: 2026-10-21, random deployment extended on the operator's request: a line drop, the air drop of bodies without a player, and an arrow on the spawn point (User Story 5, FR-028 revised, FR-047 to FR-049).
+
 ## Current State
 
 A Lite Lobby event runs once. When the dedicated server dies mid-game, as it did on
@@ -380,6 +384,35 @@ and the specification goes to implementation.
 - Q: Does the addon give the mission maker a spawn point to place? → A: yes, a
   prefab of its own, as it does for the flags of a zone trigger.
 
+### Session 2026-10-21 (amendment: timed particle effects)
+
+- Q: Where is the timed effect specified and delivered? → A: on this branch, in this
+  specification.
+- Q: From what moment does an effect's time count? → A: a setting per effect: the end
+  of freeze time or the start of the game phase.
+- Q: What does a player see who joins after an effect has started? → A: what is left
+  of its time, with no value added to the network for it.
+- Q: Does the addon ship a particle to time? → A: one, a red signal smoke that plays
+  continuously.
+- Q: How does a map zone hide some time after the start? → A: a delay setting on the
+  zone; no new component.
+- Q: From when does that delay count? → A: from the end of freeze time, whether or
+  not the mission has a mission-end timer; timed effects count from the same moment.
+- Q: What gets the delay? → A: map zones only.
+- Q: Does the delay need the zone's existing hide setting ticked? → A: no; a delay
+  above zero hides the zone on its own, and the existing setting keeps hiding it the
+  moment freeze ends.
+
+### Session 2026-10-21 (amendment: random deployment, line and air)
+
+- Q: Do bodies without a player come down from the height too? → A: yes; the
+  mission's parachute opens for them as well, as the operator saw in a test.
+- Q: Can a squad drop in a line instead of around the point? → A: yes, a setting per
+  deployment: one body after another from the drawn point along the point's arrow,
+  each later one a little higher, as a stick leaves an aircraft.
+- Q: How does a mission maker see where the line runs? → A: the addon's spawn point
+  shows its arrow in the World Editor.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The game continues where it stopped (Priority: P1)
@@ -621,9 +654,9 @@ moment and which point the server log names.
    and no freeze zone around the squad's placed position treats them as having left
    it.
 3. **Given** a squad set to deploy in the air at a height, **When** the deployment
-   happens, **Then** every body with a connected player is at that height above the
-   ground over its own spread position, and every body without one is on the ground
-   under the point.
+   happens, **Then** every body of the squad, with or without a connected player, is
+   at that height above the ground over its own position, holding nothing in its
+   hands.
 4. **Given** the same mission started ten times, **When** the drawn points are
    compared, **Then** the squad did not arrive at the same point every time, and the
    server log names the squad, the point and the number of bodies deployed each
@@ -639,6 +672,82 @@ moment and which point the server log names.
 8. **Given** a squad with an end-of-freeze deployment, **When** any player or
    spectator opens the briefing map or the game map, **Then** that squad has no
    spawn marker, while the other squads of its side have theirs.
+9. **Given** a deployment set to drop in a line, **When** it happens, **Then** the
+   bodies are one after another from the drawn point along the point's arrow, about
+   the set spacing apart, each later one higher by the set rise, and the radius plays
+   no part.
+
+---
+
+### User Story 6 - A signal burns while it matters (Priority: P3)
+
+A mission maker drops a squad of paratroopers over open country and leaves their
+supply cache in tall grass. To let them find it, the maker places red signal smoke at
+the cache and sets it to burn for fifteen minutes from the end of freeze. Nobody sees
+the smoke during slot selection, briefing or freeze, so the other side learns nothing
+early. The moment freeze ends and the squad is in the air, a red column stands over
+the cache; a quarter of an hour later it thins out and is gone.
+
+**Why this priority**: it replaces smoke that either burns out within two minutes or
+burns for the whole game from the moment the world loads. It is independent of
+session resume and of random deployment.
+
+**Independent Test**: in the demo world, place the addon's signal smoke with the
+timing component set to thirty seconds from the end of freeze, start a game with a
+one-minute freeze and watch it; join a second client during the thirty seconds and a
+third after them.
+
+**Acceptance Scenarios**:
+
+1. **Given** an effect set to start at the end of freeze, **When** the world loads and
+   through slot selection, briefing and freeze time, **Then** it shows nothing on any
+   machine.
+2. **Given** the same effect, **When** freeze time ends, by its countdown or by an
+   admin, **Then** it starts on every connected machine within a second.
+3. **Given** an effect set to start with the game phase, **When** the game phase
+   begins, **Then** it starts, during freeze time or without one.
+4. **Given** a burning effect, **When** its time has passed on the mission clock,
+   **Then** it stops emitting and the smoke already in the air thins out instead of
+   vanishing.
+5. **Given** a burning effect, **When** a player joins or reconnects, **Then** they see
+   it for what is left of its time; a player joining after its time has passed never
+   sees it.
+6. **Given** a mission without a timed effect, **When** it is played, **Then** nothing
+   about it differs from before the amendment.
+
+---
+
+### User Story 7 - The assembly area leaves the map (Priority: P3)
+
+A mission maker draws the area where one side assembles. Both sides should see it
+while they plan and through the first quarter of an hour of the fight, and then no
+more, because by then that side has moved on and the drawing only clutters the map.
+The maker sets the zone's hide delay to fifteen minutes. The zone is on the map through briefing, freeze and the
+first fifteen minutes after it, then it is gone for everyone.
+
+**Why this priority**: it gives every mission a setting that today only a mission's
+own script provides. It is independent of the other stories.
+
+**Independent Test**: in the demo world, give a map zone a hide delay of thirty
+seconds, start a game with a one-minute freeze and keep the map open;
+join a second client during the thirty seconds and a third after them.
+
+**Acceptance Scenarios**:
+
+1. **Given** a zone with a delay of thirty seconds, **When** any player looks at the
+   map during briefing, during freeze or within thirty seconds after the freeze
+   ended, **Then** the zone is drawn; afterwards it is drawn on no map, including one
+   that stayed open.
+2. **Given** a zone with the existing setting that hides it when freeze ends,
+   **When** freeze ends, **Then** the zone hides at that moment, exactly as before the
+   amendment, whatever its delay.
+3. **Given** a mission with a mission-end timer, **When** a player joins after the
+   freeze ended, **Then** the zone hides for them at the same moment as for everyone
+   else; in a mission without one, at the moment counted from the configured freeze
+   length.
+4. **Given** a zone with neither the hide setting nor a delay, **When** the mission
+   is played,
+   **Then** nothing about it differs from before the amendment.
 
 ---
 
@@ -843,8 +952,10 @@ Random deployment:
   The addon does not check equipment.
 - **A member who died before the deployment** is not moved; the slot stays KIA.
 - **Bodies without a player** (a free slot, or a slot held for a disconnected
-  player) go with the squad and are always put on the ground, also in an air drop,
-  so whoever enters one later stands under the point.
+  player) go with the squad and arrive as the others do, in an air drop at the
+  height, under the mission's parachute.
+- **A line that runs over water or obstacles** is the mission maker's choice, as a
+  point is: the line only follows the arrow and the terrain height.
 - **A player who takes a free slot of the squad during freeze**, before an
   end-of-freeze deployment, is deployed with the squad.
 - **A squad whose free slots are removed at game start** deploys the bodies that
@@ -868,6 +979,43 @@ Random deployment:
 - **A resume from a snapshot taken during freeze, before an end-of-freeze
   deployment**, deploys the squad once, when the freeze ends after the release. The
   point is drawn then; nothing about a pending draw is saved.
+
+Timed particle effects:
+
+- **Freeze changed by an admin.** An effect that starts at the end of freeze starts
+  when the freeze actually ends. Once started it burns its full time; a freeze an
+  admin revives afterwards does not put it out.
+- **A late joiner after an admin changed the freeze**, in a mission without a
+  mission-end timer, measures the effect from the configured freeze length, because
+  nothing else about the end of freeze is on the wire; its remaining time is off by
+  the admin's change. A mission-end timer's start is exact for everyone.
+- **A mission with no freeze time**: an effect set to the end of freeze starts with
+  the game phase.
+- **Hard freeze**: the mission clock stands still, so a burning effect keeps burning
+  and its remaining time does not run down.
+- **A resume**: the resumed game's clock continues, and players coming back see what
+  is left of an effect's time as any late joiner does.
+- **The end of the game phase**: a burning effect stops when debriefing begins.
+- **The component on something that is not a particle effect** logs one warning and
+  does nothing.
+- **A short effect stays short**: the component starts and stops a particle; it does
+  not make one that ends on its own, such as a smoke grenade's ninety seconds, last
+  longer. The addon's signal smoke plays until it is stopped.
+- **A dedicated server** draws no particles; the component does nothing there.
+
+Timed map zones:
+
+- **A map that stays open** loses the zone the moment its delay passes.
+- **Freeze changed by an admin.** The delay counts from the first end of freeze in
+  the game. A freeze an admin revives afterwards shows the zone again while it runs,
+  as the hide setting already does; when it ends, the delay has long passed and the
+  zone hides at once.
+- **A late joiner** hides the zone at the same moment as everyone else in a mission
+  with a mission-end timer; without one, at the moment counted from the configured
+  freeze length.
+- **A resume** keeps a mission-end timer's start; without one, players coming back
+  count from the configured freeze length.
+- **Hard freeze**: the mission clock stands still, so the delay does not run down.
 
 ## Requirements *(mandatory)*
 
@@ -1009,9 +1157,9 @@ Random deployment:
   bodies overlapping. A body arriving on the ground MUST stand on the terrain
   surface. The squad MUST remain the same squad: its roster rows, callsign, radio
   net, statistics and the triggers that name it are unaffected.
-- **FR-028**: With a height set, every body with a connected player MUST arrive at
-  that height above the ground over its own spread position, and every body without
-  one MUST arrive on the ground. The addon MUST NOT provide, open or require a
+- **FR-028**: With a height set, every body of the squad, with or without a
+  connected player, MUST arrive at that height above the ground over its own
+  position. The addon MUST NOT provide, open or require a
   parachute and MUST NOT slow the fall.
 - **FR-029**: A squad with an end-of-freeze deployment MUST spend freeze time at its
   placed position under the normal freeze rules. A start-of-freeze deployment MUST
@@ -1039,6 +1187,51 @@ Random deployment:
   every spawn point whose squad does not exist and every squad set to deploy with
   no spawn point; such a squad MUST stay at its placed position.
 
+- **FR-036**: A mission maker MUST be able to time a particle effect placed in the
+  world by adding the addon's timing component to it and setting the moment it
+  starts (the end of freeze time, the default, or the start of the game phase) and
+  how many seconds it plays.
+- **FR-037**: A timed effect MUST show nothing before its start moment, from the
+  moment the world loads.
+- **FR-038**: At its start moment a timed effect MUST start on every machine that
+  draws it, and once its seconds have passed on the mission clock it MUST stop
+  emitting and let the particles already emitted finish.
+- **FR-039**: A player who joins or reconnects while a timed effect burns MUST see it
+  for the rest of its time and never after, with the end of freeze taken from the
+  reading of FR-044.
+- **FR-040**: A started effect MUST burn its time out; a freeze revived afterwards
+  MUST NOT stop it. It MUST stop when the game phase ends.
+- **FR-041**: Timed effects MUST add no replicated property, no RPC and no
+  join-in-progress payload; each machine decides from the game state, the freeze
+  countdown and the mission clock it already receives. A dedicated server MUST do
+  nothing for them.
+- **FR-042**: The addon MUST ship one particle to time: a red signal smoke, made from
+  the game's red smoke grenade, that plays until it is stopped.
+
+- **FR-043**: A map zone MUST take a hide delay in seconds, zero (off) by default. A
+  delay above zero MUST, on its own, keep the zone on every map until that many
+  seconds after the end of freeze on the mission clock and then hide it for every
+  player, also from a map that is open. The existing setting that hides a zone when
+  freeze ends MUST keep doing so at once, whatever the delay.
+- **FR-044**: Every machine MUST take the end of freeze from one reading that timed
+  zones and timed effects share: the mission-end timer's replicated start when the
+  mission has one; otherwise the mission clock at the moment this machine saw the
+  freeze countdown reach zero; otherwise the configured freeze length. The reading is
+  the first end of freeze in a game.
+- **FR-045**: The delay and the reading MUST add no replicated property, no RPC and
+  no join-in-progress payload.
+- **FR-046**: A zone's other settings (the hidden game states, the faction list, the
+  hide setting without a delay) MUST behave as before the amendment.
+
+- **FR-047**: A deployment MUST offer a line drop as a setting: the bodies one after
+  another from the drawn point along the point's forward axis, at a set mean spacing
+  with a set random shift along and across the line, each later body higher by a set
+  rise; the dispersion radius is then not used.
+- **FR-048**: A body without a player that arrives in the air MUST hold no weapon or
+  gadget in its hands, as a player's body does.
+- **FR-049**: The addon's spawn point MUST show its forward axis as an arrow in the
+  World Editor, and nothing of it may exist in the game.
+
 ### Key Entities
 
 - **Snapshot**: one complete save point of the world, the addon's game state and the
@@ -1062,7 +1255,15 @@ Random deployment:
   squad; a candidate for that squad's deployment.
 - **Deployment**: the one-time move of a whole squad to a spawn point drawn by the
   server, at the start or at the end of freeze time, on the ground or at a height,
-  spread within a radius; its moment, height and radius are set per squad.
+  spread within a radius or in a line along the point's arrow; its moment, height,
+  radius and line are set per squad.
+
+- **Timed effect**: a particle effect placed in the world with the addon's timing
+  component; it plays for a set number of seconds from the end of freeze time or from
+  the start of the game phase.
+
+- **Freeze-end reading**: the mission clock at the first end of freeze in a game, as
+  one machine knows it; shared by timed effects and timed zones.
 
 ## Success Criteria *(mandatory)*
 
@@ -1109,8 +1310,8 @@ Random deployment:
   point than the dispersion radius, no two members overlap, and the server log names
   the point.
 - **SC-011**: In the demo world, a squad set to deploy in the air at the end of
-  freeze has every member with a player at the set height above the ground, within
-  five metres, at the moment freeze ends, and every member whose equipment includes
+  freeze has every member, with or without a player, at the set height above the
+  ground, within five metres, at the moment freeze ends, and every member whose equipment includes
   a self-opening parachute lands alive; a member seated in a vehicle at that moment
   is among them and the vehicle has not moved.
 - **SC-012**: In the demo world with session saves on, a resume from a snapshot
@@ -1119,6 +1320,18 @@ Random deployment:
   squad once when the freeze ends; one check each.
 - **SC-013**: SC-006 holds for a mission with random deployment configured: no
   traffic is added for players outside a deploying squad.
+- **SC-014**: In the demo world on a dedicated server, the addon's signal smoke set to
+  thirty seconds from the end of freeze shows nothing on two clients during a
+  one-minute freeze, appears on both within a second of the freeze ending and stops
+  emitting thirty seconds later; a third client joining ten seconds into the burn sees
+  it for about twenty seconds, and one joining after the burn sees nothing.
+- **SC-015**: SC-006 holds for a mission with timed effects: they add no network
+  traffic.
+- **SC-016**: In the demo world on a dedicated server, a map zone hidden thirty
+  seconds after a one-minute freeze is on the open map of two clients until thirty
+  seconds after the freeze ended, then on neither; a client joining after that never
+  sees it; with a mission-end timer added, a client joining ten seconds into the
+  delay loses the zone at the same moment as the others.
 
 ## Assumptions
 
@@ -1158,6 +1371,9 @@ Random deployment:
 - The addon has no parachute and the game has none; an air drop is survivable
   because the mission gives the squad a parachute that opens by itself from a
   mid-air start (operator, 2026-10-11).
+- A timed effect is a particle the mission maker places; the addon times it and ships
+  one continuous red signal smoke. Other colours, and making the game's own short
+  effects continuous, are not part of it (operator, 2026-10-21).
 - A spawn point serves one squad; two squads that should arrive together are not a
   case this feature covers.
 - Players are not told at the moment of a deployment; the mission's briefing is

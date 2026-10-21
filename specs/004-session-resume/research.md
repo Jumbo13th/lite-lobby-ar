@@ -918,3 +918,79 @@ scripts doing the same job.
 - **Alternatives considered**: a class of the addon's own with a coloured label
   (a script for a cosmetic); a bare generic entity (nothing to see in the editor);
   a prop (visible in the game).
+
+## R11. Timed particle effects (amendment of 2026-10-21)
+
+Read from `Arma-Reforger-Script-Diff` at 1.8.0.13 and from the game's particle
+files. Nothing here needed a spike.
+
+### R11.1 A placed particle plays on load
+
+- **Decision**: the component stops the particle on its first tick and starts it
+  with `Play()` when its moment comes; it ends it with `StopEmission()`.
+- **Facts**: the game places its continuous ambient particles as a
+  `ParticleEffectEntity` with an effect path (`Prefabs/Particles/EnvironmentParticle_Base.et`,
+  `Smoke/Smoke_Smokestack_Big.et`). Such an entity has no `RplComponent` and plays
+  from the moment the world loads, on every machine. `ParticleEffectEntity` exposes
+  `Play()`, `Stop()`, `Pause()` and `StopEmission()`, the last of which stops the
+  emitters and keeps updating until no particle is left.
+- **Rationale**: the mission maker places what the game places, sees it in the World
+  Editor, and the component only gates it.
+- **Alternatives considered**: spawning the particle at its moment with
+  `ParticleEffectEntity.SpawnParticleEffect` (nothing to see or place in the World
+  Editor); the game's effect-module class `SCR_ReplicatedParticleEffectEntity`, whose
+  play state the server replicates (a replicated entity per effect, and the class is
+  forced to play on a dedicated server).
+
+### R11.2 Why the grenade's smoke ends, and the continuous copy
+
+- **Facts**: `Particles/Weapon/Smoke_grenade_M18_Red.ptc` has three emitters, each
+  with `EmittingTime 90`, `Repeat 0` and six curves (`ColorMast`, `AlphaMast`,
+  `RotationSpeedMast`, `SizeMast`, `BRateMast`, `VelocityMast`) that scale the
+  emitter over those ninety seconds; the first emitter's birth-rate curve falls from
+  0.363 to 0. `Particles/Enviroment/Smoke_Smokestack_Big.ptc`, which plays for as
+  long as its entity exists, has none of those fields in any emitter. With
+  `Repeat 1` instead, each ninety-second cycle would fade in and out.
+- **Decision**: `LL_SignalSmoke_Red.ptc` is the grenade's file with `EmittingTime`,
+  `Repeat` and the six curves removed from every emitter, and the first emitter's
+  `BirthRate` lowered from 10 to 3, near the mean of its tapering burst. Materials
+  and colours are the game's, referenced by GUID.
+- **Alternatives considered**: `Repeat 1` with flattened curves (more edits, same
+  result); a long `EmittingTime` (still ends, and the clock would be the particle's,
+  started at world load).
+
+### R11.3 The clock every machine reads
+
+- **Facts**: `SCR_BaseGameMode.GetElapsedTime()` is zero when the game phase starts,
+  advances on every machine and is corrected from the server; the addon holds it
+  still on every machine during any hard freeze (plan, Constitution Check V).
+  `LL_GameModeCoop.m_fFreezeTimeRemaining` is replicated and ticked once a second by
+  the server; `m_iFreezeTime` (`GetFreezeTimeDuration()`, milliseconds) is a
+  load-time attribute, the same on every machine. Nothing tells a client when the
+  freeze ended: `m_fMissionEndStartedAt` is set only by a mission-end timer.
+- **Decision**: a machine that sees the countdown reach zero takes the clock at that
+  moment as the start; a machine that never saw it run (it joined afterwards, or
+  the mission has no freeze) takes the configured freeze length. The operator
+  accepted the late joiner's error after an admin change to the freeze in exchange
+  for nothing added to the network (spec, session 2026-10-21). R12 moves this reading to the game mode and puts a mission-end timer's start first.
+- **Alternatives considered**: a once-set replicated scalar holding the clock at the
+  end of freeze, saved in the session record (exact for late joiners, at the cost of
+  one replicated value and a record version).
+
+## R12. The end of freeze on every machine (amendment of 2026-10-21, second part)
+
+- **Facts**: `m_fMissionEndStartedAt` is set once by `LL_TriggerMissionEndTimer`
+  with the clock reading at its first poll after the freeze ends; it is replicated,
+  saved in the session record and restored on a resume, and stays -1 in a mission
+  without that timer. `m_fFreezeTimeRemaining` is an existing replicated scalar the
+  server ticks once a second; an `onRplName` callback runs on a client when a new
+  value arrives, not on the server, and adds nothing to what is sent. A map zone
+  has no tick of its own: it asks for its visibility when the map opens and every
+  frame while it is open.
+- **Decision**: one reading on the game mode serves timed zones and timed effects
+  (FR-044): the timer's start, else the moment this machine saw the countdown reach
+  zero, else the configured freeze length. Only the first end of freeze in a game
+  is kept.
+- **Alternatives considered**: each feature watching the countdown itself (the
+  first form of R11.3; a zone has no tick, and it would be two copies of one rule);
+  a new replicated scalar for the end of freeze (the operator chose no added value).

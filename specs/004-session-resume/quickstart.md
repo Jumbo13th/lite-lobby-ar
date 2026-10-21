@@ -371,3 +371,74 @@ Setup in Workbench (plan, operator steps 7 and 8):
 Outside the demo world, on a mission whose squad carries a parachute that opens by
 itself: an end-of-freeze deployment at a height. Expected: every member with a
 player lands alive (SC-011). Record the height used and the result.
+
+## Scenario 9: timed particle effects (US6, FR-036 to FR-042, SC-014, SC-015)
+
+Amendment of 2026-10-21. Demo world, dedicated server, three clients, one of them
+admin.
+
+Setup in Workbench (plan, operator steps 9 and 10):
+
+- One `EnvironmentParticle_Base` beside a squad's placed position, effect path
+  `Particles/LL_SignalSmoke_Red.ptc`, carrying `LL_TimedParticleComponent` with
+  `m_bAtFreezeEnd` on and `m_fBurnSeconds` 30.
+- Game mode: freeze time one minute.
+
+1. **Nothing before the moment** (FR-037). Clients 1 and 2 load and slot. Through slot
+   selection, briefing and the freeze, neither shows smoke at the entity.
+2. **The start** (FR-038). When the freeze ends, red smoke rises at the entity on
+   both clients, within a second of each other.
+3. **A late joiner** (FR-039). Ten seconds into the burn, client 3 joins: it shows the
+   smoke, which stops on it about twenty seconds later, together with clients 1 and 2.
+4. **The stop** (FR-038). Thirty seconds after the freeze ended the smoke stops rising
+   on every client, and the column thins out over the next seconds instead of
+   vanishing.
+5. **After the burn** (FR-039). A client joining after step 4 shows no smoke.
+6. **Admin changes to the freeze** (FR-040). New game; end the freeze with
+   `/endfreeze` after twenty seconds: the smoke starts at once. Revive the freeze
+   with `/freeze 60` while it burns: it keeps burning and stops thirty seconds after
+   it started.
+7. **The game phase** (FR-036). Set `m_bAtFreezeEnd` off, new game: the smoke starts
+   with the game phase, during the freeze, and stops thirty seconds later.
+8. **The server and the network** (FR-041, SC-015). The server log has no line from
+   the component; the diff audit of the amendment (task T054) adds no replicated
+   value and no message.
+9. **The wrong entity** (edge case). With the component on an entity that is not a
+   particle effect, a client logs one warning and nothing else happens.
+
+## Scenario 10: timed map zones (US7, FR-043 to FR-046, SC-016)
+
+Amendment of 2026-10-21, second part. Demo world, dedicated server, three clients,
+one of them admin.
+
+Setup in Workbench (plan, operator step 11):
+
+- One `LL_MapPolyZone` with `m_fHideDelaySeconds` 30 and `m_bHideAfterFreezeTime` off.
+- Game mode: freeze time one minute; no mission-end timer until step 4.
+
+1. **Before and during freeze** (FR-043). Clients 1 and 2 see the zone on the map at
+   briefing and during the freeze.
+2. **The delay** (FR-043). Client 1 keeps the map open: thirty seconds after the
+   freeze ended the zone disappears from it. Client 2 opens the map after that: no
+   zone.
+3. **A late joiner without a timer** (FR-044). Client 3 joins after the freeze ended
+   and before the thirty seconds: the zone hides for it when it hid for the others.
+4. **A late joiner with a timer** (FR-044). Add the mission-end timer, new game, end
+   the freeze with `/endfreeze` after twenty seconds; client 3 joins ten seconds
+   later and loses the zone at the same moment as clients 1 and 2.
+5. **The checkbox** (FR-043, FR-046). Tick `m_bHideAfterFreezeTime`, keep the delay:
+   the zone hides the moment the freeze ends, as before the amendment.
+6. **One reading for both** (FR-044). With Scenario 9's smoke placed as well, the
+   smoke stops and the zone hides at the same moment on every client.
+7. **Without either** (FR-046). With the checkbox off and the delay 0 the zone stays
+   all game.
+
+Amendment of 2026-10-21 to Scenario 8 (FR-028, FR-047 to FR-049):
+
+11. **Air drop of bodies without a player** (FR-028, FR-048). Deployment B with free
+    slots: when the game phase begins, the free bodies of squad B are at the height
+    with the players, holding nothing, and land under the mission's parachute.
+12. **Line drop** (FR-047, FR-049). Turn on `m_bLinear` for deployment A; in the
+    World Editor its points show an orange arrow. At the end of freeze the bodies of
+    squad A lie one after another from the drawn point along that arrow, about 40 m
+    apart, each later one about 5 m higher in an air drop.

@@ -6,6 +6,10 @@
 
 **Amended**: 2026-10-11, random squad deployment (spec User Story 5, FR-024 to FR-035): Design item 11, research R10, quickstart Scenario 8, the amendment tables below.
 
+**Amended**: 2026-10-21, timed particle effects and timed map zones (spec User Stories 6 and 7, FR-036 to FR-046): Design items 12 and 13, research R11 and R12, quickstart Scenarios 9 and 10, the amendment tables below.
+
+**Amended**: 2026-10-21, random deployment extended (spec User Story 5, FR-028 revised, FR-047 to FR-049): Design item 11 (last bullets), quickstart Scenario 8 steps 11 and 12, the amendment table below.
+
 ## Summary
 
 Build on the game's own session-save system (the persistence world system, the
@@ -36,6 +40,17 @@ teleport does, through one owner message. At the start of the game phase no body
 moved under a player at all: the fresh body every slotted player already receives
 is created at the point. No replicated value is added.
 
+The amendment of 2026-10-21 adds timed particle effects. A mission maker places a
+particle effect with the addon's timing component, which keeps it out until the end
+of freeze time or the start of the game phase and stops it after a set number of
+seconds on the mission clock. Every machine decides on its own from state it already
+receives, so nothing is added to the network. The addon ships one continuous red
+signal smoke made from the game's red smoke grenade.
+The same amendment gives a map zone a hide delay counted from the end of freeze.
+Both features take the end of freeze from one reading on the game mode: a mission-end
+timer's replicated start when the mission has one, otherwise the moment the machine
+saw the countdown end, otherwise the configured freeze length.
+
 ## Technical Context
 
 **Language/Version**: Enforce Script, Arma Reforger 1.8.0.10 (persistence files verified identical in 1.8.0.13)
@@ -57,6 +72,8 @@ is created at the point. No replicated value is added.
 **Scale/Scope**: about twelve new script files, edits to twelve existing ones, two `.conf` files, about ten localization keys, two guide pages, three operator steps (Workbench, server configuration, launch line), one deployment procedure recorded in the contract after measurement; two behaviours that apply to every mission, saves on or off: time stands still during any hard freeze, and spectators see the mission-end countdown
 
 **Amendment 2026-10-11 (random squad deployment)**: one new script file, edits to five existing ones, two new prefabs, the demo-world placement by the operator; no config file, no layout, no localization key, no guide page. Dependencies: `SCR_EditableEntityComponent.SetTransform`, `SCR_Global.TeleportPlayer`, `CompartmentAccessComponent.GetOutVehicle`, `SCR_WorldTools.FindEmptyTerrainPosition`, `SCR_Math2D.GenerateRandomPointInRadius`, the existing body replacement in `LL_LobbyManager`. One owner message and one saved bool are added. Tested in the demo world on a dedicated server (quickstart Scenario 8); the landing under a parachute is checked on a mission that has one, since the game and the demo world have none.
+
+**Amendment 2026-10-21 (timed particle effects)**: one new script file, one particle file derived from the game's red smoke grenade particle, the demo-world placement by the operator; no prefab, no config file, no layout, no localization key, no guide page. Dependencies: `ParticleEffectEntity.Play`, `Stop` and `StopEmission`, `SCR_BaseGameMode.GetElapsedTime`, `LL_GameModeCoop.GetFreezeTimeRemaining` and `GetFreezeTimeDuration`. Nothing is added to the network. Tested in the demo world on a dedicated server (quickstart Scenario 9). The second part edits `LL_GameModeCoop` (the freeze-end reading, an `onRplName` callback on the existing freeze countdown) and `LL_MapZoneComponent` (one attribute); quickstart Scenario 10.
 
 ## Constitution Check
 
@@ -92,6 +109,54 @@ Amendment 2026-10-11, random squad deployment (Design item 11):
 | Localization | None: no user-visible string; attribute descriptions are not localized. | PASS |
 | Testability | Scenario 8 runs in the demo world on a dedicated server and fails on every broken requirement. One check cannot run there: the landing under a parachute (SC-011's last clause), because neither the game nor the demo world has one; it runs on a mission that equips it. The air placement itself (who is in the air, at what height, who is on the ground) is checked in the demo world. | PASS with one check outside the demo world |
 
+Amendment 2026-10-21, timed particle effects (Design item 12):
+
+| Principle | Check | Result |
+|-----------|-------|--------|
+| I. Engine Fidelity | The effect is the game's placed ambient particle, `ParticleEffectEntity` (the class of the game's placed smokestacks), driven by its own `Play`, `Stop` and `StopEmission`. Time is the game's replicated elapsed time with the addon's freeze countdown, read as `LL_TriggerMissionEndTimer` reads them. The particle is the game's red smoke grenade with its emission envelope removed, in the form of the game's continuous smokestack particle. Nothing is spiked. | PASS |
+| II. Ask, Never Assume | Four answers from the operator in the spec's session of 2026-10-21: the branch, the start moment as a setting, the late joiner's remaining time without network cost, the one red particle. | PASS |
+| III. KISS | One component, a once-a-second tick on the call queue, two attributes; no manager, no registry, no prefab. | PASS |
+| IV. YAGNI | Two attributes, both read. No start delay, no colour beyond red, no sound, no burn-until-the-end option. | PASS |
+| V. Replication | Replicated values added: none. RPCs added: none. `RplSave`/`RplLoad`: unchanged. Local-only: each machine starts and stops its own copy from the game state, the freeze countdown and the mission clock it already receives; a dedicated server skips the component. | PASS |
+| VI. Comments and Hygiene | `LL_` prefix on the script and the particle. WHY comments on: the first tick's stop (the game plays a placed particle on load), the late joiner's start reading, the emission stop. No other addon is named. | PASS |
+| VII. Optional Integrations | Not an integration. A mission without the component is unchanged. | PASS |
+| Engine and Asset Constraints | No `.et` is written. One `.ptc`, derived from a game particle, registered through Workbench so that Workbench wrote its `.meta`; the operator confirms it loads. | PASS |
+| User Interface | None. | PASS |
+| Localization | None: no user-visible string; attribute descriptions are not localized. | PASS |
+| Testability | Scenario 9 runs in the demo world on a dedicated server and fails on every broken requirement; the operator places one particle entity. | PASS |
+
+Amendment 2026-10-21, second part, timed map zones and the freeze-end reading (Design item 13):
+
+| Principle | Check | Result |
+|-----------|-------|--------|
+| I. Engine Fidelity | The reading reuses three values the addon already has: the mission-end timer's replicated start, the replicated freeze countdown (an `onRplName` callback, the engine's own notification of a received value) and the configured freeze length. The zone's visibility check is the existing one, asked on map open and every frame. Nothing is spiked. | PASS |
+| II. Ask, Never Assume | Four answers from the operator in the spec's session of 2026-10-21: a delay setting on the zone, working on its own without the existing checkbox, counted from the end of freeze, for map zones only. | PASS |
+| III. KISS | One attribute on the zone, one getter on the game mode that both features read. | PASS |
+| IV. YAGNI | No delay for manual markers, no new component, no other start moment for the zone. | PASS |
+| V. Replication | Replicated values added: none; the existing `m_fFreezeTimeRemaining` gets an `onRplName` callback, which changes nothing that is sent. RPCs added: none. `RplSave`/`RplLoad`: unchanged. The freeze-end reading is local to each machine. | PASS |
+| VI. Comments and Hygiene | One WHY comment on the order of the reading. The timed effect drops its own copy of the rule. | PASS |
+| VII. Optional Integrations | Not an integration. A zone without the setting is unchanged. | PASS |
+| Engine and Asset Constraints | No asset. | PASS |
+| User Interface | None beyond the zone being drawn or not. | PASS |
+| Localization | None. | PASS |
+| Testability | Scenario 10 in the demo world on a dedicated server. | PASS |
+
+Amendment 2026-10-21, random deployment: line drop, air drop of bodies without a player, spawn-point arrow (Design item 11):
+
+| Principle | Check | Result |
+|-----------|-------|--------|
+| I. Engine Fidelity | Bodies without a player are moved by the same `MoveUnowned_S` (the game's `SetTransform`) and holstered with the game's `RemoveGadgetFromHand` / `TryEquipRightHandItem`, as the player's drop does on its machine. The line uses the point's own transform axis and `GetSurfaceY`. The arrow is the game's `Shape.CreateArrow` inside `#ifdef WORKBENCH`. | PASS |
+| II. Ask, Never Assume | Three answers from the operator in the spec's session of 2026-10-21; the operator saw bodies without a player land under the mission's parachute. | PASS |
+| III. KISS | Five attributes on the existing component, two helpers, one Workbench-only component on the existing spawn-point prefab. | PASS |
+| IV. YAGNI | No obstacle or water search for the line, no per-body spacing, no runtime arrow. | PASS |
+| V. Replication | Replicated values added: none. RPCs added: none. Bodies without a player are moved on the server, which owns them; players still get the one owner message per deployment. | PASS |
+| VI. Comments and Hygiene | WHY comments on the server-side holster and on the line's missing clearance search. | PASS |
+| VII. Optional Integrations | Not an integration. A deployment without the line setting places as before; an air drop now brings bodies without a player down from the height as well. | PASS |
+| Engine and Asset Constraints | `Prefabs/Spawn/LL_SpawnPoint.et` gains the arrow component; the operator confirms it in Workbench. | PASS |
+| User Interface | None. | PASS |
+| Localization | None. | PASS |
+| Testability | Scenario 8 steps 11 and 12 in the demo world on a dedicated server. | PASS |
+
 **Workbench steps for the operator** (also in [contracts/config-files.md](contracts/config-files.md)):
 
 1. Import the two new `.conf` files, confirm they load, and hand back the GUIDs
@@ -122,6 +187,17 @@ Amendment 2026-10-11, random squad deployment (Design item 11):
    have none, place six `LL_SpawnPoint` entities and name them (three per squad),
    place two `LL_RandomDeployment` entities with the attributes of quickstart
    Scenario 8, and put a car next to the first squad's placed position.
+9. Amendment 2026-10-21: compile the addon and report any error verbatim; confirm
+   that `Particles/LL_SignalSmoke_Red.ptc` loads (the agent registered it through
+   Workbench, which wrote its `.meta`).
+10. Amendment 2026-10-21: in the demo world, place the game's
+    `Prefabs/Particles/EnvironmentParticle_Base.et` beside a squad's placed position,
+    set its effect path to `Particles/LL_SignalSmoke_Red.ptc`, add
+    `LL_TimedParticleComponent` with `m_fBurnSeconds` 30, and set the demo game
+    mode's freeze time to one minute for the test.
+11. Amendment 2026-10-21: in the demo world, place an `LL_MapPolyZone` with
+    `m_fHideDelaySeconds` 30 and `m_bHideAfterFreezeTime` off; for step 4 of quickstart
+    Scenario 10, a mission-end timer trigger lasting longer than the test.
 
 ## Project Structure
 
@@ -198,6 +274,17 @@ Lite Lobby/
     │   └── LL_LobbyPlayerComponent.c            # one owner message: leave the seat if seated, then the game's own player teleport
     ├── Markers/LL_SpawnMarkers.c                # no marker for an end-of-freeze squad; the drawn point for a start-of-game squad
     └── Persistence/LL_SessionData.c             # freezeEndDeployed, record version 2
+```
+
+Amendment 2026-10-21, timed particle effects and timed map zones:
+
+```text
+Lite Lobby/
+├── Particles/LL_SignalSmoke_Red.ptc             # new: the game's red smoke grenade particle, continuous
+└── scripts/game/
+    ├── Core/LL_GameModeCoop.c                   # the freeze-end reading both features share
+    ├── Effects/LL_TimedParticleComponent.c      # new: starts and stops a placed particle by game state and mission clock
+    └── Zones/LL_MapZoneComponent.c              # the hide delay
 ```
 
 **Structure Decision**: persistence code gets its own `Persistence/` folder because
@@ -419,6 +506,64 @@ crew-lock gate rather than a new user action.
       placed and the height.
     - **Not built**: a parachute or any fall control, a message to players, a
       guide page, a random position inside an area, settings per point.
+    - **Amendment 2026-10-21.** Bodies without a player arrive at the height as well,
+      holstered on the server first (`HolsterForDrop_S`); the mission's parachute
+      brings them down. A line drop (`m_bLinear` with `m_fLineSpacing`,
+      `m_fLineJitter`, `m_fLineSpread`, `m_fLineRise`) replaces the radius spread:
+      `BuildLine_S` lays the bodies along the drawn point's forward axis, kept from
+      `Draw_S` (`m_vPointDirection`), and `LineRise` raises each later one. The
+      spawn-point prefab carries `LL_SpawnPointArrowComponent`, which draws that
+      axis in the World Editor only.
+
+12. **Timed particle effects** (amendment of 2026-10-21; FR-036 to FR-042; research
+    R11).
+    - **Authoring.** The mission maker places a particle effect entity (the game's
+      `EnvironmentParticle_Base.et`, as the game places its smokestacks) with its
+      effect path set to the addon's `Particles/LL_SignalSmoke_Red.ptc` or any
+      continuous particle, and adds `LL_TimedParticleComponent` with two attributes
+      ([data-model.md](data-model.md)): `m_bAtFreezeEnd` (on by default; off is the
+      start of the game phase) and `m_fBurnSeconds` (900 by default).
+    - **Per machine.** On every machine but a dedicated server the component ticks
+      once a second through the call queue. The first tick stops the particle, which
+      the game plays on load like any placed ambient effect (R11.1). Each tick reads
+      `GetState()`, `GetFreezeTimeRemaining()` and the game's `GetElapsedTime()`, all
+      already replicated (R11.3):
+      - before the game phase, or at the end of freeze while the countdown runs: out;
+      - the start reading: for the end of freeze, the game mode's freeze-end
+        reading (Design item 13); for the game phase, zero;
+      - burning while the clock minus the start reading is under `m_fBurnSeconds`,
+        then `StopEmission()`, which lets the emitted smoke finish (R11.2), and the
+        tick ends;
+      - once lit, the countdown is not read again (FR-040); leaving the game phase
+        stops it.
+    - **Particle.** `LL_SignalSmoke_Red.ptc` is the game's
+      `Smoke_grenade_M18_Red.ptc` with its emission time, repeat flag and the curves
+      that shape a grenade's ninety-second burn removed, as the game's continuous
+      smokestack particle has none, and the first emitter's birth rate lowered from
+      10 to 3, near the mean of its tapering burst (R11.2).
+    - **Not built**: a prefab, other colours, a start delay, a burn-until-the-end
+      option, sound, a server-side or replicated clock.
+
+13. **Timed map zones and the freeze-end reading** (amendment of 2026-10-21, second
+    part; FR-043 to FR-046; research R12).
+    - **Zone.** `LL_MapZoneComponent` gets `m_fHideDelaySeconds` (0, off, by
+      default) beside `m_bHideAfterFreezeTime`. `IsVisibleForLocalPlayer()` hides the
+      zone when the state is GAME, the countdown is zero, and either the checkbox is
+      on or the delay is above zero and the clock minus the freeze-end reading has
+      reached it. The zone already asks that question
+      when the map opens and every frame while it is open.
+    - **Reading.** `LL_GameModeCoop.GetFreezeEndedAt()`: `m_fMissionEndStartedAt`
+      when it is set (the mission-end timer's start, replicated and saved);
+      otherwise `m_fFreezeEndSeenAt`; otherwise `m_iFreezeTime / 1000`.
+      `m_fFreezeEndSeenAt` is local to each machine and set once: on the server in
+      `OnFreezeTimeEnded_S`; on a client by an `onRplName` callback on the existing
+      `m_fFreezeTimeRemaining`, when it arrives at zero after this machine saw it
+      above zero. A client that joins after the freeze only ever sees zero and keeps
+      the fallback.
+    - **Timed effects** take their start from `GetFreezeEndedAt()` when they light,
+      instead of watching the countdown themselves.
+    - **Not built**: a delay for manual markers, a new replicated value, a delay
+      counted from anything but the end of freeze.
 
 ## Constitution Check (post-design)
 
@@ -435,6 +580,16 @@ message to the moved player, one saved bool with a version bump, two new
 prefabs, a vanilla source named for every engine call, no spike. PASS on the
 documents; Scenario 8 on a dedicated server is the open gate, and the parachute
 landing stays open until it is run on a mission that has one.
+
+Amendment 2026-10-21, re-run after Design item 12: no replicated value, no RPC, no
+prefab, one particle file derived from the game's, a game source named for every
+call, no spike. PASS on the documents; Scenario 9 on a dedicated server is the open
+gate.
+
+Amendment 2026-10-21, second part, re-run after Design item 13: no replicated value
+(the callback on an existing property adds nothing to the wire), no RPC, one
+attribute on the zone, one reading for both features. PASS on the documents;
+Scenario 10 on a dedicated server is the open gate.
 
 ## Complexity Tracking
 

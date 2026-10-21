@@ -72,7 +72,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	protected int m_iMinContactShadows;
 
 	// Ticked once a second during freeze.
-	[RplProp()]
+	[RplProp(onRplName: "OnFreezeCountdownRpl")]
 	protected float m_fFreezeTimeRemaining;
 
 	[RplProp()]
@@ -135,6 +135,10 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	// Server, saved: the end-of-freeze squad deployments have run. The admin adjustment can
 	// revive a lapsed freeze, and its second end must not deploy anyone again.
 	protected bool m_bFreezeEndDeployed;
+
+	// The mission clock at the first end of freeze this machine saw; -1 until then.
+	protected float m_fFreezeEndSeenAt = -1;
+	protected bool m_bFreezeSeenRunning;
 
 	// Server: the aircraft held in the air and the damage effects paused during a hard freeze.
 	protected ref LL_VehicleHold m_VehicleHold = new LL_VehicleHold();
@@ -569,11 +573,27 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		Print("[LL_Lobby] Freeze time ended", LogLevel.NORMAL);
 		RemoveVanillaRestrictionZones_S();
 
+		if (m_fFreezeEndSeenAt < 0)
+			m_fFreezeEndSeenAt = GetElapsedTime();
+
 		if (!m_bFreezeEndDeployed)
 		{
 			m_bFreezeEndDeployed = true;
 			LL_RandomDeploymentComponent.PlaceFreezeEnd_S();
 		}
+	}
+
+	// A client that joins after the freeze receives the countdown at zero only: that is no end it saw.
+	protected void OnFreezeCountdownRpl()
+	{
+		if (m_fFreezeTimeRemaining > 0)
+		{
+			m_bFreezeSeenRunning = true;
+			return;
+		}
+
+		if (m_bFreezeSeenRunning && m_fFreezeEndSeenAt < 0 && GetState() == SCR_EGameModeState.GAME)
+			m_fFreezeEndSeenAt = GetElapsedTime();
 	}
 
 	// Stock editor restriction zones (SCR_EditorRestrictionZoneEntity) stop confining once
@@ -1159,6 +1179,19 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	float GetResumeDeadline()		{ return m_fResumeDeadline; }
 	int GetMissionEndDuration()		{ return m_iMissionEndDuration; }
 	float GetMissionEndStartedAt()	{ return m_fMissionEndStartedAt; }
+
+	// The mission clock at the end of freeze. A mission-end timer starts with it and is replicated, so
+	// it is exact everywhere; a machine that never saw the freeze end falls back to its configured length.
+	float GetFreezeEndedAt()
+	{
+		if (m_fMissionEndStartedAt >= 0)
+			return m_fMissionEndStartedAt;
+
+		if (m_fFreezeEndSeenAt >= 0)
+			return m_fFreezeEndSeenAt;
+
+		return m_iFreezeTime / 1000.0;
+	}
 	float GetResumedSnapshotTime()	{ return m_fResumedSnapshotTime; }
 
 	// Set once: a second timer or a restarted countdown must not move the spectator clock.

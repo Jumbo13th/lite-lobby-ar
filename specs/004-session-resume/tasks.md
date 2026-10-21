@@ -24,7 +24,7 @@ the review's findings are folded into the tasks they concern; revised again 2026
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (US1 to US5)
+- **[Story]**: Which user story this task belongs to (US1 to US7)
 - Include exact file paths in descriptions
 
 ## Phase 1: Setup (the persistence system exists for the mission)
@@ -182,6 +182,58 @@ from a mission that has one.
 
 ---
 
+### Amendment 2026-10-21 to User Story 5
+
+- [X] T063 [US5] In `Lite Lobby/scripts/game/Core/LL_RandomDeploymentComponent.c`: bodies without a player arrive at `m_fHeight` too, holstered on the server by `HolsterForDrop_S`, at both the start of the game phase and the end of freeze (FR-028, FR-048). Outcome 2026-10-21: first written as a local screenshot edit, kept on the operator's word after a test in which those bodies landed under the mission's parachute; TEMP labels removed, logic unchanged.
+- [X] T064 [US5] Same file: `m_bLinear`, `m_fLineSpacing`, `m_fLineJitter`, `m_fLineSpread`, `m_fLineRise`; `m_vPointDirection` kept by `Draw_S`; `BuildLine_S` and `LineRise` (FR-047). Outcome 2026-10-21: as T063.
+- [X] T065 [US5] `Lite Lobby/scripts/game/Core/LL_SpawnPointArrowComponent.c` (Workbench-only arrow, `m_fLength` 250) on `Prefabs/Spawn/LL_SpawnPoint.et` (FR-049). Outcome 2026-10-21: as T063; the prefab line was added by hand under the existing waiver for that file.
+- [ ] T066 [US5] Operator: compile; open `LL_SpawnPoint.et` and confirm the arrow; quickstart Scenario 8 steps 11 and 12 on a dedicated server.
+
+---
+
+## Phase 9: User Story 6 - A signal burns while it matters (Priority: P3)
+
+Amendment of 2026-10-21 (plan Design item 12, research R11). Independent of every
+other phase.
+
+**Goal**: a particle the mission maker places plays for a set number of seconds from
+the end of freeze time or the start of the game phase, on every machine, with
+nothing added to the network.
+
+**Independent Test**: quickstart Scenario 9 on a dedicated server.
+
+### Implementation for User Story 6
+
+- [X] T051 [P] [US6] Create `Lite Lobby/Particles/LL_SignalSmoke_Red.ptc` from the game's `Particles/Weapon/Smoke_grenade_M18_Red.ptc` per research R11.2 (`EmittingTime`, `Repeat` and the six `*Mast` curves removed from every emitter; the first emitter's `BirthRate` 10 to 3), and register it through Workbench's `RegisterResource` so that Workbench writes its `.meta` (FR-042). Outcome 2026-10-21: written, registered through `RegisterResource`; Workbench wrote the `.meta` as `{D7E94AE92D7424E2}Particles/LL_SignalSmoke_Red.ptc`.
+- [X] T052 [P] [US6] Create `Lite Lobby/scripts/game/Effects/LL_TimedParticleComponent.c`: `LL_TimedParticleComponentClass : ScriptComponentClass` and `LL_TimedParticleComponent : ScriptComponent` with `m_bAtFreezeEnd` (default 1) and `m_fBurnSeconds` (default 900), category "Lite Lobby". `OnPostInit`: nothing on a dedicated server (`RplSession.Mode() == RplMode.Dedicated`); otherwise a repeating one-second `CallLater(Tick)`, removed in `OnDelete`. `Tick`: an owner that is not a `ParticleEffectEntity` logs one warning and ends the tick; the first tick calls `Stop()`; the effect lights when the state is GAME and, for the end of freeze, the countdown is zero, with the start reading of Design item 12; `Play()` when lit; `StopEmission()` and the end of the tick when the burn is over or the state has left GAME. WHY comments on: the first stop, the late joiner's start reading, the emission stop (FR-036 to FR-041). Outcome 2026-10-21: written, not compiled (no compile call available to the agent); also returns at once outside play mode (`GetGame().InPlayMode()`), so the World Editor keeps showing the particle, and ends the tick unlit when the state reaches DEBRIEFING. Its own countdown watch was replaced by the shared reading in T058.
+- [X] T053 [P] [US6] In the architecture document at the workspace root (outside this repository): `Effects/` in the file-organisation table, `LL_TimedParticleComponent` in the world-entities line of the entity map, and a component entry of three lines; nothing in the replication contract. Outcome 2026-10-21: done; `Particles/` also added to the non-script content line.
+- [X] T054 [US6] Audit of the amendment's diff against FR-041 and the constitution: no `RplProp`, `RplRpc`, `RplSave`, `RplLoad` or `BumpMe` added; WHY comments only where T052 names them; the script ASCII with CRLF endings like the rest; no other addon, mission or person named. Needs T051 and T052. Outcome 2026-10-21: the new script has no `RplProp`, `RplRpc`, `RplSave`, `RplLoad`, `BumpMe` or `Rpc(` line; three WHY comments, the ones T052 names; ASCII with CRLF; no other addon, mission or person named in the script, the particle or the amended documents.
+- [ ] T055 [US6] Operator: plan steps 9 and 10 (compile, the particle loads, the demo-world placement), then quickstart Scenario 9 on a dedicated server, each outcome handed back. Needs T054.
+- [ ] T056 [US6] On the operator's word: one commit for the amendment on `004-session-resume`, and the pull request description extended in the "Changes:" form.
+
+---
+
+## Phase 10: User Story 7 - The assembly area leaves the map (Priority: P3)
+
+Amendment of 2026-10-21, second part (plan Design item 13, research R12). Needs
+Phase 9's component for T058 only.
+
+**Goal**: a map zone takes a hide delay that works on its own, counted from one
+end-of-freeze reading that timed effects share.
+
+**Independent Test**: quickstart Scenario 10 on a dedicated server.
+
+### Implementation for User Story 7
+
+- [X] T057 [US7] In `Lite Lobby/scripts/game/Core/LL_GameModeCoop.c`: `protected float m_fFreezeEndSeenAt = -1` and `protected bool m_bFreezeSeenRunning`; `[RplProp(onRplName: "OnFreezeCountdownRpl")]` on the existing `m_fFreezeTimeRemaining`; `protected void OnFreezeCountdownRpl()`: above zero sets `m_bFreezeSeenRunning`; at zero, in GAME, after `m_bFreezeSeenRunning` and while `m_fFreezeEndSeenAt` is unset, sets it to `GetElapsedTime()`; `OnFreezeTimeEnded_S` sets it the same way, once, on the server; `float GetFreezeEndedAt()` per Design item 13. One WHY comment on the order of the reading (FR-044, FR-045). Outcome 2026-10-21: written, not compiled. Two short comments beyond the one named: the -1 sentinel on the field, and on the callback why a late joiner's zero is no end it saw.
+- [X] T058 [P] [US7] In `Lite Lobby/scripts/game/Effects/LL_TimedParticleComponent.c`: the end-of-freeze start reading is `gm.GetFreezeEndedAt()`; drop `m_bSawFreeze` and its comment. Depends on T057 (FR-039). Outcome 2026-10-21: done; the end-of-freeze branch now only waits for the countdown and takes `GetFreezeEndedAt()`.
+- [X] T059 [P] [US7] In `Lite Lobby/scripts/game/Zones/LL_MapZoneComponent.c`: `m_fHideDelaySeconds` (default 0, category "Lite Lobby", beside `m_bHideAfterFreezeTime`), and in `IsVisibleForLocalPlayer()` the freeze-end hide also needs `GetElapsedTime() - GetFreezeEndedAt() >= m_fHideDelaySeconds`. Depends on T057 (FR-043, FR-046). Outcome 2026-10-21: written, not compiled. Revised the same day on the operator's word (spec session 2026-10-21): the delay works on its own, so the zone hides when the checkbox is on (at the end of freeze, as before) or when a delay above zero has passed; the guard became `m_bHideAfterFreezeTime || m_fHideDelaySeconds > 0`.
+- [X] T060 [US7] Audit of the second part: no new replicated value (only the `onRplName` on an existing property), no RPC, `RplSave`/`RplLoad` unchanged; the one WHY comment of T057; ASCII with CRLF; no other addon, mission or person named. Needs T057 to T059. Outcome 2026-10-21: the only replication line in the diff is the `onRplName` on the existing `m_fFreezeTimeRemaining`; no RPC, no `RplSave`/`RplLoad`; the added lines are ASCII (the 13 non-ASCII lines of `LL_GameModeCoop.c` are in the committed file); CRLF kept; no other addon, mission or person named.
+- [ ] T061 [US7] Operator: compile, plan step 11, quickstart Scenario 10 on a dedicated server, each outcome handed back. Needs T060.
+- [ ] T062 [US7] On the operator's word: in the same commit as T056.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -194,6 +246,8 @@ from a mission that has one.
 - **US4 (Phase 6)**: needs US1 to US3 on the event server.
 - **Polish (Phase 7)**: after everything; T036 before T037.
 - **US5 (Phase 8)**: needs nothing from Phases 3 to 7 but the session record (T013). T038, then T039; T040, T041 and T043 in parallel after T039; T042 after T039; T044 after T042; T045 after T038 to T044, T045b any time, T046 after T045 and T045b; T047 any time; T048 after the code tasks; T049 after T046 and T048; T050 last.
+- **US6 (Phase 9)**: independent of every other phase. T051 and T052 in parallel; T053 any time; T054 after T051 and T052; T055 after T054; T056 last.
+- **US7 (Phase 10)**: T057 first; T058 and T059 after it, in parallel; T060 after them; T061 after T060; T062 with T056.
 
 ### Parallel Opportunities
 
@@ -238,3 +292,9 @@ is the scale measurement on the event server. Scenario 7 closes the fault cases.
   message and no replicated value and leaves the guide alone. Its two prefabs are
   new and were written by the agent on the operator's waiver for those files (T045,
   T045b); no existing `.et` is edited.
+- Phase 9 was added by the amendment of 2026-10-21 (T051 to T056). It adds nothing to
+  the network, no prefab and no localization key; its one asset is a particle derived
+  from the game's.
+- Phase 10 was added by the second part of the amendment of 2026-10-21 (T057 to
+  T062). It adds an `onRplName` callback to an existing replicated property and no
+  value, and moves the timed effect onto the shared reading.

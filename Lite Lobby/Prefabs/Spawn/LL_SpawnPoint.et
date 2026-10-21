@@ -1,3 +1,7 @@
 SCR_Position {
  ID "6ACB48F9445CA432"
+ components {
+  LL_SpawnPointArrowComponent "{6AD69D269B80012C}" {
+  }
+ }
 }
