@@ -19,7 +19,7 @@ const content = join(root, 'src', 'content', 'docs');
 const temporaryOutput = join(root, '.validation-dist');
 const resultsDirectory = join(root, '.validation-results');
 const publicOrigin = config.site;
-const expectedGuideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics'];
+const expectedGuideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics', 'changelog'];
 const children = new Set();
 const servers = new Set();
 const browsers = new Set();
@@ -56,7 +56,7 @@ async function snapshot(directory) {
 async function inventoryCheck() {
   const inventory = JSON.parse(await readFile(join(root, 'tests', 'screenshots.json'), 'utf8'));
   const assetDirectory = join(root, 'src', 'assets', 'screenshots');
-  assert.equal(inventory.length, 141, 'Screenshot inventory must cover all used images');
+  assert.equal(inventory.length, 144, 'Screenshot inventory must cover all used images');
   assert.equal(new Set(inventory.map((entry) => entry.path)).size, inventory.length, 'Repeated screenshot paths');
   assert.equal(new Set(inventory.map((entry) => entry.originalPath)).size, inventory.length, 'Repeated migration source paths');
   assert.deepEqual((await filesIn(assetDirectory)).map((path) => slash(relative(assetDirectory, path))).sort(), inventory.map((entry) => entry.path).sort(), 'Screenshot files differ from the inventory, including filename case');
@@ -91,9 +91,9 @@ async function localeCheck() {
     assert.equal(html('html').attr('lang'), locale ? 'ru' : 'en');
     for (const anchor of expectedGuideOrder) assert.equal(html(`[id="${anchor}"]`).length, 1, `Missing or repeated ${locale || 'English '}anchor: ${anchor}`);
     assert.equal(html('.ll-guide-list').length, 1, 'The homepage needs one guide list');
-    assert.equal(html('.ll-guide-list article.ll-guide-entry').length, expectedGuideOrder.length, `The ${locale || 'English '}homepage needs four semantic guide entries`);
+    assert.equal(html('.ll-guide-list article.ll-guide-entry').length, expectedGuideOrder.length, `The ${locale || 'English '}homepage needs five semantic guide entries`);
     assert.deepEqual(html('.ll-guide-list article.ll-guide-entry h2').toArray().map((heading) => html(heading).attr('id')), expectedGuideOrder, 'Homepage guides must follow the agreed order');
-    for (const slug of ['create-mission', 'example-mission', 'git']) {
+    for (const slug of ['create-mission', 'example-mission', 'git', 'changelog']) {
       assert.equal(html(`#${slug} > a`).attr('href'), `${base}${locale}${slug}/`, `${slug} must link to its localized guide`);
     }
     assert.deepEqual(html('.ll-section-pages a').toArray().map((node) => html(node).attr('href')),
@@ -105,7 +105,7 @@ async function localeCheck() {
     titles.push(html('h1').text().trim());
   }
   assert.ok(titles[0] && titles[1] && titles[0] !== titles[1], 'The two homepages need localized titles');
-  console.log(`Validated matching English/Russian sources, four ordered homepage entries, three guide links, and all ${expectedGuideOrder.length} anchors`);
+  console.log(`Validated matching English/Russian sources, five ordered homepage entries, four guide links, and all ${expectedGuideOrder.length} anchors`);
 }
 
 function routeFor(relativePath) {

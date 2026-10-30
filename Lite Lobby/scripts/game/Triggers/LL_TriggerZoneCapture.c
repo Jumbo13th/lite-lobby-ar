@@ -58,10 +58,52 @@ class LL_TriggerZoneCapture : LL_TriggerZoneBase
 		if (m_fHoldSeconds <= 0)
 			m_fHoldSeconds = 1;
 
+		// A restored zone keeps its hold and flag where the snapshot left them.
+		if (m_bRestored)
+		{
+			m_bRestored = false;
+			if (m_bCaptured)
+			{
+				SetFlagOwner(GetAttackerFaction());
+				SetFlagRaise(1.0);
+				return;
+			}
+
+			SetFlagOwner(GetDefenderFaction());
+			SetFlagRaise(1.0 - Math.Clamp(m_fHeld / m_fHoldSeconds, 0, 1));
+			GetGame().GetCallqueue().CallLater(PollTick, TICK_MS, true);
+			return;
+		}
+
 		SetFlagOwner(GetDefenderFaction());
 		SetFlagRaise(1.0);
 
 		GetGame().GetCallqueue().CallLater(PollTick, TICK_MS, true);
+	}
+
+	override protected LL_TriggerState CreateState()
+	{
+		return new LL_TriggerZoneCaptureState();
+	}
+
+	override protected void SaveState(LL_TriggerState state)
+	{
+		LL_TriggerZoneCaptureState zone = LL_TriggerZoneCaptureState.Cast(state);
+		if (!zone)
+			return;
+
+		zone.held = m_fHeld;
+		zone.captured = m_bCaptured;
+	}
+
+	override protected void LoadState(LL_TriggerState state)
+	{
+		LL_TriggerZoneCaptureState zone = LL_TriggerZoneCaptureState.Cast(state);
+		if (!zone)
+			return;
+
+		m_fHeld = zone.held;
+		m_bCaptured = zone.captured;
 	}
 
 	override protected void OnDisarm()

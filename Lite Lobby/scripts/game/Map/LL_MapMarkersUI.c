@@ -143,6 +143,10 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		if (LL_SpectatorMenu.IsMapOpen())
 			return false;
 
+		// Nothing is placed or moved while the world is held; the server gate refuses too.
+		if (LL_GameModeCoop.IsHardFreezeActive())
+			return false;
+
 		PlayerController playerController = GetGame().GetPlayerController();
 		if (!playerController)
 			return false;

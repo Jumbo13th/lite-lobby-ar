@@ -11,12 +11,12 @@ FrameWidgetClass {
     Anchor 0.5 0.5 0.5 0.5
     PositionX -360
     OffsetLeft -360
-    PositionY -80
-    OffsetTop -80
+    PositionY -100
+    OffsetTop -100
     SizeX 720
     OffsetRight -360
-    SizeY 160
-    OffsetBottom -80
+    SizeY 200
+    OffsetBottom -100
    }
    Color 0.008 0.012 0.016 0.92
    style full
@@ -46,11 +46,13 @@ FrameWidgetClass {
       TextWidgetClass "{1D14000000000009}" {
        Name "PauseDetailText"
        Slot VerticalLayoutSlot "{1D1400000000000A}" {
-        HorizontalAlign 1
+        HorizontalAlign 3
        }
        Color 0.8 0.8 0.8 1
        Text ""
        "Font Size" 26
+       "Horizontal Alignment" Center
+       Wrap 1
        FontProperties FontProperties "{1D1400000000000B}" {
         OutlineSize 2
        }

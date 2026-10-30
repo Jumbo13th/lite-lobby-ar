@@ -89,6 +89,62 @@ StringTable {
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }
+  CustomStringTableItem "{D8D93C27150B704E}" {
+   Id "LL-Command_HelpSnapshot"
+   Target_en_us "/snapshot — save a session snapshot now"
+   Target_ru_ru "/snapshot — сохранить снапшот сессии сейчас"
+   Modified 1789814072
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{5E1A7C40D2B9F311}" {
+   Id "LL-Resume_HoldTitle"
+   Target_en_us "Session resumed"
+   Target_ru_ru "Сессия восстановлена"
+   Modified 1789816573
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{5E1A7C40D2B9F312}" {
+   Id "LL-Resume_HoldBody"
+   Target_en_us "The game continues from mission time %1. %2 of %3 players are back. Everyone is held in place until the admin releases the hold."
+   Target_ru_ru "Игра продолжается с отметки %1. Вернулись %2 из %3 игроков. Все удерживаются на месте, пока админ не снимет удержание."
+   Modified 1789899981
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{5E1A7C40D2B9F313}" {
+   Id "LL-Resume_HoldLimits"
+   Target_en_us "During the hold AI may move and a vehicle on a slope may creep, but nobody takes damage."
+   Target_ru_ru "Во время удержания ИИ может двигаться, а техника на склоне — сползать, но никто не получает урон."
+   Modified 1789816573
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{5E1A7C40D2B9F314}" {
+   Id "LL-Resume_Released"
+   Target_en_us "The hold is over. The game goes on."
+   Target_ru_ru "Удержание снято. Игра продолжается."
+   Modified 1789816573
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{5E1A7C40D2B9F315}" {
+   Id "LL-Resume_Refused"
+   Target_en_us "Session resume refused. The server is shutting down; see the server log."
+   Target_ru_ru "Восстановление сессии отклонено. Сервер завершает работу; смотрите лог сервера."
+   Modified 1789816573
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{5E1A7C40D2B9F316}" {
+   Id "LL-Resume_StatsIncomplete"
+   Target_en_us "Statistics incomplete: the snapshot statistics file was missing at resume."
+   Target_ru_ru "Статистика неполная: файл статистики снапшота отсутствовал при восстановлении."
+   Modified 1789816573
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
   CustomStringTableItem "{1D31000000000045}" {
    Id "LL-Command_HelpFreeze"
    Target_en_us "/freeze <seconds> — adjust freeze time (+ / -)"

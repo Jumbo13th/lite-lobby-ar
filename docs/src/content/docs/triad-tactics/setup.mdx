@@ -6,6 +6,9 @@ description: Prepare a mission for the Triad Tactics server.
 import LL_Screenshot from '../../../components/LL_Screenshot.astro';
 import triggerPoints from '../../../assets/screenshots/triad-tactics/001.png';
 import statZone from '../../../assets/screenshots/triad-tactics/002.png';
+import sessionSaves from '../../../assets/screenshots/triad-tactics/003.png';
+import saveTypes from '../../../assets/screenshots/triad-tactics/004.png';
+import systemsConfig from '../../../assets/screenshots/triad-tactics/005.png';
 
 Use this section once your mission is complete to configure it for the Triad Tactics server. Also read the [mission requirements](../requirements/), including the rules for assigning objective points.
 
@@ -43,3 +46,40 @@ This component marks an area where enemy kills earn extra points. The victim mus
   caption="LL_StatZoneComponent on the zone boundary object."
   originalLabel="Open original image"
 />
+
+## 4. Session saves {#session-saves}
+
+The server saves the game regularly. If the server crashes, the game continues from the last save.
+
+Triad Tactics Core ticks **Session Saves** in the game mode for you. To check, select `LL_GameMode_Lobby1` in **Hierarchy** and type `sess` in the property search box in **Object Properties**.
+
+<LL_Screenshot
+  src={sessionSaves}
+  alt="LL_GameMode_Lobby1 selected; the property search for sess shows Session Saves ticked under Lite Lobby."
+  caption="Session Saves in the game mode."
+  originalLabel="Open original image"
+/>
+
+The mission only has to allow saving. In **Resource Browser**, open `Missions/ShootingStar_Ep1.conf`.
+
+Under **Save Types**, tick all four checkboxes again: **MANUAL**, **AUTO**, **SCRIPTED** and **SHUTDOWN**. With all four cleared, as in [the mission name and description step](../../create-mission/world/#mission-details), the game saves nothing.
+
+<LL_Screenshot
+  src={saveTypes}
+  alt="ShootingStar_Ep1.conf with all four Save Types ticked: MANUAL, AUTO, SCRIPTED and SHUTDOWN."
+  caption="All four save types ticked."
+  originalLabel="Open original image"
+/>
+
+Click `..` next to **Systems Config**, open **LiteLobby → Configs → Systems** and choose `LL_LobbySystems.conf`.
+
+<LL_Screenshot
+  src={systemsConfig}
+  alt="The Choose SystemsConfig dialog with LiteLobby/Configs/Systems/LL_LobbySystems.conf selected; Systems Config shows LL_LobbySystems.conf."
+  caption="The lobby's systems config."
+  originalLabel="Open original image"
+/>
+
+Press `Ctrl+S` to save the scenario file.
+
+After a crash, the game finds each group by its object name. Give every group with playable slots [a name of its own](../../create-mission/groups-and-slots/#group-callsigns), such as `AB_S1`; no two groups may share a name.

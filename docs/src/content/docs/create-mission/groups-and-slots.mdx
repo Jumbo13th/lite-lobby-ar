@@ -147,7 +147,7 @@ The yellow boundary marks where players receive a warning; crossing the red boun
 
 ### Freeze duration {#freeze-duration}
 
-In **Hierarchy**, select the game mode, `LL_GameMode_Lobby1`, then **LL_GameModeCoop** in **Object Properties**. **Freeze Time** is in milliseconds: `120000` means two minutes. **Hard Freeze Time** is the initial pause that locks controls while the world loads; it is part of the overall freeze period.
+In **Hierarchy**, select the game mode, `LL_GameMode_Lobby1`, then **LL_GameModeCoop** in **Object Properties**. **Freeze Time** is in milliseconds: `120000` means two minutes. **Hard Freeze Time** is the initial pause that locks controls while the world loads. Freeze time starts counting only when the hard freeze ends: with a one-minute hard freeze and two minutes of freeze time, players wait three minutes in total.
 
 Press `Ctrl+S` to save the world.
 

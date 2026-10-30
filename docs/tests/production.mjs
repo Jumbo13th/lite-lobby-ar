@@ -8,7 +8,7 @@ import { base } from '../astro.config.mjs';
 
 const home = (locale) => `${base}${locale === 'ru' ? 'ru/' : ''}`;
 const route = (locale, article) => `${home(locale)}${article ? `${fixtureSlug}/` : ''}`;
-const guideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics'];
+const guideOrder = ['create-mission', 'example-mission', 'git', 'triad-tactics', 'changelog'];
 const guidePages = new Map([...chapters.hubs, ...chapters.chapters].map((entry) => [entry.slug, entry]));
 
 async function chapterTitle(page, locale, slug) {
@@ -207,13 +207,13 @@ async function homepageLayout(page) {
   const list = page.locator('.ll-guide-list');
   const entries = list.locator('article.ll-guide-entry');
   assert.equal(await list.count(), 1, 'Homepage must present one guide list');
-  assert.equal(await entries.count(), guideOrder.length, 'Homepage must present exactly four guide entries');
+  assert.equal(await entries.count(), guideOrder.length, 'Homepage must present exactly five guide entries');
   assert.deepEqual(await entries.locator('h2').evaluateAll((headings) => headings.map((heading) => heading.id)), guideOrder, 'Homepage guides must follow the agreed order');
   assert.equal(await page.locator('.sidebar, .sidebar-pane, starlight-toc, mobile-starlight-toc').count(), 0, 'Homepage should omit article navigation');
   assert.equal(await page.locator('#starlight__sidebar.ll-mobile-menu[popover]').count(), 1, 'Homepage needs its compact mobile menu');
   assert.equal(await page.locator('.ll-home-controls, .ll-mobile-socials').count(), 0, 'Homepage should not duplicate menu controls in the content');
   const locale = await page.locator('html').getAttribute('lang');
-  for (const slug of ['create-mission', 'example-mission', 'git']) {
+  for (const slug of ['create-mission', 'example-mission', 'git', 'changelog']) {
     assert.equal(await page.locator(`#${slug} > a`).getAttribute('href'), `${home(locale)}${slug}/`, `${slug} must link to its localized guide`);
   }
   assert.deepEqual(await page.locator('.ll-section-pages a').evaluateAll((links) => links.map((link) => link.getAttribute('href'))),

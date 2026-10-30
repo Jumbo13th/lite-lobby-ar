@@ -46,6 +46,9 @@ class LL_MapZoneComponent : ScriptComponent
 	[Attribute("0", UIWidgets.CheckBox, "Hide this zone from the map once the post-start freeze countdown ends (pair with LL_FreezeZoneComponent).", category: "Lite Lobby")]
 	protected bool m_bHideAfterFreezeTime;
 
+	[Attribute("0", UIWidgets.EditBox, "Hide this zone from the map this many seconds after the freeze countdown ends. 0 = off; hide after freeze time hides it at once instead.", category: "Lite Lobby")]
+	protected float m_fHideDelaySeconds;
+
 	protected ShapeEntity m_Shape;
 	protected SCR_MapEntity m_MapEntity;
 	protected CanvasWidget m_wCanvas;
@@ -87,10 +90,11 @@ class LL_MapZoneComponent : ScriptComponent
 			return false;
 
 		// The countdown also reads 0 before the game starts, so GAME is required too.
-		if (m_bHideAfterFreezeTime)
+		if (m_bHideAfterFreezeTime || m_fHideDelaySeconds > 0)
 		{
 			LL_GameModeCoop coopMode = LL_GameModeCoop.Cast(GetGame().GetGameMode());
-			if (coopMode && coopMode.GetLobbyState() == SCR_EGameModeState.GAME && coopMode.GetFreezeTimeRemaining() <= 0)
+			if (coopMode && coopMode.GetLobbyState() == SCR_EGameModeState.GAME && coopMode.GetFreezeTimeRemaining() <= 0
+				&& (m_bHideAfterFreezeTime || coopMode.GetElapsedTime() - coopMode.GetFreezeEndedAt() >= m_fHideDelaySeconds))
 				return false;
 		}
 
