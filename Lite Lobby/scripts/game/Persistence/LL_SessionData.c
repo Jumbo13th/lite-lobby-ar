@@ -85,18 +85,20 @@ class LL_SessionSerializer : ScriptedStateSerializer
 			if (groupRpl)
 				group = SCR_AIGroup.Cast(groupRpl.GetEntity());
 
-			string squadName = "";
-			if (group)
+			// A slot outside every mission squad (a unit spawned mid-game: its group has no entity
+			// name) cannot be matched on load and would refuse the whole resume. Its body still
+			// persists, as a plain character.
+			if (!group || group.GetName() == "")
+				continue;
+
+			string squadName = group.GetName();
+			if (!seenGroups.Contains(slot.m_iGroupId))
 			{
-				squadName = group.GetName();
-				if (!seenGroups.Contains(slot.m_iGroupId))
-				{
-					seenGroups.Insert(slot.m_iGroupId);
-					LL_SquadRecord squad = new LL_SquadRecord();
-					squad.name = squadName;
-					squad.frequency = group.GetRadioFrequency();
-					record.squads.Insert(squad);
-				}
+				seenGroups.Insert(slot.m_iGroupId);
+				LL_SquadRecord squad = new LL_SquadRecord();
+				squad.name = squadName;
+				squad.frequency = group.GetRadioFrequency();
+				record.squads.Insert(squad);
 			}
 
 			LL_SlotRecord entry = new LL_SlotRecord();
@@ -153,6 +155,17 @@ class LL_SessionSerializer : ScriptedStateSerializer
 		{
 			gm.ReportResumeFailure_S("session record unreadable");
 			return true;
+		}
+
+		// Snapshots written before the serializer skipped them still hold such slots: drop them
+		// here so the rest of the round resumes; their bodies come back as plain characters.
+		for (int i = record.slots.Count() - 1; i >= 0; i--)
+		{
+			if (record.slots[i].squad != "")
+				continue;
+
+			Print(string.Format("[LL_Lobby] Resume: slot %1 is in no mission squad, its body stays a plain character", record.slots[i].name), LogLevel.WARNING);
+			record.slots.RemoveOrdered(i);
 		}
 
 		gm.SetResumeRecord_S(record);
