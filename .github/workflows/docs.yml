@@ -5,13 +5,11 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/docs.yml'
-      - '.github/dependabot.yml'
   push:
     branches: [main]
     paths:
       - 'docs/**'
       - '.github/workflows/docs.yml'
-      - '.github/dependabot.yml'
   workflow_dispatch:
     inputs:
       publish:

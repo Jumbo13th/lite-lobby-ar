@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "schedule": ["* 1-6 * * 1"],
+  "automergeSchedule": ["* 1-6 * * 1-5"],
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": false
+  },
+  "vulnerabilityAlerts": {
+    "schedule": [],
+    "minimumReleaseAge": null,
+    "dependencyDashboardApproval": false,
+    "prCreation": "immediate"
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "automerge": true
+    },
+    {
+      "description": "The workflow deploys the guide site with a Pages token; always reviewed.",
+      "matchManagers": ["github-actions"],
+      "automerge": false,
+      "groupName": "GitHub Actions"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Guide site dependencies"
+    },
+    {
+      "matchDatasources": ["node-version"],
+      "matchPackageNames": ["node"],
+      "groupName": "Node.js"
+    }
+  ]
+}
