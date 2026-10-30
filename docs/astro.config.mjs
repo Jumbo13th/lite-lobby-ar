@@ -68,6 +68,7 @@ export default defineConfig({
             { slug: 'character-prefabs/prefab-operations' },
           ],
         },
+        { slug: 'changelog' },
       ],
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
       pagination: false,

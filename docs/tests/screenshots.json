@@ -844,5 +844,23 @@
     "originalPath": "guide/TriadMission/02.png",
     "bytes": 1651313,
     "sha256": "60f163cd182c5f147415e458894cd095a842ff3c58cc809586d40a3739f3bbf3"
+  },
+  {
+    "path": "triad-tactics/003.png",
+    "originalPath": "guide/TriadMission/03.png",
+    "bytes": 1351214,
+    "sha256": "9679cb32d9b98791e8e0c66b45f6dba252b5d334c97ac24efdef682c214b7066"
+  },
+  {
+    "path": "triad-tactics/004.png",
+    "originalPath": "guide/TriadMission/04.png",
+    "bytes": 108489,
+    "sha256": "7822e31e098806b9526eea49f207dfe1f06dbbc4b8c40b8199d834d9d76253d8"
+  },
+  {
+    "path": "triad-tactics/005.png",
+    "originalPath": "guide/TriadMission/05.png",
+    "bytes": 78071,
+    "sha256": "3b0c051b4055c0b0391376a6cae5461b1146a3a099572b66c2b2495825c87a26"
   }
 ]

@@ -1,8 +1,8 @@
 <!--
 Sync Impact Report
-- Version: 1.0.0 (initial ratification)
-- Written after the open-source cleanup of 2026-09-07/08, from the operator's standing
-  instructions and the engine lessons that shaped the addon.
+- Version: 1.0.0 → 1.1.0 (MINOR: Documentation guidance expanded)
+- Modified section: Documentation — every pull request adds a short, functional
+  changelog entry per Workshop version (operator, 2026-10-31).
 - Templates requiring updates: none; plan-template.md's constitution check reads this
   file at runtime.
 - Follow-up TODOs: none.
@@ -240,6 +240,15 @@ looks and behaves like the game.
 
   One line per change. No preamble, no rationale essay, no headings, no walls of text.
   A description that needs more than the list is a sign the change should be split.
+- Every pull request that changes what players or mission makers get adds its entry to
+  the guide's changelog page (`docs/src/content/docs/changelog.mdx` and its Russian
+  page), under the Workshop version that ships it. The entry is a very short list, one
+  plain statement per line of what was added, changed, fixed or removed ("Added
+  LL_TimedParticleComponent for signal smoke: the particle starts on a timer."). It names
+  the components, prefabs, settings and commands exactly as Workbench and the game show
+  them, and says what they now do; how the code works (methods, replication, internals)
+  belongs in the specification and the commit. The Russian page uses the community's
+  terms (спавн, хардфриз, фризтайм, слот, реконнект), never an ambiguous paraphrase.
 
 ## Open Source Standards
 
@@ -311,4 +320,4 @@ change in the Sync Impact Report at the top, and bump the version:
 
 The operator ratifies every amendment.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-08 | **Last Amended**: 2026-09-08
+**Version**: 1.1.0 | **Ratified**: 2026-09-08 | **Last Amended**: 2026-10-31

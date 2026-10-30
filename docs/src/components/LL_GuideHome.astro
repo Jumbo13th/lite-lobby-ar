@@ -2,19 +2,20 @@
 import { Icon } from '@astrojs/starlight/components';
 
 interface Props {
-  guides: [string, string, string, string];
+  guides: [string, string, string, string, string];
   triadPages: [string, string];
 }
 
 const { guides, triadPages } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const guideBase = `${base}/${Astro.locals.starlightRoute.lang === 'ru' ? 'ru/' : ''}`;
-const linkedGuides = new Set(['create-mission', 'example-mission', 'git']);
+const linkedGuides = new Set(['create-mission', 'example-mission', 'git', 'changelog']);
 const topics = [
   { id: 'create-mission', icon: 'add-document' },
   { id: 'example-mission', icon: 'open-book' },
   { id: 'git', icon: 'github' },
   { id: 'triad-tactics', icon: 'setting' },
+  { id: 'changelog', icon: 'list-format' },
 ] as const;
 ---
 

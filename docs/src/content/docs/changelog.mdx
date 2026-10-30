@@ -1,0 +1,52 @@
+---
+title: Changelog
+description: What changed in each Lite Lobby version on the Workshop.
+---
+
+What changed in each [Lite Lobby version on the Workshop](https://reforger.armaplatform.com/workshop/699319AAA5BFC57F), newest first.
+
+## 1.0.9 {#v1-0-9}
+
+- Fixed: slots a Game Master spawned during the game now come back with a session resume when the game saved their squad, and their players get them back on reconnect. If the squad was not saved (for example, all its members died), its slots are lost and the rest of the session resumes.
+
+## 1.0.8 — 25 October 2026 {#v1-0-8}
+
+- Fixed: a session could not be resumed if a Game Master spawned characters during the game that appeared in the lobby as new slots. The session now resumes; those characters stay in the world without a slot, and their players reconnect without a slot.
+
+## 1.0.7 — 21 October 2026 {#v1-0-7}
+
+- Added `LL_TimedParticleComponent` for signal smoke: the particle starts on a timer, when freeze time ends or when the game starts (**At Freeze End**), and burns for a set time (**Burn Seconds**). Late joiners see it too.
+- Added the red signal smoke particle `Particles/LL_SignalSmoke_Red.ptc` for `LL_TimedParticleComponent`.
+- Added **Hide Delay Seconds** to `LL_MapZoneComponent`: the zone leaves the map that many seconds after freeze time ends.
+- Added the **Linear** mode to `LL_RandomDeploymentComponent` for parachute drops: the squad spawns in a line along the spawn point's arrow, each next soldier higher than the one before (**Line Spacing**, **Line Jitter**, **Line Spread**, **Line Rise**).
+- Added a direction arrow to the `LL_SpawnPoint.et` prefab, visible only in World Editor (`LL_SpawnPointArrowComponent`).
+- AI members of the squad now spawn at **Height** too instead of on the ground.
+- Characters spawned more than 10 m above the ground now holster their weapon, so it no longer floats beside them under the parachute.
+
+## 1.0.5 and 1.0.6 — 11 October 2026 {#v1-0-6}
+
+- Added random squad spawn: the `LL_RandomDeployment.et` (`LL_RandomDeploymentComponent`) and `LL_SpawnPoint.et` prefabs. Each game the squad spawns at one of its spawn points, on the ground or at **Height**, when the game starts or when freeze time ends (**At Freeze End**).
+- A squad that spawns when freeze time ends has no start marker on the briefing map.
+
+## 1.0.4 — 27 September 2026 {#v1-0-4}
+
+- Fixed players losing their slots when they had not reconnected yet during the hard freeze after a session resume.
+
+## 1.0.3 — 20 September 2026 {#v1-0-3}
+
+- With **Session Saves** on, a group (`SCR_AIGroup`) is no longer deleted when its last member dies, so its KIA slots come back with it after a resume.
+
+## 1.0.2 — 20 September 2026 {#v1-0-2}
+
+- Fixed extra AI members and slots appearing in squads after a session resume and casualties.
+
+## 1.0.1 — 20 September 2026 {#v1-0-1}
+
+- Added session resume after a server crash: the **Session Saves** checkbox on `LL_GameModeCoop` and `Configs/Systems/LL_LobbySystems.conf` as the scenario's **Systems Config**. The server takes snapshots during the game; after a restart with `-loadSessionSave` the world, slots, markers, triggers and statistics come back, and players get their slots back on reconnect.
+- After a resume the game stays in a hard freeze until an admin releases it with `/hardfreeze 0`. The hard freeze shows the snapshot time and how many players are back.
+- Added the admin command `/snapshot` to take a snapshot at once.
+- A server stop now takes a final snapshot.
+- Any hard freeze now stops time, disables damage, stops vehicles and holds helicopters in the air.
+- Freeze time now starts after the hard freeze ends.
+- Spectators now see the time left until the mission ends when it has an `LL_TriggerMissionEndTimer`.
+- Snapshots are now deleted when the game reaches debriefing.

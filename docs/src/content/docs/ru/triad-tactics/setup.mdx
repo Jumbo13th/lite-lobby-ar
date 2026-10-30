@@ -6,6 +6,9 @@ description: Подготовка миссии для сервера Triad Tacti
 import LL_Screenshot from '../../../../components/LL_Screenshot.astro';
 import triggerPoints from '../../../../assets/screenshots/triad-tactics/001.png';
 import statZone from '../../../../assets/screenshots/triad-tactics/002.png';
+import sessionSaves from '../../../../assets/screenshots/triad-tactics/003.png';
+import saveTypes from '../../../../assets/screenshots/triad-tactics/004.png';
+import systemsConfig from '../../../../assets/screenshots/triad-tactics/005.png';
 
 Переходите к этому разделу, когда миссия уже готова. Здесь настроим её для сервера Triad Tactics. Также ознакомьтесь с [требованиями к миссиям](../requirements/): они определяют, в том числе, сколько очков назначать за задачи.
 
@@ -43,3 +46,40 @@ import statZone from '../../../../assets/screenshots/triad-tactics/002.png';
   caption="LL_StatZoneComponent добавлен на объект с границами зоны."
   originalLabel="Открыть оригинал изображения"
 />
+
+## 4. Сохранение сессии {#session-saves}
+
+Сервер регулярно сохраняет игру. Если сервер упадёт, игра продолжится с последнего сохранения.
+
+Triad Tactics Core сам отмечает **Session Saves** в игровом режиме. Чтобы проверить, выберите `LL_GameMode_Lobby1` в **Hierarchy** и введите `sess` в поле поиска свойств в **Object Properties**.
+
+<LL_Screenshot
+  src={sessionSaves}
+  alt="Выбран LL_GameMode_Lobby1; поиск свойств по sess показывает отмеченный флажок Session Saves в разделе Lite Lobby."
+  caption="Session Saves в игровом режиме."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Миссии остаётся только разрешить сохранение. В **Resource Browser** откройте `Missions/ShootingStar_Ep1.conf`.
+
+В разделе **Save Types** снова отметьте все четыре флажка: **MANUAL**, **AUTO**, **SCRIPTED** и **SHUTDOWN**. Если они сняты, как на [шаге с названием и описанием миссии](../../create-mission/world/#mission-details), игра ничего не сохраняет.
+
+<LL_Screenshot
+  src={saveTypes}
+  alt="Файл ShootingStar_Ep1.conf: отмечены все четыре флажка Save Types — MANUAL, AUTO, SCRIPTED и SHUTDOWN."
+  caption="Все четыре типа сохранений отмечены."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `..` рядом с **Systems Config**, откройте **LiteLobby → Configs → Systems** и выберите `LL_LobbySystems.conf`.
+
+<LL_Screenshot
+  src={systemsConfig}
+  alt="Окно Choose SystemsConfig с выбранным LiteLobby/Configs/Systems/LL_LobbySystems.conf; в поле Systems Config указан LL_LobbySystems.conf."
+  caption="Системный конфиг лобби."
+  originalLabel="Открыть оригинал изображения"
+/>
+
+Нажмите `Ctrl+S`, чтобы сохранить файл сценария.
+
+После падения сервера игра находит каждую группу по имени объекта. Дайте каждой группе со слотами [собственное имя](../../create-mission/groups-and-slots/#group-callsigns), например `AB_S1`; у двух групп не может быть одинакового имени.
