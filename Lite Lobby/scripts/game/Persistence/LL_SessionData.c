@@ -5,9 +5,52 @@
 
 class LL_SquadRecord
 {
-	// The squad entity's own name, not the roster callsign: the body is re-attached by it.
+	// The squad key: the entity's own name, not the roster callsign, or, for a squad a Game
+	// Master spawned during the game, which has no name, the persistence id the game
+	// restores it under. Kept a string so older records load unchanged.
 	string name;
 	int frequency;
+
+	//! Empty when the squad could not be found again on load.
+	static string KeyOf(notnull SCR_AIGroup group)
+	{
+		string entityName = group.GetName();
+		if (entityName != "")
+			return entityName;
+
+		PersistenceSystem persistence = PersistenceSystem.GetInstance();
+		if (!persistence)
+			return "";
+
+		UUID id = persistence.GetId(group);
+		if (id.IsNull())
+			return "";
+
+		return id;
+	}
+
+	static bool IsIdKey(string key)
+	{
+		UUID id = key;
+		return !id.IsNull();
+	}
+
+	static SCR_AIGroup Find(string key)
+	{
+		if (key == "")
+			return null;
+
+		SCR_AIGroup group = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(key));
+		if (group || !IsIdKey(key))
+			return group;
+
+		PersistenceSystem persistence = PersistenceSystem.GetInstance();
+		if (!persistence)
+			return null;
+
+		UUID id = key;
+		return SCR_AIGroup.Cast(persistence.FindById(id));
+	}
 }
 
 class LL_SlotRecord
@@ -85,25 +128,27 @@ class LL_SessionSerializer : ScriptedStateSerializer
 			if (groupRpl)
 				group = SCR_AIGroup.Cast(groupRpl.GetEntity());
 
-			// A slot outside every mission squad (a unit spawned mid-game: its group has no entity
-			// name) cannot be matched on load and would refuse the whole resume. Its body still
-			// persists, as a plain character.
-			if (!group || group.GetName() == "")
+			// A slot whose squad is gone, or untracked, cannot be matched on load and would
+			// refuse the whole resume. Its body still persists, as a plain character.
+			if (!group)
 				continue;
 
-			string squadName = group.GetName();
+			string squadKey = LL_SquadRecord.KeyOf(group);
+			if (squadKey == "")
+				continue;
+
 			if (!seenGroups.Contains(slot.m_iGroupId))
 			{
 				seenGroups.Insert(slot.m_iGroupId);
 				LL_SquadRecord squad = new LL_SquadRecord();
-				squad.name = squadName;
+				squad.name = squadKey;
 				squad.frequency = group.GetRadioFrequency();
 				record.squads.Insert(squad);
 			}
 
 			LL_SlotRecord entry = new LL_SlotRecord();
 			entry.name = slot.m_sName;
-			entry.squad = squadName;
+			entry.squad = squadKey;
 			entry.kia = slot.IsDestroyed();
 			entry.locked = slot.m_bLocked;
 			entry.sortKey = slot.m_iSortKey;

@@ -84,7 +84,7 @@ Squad record:
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `name` | string | the squad entity's own name (`IEntity.GetName()`), unique per mission (FR-021); not the roster label, which is a callsign |
+| `name` | string | the squad key: the squad entity's own name (`IEntity.GetName()`), unique per mission (FR-021), not the roster label, which is a callsign; for a squad without a name (spawned by a Game Master during the game) its persistence id (`PersistenceSystem.GetId`, a UUID string) (FR-050) |
 | `frequency` | int | the radio frequency assigned at game start |
 
 Slot record:
@@ -93,7 +93,7 @@ Slot record:
 |-------|------|-------|
 | `name` | string | the slot's display name, for the log and the refusal cause |
 | `body` | UUID | `PersistenceSystem.GetId(slotEntity)`; empty (null UUID) when the body is not tracked, logged by slot name at save time, and a refusal cause on load |
-| `squad` | string | the squad entity's own name; the body is re-attached to it on load when the game did not |
+| `squad` | string | the squad key, as in the squad record; the body is re-attached to the squad found by name, or by persistence id, on load when the game did not. Never empty: a slot whose squad no longer exists or is not tracked is not written (FR-050) |
 | `holderKey` | string | the reconnect key (identity GUID, or the name form when enabled), read through the reverse key map so a placeholder holder's key is saved again; empty for an empty slot |
 | `holderName` | string | display name, so the roster can grey it out before the player is back |
 | `kia` | bool | slot damage state is destroyed |
@@ -102,9 +102,13 @@ Slot record:
 
 Validation on load (all-or-nothing, spec FR-014): a save whose `version` is unknown,
 a native load failure, a record whose body reference is empty, whose body never
-becomes available within the load phase, whose squad entity is not found, or whose
+becomes available within the load phase, whose named squad is not found (a squad keyed by persistence id that the load did not restore drops its slots instead), or whose
 body registers no slot, and an `ACTIVE` state reached with no record at all, each
-refuse the whole resume. Nothing is dropped individually. A refusal disables saving
+refuse the whole resume. Two kinds of record are dropped individually, each with a
+warning, and their bodies stay plain characters: one whose squad is keyed by
+persistence id and was not restored by the load (dropped at `ACTIVE`, FR-050), and
+one with an empty `squad`, written before FR-050 (dropped before the record is
+applied). A refusal disables saving
 and the save types, logs its cause, purges nothing, and asks the game to close.
 
 ### `LL_TriggerData` (serializer `LL_TriggerSerializer`)

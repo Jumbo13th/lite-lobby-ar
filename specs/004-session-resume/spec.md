@@ -14,6 +14,8 @@
 
 **Amended**: 2026-10-21, random deployment extended on the operator's request: a line drop, the air drop of bodies without a player, and an arrow on the spawn point (User Story 5, FR-028 revised, FR-047 to FR-049).
 
+**Amended**: 2026-10-31, aligned with what was built outside this text: the hold's protections on every hard freeze, the engine stop of a grounded helicopter and the handbrake gate, the `/snapshot` test aid, the development identity, no member refills after casualties, mission squads kept when empty, and slots of squads a Game Master spawns during the game (kept by persistence id); session saves described only in the guide's Triad Tactics section (FR-007, FR-009, FR-015, FR-016, FR-017, FR-019 and FR-022 revised, FR-050 to FR-052).
+
 ## Current State
 
 A Lite Lobby event runs once. When the dedicated server dies mid-game, as it did on
@@ -139,7 +141,8 @@ were confirmed by the operator the same day.
 - Q: Which vehicle recipe holds a helicopter? → A: the game's own pilot-dropped
   recipe (wheel brake and autohover, engine left as it is); the forced engine stop is
   documented for cinematics and is not used. An airborne helicopter is additionally
-  pinned, which remains the one spike.
+  pinned, which remains the one spike. (Amended 2026-09-20 at review: a helicopter
+  on the ground also has its engine stopped; see the session of 2026-10-31.)
 - Q: If the launch parameter does not override the configuration file? → A: no
   addon fallback is built. The operator's alternative is the configuration value
   itself, flipped to true for that one start, which needs no code; the choice comes
@@ -412,6 +415,63 @@ and the specification goes to implementation.
   each later one a little higher, as a stick leaves an aircraft.
 - Q: How does a mission maker see where the line runs? → A: the addon's spawn point
   shows its arrow in the World Editor.
+
+### Session 2026-10-31 (alignment with the implementation)
+
+Behaviour that was built in review, in testing or as a live fix without a line in
+this text. Each answer records what the branch does.
+
+- Q: Do the hold's protections apply to every hard freeze? → A: yes. The
+  start-of-game hard freeze and an admin's `/hardfreeze N` get the same protections
+  as the resume hold, saves on or off: no character or vehicle takes damage (true
+  damage, used by scripted and admin kills, still applies), every vehicle is stopped
+  as the hold stops it, and an airborne helicopter is pinned. FR-016 and FR-022 are
+  amended.
+- Q: Does a hard freeze stop a helicopter's engine? → A: on the ground, yes (review
+  of 2026-09-20): its pilot stays seated and only the engine-start gate would hold
+  them. In the air the engine keeps running and the pin holds the aircraft. A seated
+  driver cannot toggle the handbrake during any hard freeze, because the toggle is a
+  user action the input lock does not cover.
+- Q: Is `/snapshot` an admin chat command against FR-009? → A: it is the one
+  exception, a test aid the operator asked for on 2026-09-19: one request from an
+  admin to the server, under the same gate as the autosave, ignored with saves off.
+- Q: How is a reservation tested on a development server, which gives players no
+  platform identity? → A: a server-profile switch, off by default, derives the
+  identity from the player's name the way the game does in a non-dedicated session.
+  It is for development servers only and logs a warning when on.
+- Q: Can a restored squad spawn members later in the round? → A: no. A test on
+  2026-09-20 grew 127 slots to 131 after casualties, and a later resume to 137: the
+  squads' queued member spawns outlived the load. Member spawning stays off for a
+  restored map squad for the rest of the round, queued spawns included. A squad
+  placed after the resume spawns normally.
+- Q: Does a mission squad outlive its last member? → A: with saves on, yes. The game
+  deletes an empty squad, but its KIA slots keep their corpses and every later
+  snapshot must name their squad. With saves off the game's behaviour stands.
+- Q: What happens to a slot outside every mission squad: a playable unit a Game
+  Master spawns during the game (its squad has no entity name), or a slot whose squad
+  no longer exists? → A: it is not written to the snapshot. Its body persists as the
+  game saves it and comes back as a plain character, not a slot, and its holder has
+  no reservation. A snapshot written before this rule drops such a slot on load with
+  a logged warning instead of refusing the whole resume. Found on 2026-10-25, when a
+  resume was refused with `squad entity '' not found`; fixed that day on the
+  operator's waiver and recorded here.
+- Q: Should a playable unit a Game Master spawns during the game be a slot after a
+  resume? → A (operator, the same day): yes. The game saves such a squad and gives it
+  a persistence id; a squad without an entity name is recorded by that id and found
+  by it on load, so its slots come back and their holders get them back on reconnect.
+  Only a slot whose squad no longer exists, or is not tracked by the game's
+  persistence, stays out of the snapshot as the previous answer describes. FR-050 is
+  revised.
+- Q: What if the game does not restore such a squad? → A (operator, after a review the
+  same day): its slots are dropped and the rest of the round resumes. The game's
+  group save skips a squad with no AI member and no player list, and the lobby never
+  fills that list: a wiped squad is the likely case. One missing squad must never
+  refuse a whole resume again, as on 2026-10-25.
+- Q: Where does the guide describe session saves? → A (operator): only in its Triad
+  Tactics section, and only what a mission maker does there: tick the save types
+  again, set the systems config, give every squad a unique entity name. Triad
+  Tactics Core turns the game mode's setting on. The general chapter goes back to
+  unticking the save types, which leaves the persistence system off.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -812,18 +872,25 @@ The world:
 
 Squads and slots:
 
-- **Squads placed in the mission** do not spawn their members again while the snapshot
-  is being applied; the restored members are re-attached to their squads by the
-  resume itself, because the game re-attaches AI members only and a body a player
-  controlled at the snapshot has no saved squad. A squad a Game Master places after
-  the resume spawns normally.
+- **Squads placed in the mission** do not spawn their members again, neither while
+  the snapshot is being applied nor later in the round after casualties; the
+  restored members are re-attached to their squads by the resume itself, because
+  the game re-attaches AI members only and a body a player controlled at the
+  snapshot has no saved squad. A squad a Game Master places after the resume spawns
+  normally.
 - **Squads created by script rather than placed in the world** are outside the
   guard; a mission that spawns squads from script must do so from the game start
-  hook the lobby exposes, which does not run on a resume. Stated in the guide.
-- **A squad every member of which died and whose bodies were removed** before the
-  snapshot has no slots left in the roster, today and after a resume; the squad
-  comes back with no slots. A KIA slot whose corpse is still in the world comes
-  back KIA with the corpse.
+  hook the lobby exposes, which does not run on a resume. The guide does not cover
+  squads created by script (FR-019).
+- **A playable unit a Game Master spawns during the game** registers as a slot in a
+  squad with no entity name. The snapshot records that squad by its persistence id;
+  after a resume the squad, its slots and their holders come back like a mission
+  squad's (FR-050). If the squad no longer exists at the snapshot, its slots are not
+  written and their bodies come back as plain characters.
+- **A squad every member of which died** stays in the world with saves on (FR-051).
+  A KIA slot whose corpse is still in the world comes back KIA with the corpse.
+  When the bodies were removed before the snapshot, the squad has no slots left in
+  the roster, today and after a resume; the squad comes back with no slots.
 - **A registered body the game does not track** (a prefab without the persistence
   component) is written as a slot with no body; the save logs it and a resume from
   that snapshot refuses with the slot's name. The game mode logs such bodies at game
@@ -894,8 +961,7 @@ Saving and starting:
   backwards while the game itself is not advancing time.
 - **A mission with a finite game duration** set in its game-mode state component
   ends when the clock reaches it, as today; a restored clock already past it ends
-  the mission on the first frame after the resume. Lobby missions do not set one;
-  the guide says so.
+  the mission on the first frame after the resume. Lobby missions do not set one.
 - **A snapshot taken during a hold** (an ordinary hard freeze or a resume hold)
   saves the mission clock, which stood still, the freeze's current remainder (or
   the remainder a resume hold was protecting) and the daylight setting from before
@@ -1067,7 +1133,8 @@ Timed map zones:
   mode knows a snapshot is loaded, in which no connected player can move, fire,
   enter or leave a vehicle or place markers, no character or vehicle can take damage,
   no engine can be started, every ground vehicle is stopped and braked where the game
-  offers a brake, airborne aircraft are held in place, and no trigger, zone timer,
+  offers a brake and its handbrake cannot be toggled, a helicopter on the ground has
+  its engine stopped, airborne aircraft are held in place, and no trigger, zone timer,
   mission timer, game clock or daylight advances, until an admin releases it with the
   existing hard-freeze release. Mission AI movement and slope creep of unbraked
   vehicles are accepted limits. There is no automatic release. The hold and its
@@ -1077,8 +1144,9 @@ Timed map zones:
 - **FR-008**: The addon MUST NOT delete a saved player character because its owner has
   not reconnected within any timeout; a slot stays held as it does after an ordinary
   disconnect during the game.
-- **FR-009**: The feature MUST add no admin chat command. Releasing the hold, ending a
-  game and freeing a slot use the controls that exist today.
+- **FR-009**: The feature MUST add no admin chat command other than the `/snapshot`
+  test aid (FR-002). Releasing the hold, ending a game and freeing a slot use the
+  controls that exist today.
 - **FR-010**: Reaching debriefing MUST discard the game's snapshots so a later "newest
   snapshot" never resumes a finished game.
 - **FR-011**: A deliberate server stop during the game phase MUST leave exactly one
@@ -1097,7 +1165,8 @@ Timed map zones:
   refused with a logged reason. A refusal MUST disable saving before anything else,
   MUST keep every snapshot and MUST NOT play on: the server shuts down so the
   operator restarts plainly or names an older snapshot.
-- **FR-015**: Saving and resuming MUST add no remote call or join-in-progress
+- **FR-015**: Saving and resuming MUST add no remote call other than the admin's
+  `/snapshot` request (FR-009), no join-in-progress
   payload, no replicated collection, and exactly three replicated scalars, each set
   once on the server: the snapshot's time for the hold text, the mission-end
   timer's duration, and the clock reading at which it started. The mission clock
@@ -1105,13 +1174,14 @@ Timed map zones:
   server-side, and a resume reaches clients only through the existing reconnect
   flow.
 - **FR-016**: A mission with the setting off MUST behave as before this feature,
-  with exactly two exceptions that apply to every mission: time stands still
-  during every hard freeze (FR-022), and spectators see the mission-end countdown
-  (FR-023). No snapshots, no files written, no resume, no log lines about saving.
+  with these exceptions, which apply to every mission: during every hard freeze
+  time stands still, nothing takes damage and vehicles are stopped (FR-022), and
+  spectators see the mission-end countdown (FR-023). No snapshots, no files written, no resume, no log lines about saving.
 - **FR-017**: A resume MUST NOT create a second copy of any squad member or vehicle:
   the restored world is the only world, and no squad placed in the mission spawns its
-  members again on top of the restored ones. The slot count after a resume equals the
-  slot count at the snapshot, and every slot belongs to the squad it belonged to.
+  members again on top of the restored ones, at the load or later in the round. The
+  slot count after a resume equals the count of slots the snapshot could record
+  (FR-050), and every slot belongs to the squad it belonged to.
 - **FR-020**: The statistics recorder's continuation state MUST be part of every
   snapshot's lobby record (amended 2026-09-19: no per-snapshot statistics file, no
   pruning). A snapshot without it MUST NOT refuse the resume; the recorder MUST start
@@ -1123,7 +1193,9 @@ Timed map zones:
 - **FR-022**: While any hard freeze is active, the mission clock, the freeze
   countdown, daylight and every trigger MUST stand still on every machine, saves
   on or off; the clock MUST NOT run backwards on a server with no players; the
-  freeze countdown MUST resume exactly once when the last hard freeze ends.
+  freeze countdown MUST resume exactly once when the last hard freeze ends. In the
+  same span characters and vehicles MUST NOT take damage other than true damage, and
+  every vehicle MUST be stopped and held as FR-007 describes.
 - **FR-023**: In a mission with one mission-end timer of positive duration, the
   spectator clock MUST show the time until the mission ends, derived on each
   client from the replicated clock and two once-set values, standing still
@@ -1135,9 +1207,11 @@ Timed map zones:
   new.
 - **FR-018**: With the setting on but the mission unable to save (save types
   unticked, systems config unset), the server log MUST state the cause at game start.
-- **FR-019**: The mission-making guide's instruction to untick the save types MUST be
-  replaced by the instruction to leave them and to set the systems config, in both
-  languages, as part of this feature.
+- **FR-019**: The mission-making guide MUST describe session saves only in its Triad
+  Tactics section (amended 2026-10-31): there a mission ticks the save types again,
+  sets the systems config and gives every squad a unique entity name, in both
+  languages. The general chapter keeps its instruction to untick the save types,
+  which leaves the persistence system off.
 
 - **FR-024**: A mission maker MUST be able to give a squad random deployment by
   placing spawn points in the world and linking them to the squad, any number of
@@ -1232,6 +1306,24 @@ Timed map zones:
 - **FR-049**: The addon's spawn point MUST show its forward axis as an arrow in the
   World Editor, and nothing of it may exist in the game.
 
+- **FR-050**: A slot whose squad has no entity name (a unit a Game Master spawned
+  during the game) MUST be recorded with the squad's persistence id in place of the
+  name, and on load MUST come back as a slot in that squad like any other when the
+  game restored the squad. The game saves no squad without an AI member and a player
+  list, so a squad keyed by id that does not exist once the load is complete MUST
+  have its slots dropped with a warning naming each, their bodies left plain
+  characters, and MUST NOT refuse the resume. A slot whose squad no longer exists,
+  or is not tracked by the game's persistence, MUST NOT be written; its body persists
+  as the game saves it and comes back as a plain character, not a slot. On load, a
+  slot with no squad at all, in a snapshot written before this rule, MUST be dropped
+  with a warning naming it and MUST NOT refuse the resume.
+- **FR-051**: With session saves on, a squad placed in the mission MUST NOT be deleted
+  when its last member dies, so its KIA slots keep their squad in every later
+  snapshot. With saves off the game's behaviour stands.
+- **FR-052**: A development server MAY derive a player's identity from their name
+  through a server-profile switch, off by default and logged as a warning when on,
+  so reservations can be tested without platform identities.
+
 ### Key Entities
 
 - **Snapshot**: one complete save point of the world, the addon's game state and the
@@ -1239,8 +1331,10 @@ Timed map zones:
   planned stop; has a time and a duration; the last ten are kept.
 - **Slot record**: what the addon writes per slot into a snapshot: the slot's
   character, its occupant's identity, KIA status, lock, and the squad it belongs to,
-  by the squad's entity name.
-- **Squad record**: per squad, its entity name and radio frequency.
+  by the squad's entity name, or by its persistence id when it has none. A slot whose
+  squad no longer exists has no record (FR-050).
+- **Squad record**: per squad, its entity name (or persistence id) and radio
+  frequency.
 - **Resume hold**: the protected period after a resume, from the first moment the
   game mode knows a snapshot is loaded until an admin releases it.
 - **Refusal**: the outcome of a snapshot that cannot be resumed as a whole: logged,

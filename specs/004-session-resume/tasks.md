@@ -234,6 +234,25 @@ end-of-freeze reading that timed effects share.
 
 ---
 
+## Alignment 2026-10-31: work done outside the task list
+
+Recorded in the spec session of 2026-10-31. Already in tasks: `/snapshot` (T007b),
+refills after casualties (T010 outcome), the development identity (T017b), the
+grounded helicopter's engine stop and the handbrake gate (T028 review fix).
+
+- [X] T067 [US1] In `Lite Lobby/scripts/game/Core/LL_LobbyManager.c`: `RegisterSlot_S` sets `SetDeleteWhenEmpty(false)` on the slot's squad when session saves are on, so the squad outlives its last member (FR-051).
+- [X] T068 [US1] In `Lite Lobby/scripts/game/Persistence/LL_SessionData.c`: `Serialize` skips a slot whose squad is null or has no entity name; `Deserialize` drops a record with an empty `squad` with a WARNING before `SetResumeRecord_S` (FR-050). Live fix of 2026-10-25 on the operator's waiver: the resume it unblocked restored 127 slots and seated 127 holders.
+- [X] T069 Operator decision 2026-10-31: a playable unit a Game Master spawns during the game is a slot after a resume (FR-050 revised).
+- [X] T074 In `Lite Lobby/scripts/game/Persistence/LL_SessionData.c`: `LL_SquadRecord.KeyOf` (entity name, else the squad's persistence id), `IsIdKey`, `Find` (by name, else `PersistenceSystem.FindById`); the serializer records unnamed squads by id and skips only a missing or untracked squad. `LL_PlayableComponent` (`ResumeTick`, `IsResumeRegistered`) and `LL_LobbyManager.RestoreSquadFrequencies_S` resolve squads through `Find`; a squad keyed by id is waited for until the deadline instead of refusing at once (FR-050). The roster check warns about an unnamed squad only when it was placed in the world (`IsLoaded`). Verified 2026-10-31 on the dev server: a Game Master's Green Beret RTO slot came back after a resume and its holder reclaimed it.
+- [X] T075 Review fix for T074 (2026-10-31): `LL_GameModeCoop.DropUnrestoredSquads_S` at `ACTIVE` drops the squad and slot records of a squad keyed by persistence id that the load did not restore (the game's group save skips a squad with no AI member and no player list), with a WARNING per slot; `LL_PlayableComponent.ResumeTick` stops quietly for such a body once `IsResumeFinalising()`, so one missing squad no longer refuses the resume (FR-050). Coded without a Workbench run.
+- [ ] T070 Operator: compile; quickstart Scenario 7 steps 6g and 6h on a dedicated server, outcomes handed back. Needs T067, T068, T074, T075.
+  **Outcome 2026-10-31 (dev server, partial):** 6h first case passed: a Game Master one-man squad held by a player was restored, its slot reclaimed. 6h wiped case: a Game Master fireteam of four, all dead before the snapshot, was not restored by the game; its four slots were dropped with the warning and the resume completed (38 slots, both holders seated). Open: the deleted squad, a 1.0.7 snapshot, step 6g. Both test clients share one name, so the development identity gives them one key and they may reclaim each other's slots; use two names for reconnect checks.
+- [X] T071 Guide (FR-019 as amended; replaces the outcome of T031): `create-mission/world.mdx` (EN, RU) back to unticking the save types, as on `main`; `triad-tactics/setup.mdx` (EN, RU) step 4 "Session saves": tick the save types again, set the systems config, a unique name per squad.
+- [X] T072 Operator: screenshots for T071 (`triad-tactics/003.png` Session Saves on the game mode, `004.png` save types ticked, `005.png` systems config chosen), registered in `docs/tests/screenshots.json`.
+- [X] T073 Guide: changelog page (`changelog.mdx`, EN and RU) with one entry per Workshop version from 1.0.1 to 1.0.8, linked from the sidebar, the homepage and the README; constitution 1.1.0 makes the entry part of every pull request.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -282,7 +301,8 @@ is the scale measurement on the event server. Scenario 7 closes the fault cases.
 
 ## Notes
 
-- No task adds an admin chat command (FR-009); `/hardfreeze 0` is the release.
+- No task adds an admin chat command except the `/snapshot` test aid (T007b, FR-009);
+  `/hardfreeze 0` is the release.
 - No task edits an `.et` prefab; the two `.conf` files and the mission header field
   are the only asset work, and the operator performs the Workbench steps.
 - No task purges a snapshot on a refusal; the only purge is the debriefing one.

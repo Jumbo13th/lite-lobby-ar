@@ -883,21 +883,21 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 	}
 
 	// Replaces AssignSquadFrequencies_S on a resume: the nets stay what the snapshot had.
-	void RestoreSquadFrequencies_S(notnull map<string, int> byEntityName)
+	void RestoreSquadFrequencies_S(notnull map<string, int> bySquadKey)
 	{
 		if (!Replication.IsServer())
 			return;
 
-		foreach (string name, int frequency : byEntityName)
+		foreach (string key, int frequency : bySquadKey)
 		{
 			if (frequency <= 0)
 				continue;
 
-			SCR_AIGroup group = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(name));
+			SCR_AIGroup group = LL_SquadRecord.Find(key);
 			if (group)
 				group.SetRadioFrequency(frequency);
 			else
-				Print(string.Format("[LL_Lobby] Resume: squad entity '%1' not found, its frequency is not restored", name), LogLevel.WARNING);
+				Print(string.Format("[LL_Lobby] Resume: squad '%1' not found, its frequency is not restored", key), LogLevel.WARNING);
 		}
 	}
 

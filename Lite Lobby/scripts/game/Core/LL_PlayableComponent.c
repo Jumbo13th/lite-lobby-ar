@@ -86,13 +86,13 @@ class LL_PlayableComponent : ScriptComponent
 	protected SCR_AIGroup m_ResumeGroup;
 
 	//! Called by the session record once the body is available, possibly before ACTIVE.
-	void BeginResume(string squadEntityName, int sortKey, bool kia)
+	void BeginResume(string squadKey, int sortKey, bool kia)
 	{
 		if (m_bResuming)
 			return;
 
 		m_bResuming = true;
-		m_sResumeSquad = squadEntityName;
+		m_sResumeSquad = squadKey;
 		m_bResumeCorpse = kia;
 		MarkRuntimeSpawned();
 		SetSortOrder(sortKey);
@@ -140,9 +140,22 @@ class LL_PlayableComponent : ScriptComponent
 
 		if (!m_ResumeGroup)
 		{
-			m_ResumeGroup = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(m_sResumeSquad));
+			m_ResumeGroup = LL_SquadRecord.Find(m_sResumeSquad);
 			if (!m_ResumeGroup)
 			{
+				// The game restores a squad spawned during the game itself, possibly after
+				// its bodies. Still missing once the load is complete, it was not saved: the
+				// finaliser dropped its slots and this body stays a plain character.
+				if (LL_SquadRecord.IsIdKey(m_sResumeSquad))
+				{
+					if (gm.IsResumeFinalising())
+					{
+						GetGame().GetCallqueue().Remove(ResumeTick);
+						m_bResuming = false;
+					}
+					return;
+				}
+
 				GetGame().GetCallqueue().Remove(ResumeTick);
 				gm.ReportResumeFailure_S(string.Format("squad entity '%1' not found", m_sResumeSquad));
 				return;
@@ -194,13 +207,13 @@ class LL_PlayableComponent : ScriptComponent
 	}
 
 	//! Done = the manager holds a slot for this body in the saved squad.
-	bool IsResumeRegistered(string squadEntityName)
+	bool IsResumeRegistered(string squadKey)
 	{
 		LL_SlotData slot = GetSlotData();
 		if (!slot)
 			return false;
 
-		SCR_AIGroup group = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByName(squadEntityName));
+		SCR_AIGroup group = LL_SquadRecord.Find(squadKey);
 		if (!group)
 			return false;
 

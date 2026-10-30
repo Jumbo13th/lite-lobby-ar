@@ -305,6 +305,21 @@ the twice-absent holder is put back after the second resume.
 6f. Restart with a corrupted world part of the snapshot so the native load fails
    before `ACTIVE` would arrive. Expected: `Resume refused: load failed` without
    waiting for `ACTIVE`, snapshots untouched, server shut down.
+6g. Kill every member of one squad and leave the corpses; take a snapshot; resume
+   (FR-051). Expected: the squad and its KIA slots are back with the corpses and
+   nothing refuses. After casualties in the resumed round, no squad gains members
+   (FR-017).
+6h. As Game Master, spawn a playable unit during the game phase and slot a client
+   into it; take a snapshot; resume (FR-050). Expected: no refusal, the unit's squad
+   and its slots are back in the roster, the client gets their slot back on
+   reconnect and the squad keeps its radio frequency. Then spawn a second Game Master
+   squad, kill all its members and leave the corpses before a snapshot; resume:
+   no refusal, either its KIA slots are back or the log says `the squad of slot …
+   was not restored` for each and its bodies are plain characters; record which.
+   Then delete a Game Master squad before a snapshot; resume: no refusal, its bodies
+   are plain characters.
+   Resume once from a snapshot taken by Lite Lobby 1.0.7 or older that holds such a
+   slot: the log names the slot as in no mission squad, no refusal.
 7. As Game Master, start placing a composition and let a snapshot land mid-edit;
    resume. Expected: what was placed before the save is there, nothing is doubled,
    the editor works.

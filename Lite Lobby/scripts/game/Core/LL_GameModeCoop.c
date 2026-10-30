@@ -1090,8 +1090,9 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		GetGame().GetSaveGameManager().RequestSavePoint(ESaveGameType.SHUTDOWN, string.Empty, ESaveGameRequestFlags.BLOCKING);
 	}
 
-	// What a resume cannot recover from, logged once by name: squads are re-attached by
-	// entity name, bodies found by persistence id, one mission-end timer assumed.
+	// What a resume cannot recover from, logged once by name: squads placed in the world are
+	// re-attached by entity name, bodies found by persistence id, one mission-end timer
+	// assumed.
 	protected void CheckRosterForSaves_S()
 	{
 		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
@@ -1117,7 +1118,11 @@ class LL_GameModeCoop : SCR_BaseGameMode
 				{
 					string name = groupEntity.GetName();
 					if (name == "")
-						Print(string.Format("[LL_Lobby] Session saves: squad '%1' has no entity name; its members cannot be re-attached on a resume", slot.m_sGroupName), LogLevel.WARNING);
+					{
+						// A squad spawned during the game is recorded by its persistence id.
+						if (groupEntity.IsLoaded())
+							Print(string.Format("[LL_Lobby] Session saves: squad '%1' has no entity name; its members cannot be re-attached on a resume", slot.m_sGroupName), LogLevel.WARNING);
+					}
 					else if (namesSeen.Contains(name))
 						Print(string.Format("[LL_Lobby] Session saves: squads '%1' and '%2' share the entity name '%3'", namesSeen.Get(name), slot.m_sGroupName, name), LogLevel.WARNING);
 					else
@@ -1176,6 +1181,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		return WillResume();
 	}
 
+	bool IsResumeFinalising()		{ return m_bResumeFinalising; }
 	float GetResumeDeadline()		{ return m_fResumeDeadline; }
 	int GetMissionEndDuration()		{ return m_iMissionEndDuration; }
 	float GetMissionEndStartedAt()	{ return m_fMissionEndStartedAt; }
@@ -1310,8 +1316,33 @@ class LL_GameModeCoop : SCR_BaseGameMode
 			return;
 		}
 
+		DropUnrestoredSquads_S();
+
 		GetGame().GetCallqueue().CallLater(ResumeCheck_S, 250, true);
 		ResumeCheck_S();
+	}
+
+	// The game restores a squad spawned during the game itself, but saves none that has no AI
+	// member and no player list. At ACTIVE every restored squad exists, so one still missing
+	// loses its slots, whose bodies stay plain characters, instead of refusing the resume.
+	protected void DropUnrestoredSquads_S()
+	{
+		for (int i = m_ResumeRecord.squads.Count() - 1; i >= 0; i--)
+		{
+			string key = m_ResumeRecord.squads[i].name;
+			if (LL_SquadRecord.IsIdKey(key) && !LL_SquadRecord.Find(key))
+				m_ResumeRecord.squads.RemoveOrdered(i);
+		}
+
+		for (int j = m_ResumeRecord.slots.Count() - 1; j >= 0; j--)
+		{
+			LL_SlotRecord slot = m_ResumeRecord.slots[j];
+			if (!LL_SquadRecord.IsIdKey(slot.squad) || LL_SquadRecord.Find(slot.squad))
+				continue;
+
+			Print(string.Format("[LL_Lobby] Resume: the squad of slot %1 was not restored, its body stays a plain character", slot.name), LogLevel.WARNING);
+			m_ResumeRecord.slots.RemoveOrdered(j);
+		}
 	}
 
 	protected void ResumeCheck_S()
