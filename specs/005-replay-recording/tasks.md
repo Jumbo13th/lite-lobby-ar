@@ -122,6 +122,7 @@ in a separate change after this feature (T057).
   - with every snapshot (every 3000 tenths of mission time, T030), log one line `[LL_Lobby] Replay: <session> seg <n> lines=<n> bytes=<n> workMs=<n> avgMsPerSec=<n.nn> maxFlushMs=<n> maxTickMs=<n> types=<T:n,P:n,F:n,...>`, where `workMs` is the summed tick time of the period and `avgMsPerSec` is `workMs` divided by the period's seconds (SC-001);
   - then reset the sums and maxima (research R21).
 - [ ] T008 Operator: in Workbench add `LL_ReplayRecorderComponent` (no attributes) to `Lite Lobby/Prefabs/MP/Modes/Editor/LL_GameMode_Lobby.et` and compile; on the dedicated test server write `$profile:LL_Replays.json` with `{ "Enabled": true }`.
+  - **Progress:** component added to the prefab by the agent with the operator's permission (2026-10-31, id `{6AE6272DD9E6B8A2}`); the compile and `$profile:LL_Replays.json` remain.
 - [ ] T009 Operator: quickstart Scenario 0 (recording off). Remove the config, play a game and expect no `LL_Replays` folder, no `[LL_Lobby] Replay` line and no status file. Then restore the config.
 - [ ] T010 Operator: spikes S4 and S5 from quickstart Scenario 1 with the foundation built.
   - **S4:** drive a car due north and due east and read the `P` headings; delete the segment file between two flushes and check the next flush creates it.
@@ -306,7 +307,7 @@ in a separate change after this feature (T057).
     - `Serialize` asks `LL_ReplayRecorderComponent.GetInstance().CaptureContinuation_S()` and returns `ESerializeResult.DEFAULT` when it is null; otherwise it writes `"version"`, then `"replay"` with the type discriminator off;
     - `Deserialize`: an unknown version logs a warning and returns true; otherwise it reads the continuation and calls `SetPendingContinuation_S`.
 - [X] T033 [US2] Edit `Lite Lobby/Configs/Systems/Persistence/LL_Persistence.conf`:
-  - **Done:** the Workbench check is in the handover.
+  - **Done:** Workbench loads it (operator, 2026-10-31): `State: LL_ReplayData` under ScriptedStates → Lobby, and `LL_ReplayData` enabled in Persistent States.
   - add `StatePersistenceConfig "{<fresh 16-hex id>}" { SelfDelete 0 Collection "{43DB609DE0025271}" Serializer LL_ReplaySerializer "{<fresh 16-hex id>}" {} }` inside the `Lobby` configuration group;
   - add `LL_ReplayData "{<fresh 16-hex id>}" {}` inside `PersistentStates +{ }`;
   - change nothing else (contracts/config-files.md).
