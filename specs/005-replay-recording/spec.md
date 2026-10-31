@@ -78,8 +78,8 @@ only sends, so neither the game nor the host gains a way in.
   displayed it (for example `[ABC]Callsign`); only identity GUIDs stay private.
 - Q: Should the host service send recording files while the game is still running, or
   only after it ends? → A: Only after. The recorder writes one file per game (a second
-  file only after a crash-resume), and the service sends it once the game is over: ended,
-  or cut off by a stop and not resumed. Nothing about a running game leaves the host, and
+  file only after a crash-resume), and the service sends it once the game is over: its
+  server stopped and the game was not resumed. Nothing about a running game leaves the host, and
   an owner who runs the addon without the service gets one file per game to keep or
   share.
 - Q: Should server owners who don't use the website get a way to watch their recordings?
@@ -99,6 +99,9 @@ only sends, so neither the game nor the host gains a way in.
 - Q: Must squad and slot numbers stay the same across a crash-resume? → A: No (operator,
   decision B): they are numbered within a segment; the first snapshot of every segment
   restates the whole roster, and a squad keeps its callsign across segments.
+- Q: Must every server have its own upload secret? → A: No (operator): the receiving
+  website may share one secret with all its servers; every upload still names the server
+  that sent it.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -109,7 +112,7 @@ on that server is recorded from the start of the game phase until the server sto
 moves to the next mission: who held which slot in which squad, where every soldier and vehicle went,
 who was knocked out, revived or killed, by whom and with what, who fired, where grenades,
 rockets and mortar rounds landed, who sat in which vehicle seat, what markers each side
-placed, which zones changed hands, and when the freeze and the game phases began and
+placed, which zones changed hands, and when the game phase began and each freeze began and
 ended. The players notice nothing.
 
 **Why this priority**: without the recording nothing else in this feature exists, and it
@@ -388,8 +391,8 @@ configured, with it unconfigured, and as a non-admin.
   moment, so that a reader can start from any snapshot with nothing but that file.
 - **FR-018**: Recorded data MUST reach the disk no later than 10 seconds after it
   happened. A file cut off mid-write MUST stay readable up to its last complete record.
-- **FR-019**: A segment file is final when its recording has ended or the server that
-  wrote it has stopped. A final file MUST never change afterwards.
+- **FR-019**: A segment file is final once the server that wrote it has stopped. A final
+  file MUST never change afterwards.
 - **FR-020**: The format MUST be versioned, documented in this repository, readable by a
   person with a text editor, and skippable record by record, so that a reader ignores
   record types it does not know. The format version MUST be raised whenever the meaning of
@@ -434,10 +437,11 @@ configured, with it unconfigured, and as a non-admin.
   the game.
 - **FR-030**: The service MUST NOT listen on any network port and MUST NOT contact
   anything but the configured website.
-- **FR-031**: Every upload MUST prove which server sent it with a per-server secret that is
-  carried outside the address, MUST be signed together with its time so that a captured
-  upload is refused when replayed more than five minutes from that time, and MUST let the
-  receiver refuse it from its headers alone, before reading its body.
+- **FR-031**: Every upload MUST name the server that sent it and carry, outside the address,
+  a signature made with the secret the receiver shares with that server (a receiver may
+  share one secret with all its servers). The signature MUST cover the upload's time so that
+  a captured upload is refused when replayed more than five minutes from that time, and MUST
+  let the receiver refuse the upload from its headers alone, before reading its body.
 - **FR-032**: Every sent file MUST have an identity derived from its content. Sending the
   same content twice MUST be harmless, and a changed file MUST be sent as a new file.
 - **FR-033**: The service MUST survive network outages, website downtime, requests to slow

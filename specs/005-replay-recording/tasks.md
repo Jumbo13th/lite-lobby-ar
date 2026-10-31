@@ -382,6 +382,7 @@ in a separate change after this feature (T057).
     - a status written after the game's last write naming another session means `stopped`;
     - status and files older than `wait` mean `abandoned`.
   - Table tests for every case.
+  - **Changed (2026-10-31):** the `ended` outcome and the `END debrief` check are removed with the debriefing branch; a game is over as `stopped` or `abandoned` only.
 - [X] T039 [P] [US3] Create `uplink/internal/send/limiter.go` and `limiter_test.go`: a token bucket in bytes per second wrapping an `io.Reader`, with a burst of at most one second of the cap and an injectable clock. The test asserts no 10-second window exceeds the cap (research R25).
   - **Done:** the bucket refills at 90% of the cap with a 0.1 s burst, so no 1-second window exceeds the cap.
 - [X] T040 [US3] Create `uplink/internal/send/client.go` and `client_test.go` per contracts/upload-protocol.md.
@@ -484,6 +485,7 @@ in a separate change after this feature (T057).
 - [X] T050 [US5] Operator: quickstart Scenario 6 (ready, recording, ended, in English and Russian; a non-admin; the read-only profile failure).
   - **Progress:** English `/replay` while recording verified (2026-10-31): "Recording 20261031-214724-LobbyDemo, segment 1: 1.6 min, 0.0 MB, last write 9 s ago." Open: Russian, a non-admin, the read-only failure.
   - **Progress:** fourth run, 2026-10-31: the ready reply in English and Russian is right; the latest fixes held live (M203 and GP-25 rounds recorded once as `grenade`, a Game Master vehicle without its placement ghost, a complete first snapshot, one `STOP shutdown` on a clean stop). Then, on a Workbench dedicated server with one peer: a non-admin is refused ("That command is for admins only."), and with writes to `LL_Replays` denied the recorder logged one error and `/replay` answered "Replay recording stopped: the server cannot write to its profile."
+  - **Changed (2026-10-31):** the "ended" reply was removed with the debriefing branch, so the scenario covers ready and recording.
 
 **Checkpoint**: all five user stories pass their quickstart scenarios.
 
