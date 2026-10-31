@@ -117,16 +117,18 @@ See [contracts/config-files.md](contracts/config-files.md): `Website`, `ServerId
 | Part | Contents |
 |------|----------|
 | Files | per file identity: kind, session, file name, committed time |
-| Games | per session: how it ended (`ended`, `stopped`, `abandoned`), segment identities, identity-file identity, the statistics identity last posted, confirmed time, failure count and last error |
+| Games | per session: the set last posted (how it ended: `ended`, `stopped` or `abandoned`; segment identities; identity-file identity; statistics identity), the latest confirmation time, failure count and last error |
 
 Lifecycle of a game on the host:
 
 ```text
 running ──over (end record │ other session │ wait elapsed)──▶ over
 over ──every file committed──▶ files sent ──game posted, 2xx──▶ confirmed
-confirmed ──newer statistics file──▶ (statistics committed, game posted again)
-confirmed ──retention elapsed──▶ local files deleted
+confirmed ──file set changed (newer statistics, or a segment after a resume)──▶ (new files committed, game posted again)
+confirmed ──retention elapsed since the latest confirmation──▶ local files deleted
 ```
 
 A game is never `over` while the status file says `resume`, or says `rec` for that
-session.
+session while the status or the game's files were written within the wait; a `rec`
+status that has gone stale with them is how a killed server looks, and that game ends
+as `abandoned`.

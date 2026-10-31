@@ -58,6 +58,10 @@ class LL_MapZoneComponent : ScriptComponent
 	protected ref LineDrawCommand m_OutlineCommand = new LineDrawCommand();
 	protected ref array<ref CanvasWidgetCommand> m_aCommands = {};
 
+	// Server-side registry for the replay recorder; world-guarded because statics survive a scenario restart.
+	protected static ref array<LL_MapZoneComponent> s_aZones = {};
+	protected static BaseWorld s_RegistryWorld;
+
 	override void OnPostInit(IEntity owner)
 	{
 		super.OnPostInit(owner);
@@ -72,6 +76,19 @@ class LL_MapZoneComponent : ScriptComponent
 			m_FillColor = new Color(1, 1, 1, 0.18);
 		if (!m_OutlineColor)
 			m_OutlineColor = new Color(1, 1, 1, 1);
+
+		if (Replication.IsServer())
+		{
+			BaseWorld world = owner.GetWorld();
+			if (world != s_RegistryWorld)
+			{
+				s_aZones.Clear();
+				s_RegistryWorld = world;
+			}
+
+			if (!s_aZones.Contains(this))
+				s_aZones.Insert(this);
+		}
 
 		m_MapEntity = SCR_MapEntity.GetMapInstance();
 		if (!m_MapEntity)
@@ -225,6 +242,81 @@ class LL_MapZoneComponent : ScriptComponent
 		return screen;
 	}
 
+	static array<LL_MapZoneComponent> GetAll()
+	{
+		return s_aZones;
+	}
+
+	//! Mirrors the phase and timing part of IsVisibleForLocalPlayer; a change to one must be
+	//! made to the other.
+	bool IsShownNow()
+	{
+		SCR_BaseGameMode gameMode = SCR_BaseGameMode.Cast(GetGame().GetGameMode());
+		if (gameMode && m_aHideOnGameModeStates && m_aHideOnGameModeStates.Contains(gameMode.GetState()))
+			return false;
+
+		if (m_bHideAfterFreezeTime || m_fHideDelaySeconds > 0)
+		{
+			LL_GameModeCoop coopMode = LL_GameModeCoop.Cast(GetGame().GetGameMode());
+			if (coopMode && coopMode.GetLobbyState() == SCR_EGameModeState.GAME && coopMode.GetFreezeTimeRemaining() <= 0
+				&& (m_bHideAfterFreezeTime || coopMode.GetElapsedTime() - coopMode.GetFreezeEndedAt() >= m_fHideDelaySeconds))
+				return false;
+		}
+
+		return true;
+	}
+
+	//! The points as the map draws them: shape origin plus each point's offset.
+	void GetDrawnPolygon(notnull array<vector> points)
+	{
+		points.Clear();
+		if (!m_Shape)
+			return;
+
+		array<vector> offsets = {};
+		m_Shape.GetPointsPositions(offsets);
+		vector origin = m_Shape.GetOrigin();
+		foreach (vector offset : offsets)
+		{
+			points.Insert(offset + origin);
+		}
+	}
+
+	string GetLabel()
+	{
+		return GetOwner().GetName();
+	}
+
+	Color GetFillColor()
+	{
+		return m_FillColor;
+	}
+
+	Color GetOutlineColor()
+	{
+		return m_OutlineColor;
+	}
+
+	float GetOutlineWidth()
+	{
+		return m_fOutlineWidth;
+	}
+
+	bool IsLineMode()
+	{
+		return m_bLineMode;
+	}
+
+	bool IsShownForAnyFaction()
+	{
+		return m_bShowForAnyFaction;
+	}
+
+	array<FactionKey> GetVisibleFactions()
+	{
+		return m_aVisibleForFactions;
+	}
+
 	void ~LL_MapZoneComponent()
 	{
 		if (m_MapEntity)
@@ -232,5 +324,8 @@ class LL_MapZoneComponent : ScriptComponent
 			m_MapEntity.GetOnMapOpen().Remove(OnMapOpen);
 			m_MapEntity.GetOnMapClose().Remove(OnMapClose);
 		}
+
+		if (s_aZones)
+			s_aZones.RemoveItem(this);
 	}
 }

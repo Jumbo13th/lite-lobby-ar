@@ -2289,5 +2289,53 @@ StringTable {
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }
+  CustomStringTableItem "{F1444B3205331C6D}" {
+   Id "LL-Command_HelpReplay"
+   Target_en_us "/replay — replay recording status (admin)"
+   Target_ru_ru "/replay — статус записи реплея (админ)"
+   Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{6A273D64117B369F}" {
+   Id "LL-Replay_NotEnabled"
+   Target_en_us "Replay recording is not enabled on this server."
+   Target_ru_ru "Запись реплеев на этом сервере не включена."
+   Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{47D283703A43932D}" {
+   Id "LL-Replay_Ready"
+   Target_en_us "Replay recording is on and starts with the game."
+   Target_ru_ru "Запись реплеев включена и начнётся вместе с игрой."
+   Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{1DBF6C8227E330FC}" {
+   Id "LL-Replay_Recording"
+   Target_en_us "Recording %1, segment %2: %3 min, %4 MB, last write %5 s ago."
+   Target_ru_ru "Идёт запись %1, сегмент %2: %3 мин, %4 МБ, последняя запись %5 с назад."
+   Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{50CC4B44B862C04A}" {
+   Id "LL-Replay_Ended"
+   Target_en_us "Recording %1 ended at debriefing."
+   Target_ru_ru "Запись %1 завершена на дебрифинге."
+   Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{E4705510A80A1C23}" {
+   Id "LL-Replay_Failed"
+   Target_en_us "Replay recording stopped: the server cannot write to its profile."
+   Target_ru_ru "Запись реплея остановлена: сервер не может писать в профиль."
+   Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
  }
 }

@@ -170,6 +170,8 @@ class LL_TriggerZoneCapture : LL_TriggerZoneBase
 		if (stats)
 			stats.NotifyZoneCaptured(this);
 
+		LL_ReplayRecorderComponent.RecordZoneCaptured_S(this, GetAttackerFaction());
+
 		Fire();
 	}
 

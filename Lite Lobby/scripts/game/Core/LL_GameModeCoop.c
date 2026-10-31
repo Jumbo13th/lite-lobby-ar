@@ -537,6 +537,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 
 		m_bFreezeTimerScheduled = true;
 		GetGame().GetCallqueue().CallLater(UpdateFreezeTimer_S, 1000, true);
+		LL_ReplayRecorderComponent.RecordFreeze_S(m_fFreezeTimeRemaining);
 	}
 
 	protected void CancelFreezeCountdown_S()
@@ -571,6 +572,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 	protected void OnFreezeTimeEnded_S()
 	{
 		Print("[LL_Lobby] Freeze time ended", LogLevel.NORMAL);
+		LL_ReplayRecorderComponent.RecordFreezeEnd_S();
 		RemoveVanillaRestrictionZones_S();
 
 		if (m_fFreezeEndSeenAt < 0)
@@ -668,6 +670,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_bHardFreeze = true;
 		m_fHardFreezeRemaining = seconds;
 		Replication.BumpMe();
+		LL_ReplayRecorderComponent.RecordHardFreeze_S(seconds);
 
 		// Every hard freeze holds the freeze countdown too; the release resumes it.
 		CancelFreezeCountdown_S();
@@ -691,6 +694,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		m_bHardFreeze = false;
 		m_fHardFreezeRemaining = 0;
 		Replication.BumpMe();
+		LL_ReplayRecorderComponent.RecordHardFreezeEnd_S();
 
 		m_VehicleHold.Release_S();
 		m_DamagePause.ResumeAll_S();
@@ -841,6 +845,7 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		}
 
 		m_fFreezeTimeRemaining += seconds;
+		LL_ReplayRecorderComponent.RecordFreeze_S(m_fFreezeTimeRemaining);
 
 		// A lapsed freeze revived here needs its tick back; during a hard freeze the release
 		// schedules it instead.
@@ -1169,6 +1174,12 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		return m_bSessionSaves && GetGame().GetSaveGameManager().GetActiveSave() != null;
 	}
 
+	//! Read during world load by components that must not report a fresh game while a resume is coming.
+	bool IsResumeExpected()
+	{
+		return WillResume();
+	}
+
 	//! True from world load until the record is applied or refused; bodies spawned later
 	//! register the ordinary way.
 	bool IsResumeInProgress()
@@ -1478,6 +1489,8 @@ class LL_GameModeCoop : SCR_BaseGameMode
 		LL_StatsManager stats = LL_StatsManager.GetInstance();
 		if (stats)
 			stats.ResumeRecording_S(record.stats);
+
+		LL_ReplayRecorderComponent.ResumeAfterSnapshot_S();
 
 		m_bStartupBatchDispatched = true;
 		m_bResumePending = false;

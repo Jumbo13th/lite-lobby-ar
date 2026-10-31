@@ -262,6 +262,11 @@ depends on it is written.
   recordings on servers without statistics.
 - **Alternatives considered**: moving the minting into a helper shared with the
   statistics (rejected: it rewrites working production code, against Principle I).
+- **Confirmed (T002, 2026-10-31)**: the statistics mint their identity only after the
+  `Enabled` check (`LL_StatsManager.c:104-111`); `GetSessionId()` is empty otherwise; and
+  `ResumeRecording_S` replaces it with the snapshot's identity (line 348) before the
+  recorder resumes. A recording that starts afresh after a resume therefore mints its own
+  identity, rather than writing into the crashed game's files.
 
 ## R15. Crash-resume and segments
 

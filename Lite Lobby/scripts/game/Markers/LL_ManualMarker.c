@@ -43,6 +43,10 @@ class LL_ManualMarker : GenericEntity
 	protected LL_ManualMarkerComponent m_hManualMarkerComponent;
 	protected ResourceName m_sMarkerLayout = "{1C0F8A2B3C4D5E6F}UI/Map/ManualMapMarkerBase.layout";
 
+	// Server-side registry for the replay recorder; world-guarded because statics survive a scenario restart.
+	protected static ref array<LL_ManualMarker> s_aMarkers = {};
+	protected static BaseWorld s_RegistryWorld;
+
 	// Show-for-all includes players without a slot; otherwise a player with no faction
 	// never sees a restricted marker.
 	bool IsVisibleFor(FactionKey factionKey)
@@ -167,11 +171,65 @@ class LL_ManualMarker : GenericEntity
 		if (!m_aVisibleForFactions)
 			m_aVisibleForFactions = new array<FactionKey>();
 
+		if (Replication.IsServer())
+		{
+			BaseWorld world = GetWorld();
+			if (world != s_RegistryWorld)
+			{
+				s_aMarkers.Clear();
+				s_RegistryWorld = world;
+			}
+
+			if (!s_aMarkers.Contains(this))
+				s_aMarkers.Insert(this);
+		}
+
 		m_MapEntity = SCR_MapEntity.GetMapInstance();
 		if (!m_MapEntity)
 			return;
 
 		m_MapEntity.GetOnMapOpen().Insert(CreateMapWidget);
 		m_MapEntity.GetOnMapClose().Insert(DeleteMapWidget);
+	}
+
+	static array<LL_ManualMarker> GetAll()
+	{
+		return s_aMarkers;
+	}
+
+	string GetQuadName()
+	{
+		return m_sQuadName;
+	}
+
+	Color GetMarkerColor()
+	{
+		return m_MarkerColor;
+	}
+
+	string GetDescription()
+	{
+		return m_sDescription;
+	}
+
+	bool IsShownForAnyFaction()
+	{
+		return m_bShowForAnyFaction;
+	}
+
+	array<FactionKey> GetVisibleFactions()
+	{
+		return m_aVisibleForFactions;
+	}
+
+	bool IsHiddenInState(SCR_EGameModeState state)
+	{
+		return m_aHideOnGameModeStates && m_aHideOnGameModeStates.Contains(state);
+	}
+
+	void ~LL_ManualMarker()
+	{
+		if (s_aMarkers)
+			s_aMarkers.RemoveItem(this);
 	}
 }

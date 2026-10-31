@@ -1302,6 +1302,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		chatMgr.GetCommandInvoker("slotexport").Insert(OnChatCmd_SlotExport);
 		chatMgr.GetCommandInvoker("slotimport").Insert(OnChatCmd_SlotImport);
 		chatMgr.GetCommandInvoker("stats").Insert(OnChatCmd_Stats);
+		chatMgr.GetCommandInvoker("replay").Insert(OnChatCmd_Replay);
 
 		m_bChatCommandsRegistered = true;
 	}
@@ -1324,6 +1325,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			chatMgr.GetCommandInvoker("slotexport").Remove(OnChatCmd_SlotExport);
 			chatMgr.GetCommandInvoker("slotimport").Remove(OnChatCmd_SlotImport);
 			chatMgr.GetCommandInvoker("stats").Remove(OnChatCmd_Stats);
+			chatMgr.GetCommandInvoker("replay").Remove(OnChatCmd_Replay);
 		}
 
 		m_bChatCommandsRegistered = false;
@@ -1347,6 +1349,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		help2 += "\n" + WidgetManager.Translate("#LL-Command_HelpSlotExport");
 		help2 += "\n" + WidgetManager.Translate("#LL-Command_HelpSlotImport");
 		help2 += "\n" + WidgetManager.Translate("#LL-Command_HelpStats");
+		help2 += "\n" + WidgetManager.Translate("#LL-Command_HelpReplay");
 		help2 += "\n" + WidgetManager.Translate("#LL-Command_HelpHelp");
 		ShowCommandHelp(help2);
 	}
@@ -1462,6 +1465,63 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		}
 
 		ShowCommandHelp(WidgetManager.Translate("#LL-Command_UsageVerify"));
+	}
+
+	// /replay: recording status from the server, admins only.
+	protected void OnChatCmd_Replay(SCR_ChatPanel panel, string data)
+	{
+		if (!RequireAdmin())
+			return;
+
+		Rpc(RpcAsk_ReplayStatus);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_ReplayStatus()
+	{
+		if (!SCR_Global.IsAdmin(GetPlayerId()))
+			return;
+
+		LL_ReplayRecorderComponent recorder = LL_ReplayRecorderComponent.GetInstance();
+		if (!recorder)
+		{
+			Rpc(RpcDo_ReplayStatus, LL_ReplayRecorderComponent.STATE_OFF, "", 0, 0, 0, -1);
+			return;
+		}
+
+		Rpc(RpcDo_ReplayStatus, recorder.GetRecorderState(), recorder.GetSession(), recorder.GetSegment(),
+			recorder.GetRecordedSeconds(), recorder.GetKilobytes(), recorder.GetSecondsSinceWrite());
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_ReplayStatus(int state, string session, int segment, int seconds, int kilobytes, int lastWriteAgo)
+	{
+		string line;
+		if (state == LL_ReplayRecorderComponent.STATE_READY || state == LL_ReplayRecorderComponent.STATE_RESUME)
+		{
+			line = WidgetManager.Translate("#LL-Replay_Ready");
+		}
+		else if (state == LL_ReplayRecorderComponent.STATE_RECORDING)
+		{
+			float minutes = seconds / 60.0;
+			float megabytes = kilobytes / 1024.0;
+			line = WidgetManager.Translate("#LL-Replay_Recording", session, segment.ToString(), minutes.ToString(-1, 1),
+				megabytes.ToString(-1, 1), lastWriteAgo.ToString());
+		}
+		else if (state == LL_ReplayRecorderComponent.STATE_DONE)
+		{
+			line = WidgetManager.Translate("#LL-Replay_Ended", session);
+		}
+		else if (state == LL_ReplayRecorderComponent.STATE_FAILED)
+		{
+			line = WidgetManager.Translate("#LL-Replay_Failed");
+		}
+		else
+		{
+			line = WidgetManager.Translate("#LL-Replay_NotEnabled");
+		}
+
+		ShowCommandHelp(line);
 	}
 
 	// /slotexport: local only, slots and vehicles are already replicated.

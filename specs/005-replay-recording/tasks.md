@@ -38,18 +38,21 @@ in a separate change after this feature (T057).
 
 **Purpose**: the recorder's session identity rule and the empty Go module with its CI.
 
-- [ ] T001 [P] Create `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` with the component's class declarations (completed in T005) and `protected string ResolveSession_S()`.
+- [X] T001 [P] Create `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` with the component's class declarations (completed in T005) and `protected string ResolveSession_S()`.
+  - **Done:** the minted identity is cached on the component, which lives for one loaded world.
   - It returns `LL_StatsManager.GetInstance().GetSessionId()` (line 269) when the instance exists and the identity is not empty.
   - Otherwise it mints, once per loaded world, an identity in exactly the format of `LL_StatsManager.MintSessionIdentity` (`Lite Lobby/scripts/game/Stats/LL_StatsManager.c:1605-1627`): local `System.GetYearMonthDay`/`GetHourMinuteSecond`, `GetGame().GetWorldFile()` basename without extension as the slug, `"%1%2%3-%4%5%6-%7"` with two-digit fields. It caches the result with the `BaseWorld` it was minted for, because statics survive a world reload.
   - The statistics code is not changed (Principle I).
   - One WHY comment: statistics and replay files of one game must carry the same identity (research R14).
-- [ ] T002 Read `Lite Lobby/scripts/game/Stats/LL_StatsManager.c` and confirm the identity rule of T001 holds:
+- [X] T002 Read `Lite Lobby/scripts/game/Stats/LL_StatsManager.c` and confirm the identity rule of T001 holds:
+  - **Done:** confirmed and recorded in R14.
   - the identity is minted in `OnPostInit` only when statistics are enabled (lines 104-111);
   - `GetSessionId()` returns `""` otherwise;
   - the resume path overwrites it in `ResumeRecording_S` (lines 347-348) before the recorder resumes (T034).
 
   Record the result in research R14; no edit to the file.
-- [ ] T003 [P] Create the Go module: `uplink/go.mod` (`module github.com/Jumbo13th/lite-lobby-ar/uplink`, `go 1.27`, no `require`), folders `uplink/cmd/ll-uplink/` and `uplink/internal/{config,scan,send,state,metrics}/`, and `.github/workflows/uplink.yml`. The workflow runs on pushes and pull requests touching `uplink/**` or itself, with `actions/setup-go` reading `uplink/go.mod`: `test -z "$(gofmt -l .)"`, `go vet ./...`, `go build ./...`, `go test ./...` in `uplink/`. A second job on `release: published` builds `CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w -X main.version=${{ github.event.release.tag_name }}" -o ll-uplink-linux-amd64 ./cmd/ll-uplink`, writes its SHA-256 to `ll-uplink-linux-amd64.sha256`, and attaches both to the release (`contents: write` for that job only, `contents: read` otherwise) (research R27).
+- [X] T003 [P] Create the Go module: `uplink/go.mod` (`module github.com/Jumbo13th/lite-lobby-ar/uplink`, `go 1.27`, no `require`), folders `uplink/cmd/ll-uplink/` and `uplink/internal/{config,scan,send,state,metrics}/`, and `.github/workflows/uplink.yml`. The workflow runs on pushes and pull requests touching `uplink/**` or itself, with `actions/setup-go` reading `uplink/go.mod`: `test -z "$(gofmt -l .)"`, `go vet ./...`, `go build ./...`, `go test ./...` in `uplink/`. A second job on `release: published` builds `CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags "-s -w -X main.version=${{ github.event.release.tag_name }}" -o ll-uplink-linux-amd64 ./cmd/ll-uplink`, writes its SHA-256 to `ll-uplink-linux-amd64.sha256`, and attaches both to the release (`contents: write` for that job only, `contents: read` otherwise) (research R27).
+  - **Done:** the workflow uses `actions/checkout@v7` and `actions/setup-go@v7`, the current majors; the release tag goes through an environment variable, and `--clobber` lets a re-run replace the assets.
 
 **Checkpoint**: the recorder's identity rule exists and the statistics code is untouched; `uplink/` builds empty in CI.
 
@@ -59,7 +62,8 @@ in a separate change after this feature (T057).
 
 **Purpose**: the writer, the component lifecycle and character sampling, which every story needs. The first spikes run here.
 
-- [ ] T004 Create `Lite Lobby/scripts/game/Replay/LL_ReplayWriter.c`, class `LL_ReplayWriter` (server only), per contracts/recording-format.md:
+- [X] T004 Create `Lite Lobby/scripts/game/Replay/LL_ReplayWriter.c`, class `LL_ReplayWriter` (server only), per contracts/recording-format.md:
+  - **Done:** `Open` and `Flush_S` are `Begin` and `FlushStep_S` (true once the buffer is on disk); the recorder rewrites the status file after each completed flush.
   - **Formatters:** `static string Str(string s)` writes a JSON string literal: escape `\`, `"`, LF, CR and tab; every other character below U+0020 becomes a space. `static string Tok(string s)` replaces spaces and double quotes with `_` and returns `-` for empty. `static string IntOr(int v, bool present)` returns `-` when absent.
   - **Buffer:** a line buffer `ref array<string>`, `void Add(string line)`, and `void SetTime(int t)`, which adds a `T` line only when `t` differs from the last one written.
   - **Open:** `bool Open(string session, int segment)` calls `FileIO.MakeDirectory("$profile:LL_Replays")` and sets the path `$profile:LL_Replays/<session>-<segment>.llr`.
@@ -75,7 +79,8 @@ in a separate change after this feature (T057).
   - **Counters:** lines by record type, bytes written, and the summed and longest flush step (`System.GetTickCount` delta).
   - **Failure:** any null `OpenFile` sets a failed flag and reason, logs once `[LL_Lobby] Replay: cannot write <path>, recording stopped`, and returns false.
   - **Comments:** one WHY comment on closing every flush (no flush exists, so data reaches the disk on close; research R2). One WHY comment on the identity file: segment files must never carry identities.
-- [ ] T005 Complete `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` (declared in T001): `[ComponentEditorProps(category: "Lite Lobby", description: "Server-only replay recorder; off until $profile:LL_Replays.json enables it")] class LL_ReplayRecorderComponentClass : SCR_BaseGameModeComponentClass {}` and `class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent` with `static LL_ReplayRecorderComponent GetInstance()`.
+- [X] T005 Complete `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` (declared in T001): `[ComponentEditorProps(category: "Lite Lobby", description: "Server-only replay recorder; off until $profile:LL_Replays.json enables it")] class LL_ReplayRecorderComponentClass : SCR_BaseGameModeComponentClass {}` and `class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent` with `static LL_ReplayRecorderComponent GetInstance()`.
+  - **Done:** the server stop is the component's own `OnGameEnd` override, which runs before the shutdown save; `WillResume` is protected, so `LL_GameModeCoop.IsResumeExpected()` wraps it.
   - **Config, in `OnPostInit` on the server in play mode:** read `$profile:LL_Replays.json` with `JsonLoadContext` (a flat `Enabled` bool, as `LL_StatsManager` reads its config at lines 124-144).
     - Absent: stay `off` with no log line.
     - Unreadable: one warning naming the file.
@@ -92,7 +97,8 @@ in a separate change after this feature (T057).
   - **Teardown, in `OnDelete`:** remove both calls.
   - **Status getters for `/replay`:** state, session, segment, recorded seconds, kilobytes, seconds since the last write.
   - Depends on T001, T004.
-- [ ] T006 Create `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c`, character part.
+- [X] T006 Create `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c`, character part.
+  - **Done:** new characters are still registered during a hard freeze; only the sampling pauses.
   - **Record class:** `LL_ReplayEntityRecord` with `int eid`, `IEntity entity`, `string kind`, `int lastX`, `lastZ`, `lastYaw`, `bool written`.
   - **Table class:** `LL_ReplayEntities` owns the table and the next `eid`.
   - **`void Tick_S(int t)`:** called every 100 ms by the recorder.
@@ -110,7 +116,8 @@ in a separate change after this feature (T057).
   - **`void WriteSnapshot_S()`:** restates `E` and `P` for every live record.
   - **`int EidOf(IEntity e)`:** returns `-1` when unknown.
   - Depends on T004.
-- [ ] T007 Instrumentation in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` and `LL_ReplayWriter.c`:
+- [X] T007 Instrumentation in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` and `LL_ReplayWriter.c`:
+  - **Done:** the line also carries the `playerShots` and `aiShots` counters of T015.
   - time every `Tick_S` (sampling, snapshot building and flush steps included) with `System.GetTickCount`; keep the sum and the longest;
   - with every snapshot (every 3000 tenths of mission time, T030), log one line `[LL_Lobby] Replay: <session> seg <n> lines=<n> bytes=<n> workMs=<n> avgMsPerSec=<n.nn> maxFlushMs=<n> maxTickMs=<n> types=<T:n,P:n,F:n,...>`, where `workMs` is the summed tick time of the period and `avgMsPerSec` is `workMs` divided by the period's seconds (SC-001);
   - then reset the sums and maxima (research R21).
@@ -131,7 +138,7 @@ in a separate change after this feature (T057).
 
 **Independent Test**: quickstart Scenario 2: every scripted event is in the file with its time, actors and position.
 
-- [ ] T011 [US1] Vehicles in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c` (research R5, R6).
+- [X] T011 [US1] Vehicles in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c` (research R5, R6).
   - **Registry at recording start:** take `SCR_EditableEntityCore.Cast(SCR_EditableEntityCore.GetInstance(SCR_EditableEntityCore))`, call `GetAllEntities(set)` and keep entries whose `GetEntityType() == EEditableEntityType.VEHICLE`. Subscribe `Event_OnEntityRegistered` and `Event_OnEntityUnregistered` with `void OnEditableRegistered(SCR_EditableEntityComponent entity)` and the matching unregister handler, and unsubscribe at stop.
   - **Kind**, per the data-model table:
     - `SCR_AIVehicleUsageComponent.FindOnNearestParent(owner)` then `GetVehicleType()` for helicopter, plane, static weapon, static artillery and tracked;
@@ -142,8 +149,9 @@ in a separate change after this feature (T057).
   - **`E` line:** display `GetDisplayName()`, prefab file name, side from the editable entity's faction or `-`.
   - **Sampling:** in fifths per tick, so twice per second, with the same `P` test. A destroyed vehicle stays until it is unregistered, which writes `Q`.
   - **Log:** the registered count once at start, for spike S4's comparison.
-- [ ] T012 [US1] Trackers in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c`: at recording start and on each snapshot, every `LL_TrackerComponent.GetAll()` entry becomes an entity of kind `tracker` (display = label from `ExportConfig`, side field = `*` when visible to any faction, otherwise the visible faction keys joined by commas); positions from `SampleTarget(out pos, out yaw)` sampled with the vehicles; `SampleTarget` returning false writes `Q` (research R12).
-- [ ] T013 [US1] Create `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c`, class `LL_ReplayCombat`: life states, knock-outs and the weapon dictionary (research R8).
+- [X] T012 [US1] Trackers in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c`: at recording start and on each snapshot, every `LL_TrackerComponent.GetAll()` entry becomes an entity of kind `tracker` (display = label from `ExportConfig`, side field = `*` when visible to any faction, otherwise the visible faction keys joined by commas); positions from `SampleTarget(out pos, out yaw)` sampled with the vehicles; `SampleTarget` returning false writes `Q` (research R12).
+  - **Done:** trackers are added once at recording start: `SampleTarget` fails only when the target is gone or destroyed, which is final; they are left out of the continuation, because a tracker shares its target's persistent id.
+- [X] T013 [US1] Create `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c`, class `LL_ReplayCombat`: life states, knock-outs and the weapon dictionary (research R8).
   - **Weapon dictionary:** `int WeaponId(BaseWeaponComponent weapon)` keys on UI name plus `EWeaponType` (mapped per data-model "Weapon types") and adds `W <wid> <type> "<name>"` on first sight.
   - **`void OnCharacterAdded(IEntity character, int eid)`:** subscribes `SCR_CharacterControllerComponent.m_OnLifeStateChanged` with `void OnLifeStateChanged(ECharacterLifeState previousLifeState, ECharacterLifeState newLifeState, bool isJIP)`, the vanilla parameter names of `SCR_CharacterDamageManagerComponent.c:222`.
   - **On `INCAPACITATED`:**
@@ -154,22 +162,22 @@ in a separate change after this feature (T057).
     - write `L <eid> u <attacker|-> <cause|-> <wid|-> <dist|->`.
   - **On `ALIVE` from `INCAPACITATED`:** write `L <eid> a`.
   - **`OnCharacterRemoved`:** unsubscribes.
-- [ ] T014 [US1] Deaths in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` and `LL_ReplayCombat.c`: `override void OnControllableDestroyed(notnull SCR_InstigatorContextData instigatorContextData)`, the statistics' signature at `LL_StatsManager.c:564`, calling super first, forwards to `LL_ReplayCombat.OnDestroyed`.
+- [X] T014 [US1] Deaths in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` and `LL_ReplayCombat.c`: `override void OnControllableDestroyed(notnull SCR_InstigatorContextData instigatorContextData)`, the statistics' signature at `LL_StatsManager.c:564`, calling super first, forwards to `LL_ReplayCombat.OnDestroyed`.
   - **Deletion relations** (`DELETED`, deleted by the editor) write `Q <eid>` only.
   - **Everything else** writes `K <victim> <killer|-> <relation> <cause|-> <wid|-> <dist|->`:
     - relation per the data-model table, `vehicle` when the victim is not a character;
     - cause and weapon as in T013;
     - the damage history is read synchronously inside the callback, because it is cleared 1.5 s after death (research R8).
-- [ ] T015 [US1] Shots in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c` (research R9).
+- [X] T015 [US1] Shots in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c` (research R9).
   - **Registration:** in `OnCharacterAdded`, get the character's `EventHandlerManagerComponent` and register `"OnProjectileShot"` and `"OnGrenadeThrown"` with `void OnProjectileShot(int playerID, BaseWeaponComponent weapon, IEntity entity)`, the parameter names of `SCR_DataCollectorShootingModule.c:31`, using the default delayed flag. Remove both in `OnCharacterRemoved`.
   - **Per-shooter counter:** the first shot of a second stores the heading and the `wid`. The heading is the yaw of the projectile's `ProjectileMoveComponent.GetVelocity()` when the projectile is still readable, otherwise the shooter's yaw. The shooter's last weapon and its time are stored for T013.
   - **`void SecondStep_S()`:** called once per second by the recorder, writes `F <eid> <count> <yaw> <wid>` per shooter and clears the counters.
   - **Spike counters:** keep shot counts split by player and AI, and add them to the T007 summary line.
-- [ ] T016 [US1] Explosions in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c` (research R10).
+- [X] T016 [US1] Explosions in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c` (research R10).
   - **Subscribe at recording start:** `SCR_ExplosionAmmoEffect.GetOnExplosionAmmoEffect().Insert(OnExplosionAmmoEffect)` with `(IEntity pHitEntity, inout vector outMat[3], IEntity damageSource, notnull Instigator instigator, string colliderName, float speed)`.
   - **Record:** `B <x> <z> <alt> <kind> <shooter|-> <wid|->` at `outMat[0]`. The kind (`rocket`, `grenade`, `shell`) comes from the shooter's last weapon type: rocket launcher is `rocket`, grenade launcher is `grenade`, anything else is `shell`. The shooter comes from the instigator's entity.
   - **Remove** the subscription at stop and in `OnDelete`, because the invoker is static.
-- [ ] T017 [US1] Followed objects in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c` (research R10).
+- [X] T017 [US1] Followed objects in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c` (research R10).
   - **What is followed:**
     - from `OnGrenadeThrown`, the grenade entity;
     - from `OnProjectileShot`, projectiles whose weapon type is `WT_ROCKETLAUNCHER` or `WT_GRENADELAUNCHER`;
@@ -187,7 +195,8 @@ in a separate change after this feature (T057).
   - Register `"OnAmmoCountChanged"` with `(BaseWeaponComponent weapon, BaseMuzzleComponent muzzle, BaseMagazineComponent magazine, int ammoCount, bool isBarrelChambered)`, the parameter names as used by `SCR_SpawnProtectionComponent.c:59-63`.
   - Count a decrease of `ammoCount` on the same magazine as that many shots.
   - The heading is the shooter's yaw.
-- [ ] T020 [US1] Roster and players in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c` (research R13).
+- [X] T020 [US1] Roster and players in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c` (research R13).
+  - **Done:** the roster, owners, names and connections are compared once per second instead of through the lobby-manager invokers, so nothing is subscribed and only changed values are written. A player gets a reference at once; the identity is attached when the lobby knows it, or the player takes the earlier reference of that identity (contract, Identity file).
   - **At start and in snapshots:**
     - one `GROUP <gid> <side> "<callsign>"` per distinct `LL_SlotData.m_iGroupId` (callsign `m_sGroupName`) and per AI group first seen on a character (`SCR_AIGroup.GetGroupID()`, faction key, callsign from `GetCallsigns` or the custom name);
     - one `S <m_iSortKey> <gid> <m_sFactionKey> "<m_sName>"` per slot of `LL_LobbyManager.GetSlots()`;
@@ -196,7 +205,7 @@ in a separate change after this feature (T057).
   - **Player references:** keyed by `GetReconnectKeyForPlayer_S(playerId)`. A new reference writes `N <pref> "<GetPlayerName(playerId)>"` and calls `writer.AddIdentity(pref, key)`.
   - **Once per second:** for each `GetGame().GetPlayerManager().GetPlayers()`, compare `GetPlayerControlledEntity(playerId)` with the last value and write `C <pref> <eid|->` on change.
   - **Unsubscribe** every lobby-manager invoker when the recording stops and in the recorder's `OnDelete`.
-- [ ] T021 [US1] Seats in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c` (research R7).
+- [X] T021 [US1] Seats in `Lite Lobby/scripts/game/Replay/LL_ReplayEntities.c` (research R7).
   - **Subscription:** on a new character, subscribe its `SCR_CompartmentAccessComponent.GetOnCompartmentEntered()` and `GetOnCompartmentLeft()` with `(IEntity targetEntity, BaseCompartmentManagerComponent manager, int mgrID, int slotID, bool move)`, and unsubscribe on removal.
   - **Entered:**
     - role from `manager.FindCompartment(slotID, mgrID).GetType()`: `PILOT` is driver, `TURRET` is gunner, `CARGO` is cargo;
@@ -205,19 +214,22 @@ in a separate change after this feature (T057).
   - **Left:** write `V <eid> -`.
   - **Snapshots:** keep the current seat per character for the snapshot's `V` lines.
 - [ ] T022 [US1] Operator: rerun S1 if T019 was implemented; otherwise nothing. Confirm the AI shot counts in the summary line.
-- [ ] T023 [P] [US1] Edit `Lite Lobby/scripts/game/Markers/LL_ManualMarker.c`:
+- [X] T023 [P] [US1] Edit `Lite Lobby/scripts/game/Markers/LL_ManualMarker.c`:
+  - **Done:** no size getter, because the `M+` line has no size field; `IsHiddenInState` leaves out markers hidden in the game phase.
   - a server-side static registry in the shape of `LL_StatZoneComponent.c:16-42` (world-guarded array; add on the server in play mode at init, remove on delete);
   - public getters for the drawn quad name, colour as `rrggbb`, size, description text, hidden game states, the any-faction flag and the visible faction keys.
   - No change to drawing.
-- [ ] T024 [P] [US1] Edit `Lite Lobby/scripts/game/Zones/LL_MapZoneComponent.c`:
+- [X] T024 [P] [US1] Edit `Lite Lobby/scripts/game/Zones/LL_MapZoneComponent.c`:
+  - **Done:** `GetDrawnPolygon(notnull array<vector>)`.
   - the same server registry;
   - public getters for fill colour, outline colour (`rrggbbaa`), outline width, line mode, the any-faction flag, the visible faction keys, and the label (the owner entity's name, as `LL_StatZoneComponent.c:77-83`);
   - `void GetDrawnPolygon(out array<float> points)`, returning exactly the points the component draws today (origin plus local offset);
   - add `bool IsShownNow()`, a new read-only method that evaluates the same game-state and timed conditions as the drawing's visibility check (lines 86-109) without the faction part: hidden game states, hide at freeze end, hide delay from `LL_GameModeCoop.GetFreezeEndedAt()`;
   - the drawing code is not changed (Principle I keeps working production code as it is);
   - one WHY comment on `IsShownNow()`: it mirrors the drawing's rule, and a change to one must be made to the other.
-- [ ] T025 [P] [US1] Edit `Lite Lobby/scripts/game/Triggers/LL_TriggerZoneBase.c`: public `bool GetZoneOutline(out array<float> polygon)` that returns `m_aPolygon2D` when built, otherwise builds it with `LL_TriggerComponent.BuildPolygon(m_sZoneEntityName, null, polygon)` (check the signature at `LL_TriggerComponent.c:486-511`) without storing it, and public `string GetZoneEntityName()`.
-- [ ] T026 [US1] Create `Lite Lobby/scripts/game/Replay/LL_ReplayMap.c`, class `LL_ReplayMap` (research R11, R12, contracts/recording-format.md "Map").
+- [X] T025 [P] [US1] Edit `Lite Lobby/scripts/game/Triggers/LL_TriggerZoneBase.c`: public `bool GetZoneOutline(out array<float> polygon)` that returns `m_aPolygon2D` when built, otherwise builds it with `LL_TriggerComponent.BuildPolygon(m_sZoneEntityName, null, polygon)` (check the signature at `LL_TriggerComponent.c:486-511`) without storing it, and public `string GetZoneEntityName()`.
+  - **Done:** `GetZoneOutline(notnull array<float>)`; no `GetZoneEntityName()`, which had no caller.
+- [X] T026 [US1] Create `Lite Lobby/scripts/game/Replay/LL_ReplayMap.c`, class `LL_ReplayMap` (research R11, R12, contracts/recording-format.md "Map").
   - **(a) Markers, once per second:**
     - read `GetStaticMarkers()` and `GetDisabledMarkers()` from `SCR_MapMarkerManagerComponent`, never appending to the returned arrays, and diff by `GetMarkerID()`, skipping `-1`;
     - a new id writes `M+ g<id> <type> <x> <z> <rotation> <pref|-> <sides> "<icon>" <colour|-> "<text>"`:
@@ -230,13 +242,15 @@ in a separate change after this feature (T057).
   - **(c) Map areas** from T024's registry: `A <aid> <sides> <fill|-> <outline|-> <width> <line> "<label>" <points>` at start and in snapshots, then `AV <aid> <0|1>` whenever `IsShownNow()` changes, checked once per second.
   - **(d) Trigger zones:** each `LL_TriggerComponent.GetAll()` entry that is an `LL_TriggerZoneBase` writes `Z <zid> <attacker|-> <defender|-> "<GetZoneStatLabel()>" <points from GetZoneOutline>`, plus `ZH` with `GetZoneHolderFaction()`.
   - Depends on T023, T024, T025.
-- [ ] T027 [US1] Trigger hooks:
+- [X] T027 [US1] Trigger hooks:
   - **`Lite Lobby/scripts/game/Triggers/LL_TriggerComponent.c`:** in `Fire()`, right after the latch and outside the statistics branch (lines 122-145), call `LL_ReplayRecorderComponent.RecordTrigger_S(this)`, which writes `TR "<GetStatKey()>" "<label>"`.
   - **`LL_TriggerZoneCapture.c`:** next to `NotifyZoneCaptured` (lines 169-171), record `ZC <zid> <side>`.
   - **`LL_TriggerZoneContest.c`:** next to `NotifyZoneOwnerChanged` (lines 300-302), record `ZH <zid> <holder|->`, including neutral.
   - Each call is null-safe and does nothing without a recording. Depends on T026.
-- [ ] T028 [US1] Recorder hooks for game flow in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c`: public `RecordFreeze_S(float remaining)`, `RecordFreezeEnd_S()`, `RecordHardFreeze_S(float remaining)` and `RecordHardFreezeEnd_S()`, which write the `FLOW` lines of the contract with seconds rounded. `RecordHardFreeze_S` also calls `writer.SetClockHeld(true)` and `RecordHardFreezeEnd_S` calls `SetClockHeld(false)` (T004, FR-015). Each does nothing without a recording.
-- [ ] T029 [US1] Edit `Lite Lobby/scripts/game/Core/LL_GameModeCoop.c`. Each call is null-safe (research R16).
+- [X] T028 [US1] Recorder hooks for game flow in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c`: public `RecordFreeze_S(float remaining)`, `RecordFreezeEnd_S()`, `RecordHardFreeze_S(float remaining)` and `RecordHardFreezeEnd_S()`, which write the `FLOW` lines of the contract with seconds rounded. `RecordHardFreeze_S` also calls `writer.SetClockHeld(true)` and `RecordHardFreezeEnd_S` calls `SetClockHeld(false)` (T004, FR-015). Each does nothing without a recording.
+  - **Done:** `RecordHardFreeze_S(int seconds)`, because the hard freeze counts whole seconds; `RecordTrigger_S(statKey, label)`.
+- [X] T029 [US1] Edit `Lite Lobby/scripts/game/Core/LL_GameModeCoop.c`. Each call is null-safe (research R16).
+  - **Done:** `AdjustHardFreeze_S` restarts through `StartHardFreeze_S` and `EndFreezeTime_S` ends through `OnFreezeTimeEnded_S`, so those hooks cover both; the stop is T005's `OnGameEnd`.
   - **Freeze:**
     - `ScheduleFreezeCountdown_S` calls `RecordFreeze_S(m_fFreezeTimeRemaining)`;
     - `OnFreezeTimeEnded_S` calls `RecordFreezeEnd_S()`;
@@ -246,7 +260,7 @@ in a separate change after this feature (T057).
     - `EndHardFreeze_S` calls `RecordHardFreezeEnd_S()`.
   - **Server stop:** `OnGameEnd` calls `OnServerStop_S()`.
   - Depends on T028.
-- [ ] T030 [US1] Snapshot completeness in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c`: `WriteSnapshot_S()` writes, in order:
+- [X] T030 [US1] Snapshot completeness in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c`: `WriteSnapshot_S()` writes, in order:
   - `SNAP`;
   - every `W`, `GROUP`, `N`, `S`, `O`, `D` and `C`;
   - every live entity's `E` and `P`;
@@ -280,7 +294,7 @@ in a separate change after this feature (T057).
 
 **Independent Test**: quickstart Scenario 3.
 
-- [ ] T032 [US2] Create `Lite Lobby/scripts/game/Persistence/LL_ReplayData.c` in the shape of `Lite Lobby/scripts/game/Persistence/LL_MarkerData.c` (research R15, data-model "Continuation record"):
+- [X] T032 [US2] Create `Lite Lobby/scripts/game/Persistence/LL_ReplayData.c` in the shape of `Lite Lobby/scripts/game/Persistence/LL_MarkerData.c` (research R15, data-model "Continuation record"):
   - **`class LL_ReplayContinuation`:**
     - `string session`, `int segment`, `int snapshotT`, `int nextEid`, `int nextPref`, `int nextWid`;
     - `ref array<ref LL_ReplayEntityPair> entities` (`string persistentId`, `int eid`);
@@ -291,12 +305,14 @@ in a separate change after this feature (T057).
     - `static const int VERSION = 1` and `override static typename GetTargetType()`;
     - `Serialize` asks `LL_ReplayRecorderComponent.GetInstance().CaptureContinuation_S()` and returns `ESerializeResult.DEFAULT` when it is null; otherwise it writes `"version"`, then `"replay"` with the type discriminator off;
     - `Deserialize`: an unknown version logs a warning and returns true; otherwise it reads the continuation and calls `SetPendingContinuation_S`.
-- [ ] T033 [US2] Edit `Lite Lobby/Configs/Systems/Persistence/LL_Persistence.conf`:
+- [X] T033 [US2] Edit `Lite Lobby/Configs/Systems/Persistence/LL_Persistence.conf`:
+  - **Done:** the Workbench check is in the handover.
   - add `StatePersistenceConfig "{<fresh 16-hex id>}" { SelfDelete 0 Collection "{43DB609DE0025271}" Serializer LL_ReplaySerializer "{<fresh 16-hex id>}" {} }` inside the `Lobby` configuration group;
   - add `LL_ReplayData "{<fresh 16-hex id>}" {}` inside `PersistentStates +{ }`;
   - change nothing else (contracts/config-files.md).
   - Operator: open the file in Workbench and confirm it loads.
-- [ ] T034 [US2] Continuation in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` and `LL_ReplayEntities.c` (research R15).
+- [X] T034 [US2] Continuation in `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` and `LL_ReplayEntities.c` (research R15).
+  - **Done:** the static `ResumeAfterSnapshot_S()` is called from `CompleteResume_S`.
   - **`LL_ReplayContinuation CaptureContinuation_S()`:**
     - returns null unless recording;
     - `snapshotT` is the current mission time in tenths;
@@ -326,7 +342,8 @@ in a separate change after this feature (T057).
 
 **Independent Test**: `go test ./...` in CI (quickstart Scenario 4 step 1); host checks and the website run later (steps 2 to 5).
 
-- [ ] T036 [P] [US3] Create `uplink/internal/config/config.go` and `config_test.go` (contracts/config-files.md):
+- [X] T036 [P] [US3] Create `uplink/internal/config/config.go` and `config_test.go` (contracts/config-files.md):
+  - **Done:** also refuses a website address with a user, query or fragment and trims a trailing `/`; creates `StateDir` and checks it is writable; refuses an explicit 0 for an optional number.
   - a `Config` struct with the nine fields;
   - `Load(path string) (Config, error)`:
     - refuse a file whose permission bits allow group or other access (`mode&0o077 != 0`) on non-Windows builds;
@@ -334,12 +351,14 @@ in a separate change after this feature (T057).
     - defaults `RateCapKbit` 8000, `StoppedWaitMinutes` 30, `RetentionDays` 14;
     - validate: `Website` starts with `https://`; `ServerId` matches `^[a-z0-9-]{1,64}$`; `Secret` is at least 32 characters; `Profile` is a folder; numeric ranges per the contract.
   - One test per rule.
-- [ ] T037 [P] [US3] Create `uplink/internal/state/state.go` and `state_test.go` (data-model "Service state"):
+- [X] T037 [P] [US3] Create `uplink/internal/state/state.go` and `state_test.go` (data-model "Service state"):
+  - **Done:** `Save` syncs the temporary file before the rename; `Forget` drops a game after retention.
   - `State` with `Files map[string]FileRec` (kind, session, name, committed time) and `Games map[string]GameRec` (how it ended, segment identities, identity-file identity, posted statistics identity, confirmed time, failure count, last error);
   - `Load(dir)`;
   - `Save()` writes `state.json.tmp` and then `os.Rename`.
   - The test round-trips and survives a missing file.
-- [ ] T038 [P] [US3] Create `uplink/internal/scan/scan.go` and `scan_test.go` (research R17, contracts/recording-format.md "Status file", data-model lifecycle).
+- [X] T038 [P] [US3] Create `uplink/internal/scan/scan.go` and `scan_test.go` (research R17, contracts/recording-format.md "Status file", data-model lifecycle).
+  - **Done:** rule order: an unreadable status or `resume` holds every game; `rec` for the same session holds it until the status and the game's files are both older than the wait; then `ended`, `stopped`, `abandoned`. The session's statistics files count as the game's writes; a status time before 2001 is a half-written line and is retried.
   - **`ReadStatus(profile)`:** parses `LL_Replays/status.txt`; a malformed line returns "retry".
   - **`ListRecordings(profile)`:** groups `LL_Replays/<session>-<n>.llr` by session, with segment numbers and modification times, the presence of `END debrief` in the last segment's final lines, and the identity file.
   - **`LatestStats(profile, session)`:** picks `LL_GameStats/<session>-approved.json`, then `-final`, then `-live`.
@@ -350,15 +369,17 @@ in a separate change after this feature (T057).
     - a status written after the game's last write naming another session means `stopped`;
     - status and files older than `wait` mean `abandoned`.
   - Table tests for every case.
-- [ ] T039 [P] [US3] Create `uplink/internal/send/limiter.go` and `limiter_test.go`: a token bucket in bytes per second wrapping an `io.Reader`, with a burst of at most one second of the cap and an injectable clock. The test asserts no 10-second window exceeds the cap (research R25).
-- [ ] T040 [US3] Create `uplink/internal/send/client.go` and `client_test.go` per contracts/upload-protocol.md.
+- [X] T039 [P] [US3] Create `uplink/internal/send/limiter.go` and `limiter_test.go`: a token bucket in bytes per second wrapping an `io.Reader`, with a burst of at most one second of the cap and an injectable clock. The test asserts no 10-second window exceeds the cap (research R25).
+  - **Done:** the bucket refills at 90% of the cap with a 0.1 s burst, so no 1-second window exceeds the cap.
+- [X] T040 [US3] Create `uplink/internal/send/client.go` and `client_test.go` per contracts/upload-protocol.md.
+  - **Done:** the signed path is relative to the base address; each request gets 60 s plus the cap's time for its body; no redirects, no proxy; an extra failure kind `local` covers unreadable files and an unsavable state.
   - **Signing:** `sign(secret, method, path, ts, bodySHA)`, with the contract's test vector as a test.
   - **Headers:** `X-LL-Server`, `X-LL-Timestamp`, `X-LL-Content-SHA256`, `X-LL-Signature`.
   - **Calls:** `GetFile`, `PutPiece`, `Commit` and `PostGame`.
   - **Encoding:** gzip at best compression with zeroed header time and name; the content identity is the SHA-256 of the uncompressed file, alongside the encoded SHA-256 and size; pieces are at most 1,500,000 bytes.
   - **Limits and errors:** 60 s per request; errors classified as auth, missing, invalid, rate-limited (with `Retry-After`) and transient.
   - **Test receiver:** an `httptest.Server` that checks the signature and the 300 s window before reading the body, enforces the length limits, stores pieces idempotently, joins and checks them on commit, and answers a game post naming an uncommitted file with `409`.
-- [ ] T040b [US3] Create `uplink/internal/send/doc.go`, the package documentation of `ll-upload/1`, so the protocol is documented in the code that speaks it (constitution VII, FR-037). It says, as briefly as a site can implement from:
+- [X] T040b [US3] Create `uplink/internal/send/doc.go`, the package documentation of `ll-upload/1`, so the protocol is documented in the code that speaks it (constitution VII, FR-037). It says, as briefly as a site can implement from:
   - the endpoints `GET /files/{sha256}`, `PUT /files/{sha256}/pieces/{index}`, `POST /files/{sha256}` and `POST /games/{session}`;
   - the four `X-LL-*` headers and the canonical signing string;
   - the 300-second window and the 1,500,000-byte piece limit;
@@ -366,7 +387,8 @@ in a separate change after this feature (T057).
   - a closing pointer to `specs/005-replay-recording/contracts/upload-protocol.md` for the full reference.
 
   Depends on T040.
-- [ ] T041 [US3] Create `uplink/internal/send/uploader.go` and `uploader_test.go`.
+- [X] T041 [US3] Create `uplink/internal/send/uploader.go` and `uploader_test.go`.
+  - **Done:** one upload path: a confirmed game whose set (`over`, segments, identity file, statistics) changes is committed and posted again in full, so a segment written after a resume that followed an `abandoned` post is sent (FR-029); a confirmed segment missing locally blocks a re-post; a file refused twice is held, in memory, until it changes.
   - **`UploadGame`:** for each of the game's segments, its identity file and its latest statistics file:
     - skip it if committed in the state;
     - otherwise `GetFile`, send the missing pieces through the limiter, and commit; on a `409` send the listed pieces, and on a `422` resend once, then mark the file failed;
@@ -375,10 +397,12 @@ in a separate change after this feature (T057).
   - **Backoff:** per game, from 10 s to 30 min with jitter; `Retry-After` is honoured.
   - **Statistics updates:** for a confirmed game whose latest statistics identity differs from the posted one, upload it and post the game again.
   - **Tests:** a receiver outage then recovery (no duplicate commits); `429` honoured; resend after `422`; a changed statistics file gives a new identity and a re-post, while unchanged content is never committed twice (FR-032, US4).
-- [ ] T042 [P] [US3] Create `uplink/internal/metrics/metrics.go` and `metrics_test.go`:
+- [X] T042 [P] [US3] Create `uplink/internal/metrics/metrics.go` and `metrics_test.go`:
+  - **Done:** every series carries `server="<ServerId>"`, so two instances can share one text-file folder.
   - write `ll_uplink_last_success_timestamp_seconds`, `ll_uplink_pending_files`, `ll_uplink_pending_bytes`, `ll_uplink_failures_total{kind="…"}` and `ll_uplink_confirmed_games_total` in Prometheus text format to `MetricsFile` through a temporary file and a rename;
   - do nothing when it is unset (research R26).
-- [ ] T043 [US3] Create `uplink/cmd/ll-uplink/main.go` and `uplink/internal/scan/retention.go` with `retention_test.go`.
+- [X] T043 [US3] Create `uplink/cmd/ll-uplink/main.go` and `uplink/internal/scan/retention.go` with `retention_test.go`.
+  - **Done:** retention counts from the latest confirmation and keeps every file of a game that still has an unconfirmed segment, a changed identity file or a newer statistics file.
   - **Flags:** `-config` and `-version` (`var version = "dev"`).
   - **Startup:** load the config and the state.
   - **Every 15 s:**
@@ -391,7 +415,8 @@ in a separate change after this feature (T057).
   - **Shutdown:** on SIGINT or SIGTERM, finish the current request and save the state.
   - **No listening socket.**
   - **Retention test:** only confirmed games older than the retention time lose their files.
-- [ ] T044 [US3] Create `uplink/README.md` (decision D2, 2026-10-31).
+- [X] T044 [US3] Create `uplink/README.md` (decision D2, 2026-10-31).
+  - **Done:** the service-manager example is a systemd template unit.
   - **Opening:** says who needs it (a server owner whose website implements `ll-upload/1`) and when (after turning recording on).
   - **Build:** `go build`, or the release binary with its `.sha256`.
   - **Config:** link to `specs/005-replay-recording/contracts/config-files.md`.
@@ -410,7 +435,8 @@ in a separate change after this feature (T057).
 
 **Independent Test**: quickstart Scenario 5.
 
-- [ ] T046 [US4] Audit `Lite Lobby/scripts/game/Replay/*.c`:
+- [X] T046 [US4] Audit `Lite Lobby/scripts/game/Replay/*.c`:
+  - **Done:** identities reach only `AddIdentity`; names come from `LL_LobbyManager.GetPlayerName`, with the engine's player name until the lobby has one; nothing reads chat or voice.
   - identity keys reach only `LL_ReplayWriter.AddIdentity`;
   - player names come only from `LL_LobbyManager.GetPlayerName`;
   - no `P`/`E`/`N` line carries an identity or a network address;
@@ -428,13 +454,13 @@ in a separate change after this feature (T057).
 
 **Independent Test**: quickstart Scenario 6.
 
-- [ ] T048 [US5] Edit `Lite Lobby/scripts/game/Core/LL_LobbyPlayerComponent.c` in the `/verify` pattern (contracts/admin-command.md, research R20).
+- [X] T048 [US5] Edit `Lite Lobby/scripts/game/Core/LL_LobbyPlayerComponent.c` in the `/verify` pattern (contracts/admin-command.md, research R20).
   - **Registration:** register `"replay"` in `RegisterChatCommands` (line 1286) and remove it in `UnregisterChatCommands` (line 1309).
   - **Client:** `OnChatCmd_Replay(SCR_ChatPanel panel, string data)` → `RequireAdmin()` → `AskReplayStatus()`.
   - **Server:** `[RplRpc(RplChannel.Reliable, RplRcver.Server)] protected void RpcAsk_ReplayStatus()` starts with `if (!SCR_Global.IsAdmin(GetPlayerId())) return;`, reads the recorder's status getters, and calls `Rpc(RpcDo_ReplayStatus, state, session, segment, seconds, kilobytes, lastWriteAgo)`.
   - **Owner reply:** `[RplRpc(RplChannel.Reliable, RplRcver.Owner)] protected void RpcDo_ReplayStatus(int state, string session, int segment, int seconds, int kilobytes, int lastWriteAgo)` maps the state to its key and calls `ShowCommandHelp(WidgetManager.Translate(key, …))`, with minutes and megabytes rounded to one decimal.
   - **Help:** add `#LL-Command_HelpReplay` to the second `/help` message in `OnChatCmd_Help` (line 1335).
-- [ ] T049 [US5] Edit `Lite Lobby/Language/ll_localization.st`:
+- [X] T049 [US5] Edit `Lite Lobby/Language/ll_localization.st`:
   - add `LL-Replay_NotEnabled`, `LL-Replay_Ready`, `LL-Replay_Recording`, `LL-Replay_Ended`, `LL-Replay_Failed` and `LL-Command_HelpReplay`;
   - each with a fresh GUID, single-line English from contracts/admin-command.md, and native Russian in the community's terms («реплей»);
   - then run `tools/generate-runtime-locales.ps1`.
@@ -446,14 +472,16 @@ in a separate change after this feature (T057).
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T051 [P] Add the changelog entry to `docs/src/content/docs/changelog.mdx` and `docs/src/content/docs/ru/changelog.mdx`, under the Workshop version that ships the feature. One plain line each:
+- [X] T051 [P] Add the changelog entry to `docs/src/content/docs/changelog.mdx` and `docs/src/content/docs/ru/changelog.mdx`, under the Workshop version that ships the feature. One plain line each:
+  - **Done:** under `1.1.0`, the version to confirm; `npm run validate` passed.
   - `LL_ReplayRecorderComponent` (records every game to `$profile:LL_Replays/` once `$profile:LL_Replays.json` enables it);
   - `/replay` (admin, recording status);
   - `ll-uplink` (sends finished recordings and statistics to a configured website).
 
   Run `npm run validate` in `docs/`.
 - [X] T052 Apply decision D1 (operator, 2026-10-31: format version only). Done: FR-004 no longer names the addon version; FR-020 raises the format version whenever a record's meaning changes; the decision is in the spec's Clarifications, research R18 and the `LLR` row of `contracts/recording-format.md`.
-- [ ] T053 Constitution pass over every new and edited file:
+- [X] T053 Constitution pass over every new and edited file:
+  - **Done:** game side: two dead methods removed, two in-body comments moved to their members, the identity-file comment added; Go: `gofmt` and `go vet` clean; no other project named.
   - `LL_` prefixes;
   - WHY-only comments with no narration;
   - no other project or website named;
@@ -462,7 +490,8 @@ in a separate change after this feature (T057).
   - `gofmt` and `go vet` clean.
 - [ ] T054 Operator: quickstart Scenario 7 (the same fight with recording off and on).
 - [ ] T055 Operator: quickstart Scenario 8 (scale) on the event server with 127 players and at least 100 AI, with recording on and off. The agent records the measurements in research R21; a failed criterion stays failed until it passes or the operator changes it.
-- [ ] T056 Write the handover in the "Changes:" format (constitution, Documentation), listing every Workbench step, the `.conf` file to check, the config files to place and the open decisions.
+- [X] T056 Write the handover in the "Changes:" format (constitution, Documentation), listing every Workbench step, the `.conf` file to check, the config files to place and the open decisions.
+  - **Done:** handover given in the chat, 2026-10-31.
 - [ ] T057 After this feature ships, propose the map-zone rotation fix (research R12, decision D3 of 2026-10-31) as its own change through the Spec Kit process; nothing in this feature changes the map zones' points.
 
 ---

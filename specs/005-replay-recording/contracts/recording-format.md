@@ -197,9 +197,12 @@ I 1 6f1a2b3c-4d5e-6f70-8192-a3b4c5d6e7f8
 I 2 0b9c8d7e-6f5a-4b3c-2d1e-0f9a8b7c6d5e
 ```
 
-`I` pairs a player reference with the player's identity GUID. Lines are appended as
-players first appear. This file is for matching statistics on the receiving website and
-is never shown to viewers.
+`I` pairs a player reference with the player's identity GUID. A line is appended once the
+player's identity is known, which can be seconds after the player first appears; a player
+whose identity becomes known only after a reference was given keeps that reference, unless
+the identity already has an earlier one, which the player uses from then on. A player whose
+identity never becomes known has no line. This file is for matching statistics on the
+receiving website and is never shown to viewers.
 
 ## Status file
 
