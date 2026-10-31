@@ -18,6 +18,9 @@ modded class SCR_MapDrawingUI
 	// Only the tail of the vanilla body touches the button, so the button is rebuilt first.
 	override protected void SetDrawMode(bool state, bool cacheDrawn = false)
 	{
+		if (state && m_LL_Paint)
+			m_LL_Paint.Disable();
+
 		LL_RestoreToolButton();
 
 		// Bailing here skips real teardown (listeners stay, the cursor stays in drawing
@@ -41,4 +44,67 @@ modded class SCR_MapDrawingUI
 		if (toolMenu)
 			toolMenu.LL_EnsureEntryButtons();
 	}
+
+
+	protected ref LL_MapPaintUI m_LL_Paint;
+
+	override void Init()
+	{
+		super.Init();
+		m_LL_Paint = new LL_MapPaintUI(m_MapEntity, this);
+	}
+
+	override void OnMapOpen(MapConfiguration config)
+	{
+		super.OnMapOpen(config);
+		if (m_LL_Paint)
+			m_LL_Paint.OnOpen(config);
+	}
+
+	override void OnMapClose(MapConfiguration config)
+	{
+		if (m_LL_Paint)
+			m_LL_Paint.OnClose();
+		super.OnMapClose(config);
+	}
+
+	override void Update(float timeSlice)
+	{
+		super.Update(timeSlice);
+		if (m_LL_Paint)
+			m_LL_Paint.Update(timeSlice);
+	}
+
+	override protected void OnEntryToggled(SCR_MapToolEntry entry)
+	{
+		super.OnEntryToggled(entry);
+		if (m_LL_Paint)
+			m_LL_Paint.OnEntryToggled(entry);
+	}
+
+
+
+	void LL_StopLineDrawing()
+	{
+		if (m_bIsDrawModeActive)
+			SetDrawMode(false);
+	}
+
+	bool LL_IsPaintHistoryHovered()
+	{
+		return m_LL_Paint && m_LL_Paint.LL_IsHistoryHovered();
+	}
+
+	void LL_HandlePaintInput(float value, EActionTrigger reason)
+	{
+		if (m_LL_Paint)
+			m_LL_Paint.LL_HandleMapInput(value, reason);
+	}
+
+#ifdef LL_MAP_PAINT_INPUT_TEST
+	LL_MapPaintUI LL_TestGetPaintUI()
+	{
+		return m_LL_Paint;
+	}
+#endif
 }

@@ -27,7 +27,7 @@ class LL_MapCursorModule : SCR_MapCursorModule
 		if (m_CursorState & STATE_ZOOM_RESTRICTED)
 			return;
 
-		if (IsCursorOverScrollWidget())
+		if (LL_IsPaintHistoryHovered() || IsCursorOverScrollWidget())
 			return;
 
 		// Vanilla's zoom math; super cannot be called because it zooms regardless.
@@ -41,7 +41,7 @@ class LL_MapCursorModule : SCR_MapCursorModule
 		if (m_CursorState & STATE_ZOOM_RESTRICTED)
 			return;
 
-		if (IsCursorOverScrollWidget())
+		if (LL_IsPaintHistoryHovered() || IsCursorOverScrollWidget())
 			return;
 
 		float targetPPU = m_MapEntity.GetTargetZoomPPU();
