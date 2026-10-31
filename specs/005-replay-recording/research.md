@@ -37,8 +37,8 @@ depends on it is written.
   game's own `SCR_FileIOHelper.AppendFileContent` (`scripts/Game/Helpers/SCR_FileIOHelper.c:360-433`),
   because creation by `APPEND` is not documented. `WriteLine` appends CR LF; `Write` with
   `"\n"` keeps one line ending. There is no rename (`SCR_FileIOHelper.RenameFile` is copy
-  plus delete), so a file is known to be final by its end record or by its server having
-  stopped (R17), never by its name.
+  plus delete), so a file is known to be final by its server having stopped (R17), never by
+  its name.
 - **Alternatives considered**: one handle kept open for the session, as the game's debug
   recorder does (a crash loses everything still in engine buffers); open and close per
   record (hundreds of opens per second at 127 players).
@@ -74,6 +74,10 @@ depends on it is written.
 - **Rationale**: the list is a static array maintained by the game for every character
   including AI and corpses (`scripts/Game/Components/SCR_CharacterRegistrationComponent.c:8-59`),
   so no world query is needed.
+- **Found (2026-10-31, local dev server)**: on a server hosted by a playing client, that
+  client's loadout-preview characters sit in the same list at the world origin, with no
+  faction or group. Characters without a replication id are not recorded; the next run
+  confirms the filter keeps every real character.
 
 ## R5. Vehicles
 
@@ -90,6 +94,12 @@ depends on it is written.
 - **Unverified (S4)**: a modded vehicle that does not inherit the game's vehicle base would
   be missing. The spike compares the registered count at game start with the vehicles
   placed in the demo world.
+- **Outcome (S4, 2026-10-31, local dev server)**: the nine vehicles of the demo world were
+  registered at game start. Heading is clockwise from north (+z): a car driving towards -z
+  read 165 to 181, and shot headings matched `atan2(dx, dz)` towards their targets. Placed
+  vehicles with their own overrides had no prefab file name until it was read through the
+  prefab's ancestors, as `SCR_EditableEntityComponent` does (fixed). Deleting a segment
+  between two writes was not tried.
 - **Alternatives considered**: `SCR_BaseGameMode.GetOnControllableSpawned/Deleted` (not
   proven to fire for vehicles); the addon's own squad-vehicle links (only squad vehicles).
 
@@ -139,6 +149,8 @@ depends on it is written.
   (`SCR_DataCollectorComponent.c:375-382`).
 - **Unverified (S3)**: whether the instigator is set before the life-state callback runs.
   The spike reads it at once and one frame later.
+- **Outcome (S3, 2026-10-31)**: the instigator is set when the callback runs: knock-outs
+  were recorded with attacker, cause, weapon and distance (`L 40 u 50 kinetic 1 14`).
 
 ## R9. Shots
 
@@ -156,6 +168,14 @@ depends on it is written.
   if they do not: `OnAmmoCountChanged` on the same handler, counting decreases of the
   magazine as shots (registered server-side by `SCR_SpawnProtectionComponent.c:59-63`).
   The fallback loses the projectile, so AI directions use the shooter's heading.
+- **Outcome (S1, 2026-10-31)**: the server raises no shot event for AI fire: one game counted
+  104 player shots and 0 AI shots while a Game Master's FIA group fired at the player
+  (operator). The fallback is in (T019): AI shots are counted from `OnAmmoCountChanged`
+  drops on the same magazine, aimed along the shooter's facing, and shot events count
+  players only, so no shot is counted twice. AI grenades and rockets are not followed;
+  their detonations come only from the explosion effect.
+- **Outcome (S6, inconclusive)**: shot headings matched the targets' bearings, which both
+  the projectile and the shooter's heading would give.
 - **Alternatives considered**: `SCR_MuzzleEffectComponent.GetOnWeaponFired()` (proven for
   AI on the server, but per weapon instance: every pick-up would need a new subscription);
   an impact trigger on the base bullet (rejected by FR-025: it silences rounds that have
@@ -186,6 +206,14 @@ depends on it is written.
   the refined point lands. Placed mines and charges, autocannon and heavy machine-gun
   high-explosive or incendiary rounds are not recorded (FR-011 leaves rounds without a
   server-visible detonation out).
+- **Outcome (S2, in part, 2026-10-31)**: hand grenades and RPG-7 rockets were recorded at
+  their impact: three rockets fired from three places landed on one point, as their shot
+  headings predict. The M72 and the GP-25 were not fired.
+- **Outcome (S2, second run, 2026-10-31)**: M72 rockets were recorded at their impact. Rounds
+  of under-barrel launchers were labelled by their rifle (`shell`) and one round could write
+  up to three detonations at one point, so the kind now comes from the muzzle type
+  (`MT_UGLMuzzle` grenade, `MT_RPGMuzzle` rocket) and a repeat at the same point from the
+  same shooter within half a second is not written.
 
 ## R11. Map markers
 
@@ -277,19 +305,24 @@ depends on it is written.
   persistent entity id and recording id. `LL_GameModeCoop.CompleteResume_S` hands it to the
   recorder next to `stats.ResumeRecording_S`, after the mission clock is restored. The
   recorder opens the next segment file, whose header names the resumed mission time, and
-  writes a full snapshot. A clean server stop writes a stop record to the segment; only
-  debriefing writes the end record.
+  writes a full snapshot. A clean server stop writes a stop record to the segment.
 - **Rationale**: the session state has a strict version check that refuses older
   snapshots (`scripts/game/Persistence/LL_SessionData.c:187-203`); the trigger and marker
   states show the tolerant shape (`LL_TriggerData.c:34-109`, `LL_MarkerData.c:32-150`), and
   a missing record is already a working case. A clean stop is not the end: the session
   resume feature can continue a game from its shutdown save.
+- **Decision B (operator, 2026-10-31)**: group, slot and marker numbers are numbered within a
+  segment. A resume gives groups new replication ids and some slots new keys, so the
+  first snapshot of every segment holds the whole roster (every existing character, slot,
+  squad and player) and a squad keeps its lobby callsign; entities, players and weapons
+  keep their numbers through the continuation.
 
 ## R16. Game-flow hooks
 
 - **Decision**: the recorder starts when it sees GAME in its `OnGameStateChanged` and no
-  resume is pending (the statistics' own test, `LL_StatsManager.c:255-267`), and ends at
-  DEBRIEFING. Direct calls from `LL_GameModeCoop` record: freeze countdown start
+  resume is pending (the statistics' own test, `LL_StatsManager.c:255-267`). The lobby
+  has no way to end a game (operator, 2026-10-31), so a recording ends with the server
+  stop. Direct calls from `LL_GameModeCoop` record: freeze countdown start
   (`ScheduleFreezeCountdown_S`), freeze end (`OnFreezeTimeEnded_S`, which can run twice when
   an admin revives a lapsed freeze), admin freeze changes (`AdjustFreezeTime_S`,
   `EndFreezeTime_S`), hard freeze start, end and changes (`StartHardFreeze_S`,
@@ -301,8 +334,8 @@ depends on it is written.
 
 - **Decision**: while configured, the recorder keeps a one-line status file
   (`$profile:LL_Replays/status.txt`), rewritten at server start and with every flush: idle,
-  resume pending, recording a given session and segment, or done. The service treats a
-  game as over when its last segment has the end record; or when the status file, written
+  resume pending, or recording a given session and segment. The service treats a game as
+  over when the status file, written
   after the game's last record, shows a different session; or when neither the status file
   nor the game's files changed for the configured wait. A pending resume holds every
   unfinished game.
@@ -329,6 +362,10 @@ depends on it is written.
   fallback. Player names are recorded as displayed (`[TAG]Callsign`).
 - **Unverified (S5)**: whether a dedicated server can translate keys. If it can, the
   recorder writes the English text instead of the key.
+- **Outcome (S5, 2026-10-31)**: the server does not translate. Mission, faction, role,
+  vehicle and weapon names arrive as keys (`#LL-Mission_DemoName`, `#AR-Faction_US`,
+  `#AR-Role_SquadLeader`, `#AR-Vehicle_M1025_Name`, `#AR-Weapon_M16A2_Name`) and are recorded
+  as keys, with the prefab file name beside every entity.
 
 ## R20. The `/replay` command
 

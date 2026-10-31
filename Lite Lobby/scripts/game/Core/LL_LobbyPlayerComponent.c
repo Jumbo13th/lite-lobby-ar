@@ -1508,10 +1508,6 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			line = WidgetManager.Translate("#LL-Replay_Recording", session, segment.ToString(), minutes.ToString(-1, 1),
 				megabytes.ToString(-1, 1), lastWriteAgo.ToString());
 		}
-		else if (state == LL_ReplayRecorderComponent.STATE_DONE)
-		{
-			line = WidgetManager.Translate("#LL-Replay_Ended", session);
-		}
 		else if (state == LL_ReplayRecorderComponent.STATE_FAILED)
 		{
 			line = WidgetManager.Translate("#LL-Replay_Failed");

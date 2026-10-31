@@ -1,5 +1,6 @@
 // Map squads can queue member spawns before persistence exists; the queue can outlive
-// the load. Restored bodies must stay the only members, including after casualties.
+// the load. Groups spawned during the game are recreated by the save while it is still
+// being applied. Restored bodies must stay the only members, including after casualties.
 
 modded class SCR_AIGroup
 {
@@ -40,12 +41,19 @@ modded class SCR_AIGroup
 	{
 		if (m_bLLResumeSpawnSuppressed)
 			return true;
-		if (!IsLoaded() || GetWorld().IsEditMode())
+		if (GetWorld().IsEditMode())
 			return false;
 
 		PersistenceSystem persistence = PersistenceSystem.GetInstance();
-		bool restored = persistence && persistence.WasDataLoaded();
-		if (!restored)
+		string kind = "map squad";
+		if (!IsLoaded())
+		{
+			if (!persistence || !persistence.WasDataLoaded() || persistence.GetState() >= EPersistenceSystemState.ACTIVE)
+				return false;
+
+			kind = "restored group";
+		}
+		else if (!persistence || !persistence.WasDataLoaded())
 		{
 			SaveGameManager manager = GetGame().GetSaveGameManager();
 			if (!manager || !manager.GetActiveSave())
@@ -56,7 +64,7 @@ modded class SCR_AIGroup
 
 		m_bLLResumeSpawnSuppressed = true;
 		if (Replication.IsServer())
-			Print(string.Format("[LL_Lobby] Resume: member spawning suppressed for map squad '%1'", GetName()), LogLevel.NORMAL);
+			Print(string.Format("[LL_Lobby] Resume: member spawning suppressed for %1 '%2'", kind, GetName()), LogLevel.NORMAL);
 		return true;
 	}
 }

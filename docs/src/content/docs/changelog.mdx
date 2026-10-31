@@ -7,9 +7,10 @@ What changed in each [Lite Lobby version on the Workshop](https://reforger.armap
 
 ## 1.1.0 {#v1-1-0}
 
-- Added `LL_ReplayRecorderComponent`: the server records every game, from the start of the game phase to debriefing, into `$profile:LL_Replays/` once `$profile:LL_Replays.json` contains `"Enabled": true`. A game continued after a crash goes on in the next file of the same recording.
+- Added `LL_ReplayRecorderComponent`: the server records every game into `$profile:LL_Replays/` once `$profile:LL_Replays.json` contains `"Enabled": true`. A game continued after a crash goes on in the next file of the same recording.
 - Added the admin chat command `/replay`: whether the server is recording, the recording's name, its length and its size.
 - Added `ll-uplink`, a program for the game host that sends finished recordings and the statistics files to a configured website.
+- Fixed extra AI members appearing after a session resume in groups spawned during the game, for example by the Game Master.
 
 ## 1.0.9 — 30 October 2026 {#v1-0-9}
 

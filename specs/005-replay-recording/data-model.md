@@ -18,7 +18,7 @@ host. The on-disk records are specified in
 
 | Part | Contents | Notes |
 |------|----------|-------|
-| Recording | session, segment, state (`off`, `ready`, `resume`, `rec`, `done`, `failed`), failure reason, start Unix time | state drives the status file and `/replay` |
+| Recording | session, segment, state (`off`, `ready`, `resume`, `rec`, `failed`), failure reason, start Unix time | state drives the status file and `/replay` |
 | Writer | pending lines, held lines during a snapshot, bytes written, open path, last flush time, last snapshot time, the clock-held flag and last anchor second, counters by record type, summed and longest tick and flush time | flush every 9 s in chunks of at most 300 lines per tick; snapshot every 300 s of mission time, built over consecutive ticks |
 | Entity table | per recorded entity: `eid`, a reference to the entity, kind, side, group, last written `x`, `z`, heading, sampling slot | characters from the game's character list, vehicles from the editable-entity core, trackers from their registry |
 | Players | per `pref`: identity, displayed name, connected, controlled `eid` | keyed by identity, so a reconnect keeps the reference |
@@ -93,7 +93,7 @@ recording.
 State transitions of a recording:
 
 ```text
-off ──config present──▶ ready ──GAME──▶ rec ──DEBRIEFING──▶ done
+off ──config present──▶ ready ──GAME──▶ rec
                          │               │
                          │               ├──write fails──▶ failed
                          │               └──clean stop──▶ (segment gets STOP; session save may resume it)
@@ -104,7 +104,7 @@ off ──config present──▶ ready ──GAME──▶ rec ──DEBRIEFING
 
 One line in `$profile:LL_Replays/status.txt`, rewritten at server start and with every
 flush; format in the recording contract. It carries the recording state above, mapped
-to `idle` (`ready`), `resume`, `rec` and `done`; `failed` is written as `idle`.
+to `idle` (`ready`), `resume` and `rec`; `failed` is written as `idle`.
 
 ## Service configuration
 
@@ -117,12 +117,12 @@ See [contracts/config-files.md](contracts/config-files.md): `Website`, `ServerId
 | Part | Contents |
 |------|----------|
 | Files | per file identity: kind, session, file name, committed time |
-| Games | per session: the set last posted (how it ended: `ended`, `stopped` or `abandoned`; segment identities; identity-file identity; statistics identity), the latest confirmation time, failure count and last error |
+| Games | per session: the set last posted (how it ended: `stopped` or `abandoned`; segment identities; identity-file identity; statistics identity), the latest confirmation time, failure count and last error |
 
 Lifecycle of a game on the host:
 
 ```text
-running ──over (end record │ other session │ wait elapsed)──▶ over
+running ──over (other session │ wait elapsed)──▶ over
 over ──every file committed──▶ files sent ──game posted, 2xx──▶ confirmed
 confirmed ──file set changed (newer statistics, or a segment after a resume)──▶ (new files committed, game posted again)
 confirmed ──retention elapsed since the latest confirmation──▶ local files deleted

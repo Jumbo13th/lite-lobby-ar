@@ -18,8 +18,8 @@ trigger per projectile, so a trigger added to a projectile replaces the one the 
 already has and the round loses its effect. A recorder must therefore watch the game's
 own events and never touch weapon or ammunition data. Second, the file interface has no flush and no rename. Written data
 reaches the disk when the file is closed, so crash safety comes from closing files
-often, and a finished file is recognised by its end record or by its server having
-stopped, not by renaming it.
+often, and a finished file is recognised by its server having stopped, not by renaming
+it.
 
 The server can observe, without changing any prefab:
 
@@ -44,8 +44,7 @@ The addon already holds most of what a recording needs:
 - The unit statistics recorder runs only on the server. It names each server session by
   start time and world, stamps its events (kills, teamkills, zone presence, captures, key
   targets, group defeats, survivors) with the mission clock, and writes its files under
-  the server profile: live every minute, final at debriefing, approved at each Game
-  Master publish. The session name exists only when statistics are on, and it survives a
+  the server profile: live every minute and approved at each Game Master publish. The session name exists only when statistics are on, and it survives a
   crash-resume only through the statistics' own continuation. Statistics reach a website
   today only when someone copies the files off the server and uploads them by hand.
 - The mission clock runs during the game phase and stands still during every hard freeze.
@@ -97,14 +96,17 @@ only sends, so neither the game nor the host gains a way in.
   format version only. The game cannot report an addon's version at runtime, and a
   hand-bumped constant could mislabel files; any change to what a record means raises the
   format version instead.
+- Q: Must squad and slot numbers stay the same across a crash-resume? → A: No (operator,
+  decision B): they are numbered within a segment; the first snapshot of every segment
+  restates the whole roster, and a squad keeps its callsign across segments.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Every game is recorded on the server (Priority: P1)
 
 The server owner turns recording on once in the server profile. From then on every game
-on that server is recorded from the start of the game phase until debriefing or until the
-server stops: who held which slot in which squad, where every soldier and vehicle went,
+on that server is recorded from the start of the game phase until the server stops or
+moves to the next mission: who held which slot in which squad, where every soldier and vehicle went,
 who was knocked out, revived or killed, by whom and with what, who fired, where grenades,
 rockets and mortar rounds landed, who sat in which vehicle seat, what markers each side
 placed, which zones changed hands, and when the freeze and the game phases began and
@@ -114,8 +116,8 @@ ended. The players notice nothing.
 is the part that must never cost the game anything.
 
 **Independent Test**: in the demo world with recording configured, play a short game with
-both sides and AI, perform the scripted events listed in the success criteria, advance to
-debriefing, then open the recording in the server profile and find each event with its
+both sides and AI, perform the scripted events listed in the success criteria, stop the
+server, then open the recording in the server profile and find each event with its
 time, actors and position.
 
 **Acceptance Scenarios**:
@@ -134,8 +136,8 @@ time, actors and position.
    their roles and the destruction are recorded in order.
 5. **Given** a recording is running, **When** a player of one side places a marker and
    later removes it, **Then** both are recorded with the sides that could see the marker.
-6. **Given** a recording is running, **When** an admin advances to debriefing, **Then**
-   the recording ends with an end record and nothing more is written to it.
+6. **Given** a recording is running, **When** the server stops cleanly, **Then** the
+   segment ends with a stop record and nothing more is written to it.
 7. **Given** recording is not configured, **When** a full game is played, **Then** no
    recording file is written and the recorder writes nothing to the log.
 
@@ -168,7 +170,7 @@ recording.
    resumed segment begins, **Then** those records are identifiable as rolled back.
 4. **Given** a crashed game, **When** the server is restarted without resuming, **Then**
    the next game starts a new recording, and the crashed one stays as it is, recognisable
-   as cut off by its missing end record.
+   as cut off by its missing stop record.
 
 ---
 
@@ -202,7 +204,7 @@ profile; repeat with the receiver stopped during the game and started after it.
 4. **Given** the receiver is unreachable for an hour, **When** it comes back, **Then**
    everything finished meanwhile arrives within 15 minutes, with no file missing and no
    file counted twice.
-5. **Given** the Game Master publishes the statistics again after debriefing, **When** the
+5. **Given** the Game Master publishes the statistics again after the game, **When** the
    approved statistics file changes, **Then** the new version is sent.
 6. **Given** the service is running, **When** the host's listening network ports are
    listed, **Then** none belongs to the service.
@@ -305,7 +307,7 @@ configured, with it unconfigured, and as a non-admin.
   as asked, keeps every file and tries again later. It deletes nothing that was not
   confirmed.
 - A recording cut off by a crash and never resumed stays a complete recording up to the
-  crash, recognisable by its missing end record.
+  crash, recognisable by its missing stop record.
 - Recording is turned on for a server in its usual configuration: weapons, ammunition,
   vehicles and every other part of the game behave as with recording off, because the
   recorder only observes.
@@ -322,9 +324,8 @@ configured, with it unconfigured, and as a non-admin.
   configuration file that exists but cannot be read MUST produce one warning naming the
   file and leave recording off.
 - **FR-002**: When configured, the server MUST start one recording when the game phase
-  begins and end it when debriefing begins. A server stop ends the current segment: a
-  crash-resume continues the recording in a new segment (FR-022), and a game that is not
-  resumed stays cut off at that point. Slot selection and briefing are not recorded, but
+  begins. A server stop ends the current segment: a crash-resume continues the recording
+  in a new segment (FR-022), and a game that is not resumed ends at that point. Slot selection and briefing are not recorded, but
   the markers and the roster as they stand at the start of the game phase are.
 - **FR-003**: Each recording MUST carry the identity of its server session, the same
   identity the statistics files carry, whether or not statistics are enabled, and MUST
@@ -372,8 +373,7 @@ configured, with it unconfigured, and as a non-admin.
   borders, freeze areas, restricted areas) with its outline, label, colour and the sides
   allowed to see it, and the time a timed area appears or disappears.
 - **FR-014**: A recording MUST hold the game flow: the start of the game phase, the start
-  and end of freeze time and of every hard freeze, every admin change to their length, and
-  the start of debriefing.
+  and end of freeze time and of every hard freeze, and every admin change to their length.
 - **FR-015**: Recorded times MUST use the mission clock the statistics use, so that a
   statistics event and a recorded event of the same moment carry the same time. A
   recording MUST also carry the real time in UTC often enough to recover the wall-clock
@@ -426,12 +426,12 @@ configured, with it unconfigured, and as a non-admin.
   by a stop counts as over, and the local retention time. No
   address, identity or secret is part of this repository.
 - **FR-029**: The service MUST send nothing about a game while that game is running or
-  could still be resumed. A game is over when its recording has ended, or when its server
-  stopped in the middle of it and has since started a different game or stayed stopped
-  longer than the configured wait. Once a game is over, the service MUST send each of its
+  could still be resumed. A game is over when its server has stopped
+  and has since started a different game, or has stayed stopped longer than the configured
+  wait. Once a game is over, the service MUST send each of its
   segment files, its identity file and its latest statistics file, and afterwards every
   new version of the statistics files, such as an approval the Game Master publishes after
-  debriefing.
+  the game.
 - **FR-030**: The service MUST NOT listen on any network port and MUST NOT contact
   anything but the configured website.
 - **FR-031**: Every upload MUST prove which server sent it with a per-server secret that is
@@ -466,9 +466,9 @@ configured, with it unconfigured, and as a non-admin.
 
 ### Key Entities
 
-- **Recording**: one game on one server, from the start of the game phase to debriefing or
-  the last stop, identified by its server session. It is made of one or more segment
-  files, an identity file and, when it ended normally, an end record.
+- **Recording**: one game on one server, from the start of the game phase to its last
+  server stop, identified by its server session. It is made of one or more segment files
+  and an identity file.
 - **Segment**: the stretch of a recording between one server start and the next stop,
   written as one file that begins with the recording's header. A crash-resume begins a
   new segment of the same recording.

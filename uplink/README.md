@@ -52,9 +52,9 @@ systemctl enable --now ll-uplink@server-1
 ```
 
 The service logs to standard output, opens no listening socket and connects only to the
-configured website. Every 15 seconds it checks the profile; a game is sent once it is over:
-ended at debriefing, cut off by a stop after which the server started another game, or
-stopped for longer than `StoppedWaitMinutes`.
+configured website. Every 15 seconds it checks the profile; a game is sent once it is over,
+that is after its server starts another game, or after it stays stopped longer than
+`StoppedWaitMinutes`.
 
 ## Metrics
 

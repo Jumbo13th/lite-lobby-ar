@@ -8,7 +8,7 @@
 
 A server-only game-mode component, `LL_ReplayRecorderComponent`, records every game
 phase into one text file per segment under `$profile:LL_Replays/`. It starts when the
-game phase begins and ends at debriefing. It observes only the game's own events and
+game phase begins and ends when the server stops. It observes only the game's own events and
 reads entity state, and it adds nothing to the network except the admin's `/replay`
 reply. It is inert until the server owner writes `$profile:LL_Replays.json`.
 
@@ -38,8 +38,8 @@ reply. It is inert until the server owner writes `$profile:LL_Replays.json`.
   persistent record.
 
 A Go program in `uplink/`, the host service `ll-uplink`, runs beside each game server. It
-never listens. Once a game is over (its end record is written, the server has started a
-different game, or it has stayed stopped past a configured wait), it sends the game's
+never listens. Once a game is over (the server has started a different game, or it has
+stayed stopped past a configured wait), it sends the game's
 files with the statistics to the receiver, the configured website, over the documented
 `ll-upload/1` protocol:
 - HMAC-signed requests;
@@ -213,7 +213,6 @@ it is built and deployed apart from the addon.
      is on, it writes `status.txt` as `idle`, or as `resume` when
      `LL_GameModeCoop.WillResume()`.
    - **Start:** on `OnGameStateChanged(GAME)` with no resume pending it opens segment 1.
-   - **End:** on DEBRIEFING it writes `FLOW debrief` and `END debrief`.
    - **Clean stop:** on `OnGameEnd` it writes `STOP shutdown`.
    - **Teardown:** it removes its subscription to the static explosion invoker and the
      editable-core events.

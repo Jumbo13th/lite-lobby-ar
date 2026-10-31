@@ -43,6 +43,7 @@ class LL_ReplayCharacterHooks : Managed
 		{
 			m_EventManager.RegisterScriptHandler("OnProjectileShot", this, OnProjectileShot);
 			m_EventManager.RegisterScriptHandler("OnGrenadeThrown", this, OnGrenadeThrown);
+			m_EventManager.RegisterScriptHandler("OnAmmoCountChanged", this, OnAmmoCountChanged);
 		}
 
 		m_Controller = SCR_CharacterControllerComponent.Cast(character.GetCharacterController());
@@ -63,6 +64,7 @@ class LL_ReplayCharacterHooks : Managed
 		{
 			m_EventManager.RemoveScriptHandler("OnProjectileShot", this, OnProjectileShot);
 			m_EventManager.RemoveScriptHandler("OnGrenadeThrown", this, OnGrenadeThrown);
+			m_EventManager.RemoveScriptHandler("OnAmmoCountChanged", this, OnAmmoCountChanged);
 		}
 
 		if (m_Controller)
@@ -85,6 +87,12 @@ class LL_ReplayCharacterHooks : Managed
 	{
 		if (m_Combat)
 			m_Combat.OnShot(m_iEid, m_Character, weapon, entity, true);
+	}
+
+	void OnAmmoCountChanged(BaseWeaponComponent currentWeapon, BaseMuzzleComponent currentMuzzle, BaseMagazineComponent magazine, int ammoCount, bool isChambered)
+	{
+		if (m_Combat)
+			m_Combat.OnAmmoCount(m_iEid, m_Character, currentWeapon, currentMuzzle, magazine, ammoCount);
 	}
 
 	void OnLifeStateChanged(ECharacterLifeState previousLifeState, ECharacterLifeState newLifeState, bool isJIP)
@@ -190,7 +198,8 @@ class LL_ReplayEntities : Managed
 		}
 	}
 
-	//! One tenth of the characters and one fifth of the vehicles and trackers per call.
+	//! One tenth of the characters and one fifth of the vehicles and trackers per call. Characters
+	//! without a replication id, such as a hosting player's local loadout previews, are not recorded.
 	void Tick_S()
 	{
 		DiscoverCharacters_S();
@@ -204,6 +213,24 @@ class LL_ReplayEntities : Managed
 
 	void SecondStep_S()
 	{
+		PollRoster_S();
+		PollPlayers_S();
+	}
+
+	//! Takes in every character, slot and player that already exists, so the first snapshot of a
+	//! segment holds the whole roster; group and slot numbers are only valid within a segment.
+	void Prime_S()
+	{
+		array<SCR_ChimeraCharacter> characters = SCR_CharacterRegistrationComponent.GetChimeraCharacters();
+		if (characters)
+		{
+			foreach (SCR_ChimeraCharacter character : characters)
+			{
+				if (character && !m_mByEntity.Contains(character.GetID()) && IsReplicated(character))
+					AddCharacter_S(character);
+			}
+		}
+
 		PollRoster_S();
 		PollPlayers_S();
 	}
@@ -452,9 +479,15 @@ class LL_ReplayEntities : Managed
 			SCR_ChimeraCharacter character = characters[m_iDiscoveryCursor];
 			m_iDiscoveryCursor++;
 
-			if (character && !m_mByEntity.Contains(character.GetID()))
+			if (character && !m_mByEntity.Contains(character.GetID()) && IsReplicated(character))
 				AddCharacter_S(character);
 		}
+	}
+
+	protected static bool IsReplicated(notnull IEntity entity)
+	{
+		RplComponent rpl = RplComponent.Cast(entity.FindComponent(RplComponent));
+		return rpl && rpl.Id().IsValid();
 	}
 
 	protected void AddCharacter_S(notnull SCR_ChimeraCharacter character)
@@ -481,7 +514,7 @@ class LL_ReplayEntities : Managed
 
 	protected void OnEditableRegistered(SCR_EditableEntityComponent editable)
 	{
-		if (!editable || editable.GetEntityType() != EEditableEntityType.VEHICLE)
+		if (!editable || editable.GetEntityType() != EEditableEntityType.VEHICLE || editable.HasEntityFlag(EEditableEntityFlag.LOCAL))
 			return;
 
 		IEntity owner = editable.GetOwner();
@@ -821,7 +854,20 @@ class LL_ReplayEntities : Managed
 			side = faction.GetFactionKey();
 
 		int groupKey = rpl.Id();
-		return GroupId(groupKey, side, group.GetCustomNameWithOriginal());
+		string callsign = group.GetCustomNameWithOriginal();
+		if (lobby)
+		{
+			foreach (LL_SlotData groupSlot : lobby.GetSlots())
+			{
+				if (groupSlot.m_iGroupId == groupKey && groupSlot.m_sGroupName != "")
+				{
+					callsign = groupSlot.m_sGroupName;
+					break;
+				}
+			}
+		}
+
+		return GroupId(groupKey, side, callsign);
 	}
 
 	protected int GroupId(int groupKey, string side, string callsign)
@@ -889,16 +935,13 @@ class LL_ReplayEntities : Managed
 		return "vehicle";
 	}
 
+	//! A placed entity with its own overrides has an unnamed prefab of its own; the name comes from its ancestors.
 	static string PrefabFileName(IEntity entity)
 	{
-		if (!entity)
+		string path = SCR_ResourceNameUtils.GetPrefabName(entity);
+		if (path == "")
 			return "-";
 
-		EntityPrefabData data = entity.GetPrefabData();
-		if (!data)
-			return "-";
-
-		string path = data.GetPrefabName();
 		int slash = path.LastIndexOf("/");
 		if (slash >= 0)
 			path = path.Substring(slash + 1, path.Length() - slash - 1);

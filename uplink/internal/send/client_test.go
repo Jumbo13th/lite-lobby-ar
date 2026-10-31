@@ -225,7 +225,7 @@ func TestPostGameNamesTheMissingFiles(t *testing.T) {
 	rc := newReceiver(clock)
 	c := newTestClient(t, rc, clock, testSecret)
 	stats := hexSHA([]byte("stats"))
-	g := GamePost{Session: "20261031-201500-eden", Over: "ended", Segments: []string{helloSHA}, Stats: &stats}
+	g := GamePost{Session: "20261031-201500-eden", Over: "stopped", Segments: []string{helloSHA}, Stats: &stats}
 	var e *Error
 	if err := c.PostGame(g); !errors.As(err, &e) || e.Kind != KindMissing || !slices.Equal(e.Files, []string{helloSHA, stats}) {
 		t.Fatalf("post naming uncommitted files: %v", err)
@@ -347,7 +347,7 @@ func TestEncodeIsDeterministic(t *testing.T) {
 		t.Fatal("pieces do not decompress to the file")
 	}
 
-	small, err := Encode([]byte("LLR 1\nEND debrief\n"))
+	small, err := Encode([]byte("LLR 1\nH session s\nSTOP shutdown\n"))
 	if err != nil || len(small.Pieces) != 1 {
 		t.Fatalf("small file: %+v, %v", small, err)
 	}

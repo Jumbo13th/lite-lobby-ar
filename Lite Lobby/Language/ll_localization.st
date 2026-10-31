@@ -2321,14 +2321,6 @@ StringTable {
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }
-  CustomStringTableItem "{50CC4B44B862C04A}" {
-   Id "LL-Replay_Ended"
-   Target_en_us "Recording %1 ended at debriefing."
-   Target_ru_ru "Запись %1 завершена на дебрифинге."
-   Modified 1793465528
-   Author "[TT]Jumbo"
-   LastChanged "[TT]Jumbo"
-  }
   CustomStringTableItem "{E4705510A80A1C23}" {
    Id "LL-Replay_Failed"
    Target_en_us "Replay recording stopped: the server cannot write to its profile."

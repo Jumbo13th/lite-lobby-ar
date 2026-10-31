@@ -30,7 +30,7 @@ func TestRetainDeletesOnlyConfirmedFilesPastRetention(t *testing.T) {
 		return file{put(t, profile, rel, content, time.Time{}), content}
 	}
 	confirm := func(session string, at time.Time, segments []file, identity, stats *file) {
-		g := state.GameRec{Over: OverEnded, Confirmed: at}
+		g := state.GameRec{Over: OverStopped, Confirmed: at}
 		for _, s := range segments {
 			g.Segments = append(g.Segments, sha(s.content))
 			st.Files[sha(s.content)] = state.FileRec{Kind: "segment", Session: session}
@@ -46,20 +46,20 @@ func TestRetainDeletesOnlyConfirmedFilesPastRetention(t *testing.T) {
 		st.Games[session] = g
 	}
 
-	oldSeg := add("LL_Replays/old-1.llr", "LLR 1\nH session old\nEND debrief\n")
+	oldSeg := add("LL_Replays/old-1.llr", "LLR 1\nH session old\nP 1 2 3 4 5\n")
 	oldIdent := add("LL_Replays/old-identities.txt", "LLI 1\nH session old\n")
 	oldLive := add("LL_GameStats/old-live.json", `{"phase":"live"}`)
 	oldFinal := add("LL_GameStats/old-final.json", `{"phase":"final"}`)
 	confirm("old", expired, []file{oldSeg}, &oldIdent, &oldFinal)
 
-	recentSeg := add("LL_Replays/recent-1.llr", "LLR 1\nH session recent\nEND debrief\n")
+	recentSeg := add("LL_Replays/recent-1.llr", "LLR 1\nH session recent\nP 1 2 3 4 5\n")
 	recentStats := add("LL_GameStats/recent-final.json", `{"phase":"final","session":"recent"}`)
 	confirm("recent", now.Add(-13*24*time.Hour), []file{recentSeg}, nil, &recentStats)
 
 	openSeg := add("LL_Replays/open-1.llr", "LLR 1\nH session open\n")
 	st.Games["open"] = state.GameRec{Failures: 4, LastError: "transient: HTTP 503"}
 
-	pendingSeg := add("LL_Replays/pending-1.llr", "LLR 1\nH session pending\nEND debrief\n")
+	pendingSeg := add("LL_Replays/pending-1.llr", "LLR 1\nH session pending\nP 1 2 3 4 5\n")
 	pendingFinal := add("LL_GameStats/pending-final.json", `{"phase":"final","session":"pending"}`)
 	pendingApproved := add("LL_GameStats/pending-approved.json", `{"phase":"approved","session":"pending"}`)
 	confirm("pending", expired, []file{pendingSeg}, nil, &pendingFinal)
@@ -67,9 +67,9 @@ func TestRetainDeletesOnlyConfirmedFilesPastRetention(t *testing.T) {
 	lateSeg1 := add("LL_Replays/late-1.llr", "LLR 1\nH session late\n")
 	lateIdent := add("LL_Replays/late-identities.txt", "LLI 1\nH session late\nI 1 x\n")
 	confirm("late", expired, []file{lateSeg1}, &lateIdent, nil)
-	lateSeg2 := add("LL_Replays/late-2.llr", "LLR 1\nH session late\nH segment 2\nEND debrief\n")
+	lateSeg2 := add("LL_Replays/late-2.llr", "LLR 1\nH session late\nH segment 2\nH resumed 9000\n")
 
-	grownSeg := add("LL_Replays/grown-1.llr", "LLR 1\nH session grown\nEND debrief\n")
+	grownSeg := add("LL_Replays/grown-1.llr", "LLR 1\nH session grown\nP 1 2 3 4 5\n")
 	grownIdent := add("LL_Replays/grown-identities.txt", "LLI 1\nH session grown\nI 1 x\n")
 	confirm("grown", expired, []file{grownSeg}, &grownIdent, nil)
 	grownIdent = add("LL_Replays/grown-identities.txt", grownIdent.content+"I 2 y\n")

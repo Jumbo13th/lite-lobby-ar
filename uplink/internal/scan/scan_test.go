@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"strings"
 	"testing"
 	"time"
 )
@@ -35,7 +34,7 @@ func TestReadStatus(t *testing.T) {
 		ok            bool
 	}{
 		{"rec", "LLS 1 rec " + s + " 1 1793566800\n", Status{StateRec, s, 1, 1793566800}, true},
-		{"crlf", "LLS 1 done " + s + " 2 1793566800\r\n", Status{StateDone, s, 2, 1793566800}, true},
+		{"crlf", "LLS 1 rec " + s + " 2 1793566800\r\n", Status{StateRec, s, 2, 1793566800}, true},
 		{"no final newline", "LLS 1 idle " + s + " - 1793566800", Status{StateIdle, s, 0, 1793566800}, true},
 		{"resume without session", "LLS 1 resume - - 1793566800\n", Status{StateResume, "", 0, 1793566800}, true},
 		{"empty", "", Status{}, false},
@@ -45,7 +44,7 @@ func TestReadStatus(t *testing.T) {
 		{"unknown state", "LLS 1 paused " + s + " 1 1793566800\n", Status{}, false},
 		{"rec without segment", "LLS 1 rec " + s + " - 1793566800\n", Status{}, false},
 		{"rec without session", "LLS 1 rec - 1 1793566800\n", Status{}, false},
-		{"done without session", "LLS 1 done - - 1793566800\n", Status{}, false},
+		{"done is not a state", "LLS 1 done " + s + " 1 1793566800\n", Status{}, false},
 		{"segment zero", "LLS 1 rec " + s + " 0 1793566800\n", Status{}, false},
 		{"time not a number", "LLS 1 rec " + s + " 1 soon\n", Status{}, false},
 		{"double space", "LLS 1 rec  " + s + " 1 1793566800\n", Status{}, false},
@@ -79,7 +78,7 @@ func TestListRecordings(t *testing.T) {
 	const a, b = "20261030-180000-eden", "20261031-090000-eden-2"
 	put(t, profile, "LL_Replays/"+a+"-1.llr", "LLR 1\nT 10\nP 1 2 3 4 5\n", t0)
 	put(t, profile, "LL_Replays/"+a+"-2.llr", "LLR 1\nSTOP shutdown\n", t0.Add(time.Hour))
-	put(t, profile, "LL_Replays/"+a+"-10.llr", "LLR 1\nFLOW debrief\nEND debrief\n", t0.Add(2*time.Hour))
+	put(t, profile, "LL_Replays/"+a+"-10.llr", "LLR 1\nP 1 2 3 4 5\nSTOP shutdown\n", t0.Add(2*time.Hour))
 	ident := put(t, profile, "LL_Replays/"+a+"-identities.txt", "LLI 1\nH session "+a+"\n", t0.Add(2*time.Hour))
 	put(t, profile, "LL_GameStats/"+a+"-final.json", "{}", t0.Add(3*time.Hour))
 	put(t, profile, "LL_Replays/"+b+"-1.llr", "LLR 1\nP 1 2 3 4 5\n", t0.Add(4*time.Hour))
@@ -105,10 +104,10 @@ func TestListRecordings(t *testing.T) {
 	if !slices.Equal(numbers, []int{1, 2, 10}) {
 		t.Errorf("segments = %v, want 1 2 10", numbers)
 	}
-	if !recs[0].Ended || recs[0].Identity != ident || !recs[0].LastWrite.Equal(t0.Add(3*time.Hour)) {
+	if recs[0].Identity != ident || !recs[0].LastWrite.Equal(t0.Add(3*time.Hour)) {
 		t.Errorf("first recording = %+v", recs[0])
 	}
-	if recs[1].Ended || recs[1].Identity != "" || !recs[1].LastWrite.Equal(t0.Add(4*time.Hour)) {
+	if recs[1].Identity != "" || !recs[1].LastWrite.Equal(t0.Add(4*time.Hour)) {
 		t.Errorf("second recording = %+v", recs[1])
 	}
 }
@@ -117,39 +116,6 @@ func TestListRecordingsWithoutFolder(t *testing.T) {
 	recs, err := ListRecordings(t.TempDir())
 	if err != nil || len(recs) != 0 {
 		t.Fatalf("recs = %v, err = %v", recs, err)
-	}
-}
-
-func TestEndsWithDebrief(t *testing.T) {
-	long := strings.Repeat("P 17 4512 6120 41 87\n", 2000)
-	cases := []struct {
-		name, content string
-		want          bool
-	}{
-		{"end last", "T 10\nFLOW debrief\nEND debrief\n", true},
-		{"end then time records", "FLOW debrief\nEND debrief\nU 1793566800 9000\nT 9001\n", true},
-		{"crlf", "FLOW debrief\r\nEND debrief\r\n", true},
-		{"end then a cut line", "END debrief\nU 17935", true},
-		{"end cut before its newline", "FLOW debrief\nEND debrief", false},
-		{"stopped", "P 1 2 3 4 5\nSTOP shutdown\n", false},
-		{"record after the end", "END debrief\nP 1 2 3 4 5\n", false},
-		{"cut by a crash", "P 1 2 3 4 5\nP 1 2", false},
-		{"empty", "", false},
-		{"end inside a string", "M+ g1 custom 1 2 0 - * \"x\" - \"END debrief\"\n", false},
-		{"long file", long + "END debrief\n", true},
-		{"end far back", "END debrief\n" + long, false},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			path := put(t, t.TempDir(), "s-1.llr", c.content, time.Time{})
-			got, err := endsWithDebrief(path)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if got != c.want {
-				t.Fatalf("got %v, want %v", got, c.want)
-			}
-		})
 	}
 }
 
@@ -194,8 +160,8 @@ func TestGamesOver(t *testing.T) {
 		}
 		return st
 	}
-	rec := func(session string, ended bool, lastWrite time.Time) Recording {
-		return Recording{Session: session, Ended: ended, LastWrite: lastWrite}
+	rec := func(session string, lastWrite time.Time) Recording {
+		return Recording{Session: session, LastWrite: lastWrite}
 	}
 	const a, b, c = "20261031-180000-eden", "20261031-200000-eden", "20261031-220000-eden"
 	cases := []struct {
@@ -205,36 +171,32 @@ func TestGamesOver(t *testing.T) {
 		want map[string]string
 	}{
 		{"unreadable status holds every game", Status{},
-			[]Recording{rec(a, true, ago(2*time.Hour)), rec(b, false, ago(10*time.Hour))}, map[string]string{}},
+			[]Recording{rec(a, ago(2*time.Hour)), rec(b, ago(10*time.Hour))}, map[string]string{}},
 		{"resume holds every game", status(StateResume, "", ago(time.Minute)),
-			[]Recording{rec(a, true, ago(2*time.Hour)), rec(b, false, ago(10*time.Hour))}, map[string]string{}},
+			[]Recording{rec(a, ago(2*time.Hour)), rec(b, ago(10*time.Hour))}, map[string]string{}},
 		{"resume holds even when everything is stale", status(StateResume, b, ago(10*time.Hour)),
-			[]Recording{rec(a, false, ago(10*time.Hour))}, map[string]string{}},
+			[]Recording{rec(a, ago(10*time.Hour))}, map[string]string{}},
 		{"rec with the same session is running", status(StateRec, a, ago(5*time.Second)),
-			[]Recording{rec(a, false, ago(5*time.Second))}, map[string]string{}},
-		{"fresh rec holds its session even with an end record", status(StateRec, a, ago(5*time.Second)),
-			[]Recording{rec(a, true, ago(5*time.Second))}, map[string]string{}},
+			[]Recording{rec(a, ago(5*time.Second))}, map[string]string{}},
 		{"fresh rec status holds stale files", status(StateRec, a, ago(time.Minute)),
-			[]Recording{rec(a, false, ago(time.Hour))}, map[string]string{}},
-		{"end record means ended", status(StateDone, a, ago(5*time.Second)),
-			[]Recording{rec(a, true, ago(5*time.Second))}, map[string]string{a: OverEnded}},
-		{"end record while another session records", status(StateRec, b, now),
-			[]Recording{rec(a, true, ago(time.Hour)), rec(b, false, now)}, map[string]string{a: OverEnded}},
+			[]Recording{rec(a, ago(time.Hour))}, map[string]string{}},
 		{"another session written after the last write means stopped", status(StateIdle, b, ago(time.Minute)),
-			[]Recording{rec(a, false, ago(10*time.Minute))}, map[string]string{a: OverStopped}},
+			[]Recording{rec(a, ago(10*time.Minute))}, map[string]string{a: OverStopped}},
+		{"a game cut off while the next one records is stopped", status(StateRec, b, now),
+			[]Recording{rec(a, ago(time.Hour)), rec(b, now)}, map[string]string{a: OverStopped}},
 		{"another session written before the last write proves nothing", status(StateIdle, b, ago(10*time.Minute)),
-			[]Recording{rec(a, false, ago(5*time.Minute))}, map[string]string{}},
+			[]Recording{rec(a, ago(5*time.Minute))}, map[string]string{}},
 		{"status and files older than the wait mean abandoned", status(StateRec, a, ago(31*time.Minute)),
-			[]Recording{rec(a, false, ago(31*time.Minute))}, map[string]string{a: OverAbandoned}},
-		{"stale end record still means ended", status(StateRec, a, ago(31*time.Minute)),
-			[]Recording{rec(a, true, ago(31*time.Minute))}, map[string]string{a: OverEnded}},
+			[]Recording{rec(a, ago(31*time.Minute))}, map[string]string{a: OverAbandoned}},
+		{"another session's start counts before staleness", status(StateIdle, b, ago(2*time.Hour)),
+			[]Recording{rec(a, ago(3*time.Hour))}, map[string]string{a: OverStopped}},
 		{"fresh files keep a stale status from abandoning", status(StateRec, a, ago(31*time.Minute)),
-			[]Recording{rec(a, false, ago(time.Minute))}, map[string]string{}},
+			[]Recording{rec(a, ago(time.Minute))}, map[string]string{}},
 		{"within the wait nothing is abandoned", status(StateIdle, a, ago(29*time.Minute)),
-			[]Recording{rec(a, false, ago(29*time.Minute))}, map[string]string{}},
-		{"each game on its own", status(StateRec, c, now),
-			[]Recording{rec(a, true, ago(3*time.Hour)), rec(b, false, ago(2*time.Hour)), rec(c, false, now)},
-			map[string]string{a: OverEnded, b: OverStopped}},
+			[]Recording{rec(a, ago(29*time.Minute))}, map[string]string{}},
+		{"each game on its own", status(StateIdle, c, ago(40*time.Minute)),
+			[]Recording{rec(a, ago(3*time.Hour)), rec(b, ago(10*time.Minute)), rec(c, ago(40*time.Minute))},
+			map[string]string{a: OverStopped, c: OverAbandoned}},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

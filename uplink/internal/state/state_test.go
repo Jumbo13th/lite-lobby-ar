@@ -27,7 +27,7 @@ func TestSaveAndLoadRoundTrip(t *testing.T) {
 	at := time.Date(2026, 10, 31, 20, 15, 0, 0, time.UTC)
 	s.Files["3f2a"] = FileRec{Kind: "segment", Session: "20261031-201500-eden", Name: "20261031-201500-eden-1.llr", Committed: at}
 	s.Files["c09d"] = FileRec{Kind: "identity", Session: "20261031-201500-eden", Name: "20261031-201500-eden-identities.txt", Committed: at}
-	s.Games["20261031-201500-eden"] = GameRec{Over: "ended", Segments: []string{"3f2a"}, Identity: "c09d", Confirmed: at.Add(time.Minute)}
+	s.Games["20261031-201500-eden"] = GameRec{Over: "stopped", Segments: []string{"3f2a"}, Identity: "c09d", Confirmed: at.Add(time.Minute)}
 	s.Games["20261031-231000-eden"] = GameRec{Failures: 3, LastError: "transient: HTTP 503"}
 	if err := s.Save(); err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func TestForgetDropsTheGameAndItsFiles(t *testing.T) {
 	}
 	s.Files["a"] = FileRec{Session: "one"}
 	s.Files["b"] = FileRec{Session: "two"}
-	s.Games["one"] = GameRec{Over: "ended"}
+	s.Games["one"] = GameRec{Over: "stopped"}
 	s.Games["two"] = GameRec{Over: "stopped"}
 	s.Forget("one")
 	if _, ok := s.Games["one"]; ok {

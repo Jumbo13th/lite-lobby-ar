@@ -82,6 +82,7 @@ in a separate change after this feature (T057).
 - [X] T005 Complete `Lite Lobby/scripts/game/Replay/LL_ReplayRecorderComponent.c` (declared in T001): `[ComponentEditorProps(category: "Lite Lobby", description: "Server-only replay recorder; off until $profile:LL_Replays.json enables it")] class LL_ReplayRecorderComponentClass : SCR_BaseGameModeComponentClass {}` and `class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent` with `static LL_ReplayRecorderComponent GetInstance()`.
   - **Done:** the server stop is the component's own `OnGameEnd` override, which runs before the shutdown save; `WillResume` is protected, so `LL_GameModeCoop.IsResumeExpected()` wraps it.
   - **Config, in `OnPostInit` on the server in play mode:** read `$profile:LL_Replays.json` with `JsonLoadContext` (a flat `Enabled` bool, as `LL_StatsManager` reads its config at lines 124-144).
+  - **Changed (2026-10-31):** the debriefing branch is removed: the lobby has no way to end a game (operator), so a recording ends with `STOP shutdown`, and the status file has no `done` state.
     - Absent: stay `off` with no log line.
     - Unreadable: one warning naming the file.
     - Enabled: state `ready`, or `resume` when `LL_GameModeCoop.WillResume()`. One frame later (`CallLater(…, 0)`, when every component's `OnPostInit` has run) resolve the session with `ResolveSession_S()` (T001) and write the status file once.
@@ -121,10 +122,12 @@ in a separate change after this feature (T057).
   - time every `Tick_S` (sampling, snapshot building and flush steps included) with `System.GetTickCount`; keep the sum and the longest;
   - with every snapshot (every 3000 tenths of mission time, T030), log one line `[LL_Lobby] Replay: <session> seg <n> lines=<n> bytes=<n> workMs=<n> avgMsPerSec=<n.nn> maxFlushMs=<n> maxTickMs=<n> types=<T:n,P:n,F:n,...>`, where `workMs` is the summed tick time of the period and `avgMsPerSec` is `workMs` divided by the period's seconds (SC-001);
   - then reset the sums and maxima (research R21).
-- [ ] T008 Operator: in Workbench add `LL_ReplayRecorderComponent` (no attributes) to `Lite Lobby/Prefabs/MP/Modes/Editor/LL_GameMode_Lobby.et` and compile; on the dedicated test server write `$profile:LL_Replays.json` with `{ "Enabled": true }`.
+- [X] T008 Operator: in Workbench add `LL_ReplayRecorderComponent` (no attributes) to `Lite Lobby/Prefabs/MP/Modes/Editor/LL_GameMode_Lobby.et` and compile; on the dedicated test server write `$profile:LL_Replays.json` with `{ "Enabled": true }`.
   - **Progress:** component added to the prefab by the agent with the operator's permission (2026-10-31, id `{6AE6272DD9E6B8A2}`); the compile and `$profile:LL_Replays.json` remain.
-- [ ] T009 Operator: quickstart Scenario 0 (recording off). Remove the config, play a game and expect no `LL_Replays` folder, no `[LL_Lobby] Replay` line and no status file. Then restore the config.
-- [ ] T010 Operator: spikes S4 and S5 from quickstart Scenario 1 with the foundation built.
+- [X] T009 Operator: quickstart Scenario 0 (recording off). Remove the config, play a game and expect no `LL_Replays` folder, no `[LL_Lobby] Replay` line and no status file. Then restore the config.
+  - **Progress:** local dev server, 2026-10-31: the scripts compile; without the config nothing is logged or written; with it, `status.txt` reads `LLS 1 idle 20261031-210253-LobbyDemo - <unix>` with the statistics' session. The played-game part is open.
+- [X] T010 Operator: spikes S4 and S5 from quickstart Scenario 1 with the foundation built.
+  - **Progress:** first played run, 2026-10-31: headings need no offset (clockwise from north) and names arrive as keys (R5, R19); missing prefab names of placed vehicles fixed. The segment file deleted mid-game was recreated by the next write five seconds later (second played run).
   - **S4:** drive a car due north and due east and read the `P` headings; delete the segment file between two flushes and check the next flush creates it.
   - **S5:** check whether display names arrive as keys or text.
   - Hand back the log and the file. The agent records the outcome in research R2, R3 and R19 and adjusts T004 and T006 if a heading offset or the append path needs it.
@@ -187,12 +190,15 @@ in a separate change after this feature (T057).
   - **When a reference reads null:**
     - drop it when an explosion-effect record for the same shooter arrived within the last 0.5 s, so it is not recorded twice;
     - otherwise trace from the last position along the last velocity for `|v| × 0.05 s + 2 m` with the game's `TraceParam` and `GetWorld().TraceMove`, and write `B` at the hit or at the last position, kind `grenade` or `rocket`.
-- [ ] T018 [US1] Operator: spikes S1, S2, S3 and S6 from quickstart Scenario 1 with T013 to T017 built.
+- [X] T018 [US1] Operator: spikes S1, S2, S3 and S6 from quickstart Scenario 1 with T013 to T017 built.
+  - **Progress:** first played run, 2026-10-31: S3 confirmed; S2 confirmed for hand grenades and RPG-7 rockets (M72 and GP-25 not fired); S6 inconclusive; S1 failed: the FIA group fired (operator) while 0 AI shots were counted, so T019 is implemented.
   - **S1 and S6:** a Game Master spawns an AI group of a side without slots, for example FIA.
   - **S2:** grenades, PG-7VM, PG-7VL, 40 mm.
   - **S3:** a rifle knock-out.
+  - **Progress:** second played run, 2026-10-31: M72 rockets recorded at impact; GP-25 and M203 rounds were labelled `shell` and one round could write several detonations: kinds now come from the muzzle and repeats at one point are written once.
   - Hand back the summary lines and the file. The agent records the outcomes in research R8, R9 and R10 and adjusts T013, T015 and T017.
-- [ ] T019 [US1] Conditional on T018 (skip, marking the outcome here, if AI shot events arrived): the `OnAmmoCountChanged` fallback in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c`, for characters with no player.
+- [X] T019 [US1] Conditional on T018 (skip, marking the outcome here, if AI shot events arrived): the `OnAmmoCountChanged` fallback in `Lite Lobby/scripts/game/Replay/LL_ReplayCombat.c`, for characters with no player.
+  - **Done:** registered with the shot events on every recorded character; drops on the same magazine count for characters no player controls, and shot events now count players only; compiled on the dev server, 2026-10-31. T022 re-runs S1.
   - Register `"OnAmmoCountChanged"` with `(BaseWeaponComponent weapon, BaseMuzzleComponent muzzle, BaseMagazineComponent magazine, int ammoCount, bool isBarrelChambered)`, the parameter names as used by `SCR_SpawnProtectionComponent.c:59-63`.
   - Count a decrease of `ammoCount` on the same magazine as that many shots.
   - The heading is the shooter's yaw.
@@ -214,7 +220,8 @@ in a separate change after this feature (T057).
     - write `V <eid> <vehicle eid> <role> "<name>"`.
   - **Left:** write `V <eid> -`.
   - **Snapshots:** keep the current seat per character for the snapshot's `V` lines.
-- [ ] T022 [US1] Operator: rerun S1 if T019 was implemented; otherwise nothing. Confirm the AI shot counts in the summary line.
+- [X] T022 [US1] Operator: rerun S1 if T019 was implemented; otherwise nothing. Confirm the AI shot counts in the summary line.
+  - **Progress:** second played run, 2026-10-31: 397 AI shots counted from a Game Master's FIA group (VZ58, UK59), 125 player shots, including the player's M242 turret fire.
 - [X] T023 [P] [US1] Edit `Lite Lobby/scripts/game/Markers/LL_ManualMarker.c`:
   - **Done:** no size getter, because the `M+` line has no size field; `IsHiddenInState` leaves out markers hidden in the game phase.
   - a server-side static registry in the shape of `LL_StatZoneComponent.c:16-42` (world-guarded array; add on the server in play mode at init, remove on delete);
@@ -280,7 +287,9 @@ in a separate change after this feature (T057).
   - an entity that appears or disappears while the snapshot is being built is written after `SNAP-END`.
 
   Depends on T011 to T029.
-- [ ] T031 [US1] Operator: in Workbench, in the demo world (`Lite Lobby/Missions/LobbyDemo.conf`), do three things, then run quickstart Scenario 2 on the dedicated server and hand back the `.llr`, the statistics final file and the log:
+- [X] T031 [US1] Operator: in Workbench, in the demo world (`Lite Lobby/Missions/LobbyDemo.conf`), do three things, then run quickstart Scenario 2 on the dedicated server and hand back the `.llr`, the statistics final file and the log:
+  - **Progress:** set up by the agent with the operator's permission (2026-10-31): a vanilla `USSR_AmmoBox_empty` crate 3 m east of the US mortar box (RPG-7 PGO-7, 4 PG-7VM, 4 PG-7VL, 2 M72A3, AK-74 GP-25, 10 VOG-25, 6 RGD-5); **Hide Delay Seconds** 30 on `NeutralZone`; unconsciousness needed no change, both vanilla switches default to on. Scenario 2 is open.
+  - **Changed (2026-10-31):** the crate and the hide delay were test setup and are reverted after the runs; the demo mission is unchanged.
   - place one weapon crate with an M72 or RPG-7 with PG-7VM and PG-7VL, a grenade launcher and hand grenades;
   - set a 30 s hide delay on the NeutralZone map area;
   - allow unconsciousness in the demo game mode's health settings.
@@ -327,7 +336,10 @@ in a separate change after this feature (T057).
       - open segment `c.segment + 1` with the header plus `H resumed <c.snapshotT>`, write a snapshot, start the calls, state `rec`;
     - without one: start a new recording as at GAME.
   - **Edit `Lite Lobby/scripts/game/Core/LL_GameModeCoop.c`:** in `CompleteResume_S`, next to `stats.ResumeRecording_S` (lines 1478-1480, after the clock restore at 1446), call the recorder's `ResumeRecording_S()`. Confirm the status file reads `resume` from server start while `WillResume()` (T005).
-- [ ] T035 [US2] Operator: quickstart Scenario 3:
+- [X] T035 [US2] Operator: quickstart Scenario 3:
+  - **Progress:** local dev server, 2026-10-31: killed mid-game, restarted with `-loadSessionSave`: `status.txt` read `resume`, then `rec <session> 2`; segment 2 has `H resumed 5480` and a snapshot, and entities and weapons kept their ids. A clean close wrote `STOP shutdown` (twice; now once). A plain start minted a new session. group numbers and 8 of 55 slot ids changed across the resume: decision B, numbered per segment, with a complete first snapshot (contract, R15).
+  - **Progress:** third run, 2026-10-31: resumed with a Game Master group in the save; the group kept exactly its saved members (fix in `LL_M_SCR_AIGroup`, operator-approved), no new soldier appeared, and segment 2 opened with the whole roster in its first snapshot. The game ends when the server stops or moves to the next mission (operator: ending a game is not a lobby function), and that end passed.
+  - **Progress:** ending a game is not a lobby function (operator), so a recording ends with `STOP shutdown` or a crash and `END debrief` does not occur; quickstart scenarios corrected. The reconnecting player was not reseated after the resume because the dev server gave the host player a name-derived identity before the crash and the backend identity after it (log: slot held for key `00bbbddd-...`, player connected as `54f42888-...`).
   - kill the server mid-game and inspect the file;
   - resume and expect `status.txt` to read `resume` then `rec`, segment 2 with `H resumed` and a snapshot;
   - stop gracefully and expect `STOP shutdown`;
@@ -424,6 +436,7 @@ in a separate change after this feature (T057).
   - **Running:** a generic service-manager unit with restart always and one instance per game server.
   - **Metrics and retention.**
   - **Nothing else.**
+  - **Changed (2026-10-31):** the README no longer lists an end at debriefing as a way a game is over.
 - [ ] T045 [US3] Operator: quickstart Scenario 4. Step 1 now (CI green on the pull request). Steps 2 to 5 on the test host once the receiving website implements the protocol: game delivered within 2 minutes, nothing while running, the abandoned and resumed cases, `ss -ltnp`, a clean log, metrics.
 
 **Checkpoint**: the service passes its tests in CI and, against a conforming receiver, delivers finished games only.
@@ -444,6 +457,7 @@ in a separate change after this feature (T057).
   - no chat message or voice data is read or written anywhere in the recorder (FR-016).
   - Fix any leak found.
 - [ ] T047 [US4] Operator: quickstart Scenario 5 on the recordings of Scenarios 2 and 3. Search for the GUID pattern, IP addresses and the secret; check the service state for an identity committed twice with different content.
+  - **Progress:** dev recordings of 2026-10-31 (5 segments, 7,002 lines): no identity GUID, IP address, secret or chat in any segment; GUIDs only in the identity files. Open: the service-state check, which needs T045.
 
 **Checkpoint**: what a receiver publishes from a recording carries no account identity, and its files are content-addressed.
 
@@ -461,11 +475,15 @@ in a separate change after this feature (T057).
   - **Server:** `[RplRpc(RplChannel.Reliable, RplRcver.Server)] protected void RpcAsk_ReplayStatus()` starts with `if (!SCR_Global.IsAdmin(GetPlayerId())) return;`, reads the recorder's status getters, and calls `Rpc(RpcDo_ReplayStatus, state, session, segment, seconds, kilobytes, lastWriteAgo)`.
   - **Owner reply:** `[RplRpc(RplChannel.Reliable, RplRcver.Owner)] protected void RpcDo_ReplayStatus(int state, string session, int segment, int seconds, int kilobytes, int lastWriteAgo)` maps the state to its key and calls `ShowCommandHelp(WidgetManager.Translate(key, …))`, with minutes and megabytes rounded to one decimal.
   - **Help:** add `#LL-Command_HelpReplay` to the second `/help` message in `OnChatCmd_Help` (line 1335).
+  - **Changed (2026-10-31):** the "ended" reply is removed with the debriefing branch.
 - [X] T049 [US5] Edit `Lite Lobby/Language/ll_localization.st`:
+  - **Changed (2026-10-31):** `LL-Replay_Ended` is removed with the debriefing branch; the runtime confs carry 291 keys.
   - add `LL-Replay_NotEnabled`, `LL-Replay_Ready`, `LL-Replay_Recording`, `LL-Replay_Ended`, `LL-Replay_Failed` and `LL-Command_HelpReplay`;
   - each with a fresh GUID, single-line English from contracts/admin-command.md, and native Russian in the community's terms («реплей»);
   - then run `tools/generate-runtime-locales.ps1`.
-- [ ] T050 [US5] Operator: quickstart Scenario 6 (ready, recording, ended, in English and Russian; a non-admin; the read-only profile failure).
+- [X] T050 [US5] Operator: quickstart Scenario 6 (ready, recording, ended, in English and Russian; a non-admin; the read-only profile failure).
+  - **Progress:** English `/replay` while recording verified (2026-10-31): "Recording 20261031-214724-LobbyDemo, segment 1: 1.6 min, 0.0 MB, last write 9 s ago." Open: Russian, a non-admin, the read-only failure.
+  - **Progress:** fourth run, 2026-10-31: the ready reply in English and Russian is right; the latest fixes held live (M203 and GP-25 rounds recorded once as `grenade`, a Game Master vehicle without its placement ghost, a complete first snapshot, one `STOP shutdown` on a clean stop). Then, on a Workbench dedicated server with one peer: a non-admin is refused ("That command is for admins only."), and with writes to `LL_Replays` denied the recorder logged one error and `/replay` answered "Replay recording stopped: the server cannot write to its profile."
 
 **Checkpoint**: all five user stories pass their quickstart scenarios.
 

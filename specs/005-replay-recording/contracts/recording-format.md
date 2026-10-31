@@ -39,9 +39,10 @@ segment.
 - Mission time `t` is the mission clock the statistics files use, in tenths of a second
   (an integer). It runs during the game phase and stands still during a hard freeze. A
   statistics event at `t` seconds and a record at `10 × t` describe the same moment.
-- Identifiers are local to one recording and stable across its segments: `eid`
-  entities, `pref` players, `gid` squads and groups, `wid` weapons, `slot` slots, `mid`
-  markers, `aid` map areas, `zid` trigger zones.
+- Identifiers are local to one recording. `eid` entities, `pref` players, `wid` weapons,
+  `aid` map areas and `zid` trigger zones are stable across its segments. `gid` squads and
+  groups, `slot` slots and `mid` markers are numbered within a segment: the segment's first
+  snapshot restates every one of them, and a squad keeps its callsign across segments.
 - `side` is a faction key from the header. `sides` is `*` (everyone) or faction keys
   joined by commas.
 - Colours are hex `rrggbb`, or `rrggbbaa` where transparency matters.
@@ -161,9 +162,8 @@ only; a public viewer should filter it as well.
 | `FLOW game` | | the game phase began |
 | `FLOW freeze` | int seconds | freeze time started or was changed; seconds remaining |
 | `FLOW freeze-end` | | freeze time ended (it can end twice if an admin revives it) |
-| `FLOW hardfreeze` | int seconds | a hard freeze started or was changed; seconds remaining |
+| `FLOW hardfreeze` | int seconds | a hard freeze started or was changed; seconds remaining, or 0 while it holds until an admin releases it |
 | `FLOW hardfreeze-end` | | the hard freeze ended |
-| `FLOW debrief` | | debriefing began |
 
 ## Snapshots
 
@@ -182,9 +182,8 @@ ignored.
 | Record | Meaning |
 |--------|---------|
 | `STOP shutdown` | the server stopped cleanly; the game may still be resumed into a next segment |
-| `END debrief` | the recording ended at debriefing; it is the last line of the last segment |
 
-A segment without either record was cut off by a crash. A segment `n` ≥ 2 names in
+A segment without a stop record was cut off by a crash. A segment `n` ≥ 2 names in
 `H resumed` the mission time it continues from; records in earlier segments later than
 that time were rolled back by the crash and are not part of the game.
 
@@ -215,7 +214,7 @@ LLS 1 rec 20261031-201500-eden 1 1793566800
 Fields: format version, state, session or `-`, segment or `-`, UTC Unix seconds.
 States: `idle` (no recording; the session is the one this server start minted), `resume`
 (the server is resuming a game; nothing is over yet), `rec` (recording this session and
-segment), `done` (this session's recording ended at debriefing). A reader of a
+segment). A reader of a
 partially written status file retries.
 
 ## Example

@@ -17,7 +17,8 @@ class LL_ReplayFollowed : Managed
 }
 
 //! Knock-outs, deaths, shot summaries and detonations, all observed from the game's own
-//! events; no weapon or ammunition prefab is changed.
+//! events; no weapon or ammunition prefab is changed. One detonation can raise the explosion
+//! effect several times, so repeats at the same point are written once.
 class LL_ReplayCombat : Managed
 {
 	//! Grenades and some rockets raise no detonation event and are followed every frame
@@ -37,6 +38,11 @@ class LL_ReplayCombat : Managed
 	protected ref map<int, int> m_mLastWidByShooter = new map<int, int>();
 	protected ref map<int, float> m_mLastShotTimeByShooter = new map<int, float>();
 	protected ref map<int, float> m_mLastExplosionByShooter = new map<int, float>();
+	protected ref map<int, BaseMagazineComponent> m_mMagazineByShooter = new map<int, BaseMagazineComponent>();
+	protected ref map<int, int> m_mAmmoByShooter = new map<int, int>();
+	protected ref map<int, string> m_mLastKindByShooter = new map<int, string>();
+	protected string m_sLastDetonation;
+	protected float m_fLastDetonationTime;
 	protected ref array<ref LL_ReplayFollowed> m_aFollowed = {};
 	protected bool m_bFollowing;
 	protected bool m_bListening;
@@ -78,36 +84,13 @@ class LL_ReplayCombat : Managed
 
 	void OnShot(int eid, IEntity shooter, BaseWeaponComponent weapon, IEntity projectile, bool grenade)
 	{
-		if (!m_bListening)
+		if (!m_bListening || !shooter || GetGame().GetPlayerManager().GetPlayerIdFromControlledEntity(shooter) <= 0)
 			return;
 
 		float now = GetGame().GetWorld().GetWorldTime();
 		int wid = WeaponId(weapon);
-		if (wid > 0)
-		{
-			m_mLastWidByShooter.Set(eid, wid);
-			m_mLastShotTimeByShooter.Set(eid, now);
-		}
-
-		LL_ReplayShotCounter counter;
-		if (!m_mShots.Find(eid, counter))
-		{
-			counter = new LL_ReplayShotCounter();
-			m_mShots.Set(eid, counter);
-		}
-
-		if (counter.m_iCount == 0)
-		{
-			counter.m_iYaw = ShotYaw(shooter, projectile);
-			counter.m_iWid = wid;
-		}
-
-		counter.m_iCount++;
-
-		if (shooter && GetGame().GetPlayerManager().GetPlayerIdFromControlledEntity(shooter) > 0)
-			m_iPlayerShots++;
-		else
-			m_iAiShots++;
+		CountShots(eid, shooter, projectile, wid, ShotKind(weapon, null, wid, grenade), 1, now);
+		m_iPlayerShots++;
 
 		if (!projectile)
 			return;
@@ -124,6 +107,31 @@ class LL_ReplayCombat : Managed
 			Follow(projectile, "rocket", eid, wid, now);
 		else if (type == "grenadelauncher")
 			Follow(projectile, "grenade", eid, wid, now);
+	}
+
+	//! The server raises no shot event for AI fire, so an AI character's shots are counted from
+	//! what leaves its magazine, aimed along its facing; players' shots arrive through OnShot.
+	void OnAmmoCount(int eid, IEntity shooter, BaseWeaponComponent weapon, BaseMuzzleComponent muzzle, BaseMagazineComponent magazine, int ammoCount)
+	{
+		if (!m_bListening || !magazine || !shooter)
+			return;
+
+		if (GetGame().GetPlayerManager().GetPlayerIdFromControlledEntity(shooter) > 0)
+			return;
+
+		BaseMagazineComponent lastMagazine;
+		int lastCount;
+		bool sameMagazine = m_mMagazineByShooter.Find(eid, lastMagazine) && lastMagazine == magazine && m_mAmmoByShooter.Find(eid, lastCount);
+		m_mMagazineByShooter.Set(eid, magazine);
+		m_mAmmoByShooter.Set(eid, ammoCount);
+
+		if (!sameMagazine || ammoCount >= lastCount)
+			return;
+
+		int shots = lastCount - ammoCount;
+		int wid = WeaponId(weapon);
+		CountShots(eid, shooter, null, wid, ShotKind(weapon, muzzle, wid, false), shots, GetGame().GetWorld().GetWorldTime());
+		m_iAiShots += shots;
 	}
 
 	void OnLifeState(int eid, IEntity character, ECharacterLifeState previousLifeState, ECharacterLifeState newLifeState)
@@ -245,6 +253,32 @@ class LL_ReplayCombat : Managed
 		}
 	}
 
+	protected void CountShots(int eid, IEntity shooter, IEntity projectile, int wid, string kind, int shots, float now)
+	{
+		if (wid > 0)
+		{
+			m_mLastWidByShooter.Set(eid, wid);
+			m_mLastShotTimeByShooter.Set(eid, now);
+		}
+
+		m_mLastKindByShooter.Set(eid, kind);
+
+		LL_ReplayShotCounter counter;
+		if (!m_mShots.Find(eid, counter))
+		{
+			counter = new LL_ReplayShotCounter();
+			m_mShots.Set(eid, counter);
+		}
+
+		if (counter.m_iCount == 0)
+		{
+			counter.m_iYaw = ShotYaw(shooter, projectile);
+			counter.m_iWid = wid;
+		}
+
+		counter.m_iCount += shots;
+	}
+
 	protected void OnExplosionAmmoEffect(IEntity pHitEntity, inout vector outMat[3], IEntity damageSource, notnull Instigator instigator, string colliderName, float speed)
 	{
 		if (!m_bListening)
@@ -252,13 +286,18 @@ class LL_ReplayCombat : Managed
 
 		int shooterEid = m_Entities.EidOf(instigator.GetInstigatorEntity());
 		int wid = -1;
+		string kind;
 		if (shooterEid > 0)
 		{
 			m_mLastWidByShooter.Find(shooterEid, wid);
+			m_mLastKindByShooter.Find(shooterEid, kind);
 			m_mLastExplosionByShooter.Set(shooterEid, GetGame().GetWorld().GetWorldTime());
 		}
 
-		WriteDetonation(outMat[0], KindForWeapon(wid), shooterEid, wid);
+		if (kind == "")
+			kind = KindForWeapon(wid);
+
+		WriteDetonation(outMat[0], kind, shooterEid, wid);
 	}
 
 	protected void Follow(IEntity projectile, string kind, int shooterEid, int wid, float now)
@@ -335,6 +374,14 @@ class LL_ReplayCombat : Managed
 		int x = Math.Round(position[0]);
 		int z = Math.Round(position[2]);
 		int alt = Math.Round(position[1]);
+
+		string detonation = string.Format("%1 %2 %3", x, z, shooterEid);
+		float now = GetGame().GetWorld().GetWorldTime();
+		if (detonation == m_sLastDetonation && now - m_fLastDetonationTime <= SAME_DETONATION_MS)
+			return;
+
+		m_sLastDetonation = detonation;
+		m_fLastDetonationTime = now;
 		m_Writer.Add(string.Format("B %1 %2 %3 %4 %5 %6", x, z, alt, kind,
 			LL_ReplayWriter.IntOr(shooterEid, shooterEid > 0), LL_ReplayWriter.IntOr(wid, wid > 0)));
 	}
@@ -462,6 +509,26 @@ class LL_ReplayCombat : Managed
 		m_mWidByKey.Set(type + "|" + name, wid);
 		m_mWeaponTypeByWid.Set(wid, type);
 		m_mWeaponLines.Set(wid, string.Format("W %1 %2 %3", wid, type, LL_ReplayWriter.Str(name)));
+	}
+
+	protected string ShotKind(BaseWeaponComponent weapon, BaseMuzzleComponent muzzle, int wid, bool thrown)
+	{
+		if (thrown)
+			return "grenade";
+
+		if (!muzzle && weapon)
+			muzzle = weapon.GetCurrentMuzzle();
+
+		if (muzzle)
+		{
+			EMuzzleType type = muzzle.GetMuzzleType();
+			if (type == EMuzzleType.MT_UGLMuzzle)
+				return "grenade";
+			if (type == EMuzzleType.MT_RPGMuzzle)
+				return "rocket";
+		}
+
+		return KindForWeapon(wid);
 	}
 
 	protected string KindForWeapon(int wid)

@@ -30,7 +30,7 @@
 // A commit body is {"kind","session","name","size","encoding":"gzip","encodedSize",
 // "encodedSha256","pieces"}; kind is segment, identity or stats. The receiver joins the
 // pieces and checks encodedSize and encodedSha256. A game body is {"session","over",
-// "segments","identity","stats"}: over is ended, stopped or abandoned, segments are in
+// "segments","identity","stats"}: over is stopped or abandoned, segments are in
 // order, and identity and stats are null when absent. A game is posted once all its files
 // are committed, and again whenever its file set changes: a newer statistics file, or a
 // segment written after a resume that followed an abandoned post. A repeated post replaces

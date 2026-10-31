@@ -124,16 +124,15 @@ file it names is committed. Body (`application/json`, at most 64 KB):
 ```json
 {
   "session": "20261031-201500-eden",
-  "over": "ended",
+  "over": "stopped",
   "segments": ["3f2a…e9", "a81c…40"],
   "identity": "c09d…11",
   "stats": "77e2…b8"
 }
 ```
 
-- `over` is `ended` (the recording has its end record), `stopped` (the server stopped
-  in the game and later started a different game), or `abandoned` (the server stayed
-  stopped longer than the configured wait).
+- `over` is `stopped` (the server stopped in the game and later started a different
+  game) or `abandoned` (the server stayed stopped longer than the configured wait).
 - `segments` lists the segment files in segment order.
 - `identity` is the session's identity file, or `null` when no player identity became
   known in the game.
@@ -141,7 +140,7 @@ file it names is committed. Body (`application/json`, at most 64 KB):
   off.
 - The service posts the game again whenever its file set changes: a newer statistics
   file appears for the session, for example an approval the Game Master publishes after
-  debriefing, or a game posted as `abandoned` is resumed later and writes another
+  the game, or a game posted as `abandoned` is resumed later and writes another
   segment and a longer identity file. A repeated post replaces the game's record: its
   `over`, `segments`, `identity` and `stats` are those of the latest post.
 

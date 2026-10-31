@@ -22,8 +22,7 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 	static const int STATE_READY = 1;
 	static const int STATE_RESUME = 2;
 	static const int STATE_RECORDING = 3;
-	static const int STATE_DONE = 4;
-	static const int STATE_FAILED = 5;
+	static const int STATE_FAILED = 4;
 
 	protected static LL_ReplayRecorderComponent s_Instance;
 	//! Static because the session save can be read before this component initialises.
@@ -51,6 +50,7 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 	protected int m_iPeriodStartUnix;
 	protected int m_iLastFreezeSeconds = -1;
 	protected int m_iLastFreezeT = -1;
+	protected bool m_bStopWritten;
 
 	static LL_ReplayRecorderComponent GetInstance()
 	{
@@ -94,8 +94,6 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 
 		if (state == SCR_EGameModeState.GAME && (m_iState == STATE_READY || m_iState == STATE_RESUME) && !LL_GameModeCoop.IsResumePending())
 			StartRecording_S(ResolveSession_S(), 1, -1);
-		else if (state == SCR_EGameModeState.DEBRIEFING && m_iState == STATE_RECORDING)
-			EndRecording_S();
 	}
 
 	override void OnControllableDestroyed(notnull SCR_InstigatorContextData instigatorContextData)
@@ -107,13 +105,15 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 	}
 
 	//! A clean stop ends the segment, not the recording: the session save may resume the game.
+	//! The game can end more than once on the way out, and the stop is written once.
 	override void OnGameEnd()
 	{
 		super.OnGameEnd();
 
-		if (m_iState != STATE_RECORDING)
+		if (m_iState != STATE_RECORDING || m_bStopWritten)
 			return;
 
+		m_bStopWritten = true;
 		AddNow("STOP shutdown");
 		StopParts_S();
 		FlushAll_S();
@@ -330,6 +330,7 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 		m_Entities.Start_S();
 		m_Combat.Start_S();
 		m_Map.Start_S();
+		m_Entities.Prime_S();
 
 		m_iState = STATE_RECORDING;
 		BeginSnapshot_S();
@@ -337,23 +338,6 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 		GetGame().GetCallqueue().CallLater(Tick_S, TICK_MS, true);
 		LL_ReplayWriter.WriteStatus_S("rec", session, segment);
 		Print(string.Format("[LL_Lobby] Replay: recording %1 segment %2", session, segment), LogLevel.NORMAL);
-	}
-
-	protected void EndRecording_S()
-	{
-		while (m_iSnapshotCursor >= 0)
-		{
-			SnapshotStep_S();
-		}
-
-		AddNow("FLOW debrief");
-		AddNow("END debrief");
-		StopParts_S();
-		FlushAll_S();
-
-		m_iState = STATE_DONE;
-		LL_ReplayWriter.WriteStatus_S("done", m_sSession, m_iSegment);
-		Print(string.Format("[LL_Lobby] Replay: recording %1 ended at debriefing", m_sSession), LogLevel.NORMAL);
 	}
 
 	protected void Fail_S()

@@ -112,12 +112,12 @@ func TestPassSendsOnlyGamesThatAreOver(t *testing.T) {
 	profile := t.TempDir()
 	clock := &testClock{t: time.Unix(1793563200, 0)}
 	now := clock.Now()
-	const ended, running, next = "20261031-180000-eden", "20261031-200000-eden", "20261031-230000-eden"
-	endedFiles := []string{
-		put(t, profile, "LL_Replays/"+ended+"-1.llr", "LLR 1\nH session "+ended+"\nFLOW debrief\nEND debrief\n", now.Add(-time.Hour)),
-		put(t, profile, "LL_Replays/"+ended+"-identities.txt", "LLI 1\nH session "+ended+"\nI 1 x\n", now.Add(-time.Hour)),
-		put(t, profile, "LL_GameStats/"+ended+"-live.json", `{"phase":"live"}`, now.Add(-2*time.Hour)),
-		put(t, profile, "LL_GameStats/"+ended+"-final.json", `{"phase":"final"}`, now.Add(-time.Hour)),
+	const finished, running, next = "20261031-180000-eden", "20261031-200000-eden", "20261031-230000-eden"
+	finishedFiles := []string{
+		put(t, profile, "LL_Replays/"+finished+"-1.llr", "LLR 1\nH session "+finished+"\nP 1 2 3 4 5\nSTOP shutdown\n", now.Add(-time.Hour)),
+		put(t, profile, "LL_Replays/"+finished+"-identities.txt", "LLI 1\nH session "+finished+"\nI 1 x\n", now.Add(-time.Hour)),
+		put(t, profile, "LL_GameStats/"+finished+"-live.json", `{"phase":"live"}`, now.Add(-2*time.Hour)),
+		put(t, profile, "LL_GameStats/"+finished+"-final.json", `{"phase":"final"}`, now.Add(-time.Hour)),
 	}
 	runningSegment := put(t, profile, "LL_Replays/"+running+"-1.llr", "LLR 1\nH session "+running+"\nP 1 2 3 4 5\n", now)
 	put(t, profile, "LL_Replays/status.txt", fmt.Sprintf("LLS 1 rec %s 1 %d\n", running, now.Unix()), now)
@@ -142,9 +142,9 @@ func TestPassSendsOnlyGamesThatAreOver(t *testing.T) {
 	}
 
 	s.pass(context.Background())
-	g, posted := rx.game(ended)
-	if !posted || g.Over != "ended" || len(g.Segments) != 1 || g.Identity == nil || *g.Stats != sha(`{"phase":"final"}`) {
-		t.Fatalf("finished game posted as %+v (posted %v)", g, posted)
+	g, posted := rx.game(finished)
+	if !posted || g.Over != "stopped" || len(g.Segments) != 1 || g.Identity == nil || *g.Stats != sha(`{"phase":"final"}`) {
+		t.Fatalf("game followed by the next session posted as %+v (posted %v)", g, posted)
 	}
 	rx.mu.Lock()
 	early := slices.Contains(rx.sessions, running)
@@ -160,7 +160,7 @@ func TestPassSendsOnlyGamesThatAreOver(t *testing.T) {
 	clock.Sleep(time.Minute)
 	put(t, profile, "LL_Replays/status.txt", fmt.Sprintf("LLS 1 resume - - %d\n", clock.Now().Unix()), clock.Now())
 	approved := `{"phase":"approved"}`
-	put(t, profile, "LL_GameStats/"+ended+"-approved.json", approved, clock.Now())
+	put(t, profile, "LL_GameStats/"+finished+"-approved.json", approved, clock.Now())
 	commits := rx.commitCount()
 	s.pass(context.Background())
 	if rx.commitCount() != commits {
@@ -170,14 +170,14 @@ func TestPassSendsOnlyGamesThatAreOver(t *testing.T) {
 	clock.Sleep(time.Minute)
 	put(t, profile, "LL_Replays/status.txt", fmt.Sprintf("LLS 1 idle %s - %d\n", next, clock.Now().Unix()), clock.Now())
 	s.pass(context.Background())
-	if g, _ := rx.game(ended); *g.Stats != sha(approved) {
+	if g, _ := rx.game(finished); *g.Stats != sha(approved) || g.Over != "stopped" {
 		t.Fatalf("newer statistics not posted: %+v", g)
 	}
 	if g, ok := rx.game(running); !ok || g.Over != "stopped" {
 		t.Fatalf("game cut off by another game's start posted as %+v", g)
 	}
-	endedFiles = append(endedFiles, filepath.Join(profile, "LL_GameStats", ended+"-approved.json"))
-	for _, p := range append(endedFiles, runningSegment) {
+	finishedFiles = append(finishedFiles, filepath.Join(profile, "LL_GameStats", finished+"-approved.json"))
+	for _, p := range append(finishedFiles, runningSegment) {
 		if !exists(p) {
 			t.Fatalf("%s deleted before the retention time", p)
 		}
@@ -185,7 +185,7 @@ func TestPassSendsOnlyGamesThatAreOver(t *testing.T) {
 
 	clock.Sleep(15 * 24 * time.Hour)
 	s.pass(context.Background())
-	for _, p := range append(endedFiles, runningSegment) {
+	for _, p := range append(finishedFiles, runningSegment) {
 		if exists(p) {
 			t.Errorf("%s kept past the retention time", p)
 		}

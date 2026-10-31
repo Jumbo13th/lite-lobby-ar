@@ -20,8 +20,8 @@ Every scenario ends with the server log excerpt and the recording files handed b
 
 ## Scenario 0: off means off (SC-011, FR-001)
 
-1. Remove `$profile:LL_Replays.json`. Start the server and play the game phase to
-   debriefing.
+1. Remove `$profile:LL_Replays.json`. Start the server, play the game phase and
+   stop the server.
 2. Expected: no `LL_Replays` folder, no `[LL_Lobby] Replay` log line, and `/replay` as
    admin answers "Replay recording is not enabled on this server."
 
@@ -50,8 +50,8 @@ Record each observed result in [research.md](research.md), whatever it is.
    rocket at a crewed BTR-70 with a driver and a gunner until it is destroyed; capture the
    Road zone; wait for the NeutralZone area to disappear 30 s after freeze end; disconnect
    and reconnect the third client.
-4. Advance to debriefing. Check that the file ends with `FLOW debrief` and `END debrief`
-   and that `status.txt` reads `done`.
+4. Stop the server cleanly. Check that the file ends with `STOP shutdown`, then start the
+   next mission and check that `status.txt` names a new session.
 5. Open the file in a text editor and find every event of step 2 and 3 with the right
    time (within 1 s), actors and position (within 2 m). Check that every kill event in
    `$profile:LL_GameStats/<session>-final.json` has a `K` record with the same victim
@@ -82,8 +82,8 @@ Record each observed result in [research.md](research.md), whatever it is.
    for every status-file state, retention, and a config file readable by others being
    refused.
 2. On the test host, run `ll-uplink -config <file>` against the receiving website (when
-   it exists). Play a game to debriefing. Check that the website holds the segment, the
-   identity file and the final statistics within 2 minutes.
+   it exists). Play a game, then start the next mission. Check that the website holds the
+   segment, the identity file and the latest statistics within 2 minutes.
 3. While a game runs, check that the website holds nothing of it.
 4. Kill the game server mid-game and leave it stopped longer than `StoppedWaitMinutes`.
    Check that the cut-off recording is then sent as `abandoned`. Repeat, resuming within
@@ -101,8 +101,8 @@ Record each observed result in [research.md](research.md), whatever it is.
 
 ## Scenario 6: `/replay` (US5, FR-039, FR-040)
 
-1. As admin, type `/replay` before the game phase (ready), during it (recording, with
-   growing minutes and size), and after debriefing (ended), in English and in Russian.
+1. As admin, type `/replay` before the game phase (ready), and during it (recording, with
+   growing minutes and size), in English and in Russian.
 2. As a non-admin, type `/replay`: the client says it is for admins, and the server log
    shows no reply sent.
 3. Make the profile folder read-only during a game: the next `/replay` reports the

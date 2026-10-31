@@ -5,7 +5,6 @@ package scan
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -20,18 +19,15 @@ const (
 	StateIdle   = "idle"
 	StateResume = "resume"
 	StateRec    = "rec"
-	StateDone   = "done"
 )
 
 const (
-	OverEnded     = "ended"
 	OverStopped   = "stopped"
 	OverAbandoned = "abandoned"
 )
 
 const (
 	minStatusUnix  = 1_000_000_000
-	tailSize       = 4096
 	identitySuffix = "-identities.txt"
 )
 
@@ -74,7 +70,7 @@ func parseStatus(s string) (Status, bool) {
 	}
 	st := Status{State: f[2]}
 	switch st.State {
-	case StateIdle, StateResume, StateRec, StateDone:
+	case StateIdle, StateResume, StateRec:
 	default:
 		return Status{}, false
 	}
@@ -96,7 +92,7 @@ func parseStatus(s string) (Status, bool) {
 		return Status{}, false
 	}
 	st.Unix = unix
-	if (st.State == StateRec && (st.Session == "" || st.Segment == 0)) || (st.State == StateDone && st.Session == "") {
+	if st.State == StateRec && (st.Session == "" || st.Segment == 0) {
 		return Status{}, false
 	}
 	return st, true
@@ -113,8 +109,6 @@ type Recording struct {
 	Segments []Segment
 	// Identity is the path of the identity file, "" when no player appeared.
 	Identity string
-	// Ended means the last segment's last record, after any time records, is END debrief.
-	Ended bool
 	// LastWrite also counts the session's statistics files, whose autosaves keep a running
 	// game from looking abandoned when its recording stopped writing.
 	LastWrite time.Time
@@ -136,11 +130,6 @@ func ListRecordings(profile string) ([]Recording, error) {
 				r.LastWrite = info.ModTime()
 			}
 		}
-		ended, err := endsWithDebrief(r.Segments[len(r.Segments)-1].Path)
-		if err != nil {
-			return nil, err
-		}
-		r.Ended = ended
 		recs = append(recs, *r)
 	}
 	slices.SortFunc(recs, func(a, b Recording) int { return strings.Compare(a.Session, b.Session) })
@@ -162,8 +151,8 @@ func LatestStats(profile, session string) (string, error) {
 	return "", nil
 }
 
-// GamesOver maps each recording that is over to how it ended. Nothing is over while the status
-// is unreadable or a resume is pending, and a rec status holds its session until it goes stale.
+// GamesOver maps each recording that is over to stopped or abandoned. Nothing is over while the
+// status is unreadable or a resume is pending, and a rec status holds its session until stale.
 func GamesOver(now time.Time, st Status, recs []Recording, wait time.Duration) map[string]string {
 	over := map[string]string{}
 	if st.State == "" || st.State == StateResume {
@@ -176,8 +165,6 @@ func GamesOver(now time.Time, st Status, recs []Recording, wait time.Duration) m
 			continue
 		}
 		switch {
-		case r.Ended:
-			over[r.Session] = OverEnded
 		case st.Session != r.Session && st.Unix > r.LastWrite.Unix():
 			over[r.Session] = OverStopped
 		case stale:
@@ -240,37 +227,6 @@ func statsPaths(profile, session string) []string {
 		paths[i] = filepath.Join(profile, "LL_GameStats", session+"-"+phase+".json")
 	}
 	return paths
-}
-
-func endsWithDebrief(path string) (bool, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return false, err
-	}
-	defer f.Close()
-	info, err := f.Stat()
-	if err != nil {
-		return false, err
-	}
-	off := max(info.Size()-tailSize, 0)
-	buf := make([]byte, info.Size()-off)
-	n, err := f.ReadAt(buf, off)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
-	lines := strings.Split(string(buf[:n]), "\n")
-	lines = lines[:len(lines)-1]
-	if off > 0 && len(lines) > 0 {
-		lines = lines[1:]
-	}
-	for i := len(lines) - 1; i >= 0; i-- {
-		line := strings.TrimSuffix(lines[i], "\r")
-		if strings.HasPrefix(line, "U ") || strings.HasPrefix(line, "T ") {
-			continue
-		}
-		return line == "END debrief", nil
-	}
-	return false, nil
 }
 
 func later(a, b time.Time) time.Time {

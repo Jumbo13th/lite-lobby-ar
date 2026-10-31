@@ -60,10 +60,10 @@ func newFixture(t *testing.T) *fixture {
 	f.up = f.uploader(testSecret)
 	f.game = Game{
 		Session: session,
-		Over:    "ended",
+		Over:    "stopped",
 		Segments: []string{
 			f.write("LL_Replays/"+session+"-1.llr", randomBytes(3_200_000, 11)),
-			f.write("LL_Replays/"+session+"-2.llr", []byte("LLR 1\nH session "+session+"\nH segment 2\nEND debrief\n")),
+			f.write("LL_Replays/"+session+"-2.llr", []byte("LLR 1\nH session "+session+"\nH segment 2\nSTOP shutdown\n")),
 		},
 		Identity: f.write("LL_Replays/"+session+"-identities.txt", []byte("LLI 1\nH session "+session+"\nI 1 6f1a2b3c-4d5e-6f70-8192-a3b4c5d6e7f8\n")),
 		Stats:    f.write("LL_GameStats/"+session+"-final.json", []byte(`{"session":"`+session+`","phase":"final"}`)),
@@ -136,12 +136,12 @@ func TestUploadGameSendsEveryFileThenPosts(t *testing.T) {
 	f.committedOnce(ids...)
 	f.rc.with(func() {
 		g := f.rc.games[session]
-		if f.rc.posts != 1 || g.Over != "ended" || !slices.Equal(g.Segments, ids[:2]) || *g.Identity != ids[2] || *g.Stats != ids[3] {
+		if f.rc.posts != 1 || g.Over != "stopped" || !slices.Equal(g.Segments, ids[:2]) || *g.Identity != ids[2] || *g.Stats != ids[3] {
 			t.Fatalf("receiver got %d posts, last %+v", f.rc.posts, g)
 		}
 	})
 	rec := f.st.Games[session]
-	if rec.Confirmed.IsZero() || rec.Over != "ended" || !slices.Equal(rec.Segments, ids[:2]) || rec.Identity != ids[2] || rec.Stats != ids[3] {
+	if rec.Confirmed.IsZero() || rec.Over != "stopped" || !slices.Equal(rec.Segments, ids[:2]) || rec.Identity != ids[2] || rec.Stats != ids[3] {
 		t.Fatalf("state = %+v", rec)
 	}
 	kinds := map[string]string{ids[0]: "segment", ids[1]: "segment", ids[2]: "identity", ids[3]: "stats"}
@@ -325,7 +325,7 @@ func TestStatisticsAloneArePostedAgain(t *testing.T) {
 	f.committedOnce(append(ids, approvedID)...)
 	f.rc.with(func() {
 		got := f.rc.games[session]
-		if f.rc.posts != 2 || *got.Stats != approvedID || !slices.Equal(got.Segments, ids[:2]) || *got.Identity != ids[2] || got.Over != "ended" {
+		if f.rc.posts != 2 || *got.Stats != approvedID || !slices.Equal(got.Segments, ids[:2]) || *got.Identity != ids[2] || got.Over != "stopped" {
 			t.Fatalf("%d posts, last %+v", f.rc.posts, got)
 		}
 	})
@@ -354,10 +354,10 @@ func TestResumedGameIsPostedAgainWithAllItsFiles(t *testing.T) {
 	seg1ID, oldIdentity := f.id(seg1), f.id(identity)
 
 	f.clock.Advance(time.Hour)
-	seg2 := f.write("LL_Replays/"+session+"-2.llr", []byte("LLR 1\nH session "+session+"\nH segment 2\nH resumed 9000\nEND debrief\n"))
+	seg2 := f.write("LL_Replays/"+session+"-2.llr", []byte("LLR 1\nH session "+session+"\nH segment 2\nH resumed 9000\nP 1 2 3 4 5\n"))
 	f.appendTo(identity, "I 2 0b9c8d7e-6f5a-4b3c-2d1e-0f9a8b7c6d5e\n")
-	ended := Game{Session: session, Over: "ended", Segments: []string{seg1, seg2}, Identity: identity}
-	if err := f.up.UploadGame(context.Background(), ended); err != nil {
+	stopped := Game{Session: session, Over: "stopped", Segments: []string{seg1, seg2}, Identity: identity}
+	if err := f.up.UploadGame(context.Background(), stopped); err != nil {
 		t.Fatal(err)
 	}
 
@@ -365,7 +365,7 @@ func TestResumedGameIsPostedAgainWithAllItsFiles(t *testing.T) {
 	f.committedOnce(seg1ID, seg2ID, oldIdentity, newIdentity)
 	f.rc.with(func() {
 		got := f.rc.games[session]
-		if f.rc.posts != 2 || got.Over != "ended" || !slices.Equal(got.Segments, []string{seg1ID, seg2ID}) || *got.Identity != newIdentity || got.Stats != nil {
+		if f.rc.posts != 2 || got.Over != "stopped" || !slices.Equal(got.Segments, []string{seg1ID, seg2ID}) || *got.Identity != newIdentity || got.Stats != nil {
 			t.Fatalf("%d posts, last %+v", f.rc.posts, got)
 		}
 		if f.rc.puts[seg1ID] != 3 {
@@ -373,12 +373,12 @@ func TestResumedGameIsPostedAgainWithAllItsFiles(t *testing.T) {
 		}
 	})
 	rec := f.st.Games[session]
-	if rec.Over != "ended" || !slices.Equal(rec.Segments, []string{seg1ID, seg2ID}) || rec.Identity != newIdentity || !rec.Confirmed.After(first) {
+	if rec.Over != "stopped" || !slices.Equal(rec.Segments, []string{seg1ID, seg2ID}) || rec.Identity != newIdentity || !rec.Confirmed.After(first) {
 		t.Fatalf("state = %+v", rec)
 	}
 
 	before := f.requests()
-	if err := f.up.UploadGame(context.Background(), ended); err != nil || f.requests() != before {
+	if err := f.up.UploadGame(context.Background(), stopped); err != nil || f.requests() != before {
 		t.Fatalf("unchanged game sent again: %v, %d requests", err, f.requests()-before)
 	}
 }
@@ -391,13 +391,13 @@ func TestRepeatedPostKeepsWhatWasConfirmed(t *testing.T) {
 	ids := f.ids()
 	approved := f.write("LL_GameStats/"+session+"-approved.json", []byte(`{"phase":"approved"}`))
 
-	without := Game{Session: session, Over: "ended", Segments: f.game.Segments[1:], Identity: f.game.Identity, Stats: approved}
+	without := Game{Session: session, Over: "stopped", Segments: f.game.Segments[1:], Identity: f.game.Identity, Stats: approved}
 	before := f.requests()
 	if err := f.up.UploadGame(context.Background(), without); err != nil || f.requests() != before {
 		t.Fatalf("posted without a confirmed segment: %v, %d requests", err, f.requests()-before)
 	}
 
-	noIdentity := Game{Session: session, Over: "ended", Segments: f.game.Segments, Stats: approved}
+	noIdentity := Game{Session: session, Over: "stopped", Segments: f.game.Segments, Stats: approved}
 	if err := f.up.UploadGame(context.Background(), noIdentity); err != nil {
 		t.Fatal(err)
 	}
