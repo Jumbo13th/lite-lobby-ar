@@ -22,11 +22,10 @@ root; game scripts live under `Lite Lobby/scripts/game/`. "Operator" tasks are s
 the operator performs (Workbench, server configuration, live runs); the agent hands over
 exact values and waits.
 
-**Operator decisions** (from plan.md, Operator steps): D1, whether the header carries the
-format version only (amends FR-004, task T052) is **open** and must be decided before T005
-writes the header. D2, decided 2026-10-31: the server-owner setup text lives in
-`uplink/README.md` (task T044). D3, decided 2026-10-31: the map-zone rotation finding is
-fixed in a separate change after this feature (T057).
+**Operator decisions** (2026-10-31, plan.md Operator steps): D1, the header carries the
+format version only and FR-004 is amended (task T052, done). D2, the server-owner setup
+text lives in `uplink/README.md` (task T044). D3, the map-zone rotation finding is fixed
+in a separate change after this feature (T057).
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -84,7 +83,7 @@ fixed in a separate change after this feature (T057).
   - **`override void OnGameStateChanged(SCR_EGameModeState state)`** (the statistics' signature, `LL_StatsManager.c:255`):
     - On `GAME` with `!LL_GameModeCoop.IsResumePending()` and state `ready`, call `StartRecording_S()`:
       - session from `ResolveSession_S()`, segment 1;
-      - the header lines of contracts/recording-format.md, as decided in D1 (T052), which must be settled before this task: mission and author from `SCR_MissionHeader` (`GetGame().GetMissionHeader()`), world `GetGame().GetWorldFile()`, bounds from `GetGame().GetWorldEntity().GetTerrain(0, 0).GetTerrainBoundBox(mins, maxs)` rounded to metres, in-game date and time from `ChimeraWorld.GetTimeAndWeatherManager()` (`GetDate`, `GetHoursMinutesSeconds`), `System.GetUnixTime()`, and one `H side` per faction of `GetGame().GetFactionManager()` (key, name, colour from `GetFactionColor()` as `rrggbb`);
+      - the header lines of contracts/recording-format.md, with the format version and no addon version (decision D1): mission and author from `SCR_MissionHeader` (`GetGame().GetMissionHeader()`), world `GetGame().GetWorldFile()`, bounds from `GetGame().GetWorldEntity().GetTerrain(0, 0).GetTerrainBoundBox(mins, maxs)` rounded to metres, in-game date and time from `ChimeraWorld.GetTimeAndWeatherManager()` (`GetDate`, `GetHoursMinutesSeconds`), `System.GetUnixTime()`, and one `H side` per faction of `GetGame().GetFactionManager()` (key, name, colour from `GetFactionColor()` as `rrggbb`);
       - then `U`, `FLOW game` and a snapshot;
       - start `CallLater(Tick_S, 100, true)`, and mark a flush due every 9 s, which `Tick_S` carries out through `LL_ReplayWriter.Flush_S()` (T004), so a record reaches the disk within FR-018's 10 seconds.
     - On `DEBRIEFING` while recording: `FLOW debrief`, `END debrief`, flush, stop both calls, state `done`.
@@ -453,9 +452,7 @@ fixed in a separate change after this feature (T057).
   - `ll-uplink` (sends finished recordings and statistics to a configured website).
 
   Run `npm run validate` in `docs/`.
-- [ ] T052 Apply decision D1. The operator decides before T005 writes the header; this task records the result:
-  - **If accepted:** remove "the addon version" from FR-004 in `specs/005-replay-recording/spec.md` and add the decision to its Clarifications.
-  - **If rejected:** add a version constant in `Lite Lobby/scripts/game/Core/` and an `H addon` line to the header, the writer and `contracts/recording-format.md`.
+- [X] T052 Apply decision D1 (operator, 2026-10-31: format version only). Done: FR-004 no longer names the addon version; FR-020 raises the format version whenever a record's meaning changes; the decision is in the spec's Clarifications, research R18 and the `LLR` row of `contracts/recording-format.md`.
 - [ ] T053 Constitution pass over every new and edited file:
   - `LL_` prefixes;
   - WHY-only comments with no narration;
@@ -475,7 +472,7 @@ fixed in a separate change after this feature (T057).
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: none.
-- **Foundational (Phase 2)**: depends on T001 (T002 only confirms it); T005's header waits for decision D1; blocks User Stories 1, 2 and 5.
+- **Foundational (Phase 2)**: depends on T001 (T002 only confirms it); blocks User Stories 1, 2 and 5.
 - **User Story 1 (Phase 3)**: depends on Phase 2.
 - **User Story 2 (Phase 4)**: depends on User Story 1's entity maps and snapshot (T011 to T030).
 - **User Story 3 (Phase 5)**: depends only on T003 and the contracts; runs in parallel with Phases 2 to 4.

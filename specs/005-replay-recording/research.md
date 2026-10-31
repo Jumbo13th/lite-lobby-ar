@@ -307,8 +307,9 @@ depends on it is written.
 
 ## R18. Addon version in the header
 
-- **Decision**: the header carries the recording format version only. **This amends
-  FR-004** and needs the operator's confirmation.
+- **Decision** (operator, 2026-10-31): the header carries the recording format version
+  only, which amends FR-004; the format version is raised whenever the meaning of a record
+  changes (FR-020).
 - **Rationale**: no API returns an addon's version at runtime (`GameProject` offers GUIDs,
   id and title only, `scripts/GameLib/generated/GameProject.c:17-26`). A constant in the
   scripts would duplicate the version the changelog already holds, against "one source per

@@ -67,7 +67,7 @@ H end
 
 | Record | Fields |
 |--------|--------|
-| `LLR` | int format version, `1` |
+| `LLR` | int format version, `1`; raised whenever the meaning of any record changes, so a reader keys any workaround for a faulty release on it |
 | `H session` | tok session identity |
 | `H segment` | int segment number |
 | `H mission` | str mission name as the game reports it (may be a localization key) |

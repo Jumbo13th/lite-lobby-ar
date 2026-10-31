@@ -121,7 +121,7 @@ host program
 | Principle | Check | Result |
 |-----------|-------|--------|
 | I. Engine Fidelity | Every mechanism follows a vanilla pattern (details below the table). Six behaviours cannot be read from the scripts and are spiked first: S1 AI shot events, S2 detonation by disappearance, S3 knock-out instigator timing, S4 vehicle coverage, heading and append creation, S5 key translation on a server, S6 projectile in the delayed callback. | PASS with six spikes |
-| II. Ask, Never Assume | The product questions were answered in the spec's clarifications. Two items return to the operator: the FR-004 amendment (R18) and the map-zone rotation finding (R12). Every spike's failure has a planned fallback, and the result is recorded. | PASS |
+| II. Ask, Never Assume | The product questions were answered in the spec's clarifications. The two items that returned to the operator are decided (2026-10-31): the FR-004 amendment (R18) and the map-zone rotation finding (R12). Every spike's failure has a planned fallback, and the result is recorded. | PASS |
 | III. KISS | One component, one writer, one status line, one persistent record. Direct calls from the addon's existing choke points rather than an event bus. A diff instead of marker hooks. One service process per server, polling, standard library only. | PASS |
 | IV. YAGNI | One recorder setting (`Enabled`). The service settings are each required by FR-028, plus the optional metrics path required by FR-036. No sampling knobs, no live view, no in-game viewer, no extra record types beyond the spec. | PASS |
 | V. Replication | No replicated value, no `RplSave`/`RplLoad` change, no broadcast. One client-to-server request `RpcAsk_ReplayStatus` (no arguments, admin re-checked on the server) and one owner reply `RpcDo_ReplayStatus` (six values). Visibility: admin only, the requesting player, on demand. Everything else is server-local. | PASS |
@@ -357,10 +357,9 @@ it is built and deployed apart from the addon.
 - **Game host:** install the `ll-uplink` binary from a release, write one config file
   per game server (owner-only), run it under the service manager. The website provides the
   server identity and secret.
-- **Decide:** accept or reject the FR-004 amendment (format version instead of addon
-  version, R18); open, needed before the header is written.
-- **Decided 2026-10-31:** the server-owner setup text lives in `uplink/README.md`; the
-  map-zone rotation finding (R12) is fixed in a separate change after this feature.
+- **Decided 2026-10-31:** the header carries the format version only and FR-004 is
+  amended (R18); the server-owner setup text lives in `uplink/README.md`; the map-zone
+  rotation finding (R12) is fixed in a separate change after this feature.
 
 ## Constitution Check (post-design)
 

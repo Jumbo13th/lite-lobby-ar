@@ -93,6 +93,10 @@ only sends, so neither the game nor the host gains a way in.
   freeze areas, restricted areas) with the sides allowed to see them? → A: Yes: every
   mission-maker map area with its outline, label, colour, the sides allowed to see it, and
   when it appears or disappears.
+- Q: Should the header carry the addon's version as well as the format version? → A: The
+  format version only. The game cannot report an addon's version at runtime, and a
+  hand-bumped constant could mislabel files; any change to what a record means raises the
+  format version instead.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -326,9 +330,9 @@ configured, with it unconfigured, and as a non-admin.
   identity the statistics files carry, whether or not statistics are enabled, and MUST
   keep it across a crash-resume.
 - **FR-004**: Every segment file of a recording MUST begin with the recording's header,
-  naming the mission, its author, the terrain and its bounds, the in-game date and time of day, the real start time in UTC,
-  every side with its name and colour, the addon version and the recording format
-  version.
+  naming the mission, its author, the terrain and its bounds, the in-game date and time
+  of day, the real start time in UTC, every side with its name and colour, and the
+  recording format version.
 - **FR-005**: A recording MUST hold the roster: every slot's side, squad callsign as the
   game shows it, role name and occupant by displayed name; and every change of occupant,
   connection state and controller (joins, leaves, reconnects, slot moves, Game Master
@@ -388,7 +392,9 @@ configured, with it unconfigured, and as a non-admin.
   wrote it has stopped. A final file MUST never change afterwards.
 - **FR-020**: The format MUST be versioned, documented in this repository, readable by a
   person with a text editor, and skippable record by record, so that a reader ignores
-  record types it does not know.
+  record types it does not know. The format version MUST be raised whenever the meaning of
+  a record changes, so that a reader can recognise and work around files written by a
+  faulty release by their format version alone.
 - **FR-021**: Identity GUIDs MUST NOT appear in the segment files. The link
   between a recording's players and their identities, which a website needs to match
   statistics, MUST be written to a separate identity file per recording.
