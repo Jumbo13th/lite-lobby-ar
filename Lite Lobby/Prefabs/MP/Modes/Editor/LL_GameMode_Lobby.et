@@ -84,6 +84,8 @@ LL_GameModeCoop : "{0F307326459A1395}Prefabs/MP/Modes/GameMode_Base.et" {
   LL_PlayerVerificationComponent "{69DD1DAC84FD544D}" {
    m_bUseWebsiteMock 0
   }
+  LL_ReplayRecorderComponent "{6AE6272DD9E6B8A2}" {
+  }
   LL_SpawnMarkers "{69A12AC4C6827AAB}" {
    m_sQuadName "squad"
    m_fWorldSize 10

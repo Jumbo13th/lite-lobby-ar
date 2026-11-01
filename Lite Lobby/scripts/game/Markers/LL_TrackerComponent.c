@@ -122,6 +122,8 @@ class LL_TrackerComponent : ScriptComponent
 		LL_TrackerManager mgr = LL_TrackerManager.GetInstance();
 		if (mgr)
 			mgr.OnTrackerAdded(this);
+
+		LL_ReplayRecorderComponent.RecordTrackerAdded_S(this);
 	}
 
 	override void OnDelete(IEntity owner)

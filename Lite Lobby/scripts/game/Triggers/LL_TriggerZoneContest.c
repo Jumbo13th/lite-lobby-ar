@@ -301,6 +301,8 @@ class LL_TriggerZoneContest : LL_TriggerZoneBase
 		if (stats)
 			stats.NotifyZoneOwnerChanged(this, m_sHolder);
 
+		LL_ReplayRecorderComponent.RecordZoneHolder_S(this, m_sHolder);
+
 		AnnounceFlip();
 	}
 
