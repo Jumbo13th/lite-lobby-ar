@@ -136,7 +136,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! The client must refuse too because the stock drag writes the new position locally
 	//! before asking the server; with the RPC dropped a spectator could redraw the plan
 	//! for themselves.
-	protected bool LL_CanEditMarkers()
+	bool LL_CanEditMarkers()
 	{
 		// The spectator map is read-only outright; the death → spectator handover does
 		// not land in one frame.
@@ -171,6 +171,9 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! re-asserts its own screen position every frame otherwise.
 	override protected void OnDragWidget(Widget widget)
 	{
+		if (m_MapEntity.LL_IsPaintToolEnabled())
+			return;
+
 		if (!LL_CanEditMarkers())
 			return;
 
@@ -199,6 +202,9 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! Removal is intel too; the server refuses it from a spectator.
 	override protected void OnInputMarkerDelete(float value, EActionTrigger reason)
 	{
+		if (m_MapEntity.LL_IsPaintToolEnabled())
+			return;
+
 		if (!LL_CanEditMarkers())
 			return;
 
@@ -208,6 +214,9 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! Own placed marker → edit dialog; empty map → double-click → place dialog.
 	override protected void OnInputMapSelect(float value, EActionTrigger reason)
 	{
+		if (m_MapEntity.LL_IsPaintToolEnabled())
+			return;
+
 		if (!LL_CanEditMarkers())
 			return;
 
@@ -483,7 +492,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		if (!m_MarkerMgr)
 			return;
 
-		bool wanted = GetGame().GetInputManager().GetActionValue("LL_MapMarkerInfo") > 0;
+		bool wanted = !m_MapEntity.LL_IsPaintToolEnabled() && GetGame().GetInputManager().GetActionValue("LL_MapMarkerInfo") > 0;
 		if (wanted == m_bLLAgesShown)
 			return;
 
