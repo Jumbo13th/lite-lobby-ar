@@ -117,8 +117,8 @@ Kinds: `man`, `car`, `truck`, `apc`, `tracked`, `heli`, `plane`, `static`, `mort
 `vehicle` (any other vehicle, boats included) and `tracker` (a mission-maker tracker,
 whose display name is its label).
 
-A `P` record is written when the entity moved at least 1 metre on an axis or turned at
-least 5 degrees since its previous record; characters are checked every second,
+A `P` record is written when the entity moved at least 1 metre east or north, 2 metres in
+height, or turned at least 5 degrees since its previous record; characters are checked every second,
 vehicles and trackers every half second. Between records a reader interpolates.
 
 ## Combat

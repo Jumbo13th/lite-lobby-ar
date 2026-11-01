@@ -551,6 +551,18 @@ class LL_ReplayEntities : Managed
 			Remove(record);
 	}
 
+	//! A tracker already recorded is left alone.
+	void TrackerAdded_S(notnull LL_TrackerComponent tracker)
+	{
+		foreach (LL_ReplayEntityRecord record : m_aVehicles)
+		{
+			if (record.m_Tracker == tracker)
+				return;
+		}
+
+		AddTracker_S(tracker);
+	}
+
 	protected void AddTracker_S(notnull LL_TrackerComponent tracker)
 	{
 		LL_TrackerData data = new LL_TrackerData();
@@ -737,8 +749,10 @@ class LL_ReplayEntities : Managed
 		if (!lobby)
 			return;
 
+		set<int> present = new set<int>();
 		foreach (LL_SlotData slot : lobby.GetSlots())
 		{
+			present.Insert(slot.m_iSortKey);
 			int gid = GroupId(slot.m_iGroupId, slot.m_sFactionKey, slot.m_sGroupName);
 			string slotLine = string.Format("S %1 %2 %3 %4", slot.m_iSortKey, LL_ReplayWriter.IntOr(gid, gid > 0),
 				LL_ReplayWriter.Tok(slot.m_sFactionKey), LL_ReplayWriter.Str(slot.m_sName));
@@ -757,6 +771,21 @@ class LL_ReplayEntities : Managed
 				m_mOccupantBySlot.Set(slot.m_iSortKey, occupant);
 				m_Writer.Add(string.Format("O %1 %2", slot.m_iSortKey, LL_ReplayWriter.IntOr(occupant, occupant > 0)));
 			}
+		}
+
+		// Slots the lobby removed, such as the unused ones deleted at the game start, drop out of
+		// the roster so that snapshots stop restating them.
+		array<int> gone = {};
+		foreach (int slotKey, string knownLine : m_mSlotLines)
+		{
+			if (!present.Contains(slotKey))
+				gone.Insert(slotKey);
+		}
+
+		foreach (int goneKey : gone)
+		{
+			m_mSlotLines.Remove(goneKey);
+			m_mOccupantBySlot.Remove(goneKey);
 		}
 	}
 

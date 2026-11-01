@@ -517,6 +517,22 @@ in a separate change after this feature (T057).
 
 ---
 
+## Review fixes (pull request review, 2026-11-01)
+
+- [X] T058 [US2] A second crash before the next session save resumes from the same point again: the resume takes the next unused segment number instead of appending to the attempt in between (`LL_ReplayRecorderComponent.Resume_S`, `LL_ReplayWriter.SegmentPath`).
+- [X] T059 [US1] Zone holders are read every second and written when they change, and a capture writes its new holder at once: a capture zone no longer restates its defender after the capture, and a contest zone records the defender its trigger sets on activation (`LL_ReplayMap`).
+- [X] T060 [US1] A followed projectile is dropped after 20 seconds without a detonation, so a smoke canister lying on as an item neither holds one of the 32 slots nor ends in a blast when it is cleared away (`LL_ReplayCombat.FollowStep_S`).
+- [X] T061 [US1] A detonation names the weapon of the followed projectile it came from, else the shooter's weapon only when it fired within the last 10 seconds, else none; turret and mortar blasts are no longer put down to the gunner's rifle (`LL_ReplayCombat.OnExplosionAmmoEffect`).
+- [X] T062 [US1] A clean stop during a snapshot finishes the snapshot first, so the records it held and `STOP` reach the file (`LL_ReplayRecorderComponent.OnGameEnd`).
+- [X] T063 [US1] Trackers spawned after the recording started are recorded (`LL_TrackerComponent` → `LL_ReplayRecorderComponent.RecordTrackerAdded_S`).
+- [X] T064 [US1] Underbarrel launcher rounds are followed: the follow decision uses the shot kind, which reads the muzzle (`LL_ReplayCombat.OnShot`).
+- [X] T065 [US1] An anchor that falls due during a snapshot is written when the snapshot ends, keeping anchors at most 10 seconds apart as the format promises (`LL_ReplayWriter`).
+- [X] T066 [US1] Slots the lobby removed, such as the unused ones deleted at the game start, drop out of the roster, so snapshots stop restating them (`LL_ReplayEntities.PollRoster_S`).
+- [X] T067 contracts/recording-format.md: a position is written after 1 metre east or north or 2 metres in height, as the recorder does; height wobbles on uneven ground and no reader draws it.
+- [ ] T068 Operator: compile in Workbench, then re-run quickstart Scenarios 2 and 3 with a zone capture, a contest zone, a smoke grenade and a second crash before the next session save.
+
+Not changed, by decision: a pending resume holds every unfinished game (R17); the recorder keeps its own copy of the session identity (C2) and `IsShownNow` mirrors the map zones' rule (C3); retention hashes only expired games whose files changed since their last post.
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

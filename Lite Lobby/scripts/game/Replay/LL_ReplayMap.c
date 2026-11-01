@@ -97,6 +97,16 @@ class LL_ReplayMap : Managed
 			m_aAreaShown[i] = shown;
 			m_Writer.Add(AreaVisibilityLine(i + 1, shown));
 		}
+
+		// A capture zone's holder follows its capture and a contest zone takes its defender only
+		// when its trigger activates, neither through the recorder, so holders are read here.
+		int zoneCount = m_aZones.Count();
+		for (int z = 0; z < zoneCount; z++)
+		{
+			LL_TriggerZoneBase zone = m_aZones[z];
+			if (zone)
+				UpdateHolder_S(z, zone.GetZoneHolderFaction());
+		}
 	}
 
 	void WriteSnapshot_S()
@@ -133,12 +143,21 @@ class LL_ReplayMap : Managed
 			return;
 
 		m_Writer.Add(string.Format("ZC %1 %2", index + 1, LL_ReplayWriter.Tok(side)));
+		UpdateHolder_S(index, side);
 	}
 
 	void RecordZoneHolder_S(LL_TriggerZoneBase zone, string holder)
 	{
 		int index = m_aZones.Find(zone);
 		if (index < 0)
+			return;
+
+		UpdateHolder_S(index, holder);
+	}
+
+	protected void UpdateHolder_S(int index, string holder)
+	{
+		if (holder == m_aZoneHolders[index])
 			return;
 
 		m_aZoneHolders[index] = holder;

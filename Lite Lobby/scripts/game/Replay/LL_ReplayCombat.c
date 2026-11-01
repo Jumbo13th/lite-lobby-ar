@@ -26,6 +26,7 @@ class LL_ReplayCombat : Managed
 	protected static const int MAX_FOLLOWED = 32;
 	protected static const float WEAPON_MEMORY_MS = 10000;
 	protected static const float SAME_DETONATION_MS = 500;
+	protected static const float FOLLOW_MS = 20000;
 
 	protected LL_ReplayWriter m_Writer;
 	protected LL_ReplayEntities m_Entities;
@@ -89,24 +90,13 @@ class LL_ReplayCombat : Managed
 
 		float now = GetGame().GetWorld().GetWorldTime();
 		int wid = WeaponId(weapon);
-		CountShots(eid, shooter, projectile, wid, ShotKind(weapon, null, wid, grenade), 1, now);
+		string kind = ShotKind(weapon, null, wid, grenade);
+		CountShots(eid, shooter, projectile, wid, kind, 1, now);
 		m_iPlayerShots++;
 
-		if (!projectile)
-			return;
-
-		if (grenade)
-		{
-			Follow(projectile, "grenade", eid, wid, now);
-			return;
-		}
-
-		string type;
-		m_mWeaponTypeByWid.Find(wid, type);
-		if (type == "rocketlauncher")
-			Follow(projectile, "rocket", eid, wid, now);
-		else if (type == "grenadelauncher")
-			Follow(projectile, "grenade", eid, wid, now);
+		// By muzzle as well as weapon type, so an underbarrel launcher's rounds are followed too.
+		if (projectile && (kind == "grenade" || kind == "rocket"))
+			Follow(projectile, kind, eid, wid, now);
 	}
 
 	//! The server raises no shot event for AI fire, so an AI character's shots are counted from
@@ -284,20 +274,49 @@ class LL_ReplayCombat : Managed
 		if (!m_bListening)
 			return;
 
+		float now = GetGame().GetWorld().GetWorldTime();
 		int shooterEid = m_Entities.EidOf(instigator.GetInstigatorEntity());
 		int wid = -1;
 		string kind;
-		if (shooterEid > 0)
+		// A followed projectile names its own weapon. Otherwise only a shot of the last seconds is
+		// trusted: turret and mortar fire is not recorded, and its blasts would go to the gunner's rifle.
+		LL_ReplayFollowed source = FollowedOf(damageSource);
+		if (source)
 		{
-			m_mLastWidByShooter.Find(shooterEid, wid);
-			m_mLastKindByShooter.Find(shooterEid, kind);
-			m_mLastExplosionByShooter.Set(shooterEid, GetGame().GetWorld().GetWorldTime());
+			wid = source.m_iWid;
+			kind = source.m_sKind;
 		}
+		else if (shooterEid > 0)
+		{
+			float shotTime;
+			if (m_mLastShotTimeByShooter.Find(shooterEid, shotTime) && now - shotTime <= WEAPON_MEMORY_MS)
+			{
+				m_mLastWidByShooter.Find(shooterEid, wid);
+				m_mLastKindByShooter.Find(shooterEid, kind);
+			}
+		}
+
+		if (shooterEid > 0)
+			m_mLastExplosionByShooter.Set(shooterEid, now);
 
 		if (kind == "")
 			kind = KindForWeapon(wid);
 
 		WriteDetonation(outMat[0], kind, shooterEid, wid);
+	}
+
+	protected LL_ReplayFollowed FollowedOf(IEntity entity)
+	{
+		if (!entity)
+			return null;
+
+		foreach (LL_ReplayFollowed followed : m_aFollowed)
+		{
+			if (followed.m_Entity == entity)
+				return followed;
+		}
+
+		return null;
 	}
 
 	protected void Follow(IEntity projectile, string kind, int shooterEid, int wid, float now)
@@ -329,6 +348,14 @@ class LL_ReplayCombat : Managed
 			LL_ReplayFollowed followed = m_aFollowed[i];
 			if (followed.m_Entity)
 			{
+				// What has not gone off by now never will: a smoke grenade's canister lies on as an item
+				// until it is cleared away, and must neither hold a slot nor end in a blast.
+				if (now - followed.m_fShotTime > FOLLOW_MS)
+				{
+					m_aFollowed.Remove(i);
+					continue;
+				}
+
 				vector position = followed.m_Entity.GetOrigin();
 				ProjectileMoveComponent move = ProjectileMoveComponent.Cast(followed.m_Entity.FindComponent(ProjectileMoveComponent));
 				if (move)

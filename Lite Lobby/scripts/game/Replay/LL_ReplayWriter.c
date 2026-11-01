@@ -24,6 +24,7 @@ class LL_ReplayWriter : Managed
 	protected int m_iLastWrittenT = -1;
 	protected bool m_bClockHeld;
 	protected int m_iLastAnchorUnix;
+	protected bool m_bAnchorDue;
 
 	protected bool m_bFailed;
 	protected int m_iBytes;
@@ -32,11 +33,16 @@ class LL_ReplayWriter : Managed
 	protected int m_iFlushMsMax;
 	protected ref map<string, int> m_mTypeCounts = new map<string, int>();
 
+	static string SegmentPath(string session, int segment)
+	{
+		return string.Format("%1/%2-%3.llr", FOLDER, session, segment);
+	}
+
 	void Begin(string session, int segment)
 	{
 		m_sSession = session;
 		m_iSegment = segment;
-		m_sPath = string.Format("%1/%2-%3.llr", FOLDER, session, segment);
+		m_sPath = SegmentPath(session, segment);
 		m_sIdentityPath = string.Format("%1/%2-identities.txt", FOLDER, session);
 		m_aLines.Clear();
 		m_iWritten = 0;
@@ -97,6 +103,9 @@ class LL_ReplayWriter : Managed
 
 		m_aHeldT.Clear();
 		m_aHeldLines.Clear();
+
+		if (m_bAnchorDue)
+			Anchor();
 	}
 
 	//! While the mission clock stands still, records share one time; an anchor per new
@@ -108,8 +117,14 @@ class LL_ReplayWriter : Managed
 
 	void Anchor()
 	{
+		// Written once the snapshot ends, so anchors stay at most ten seconds apart.
 		if (m_bSnapshot)
+		{
+			m_bAnchorDue = true;
 			return;
+		}
+
+		m_bAnchorDue = false;
 
 		m_iLastAnchorUnix = System.GetUnixTime();
 		Push(string.Format("U %1 %2", m_iLastAnchorUnix, m_iTime));

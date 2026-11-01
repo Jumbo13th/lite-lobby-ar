@@ -114,6 +114,13 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 			return;
 
 		m_bStopWritten = true;
+		// A snapshot holds every record made while it is built; finished first, or the stop and
+		// those records would never reach the file.
+		while (m_iSnapshotCursor >= 0)
+		{
+			SnapshotStep_S();
+		}
+
 		AddNow("STOP shutdown");
 		StopParts_S();
 		FlushAll_S();
@@ -261,6 +268,17 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 		recorder.m_Map.RecordZoneHolder_S(zone, holder);
 	}
 
+	//! Trackers present at the start are collected by the recorder itself; this takes the ones spawned later.
+	static void RecordTrackerAdded_S(LL_TrackerComponent tracker)
+	{
+		LL_ReplayRecorderComponent recorder = s_Instance;
+		if (!recorder || recorder.m_iState != STATE_RECORDING || !tracker)
+			return;
+
+		recorder.m_Writer.SetTime(recorder.CurrentT());
+		recorder.m_Entities.TrackerAdded_S(tracker);
+	}
+
 	protected bool LoadConfig()
 	{
 		if (!FileIO.FileExists(CONFIG_PATH))
@@ -301,7 +319,15 @@ class LL_ReplayRecorderComponent : SCR_BaseGameModeComponent
 		{
 			m_Entities.RestoreContinuation(continuation);
 			m_Combat.RestoreContinuation(continuation);
-			StartRecording_S(continuation.session, continuation.segment + 1, continuation.snapshotT);
+			// The resume point is saved only with a session save, so a second crash before the next
+			// save resumes from the same point again; the attempt in between keeps its file.
+			int segment = continuation.segment + 1;
+			while (FileIO.FileExists(LL_ReplayWriter.SegmentPath(continuation.session, segment)))
+			{
+				segment++;
+			}
+
+			StartRecording_S(continuation.session, segment, continuation.snapshotT);
 			return;
 		}
 
