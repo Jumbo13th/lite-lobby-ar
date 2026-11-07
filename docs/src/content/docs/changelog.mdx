@@ -5,17 +5,21 @@ description: What changed in each Lite Lobby version on the Workshop.
 
 What changed in each [Lite Lobby version on the Workshop](https://reforger.armaplatform.com/workshop/699319AAA5BFC57F), newest first.
 
-## 1.1.0 {#v1-1-0}
+## 1.1.1 {#v1-1-1}
+
+- Requires game version 1.9.
+- Fixed voice in the lobby, the briefing and spectator being silent on game version 1.9.
+- Fixed a player who died while talking on the radio, for example in a vehicle, staying on the air.
+- Dead players no longer hear their squad's radio: the radios on a dead body are switched off, so a looted radio has to be turned on in the radio menu.
+- Fixed the canteen's stamina boost (new in game version 1.9) doing nothing after a hard freeze: the boost now works again when the hard freeze ends.
+- Fixed the **Type** and **Color** lists in the **Insert marker** dialog showing no icons.
+
+## 1.1.0 — 1 November 2026 {#v1-1-0}
 
 - Added `LL_ReplayRecorderComponent`: the server records every game into `$profile:LL_Replays/` once `$profile:LL_Replays.json` contains `"Enabled": true`. A game continued after a crash goes on in the next file of the same recording.
 - Added the admin chat command `/replay`: whether the server is recording, the recording's name, its length and its size.
 - Added `ll-uplink`, a program for the game host that sends finished recordings and the statistics files to a configured website.
 - Fixed extra AI members appearing after a session resume in groups spawned during the game, for example by the Game Master.
-- Fixed the canteen's stamina boost (new in game version 1.9) doing nothing after a hard freeze: the boost now works again when the hard freeze ends.
-- Fixed voice in the lobby, the briefing and spectator being silent on game version 1.9.
-- Fixed a player who died while talking on the radio, for example in a vehicle, staying on the air.
-- Dead players no longer hear their squad's radio: the radios on a dead body are switched off, so a looted radio has to be turned on in the radio menu.
-- Fixed the **Type** and **Color** lists in the **Insert marker** dialog showing no icons.
 
 ## 1.0.9 — 30 October 2026 {#v1-0-9}
 
