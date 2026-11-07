@@ -8,7 +8,6 @@ class LL_MenuVoN
 	protected static ref LL_MenuVoN s_Instance;
 
 	protected SCR_VoNComponent m_VoNComp;
-	protected BaseTransceiver m_Transceiver;
 	protected bool m_bActive;
 	protected bool m_bEditorSubscribed;
 
@@ -49,11 +48,6 @@ class LL_MenuVoN
 			Activate(pc);
 		else
 			Deactivate();
-
-		// The local copy of the menu radio follows speaker-ness like the server's does.
-		LL_VoNChannelsManager vonMgr = LL_VoNChannelsManager.GetInstance();
-		if (vonMgr)
-			vonMgr.ApplyRadioKey(pc.GetPlayerId());
 	}
 
 	// An opened editor connects its own component for the same player id; two connected
@@ -109,9 +103,20 @@ class LL_MenuVoN
 		// capture on that component, which after death is the corpse (transmit icon shows,
 		// nobody hears) and after closing Game Master the disconnected editor component.
 		// Vanilla re-sets it on possession and editor open, so this is self-healing.
+		// Vanilla stops a transmission only on the component it holds; once detached nothing
+		// else would, so a radio keyed at death would stay on the air.
 		SCR_VONController vonController = SCR_VONController.Cast(pc.FindComponent(SCR_VONController));
-		if (vonController && vonController.GetVONComponent())
-			vonController.SetVONComponent(null);
+		if (vonController)
+		{
+			SCR_VoNComponent held = vonController.GetVONComponent();
+			if (held)
+			{
+				held.SetCapture(false);
+				vonController.SetVONComponent(null);
+			}
+		}
+
+		SilenceCorpse(pc.GetControlledEntity());
 
 		IEntity proxy = LL_VoNProxyComponent.GetProxyEntity(pc.GetPlayerId());
 		if (!proxy)
@@ -142,15 +147,10 @@ class LL_MenuVoN
 		}
 
 		m_VoNComp = vonComp;
-		m_Transceiver = radio.GetTransceiver(0);
 
 		// Required: without this the engine never starts capture for a component that is
 		// not on the controlled entity.
 		m_VoNComp.ConnectEditorToVoNSystem(pc.GetPlayerId());
-
-		// Armed on the radio for reception as well, not only while the talk key is held.
-		m_VoNComp.SetCommMethod(ECommMethod.SQUAD_RADIO);
-		m_VoNComp.SetTransmitRadio(m_Transceiver);
 
 		InputManager inputManager = GetGame().GetInputManager();
 		inputManager.AddActionListener("VONDirect", EActionTrigger.DOWN, OnTalkDown);
@@ -158,6 +158,59 @@ class LL_MenuVoN
 
 		m_bActive = true;
 		Print("[LL_VoN] MenuVoN: activated", LogLevel.NORMAL);
+	}
+
+	// The body stays its player's controlled entity after death, which kept it on the squad
+	// net two ways: capture left on one of its voice components (dying mid-transmission, seen
+	// in vehicles, on a component the controller no longer holds) and powered radios that
+	// keep receiving. The dead hear their voice rooms only.
+	protected void SilenceCorpse(IEntity controlled)
+	{
+		ChimeraCharacter corpse = ChimeraCharacter.Cast(controlled);
+		if (!corpse)
+			return;
+
+		CharacterControllerComponent characterController = corpse.GetCharacterController();
+		if (!characterController || !characterController.IsDead())
+			return;
+
+		array<Managed> components = {};
+		corpse.FindComponents(SCR_VoNComponent, components);
+		foreach (Managed component : components)
+		{
+			SCR_VoNComponent vonComp = SCR_VoNComponent.Cast(component);
+			if (vonComp)
+				vonComp.SetCapture(false);
+		}
+
+		// The radio menu's own power toggle (SCR_VONEntryRadio.ToggleEntry), so the server
+		// stops routing the net to this player; a looted radio comes up switched off.
+		SCR_GadgetManagerComponent gadgetManager = SCR_GadgetManagerComponent.GetGadgetManager(corpse);
+		if (!gadgetManager)
+			return;
+
+		array<SCR_GadgetComponent> radios = {};
+		array<SCR_GadgetComponent> found = gadgetManager.GetGadgetsByType(EGadgetType.RADIO);
+		if (found)
+			radios.InsertAll(found);
+
+		found = gadgetManager.GetGadgetsByType(EGadgetType.RADIO_BACKPACK);
+		if (found)
+			radios.InsertAll(found);
+
+		foreach (SCR_GadgetComponent gadget : radios)
+		{
+			// The death handler stops this list following the inventory, so it still names
+			// radios a teammate has since looted; the gadget's own carrier says who has it now
+			// (GetRootParent would answer the vehicle for a seated body).
+			SCR_RadioComponent radioGadget = SCR_RadioComponent.Cast(gadget);
+			if (!radioGadget || radioGadget.GetCharacterOwner() != corpse)
+				continue;
+
+			BaseRadioComponent radio = radioGadget.GetRadioComponent();
+			if (radio && radio.IsPowered())
+				radio.SetPower(false);
+		}
 	}
 
 	protected void Deactivate()
@@ -176,7 +229,6 @@ class LL_MenuVoN
 		}
 
 		m_VoNComp = null;
-		m_Transceiver = null;
 		m_bActive = false;
 		Print("[LL_VoN] MenuVoN: deactivated", LogLevel.NORMAL);
 	}
@@ -186,9 +238,8 @@ class LL_MenuVoN
 		if (!m_bActive || !m_VoNComp)
 			return;
 
-		// Direct, not radio: since 1.8 an editor-connected component transmits only through
-		// the Game Master pipeline, which ignores the tuned transceiver; rooms are carried
-		// by the virtual positions from GetEditorWorldLocation.
+		// Direct, not radio: an editor-connected component transmits only through the Game
+		// Master pipeline, which ignores the transceiver; rooms are where the proxies stand.
 		m_VoNComp.SetCommMethod(ECommMethod.DIRECT);
 		m_VoNComp.SetTransmitRadio(null);
 		m_VoNComp.SetCapture(true);

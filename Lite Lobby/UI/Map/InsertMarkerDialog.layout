@@ -181,7 +181,7 @@ FrameWidgetClass {
          m_sLabel "#LL-InsertMarker_Type"
          m_fSizeWithLabel 44
          m_sLabelLayout "{1D23A7B8C9D0E1F2}UI/Map/MarkerDialogLabel.layout"
-         m_sElementLayout "{F84B269BBA680B3E}UI/layouts/WidgetLibrary/ComboBox/Elements/WLib_ComboBoxElementIcon.layout"
+         m_sElementLayout "{8D4C9DF8998874EC}UI/layouts/WidgetLibrary/ComboBox/Elements/WLib_ComboBoxElementIcon.layout"
         }
        }
       }
@@ -197,7 +197,7 @@ FrameWidgetClass {
          m_sLabel "#LL-InsertMarker_Color"
          m_fSizeWithLabel 44
          m_sLabelLayout "{1D23A7B8C9D0E1F2}UI/Map/MarkerDialogLabel.layout"
-         m_sElementLayout "{F84B269BBA680B3E}UI/layouts/WidgetLibrary/ComboBox/Elements/WLib_ComboBoxElementIcon.layout"
+         m_sElementLayout "{8D4C9DF8998874EC}UI/layouts/WidgetLibrary/ComboBox/Elements/WLib_ComboBoxElementIcon.layout"
         }
        }
       }
