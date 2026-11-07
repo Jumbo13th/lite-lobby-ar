@@ -56,10 +56,10 @@ class LL_VoNProxyComponent : ScriptComponent
 		s_mByPlayerId.Set(m_iPlayerId, this);
 
 		// On clients the proxy can stream in after the channel data arrived (JIP);
-		// registration is the one reliable "this radio exists now" hook.
+		// registration is the one reliable "this proxy exists now" hook.
 		LL_VoNChannelsManager vonMgr = LL_VoNChannelsManager.GetInstance();
 		if (vonMgr)
-			vonMgr.ApplyRadioKey(m_iPlayerId);
+			vonMgr.PlaceProxy(m_iPlayerId);
 	}
 
 	override void OnDelete(IEntity owner)
