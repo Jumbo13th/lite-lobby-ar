@@ -1,6 +1,127 @@
 StringTable {
  ItemClassName "CustomStringTableItem"
  Items {
+  CustomStringTableItem "{4903E61E06E5DF32}" {
+   Id "LL-MapPaint_Brush"
+   Target_en_us "Brush (1)"
+   Target_ru_ru "Кисть (1)"
+  }
+  CustomStringTableItem "{AA2EC33661F98669}" {
+   Id "LL-MapPaint_Line"
+   Target_en_us "Straight line (2)"
+   Target_ru_ru "Прямая линия (2)"
+  }
+  CustomStringTableItem "{43DF18FD7C87586F}" {
+   Id "LL-MapPaint_Circle"
+   Target_en_us "Circle (3)"
+   Target_ru_ru "Окружность (3)"
+  }
+  CustomStringTableItem "{81E7F34DBE301DA1}" {
+   Id "LL-MapPaint_Anchor"
+   Target_en_us "Anchor line (Left Ctrl)"
+   Target_ru_ru "Ломаная линия (левый Ctrl)"
+  }
+  CustomStringTableItem "{F1F347B9239CAF04}" {
+   Id "LL-MapPaint_Eraser"
+   Target_en_us "Eraser (Shift)"
+   Target_ru_ru "Ластик (Shift)"
+  }
+  CustomStringTableItem "{44C5610EE2CDBF52}" {
+   Id "LL-MapPaint_Color"
+   Target_en_us "Drawing color (C)"
+   Target_ru_ru "Цвет рисования (C)"
+  }
+  CustomStringTableItem "{20E83ED04696C9DD}" {
+   Id "LL-MapPaint_Loading"
+   Target_en_us "Loading history..."
+   Target_ru_ru "Загрузка истории..."
+  }
+  CustomStringTableItem "{5AB2BFD23754F6FF}" {
+   Id "LL-MapPaint_Unavailable"
+   Target_en_us "History is unavailable. Reopen to retry."
+   Target_ru_ru "История недоступна. Откройте её снова."
+  }
+  CustomStringTableItem "{3D7EB6FA9BAAEF23}" {
+   Id "LL-MapPaint_Timeout"
+   Target_en_us "History request timed out. Reopen to retry."
+   Target_ru_ru "История не загрузилась. Откройте её снова."
+  }
+  CustomStringTableItem "{8F481C190741A053}" {
+   Id "LL-MapPaint_Empty"
+   Target_en_us "No changes in the last 5 minutes."
+   Target_ru_ru "За последние 5 минут изменений нет."
+  }
+  CustomStringTableItem "{A70C55E136E1B06A}" {
+   Id "LL-MapPaint_NotReady"
+   Target_en_us "Drawing data is not ready"
+   Target_ru_ru "Рисунки ещё не загружены"
+  }
+  CustomStringTableItem "{4DA2330FE78E0F35}" {
+   Id "LL-MapPaint_NoManager"
+   Target_en_us "No marker manager"
+   Target_ru_ru "Система маркеров недоступна"
+  }
+  CustomStringTableItem "{77238D42D8C1D50F}" {
+   Id "LL-MapPaint_NoFaction"
+   Target_en_us "No faction assigned"
+   Target_ru_ru "Сторона не выбрана"
+  }
+  CustomStringTableItem "{3861F2599F993C00}" {
+   Id "LL-MapPaint_NoSync"
+   Target_en_us "No MapMarkerSync component"
+   Target_ru_ru "Синхронизация маркеров недоступна"
+  }
+  CustomStringTableItem "{8F65C4146AE69587}" {
+   Id "LL-MapPaint_Waiting"
+   Target_en_us "Waiting for server snapshot"
+   Target_ru_ru "Ожидание рисунков с сервера"
+  }
+  CustomStringTableItem "{FE735DE07029BFFB}" {
+   Id "LL-MapPaint_HistoryBrush"
+   Target_en_us "%1 - Drew with the brush"
+   Target_ru_ru "%1 — рисование кистью"
+  }
+  CustomStringTableItem "{0CE8AFC086684D91}" {
+   Id "LL-MapPaint_HistoryLine"
+   Target_en_us "%1 - Drew a straight line"
+   Target_ru_ru "%1 — прямая линия"
+  }
+  CustomStringTableItem "{350A8EDF0DC85566}" {
+   Id "LL-MapPaint_HistoryCircle"
+   Target_en_us "%1 - Drew a circle"
+   Target_ru_ru "%1 — окружность"
+  }
+  CustomStringTableItem "{EA9E5874F696C688}" {
+   Id "LL-MapPaint_HistoryAnchor"
+   Target_en_us "%1 - Drew an anchor line"
+   Target_ru_ru "%1 — ломаная линия"
+  }
+  CustomStringTableItem "{3EAB984DF6D24AEA}" {
+   Id "LL-MapPaint_HistoryErase"
+   Target_en_us "%1 - Erased drawings"
+   Target_ru_ru "%1 — стирание рисунков"
+  }
+  CustomStringTableItem "{F2320ABE4C55CBC2}" {
+   Id "LL-MapPaint_HistoryEraseAuthor"
+   Target_en_us "%1 - Erased drawings by %2"
+   Target_ru_ru "%1 — стирание рисунков игрока %2"
+  }
+  CustomStringTableItem "{A9515C0DE80ADC27}" {
+   Id "LL-MapPaint_UnknownPlayer"
+   Target_en_us "Unknown player"
+   Target_ru_ru "Неизвестный игрок"
+  }
+  CustomStringTableItem "{D8DACA77021162BF}" {
+   Id "LL-MapPaint_Player"
+   Target_en_us "Player %1"
+   Target_ru_ru "Игрок %1"
+  }
+  CustomStringTableItem "{C3795503B63117B9}" {
+   Id "LL-MapPaint_LocalPlayer"
+   Target_en_us "Local player"
+   Target_ru_ru "Локальный игрок"
+  }
+
   CustomStringTableItem "{1D3100000000004C}" {
    Id "LL-AdminMessage_AdminAnnouncement"
    Target_en_us "Admin Announcement"
