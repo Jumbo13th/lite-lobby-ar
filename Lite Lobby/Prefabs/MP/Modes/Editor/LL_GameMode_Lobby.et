@@ -103,6 +103,9 @@ LL_GameModeCoop : "{0F307326459A1395}Prefabs/MP/Modes/GameMode_Base.et" {
   LL_VoNChannelsManager "{699323211FCEA686}" {
    m_sVoNProxyPrefab "{434AFBBE90F2B079}Prefabs/VoN/LL_VoNProxy.et"
   }
+  SCR_AdditionalGameModeSettingsComponent "{6170E11C3C452ACC}" {
+   m_bEnableTeamKillPunishment 0
+  }
   SCR_CampaignBuildingManagerComponent "{61B4DDBF56BF1B48}" {
    m_sFreeRoamBuildingClientTrigger "{5E191CEAF4B95816}Prefabs/MP/FreeRoamBuildingClientTrigger.et"
    m_BudgetType CAMPAIGN
@@ -147,6 +150,9 @@ LL_GameModeCoop : "{0F307326459A1395}Prefabs/MP/Modes/GameMode_Base.et" {
  PlayerControllerPrefab "{50ED75DE7FEAC8FC}Prefabs/Characters/Core/DefaultPlayerControllerMP_LL.et"
  m_bAutoPlayerRespawn 0
  m_bAllowFactionChange 0
+ m_aDisabledResourceTypes {
+  SUPPLIES
+ }
  m_bHardFreezeEnabled 0
  m_bDisableChat 0
  m_bHideProximityVonUI 0
