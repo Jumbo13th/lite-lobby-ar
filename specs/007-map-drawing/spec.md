@@ -61,13 +61,25 @@ to each player of the faction when it is confirmed.
   colour-only dialog to change the colour of the line in progress.
 - Q: Does the line and its start point keep the interim look? → A: No. Their look is designed to
   match the lobby's markers in a Claude Design round; until then the interim look stays.
+- Q: Which look did the design round settle on? → A: Option A: a semi-transparent band in the
+  line's colour with a darker outline, as the marker glyphs have. The start point is the Dot
+  marker itself, always identical to a placed Dot marker of that colour (same glyph, same size on
+  the screen at every zoom, label in the same place), so the two never drift apart.
+
+### Session 2026-11-27 (second in-game test)
+
+- Q: How does the line in progress follow the zoom? → A: The whole line takes the width of the
+  zoom at the player's latest click; between clicks it scales with the map like a finished
+  line, and Enter sends the width of the latest click.
+- Q: Do the larger insert-marker dialog icons ship with this feature? → A: Yes, in the same pull
+  request: the dialog preview grows from 38 to 56 px and the list icons from 20 to 32 px.
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Draw a line and share it with the faction (Priority: P1)
 
-A squad leader on the briefing map holds Ctrl and clicks: a dot marks the start, in the colour
-last chosen in the insert-marker dialog. Every further click adds a straight segment from the
+A squad leader on the briefing map holds Ctrl and clicks: a Dot marker marks the start, in the
+colour last chosen in the insert-marker dialog. Every further click adds a straight segment from the
 previous point. Many close clicks make a curve, an arc or a circle. A double click opens the
 colour list to change the colour of the line. Enter ends the line, and it appears on the map of
 every player of the faction.
@@ -81,9 +93,9 @@ does not.
 
 **Acceptance Scenarios**:
 
-1. **Given** a player who may place markers, **When** they Ctrl + left click the map, **Then** a
-   filled dot slightly wider than a line appears under the cursor, in the colour they last
-   confirmed (the first colour of the list until they confirm one).
+1. **Given** a player who may place markers, **When** they Ctrl + left click the map, **Then** the
+   Dot marker glyph appears under the cursor, looking exactly like a placed Dot marker, in the
+   colour they last confirmed (the first colour of the list until they confirm one).
 2. **Given** a line in progress, **When** the player left clicks elsewhere, **Then** a straight
    segment joins the previous point to the click, and no marker dialog opens.
 3. **Given** a line in progress, **When** the player double clicks, **Then** no point is added and
@@ -122,13 +134,13 @@ through the whole range and pan.
 1. **Given** two lines finished at different zooms below the cap, **When** each is finished,
    **Then** both have the same width on the screen at that moment, and their widths on the ground
    differ by the zoom ratio.
-2. **Given** a line in progress, **When** the player zooms in or out, **Then** the line keeps its
-   width on the screen.
+2. **Given** a line in progress, **When** the player zooms in and clicks the next point, **Then**
+   the whole line takes the width of the new zoom; zooming alone scales it with the map.
 3. **Given** a line finished fully zoomed out, **Then** it is 50 m wide on the ground.
 4. **Given** a finished line, **When** any player zooms or pans, **Then** the line stays on its
    ground positions and its width scales with the map: zooming in on a line drawn zoomed out
-   shows a wide band, zooming out on a line drawn zoomed in shows a hairline. The start dot
-   follows the same rule.
+   shows a wide band, zooming out on a line drawn zoomed in shows a hairline. The start point
+   keeps the size of a Dot marker on the screen.
 5. **Given** a line, **When** any player looks at it at any zoom, **Then** its ground width is the
    same for every player: width belongs to the line, not to the viewer.
 6. **Given** lines cross each other, roads or markers, **Then** the map and other lines show
@@ -199,8 +211,8 @@ it; a second client switches from that faction to the other one.
   confirms the colour.
 - Enter less than two seconds after the player's previous line tells the player to wait and
   keeps the line in progress.
-- Dragging the map to pan while a line is in progress adds no point; zooming changes the line's
-  ground width so that it keeps its width on the screen.
+- Dragging the map to pan while a line is in progress adds no point; zooming leaves the line's
+  ground width as the latest click set it.
 - A request sent to the server without the map screen (a modified client) with a colour not on
   the list, too many or too few points, points outside the map, a width outside 0.1 to 50 m,
   too soon after the previous line, or without the right to draw, is refused: nothing is stored
@@ -232,11 +244,14 @@ it; a second client switches from that faction to the other one.
   starts in the colour last confirmed in that dialog, for a marker or a line; a colour confirmed
   in the double-click dialog MUST recolour the whole line in progress and become the remembered
   colour.
-- **FR-006**: While a line is in progress it MUST keep the same width on the screen at any zoom.
-  Its ground width MUST be fixed when it is finished, from the zoom at that moment, and MUST NOT
-  exceed 50 m. After that the width MUST scale with the map. The start dot MUST be slightly
-  wider than the line and follow the same rule.
-- **FR-007**: Lines MUST be semi-transparent and drawn above the map and beneath markers.
+- **FR-006**: Each click of a line in progress MUST set the whole line's ground width from the
+  zoom at that click, so that it is 2% of the screen at that moment, never more than 50 m;
+  between clicks the line scales with the map. Enter MUST send the width of the latest click.
+- **FR-007**: A line MUST be drawn as a semi-transparent band in its colour with a darker outline,
+  above the map and beneath markers. Its start point MUST be drawn exactly as a placed Dot marker
+  of the line's colour is drawn, from the same marker settings, so it has the Dot marker's glyph
+  and size on the screen at every zoom, and its Left Shift label sits where a Dot marker's label
+  sits.
 - **FR-008**: A line MUST carry no text.
 - **FR-009**: Nothing MUST be sent while a line is in progress. A confirmed line MUST be sent as
   one request, and the server MUST deliver it only to the players of the author's faction; a
@@ -301,9 +316,12 @@ it; a second client switches from that faction to the other one.
   Masters without a slot included, neither draw nor see lines.
 - A line cannot be edited; it is deleted and drawn again. There is no undo of the last point.
 - Markers and lines share the last confirmed colour.
-- On the screen, a line in progress is about 2% of the screen height wide, the start dot about
-  one and a half times the line width, at about 60% opacity. Joints between segments need not be
-  smoothed. This is the interim look until the Claude Design round settles it.
+- On the screen, a line in progress is about 2% of the screen height wide. The band is about 55%
+  opaque; its outline is a 2 px edge in the line's colour at about half its brightness, as on the
+  glyphs, drawn along the edges only so the map shows through the band. Joints between segments need not be smoothed. These values are
+  tuned in game; the look itself is the design round's option A.
+- If a mission replaces the marker icons and has no Dot glyph, the start point uses its first
+  marker icon.
 - The game's own pencil tool stays as it is: it draws for its user only and is not part of this
   feature.
 - Drawing is a keyboard-and-mouse feature; the dialog keeps its controller navigation.

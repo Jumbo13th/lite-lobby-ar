@@ -168,7 +168,9 @@ docs/src/content/docs/
    - Dialog: created and driven as `LL_MapMarkersUI` does; OK recolours the line in progress and
      stores the colour as the last confirmed one; Cancel only closes it. Drawing continues.
    - Render: rebuilds the commands when the zoom, the pan or the cache changed, or a line is in
-     progress; culls by bounding box; one origin projection per frame (research R2).
+     progress; culls by bounding box; one origin projection per frame (research R2). Each line
+     is an outline pass and a colour pass; its start point is a pooled image widget drawn as the
+     Dot marker (research R1).
    - Delete: `MapMarkerDelete` listener per research R10, then `RpcAsk_RemoveMapLine`.
    - Labels: while `LL_MapMarkerInfo` is held, one text widget per visible start dot, styled
      with the marker label constants, repositioned every frame.

@@ -55,7 +55,7 @@ Kept sorted by id. Cleared by the reset RPC, never by the client on its own.
 | Field | Type | Rule |
 |-------|------|------|
 | points | array<int> | Decimetres; 1 point after Ctrl + click, at most 64. |
-| width | float | Not stored: follows the zoom every frame, fixed on Enter (research R2). |
+| width | float | Set from the zoom at each click, sent on Enter (research R2). |
 | colour | int | The last confirmed colour; replaced by the double-click dialog's choice on OK. |
 
 Discarded on Escape, when the map closes, or when the player loses the right to draw.

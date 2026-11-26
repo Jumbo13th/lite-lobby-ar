@@ -12,13 +12,17 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 {
 	// Fixed size: content-driven sizing mismeasured the late-sizing WLib buttons.
 	protected const int DIALOG_WIDTH = 360;
-	protected const int DIALOG_HEIGHT = 338;
+	protected const int DIALOG_HEIGHT = 356;
 
 	// Dropdown lists open downward past the dialog's bottom edge.
 	protected const int DROPDOWN_RESERVE = 210;
 
-	// The rows a map line does not use: preview 66, description and type 8 + 44 each.
-	protected const int LINE_MODE_HIDDEN_HEIGHT = 170;
+	// The rows a map line does not use: preview 84, description and type 8 + 44 each.
+	protected const int LINE_MODE_HIDDEN_HEIGHT = 188;
+
+	// The stock icon element is 20 px, and the glyphs sit padded inside their squares: at that
+	// size a dot is a few pixels.
+	protected const float ROW_ICON_SIZE = 32;
 
 	protected SCR_MapMarkerEntryPlaced m_Config;
 	protected bool m_bLineMode;
@@ -346,6 +350,16 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		UpdatePreview();
 	}
 
+	protected void SetRowIconSize(notnull Widget element)
+	{
+		SizeLayoutWidget iconSize = SizeLayoutWidget.Cast(element.FindAnyWidget("IconSize"));
+		if (!iconSize)
+			return;
+
+		iconSize.SetWidthOverride(ROW_ICON_SIZE);
+		iconSize.SetHeightOverride(ROW_ICON_SIZE);
+	}
+
 	//! Paint each type row with its glyph, tinted in the currently selected color.
 	protected void OnTypeComboOpened(SCR_ComboBoxComponent combo)
 	{
@@ -369,6 +383,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 				continue;
 
 			icon.LoadImageFromSet(0, imageset, quad);
+			SetRowIconSize(element);
 			icon.SetColor(color);
 		}
 	}
@@ -394,6 +409,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 				continue;
 
 			icon.LoadImageFromSet(0, imageset, quad);
+			SetRowIconSize(element);
 			icon.SetColor(m_Config.GetColorEntry(i));
 		}
 	}

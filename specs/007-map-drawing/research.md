@@ -6,10 +6,22 @@ repository.
 
 ## R1. Drawing a thick, semi-transparent line
 
-- **Decision**: one `CanvasWidget` per map screen, one `LineDrawCommand` per line (all its
-  points, `m_fWidth` in screen pixels, colour with alpha) and one `PolygonDrawCommand` for its
-  start dot (a 16-sided circle). The canvas is the existing `UI/Map/ZoneCanvas.layout`, created
-  in the map frame when the map opens and given Z order -450.
+- **Decision**: one `CanvasWidget` per map screen and two `LineDrawCommand`s per line: the band
+  with all its points at 55% alpha, then its outline as one closed loop along both edges (each
+  vertex offset by half the width along its mitre, capped at sharp turns), 2 px wide, in the
+  colour at 53% brightness and 80% alpha (the glyph outline is the fill at 53%: 231→123,
+  236→122). An outline drawn under the whole band was tried first: the two alphas stacked to
+  about 94% and hid the map. The start point is
+  not drawn on the canvas: it is an `ImageWidget` per shown line, loaded with
+  `LoadImageFromSet(0, imageset, quad)` from the Dot entry of the placed-marker config, tinted with
+  `SetColor` and sized from that entry's `GetIconSize()` (or the marker layout's 56 px when 0),
+  which is exactly how `LL_MapMarkerEntryPlaced.InitClientSettings` and
+  `SCR_MapMarkerWidgetComponent.SetImage`/`SetColor` draw a placed marker; flags as vanilla's
+  script-made images (`BLEND | VISIBLE | STRETCH`, plus `IGNORE_CURSOR | NOFOCUS`). The canvas is
+  the existing `UI/Map/ZoneCanvas.layout`, created in the map frame when the map opens and given
+  Z order -450; start points sit at -445, labels at -440, markers at 0.
+- **Why an edge loop**: `LineDrawCommand` has outline fields, but no official script sets them to
+  anything but 0, so how the engine draws them is unknown; plain lines are the known path.
 - **Rationale**: `LineDrawCommand` (`scripts/Core/proto/EnWidgets.c`) draws a whole polyline with
   a width in one command, so 150 lines are 300 commands, not thousands of widgets. Polyzones
   already draw on that canvas layout in the map frame, projected with `SCR_MapEntity.WorldToScreen`
@@ -23,9 +35,9 @@ repository.
 
 ## R2. Width fixed on the ground, chosen from the zoom
 
-- **Decision**: while a line is in progress its ground width is recomputed every frame as
-  `0.02 × screen height (px) / SCR_MapEntity.GetCurrentZoom()`, so it keeps its width on the
-  screen through any zoom. Enter fixes the width at that moment, capped at 50 m. A stored line is
+- **Decision**: each click of a line in progress sets the whole line's ground width to
+  `0.02 × screen height (px) / SCR_MapEntity.GetCurrentZoom()`, capped at 50 m; between clicks
+  it is drawn like a finished line, and Enter sends the latest value. A stored line is
   drawn `width × GetCurrentZoom()` pixels wide, never below 1 px. The start dot's radius is 0.75 ×
   the width.
 - **Rationale**: `GetCurrentZoom()` is pixels per metre (`scripts/Game/Map/SCR_MapEntity.c`), so
@@ -134,7 +146,9 @@ repository.
 ## R9. Who drew it (marker-info key)
 
 - **Decision**: while `LL_MapMarkerInfo` is held, a text label "Name (12 minutes ago)" sits to
-  the right of each visible start dot, in the marker labels' font, size and colour. Each delivery
+  the right of each visible start point, in the marker labels' font, size and colour, at the
+  marker label's offset: half the icon size times the Dot entry's label ink, plus the label gap
+  (`LL_M_SCR_MapMarkerWidgetComponent.LL_PlaceLabels`). Each delivery
   carries the line's age in seconds; the client stores `GetServerTimestamp()` minus that age and
   formats it with the markers' age wording.
 - **Rationale**: markers show exactly this while the key is held

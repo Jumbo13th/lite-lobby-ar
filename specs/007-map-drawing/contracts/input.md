@@ -27,8 +27,8 @@ Defines `LL_MapLineFinish` and `LL_MapLineCancel`; references `MapSelect`, `MapW
 | drawing | click | point added (ignored past 64 points, with a message once) |
 | drawing | double click | the first click's point is taken back; dialog opens with the colour list only |
 | drawing | drag | map pans, no point |
-| drawing | zoom | the line keeps its width on the screen |
-| drawing, 2+ points | Enter | line sent in its colour with the width of this zoom (max 50 m); within 2 s of the previous line: message, line kept |
+| drawing | zoom | the line scales with the map; the next click sets the width of this zoom |
+| drawing, 2+ points | Enter | line sent in its colour with the width of the latest click (max 50 m); within 2 s of the previous line: message, line kept |
 | drawing, 1 point | Enter | nothing |
 | drawing | Escape | line discarded |
 | drawing | loses the right to draw, map closes | line discarded |

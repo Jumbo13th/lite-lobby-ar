@@ -14,7 +14,8 @@ logged in as admin where a step says so.
 ## Steps
 
 1. **Draw and share (US1).** A places a marker and picks red in its dialog. Ctrl + click: a red
-   dot. Click 20 points round an object, double click: no point is added and the dialog shows
+   Dot marker, identical to a placed one, and it keeps that size at every zoom. Click 20 points
+   round an object, double click: no point is added and the dialog shows
    only Colour, Cancel and OK. Pick green, OK: the whole line turns green and drawing goes on.
    Two more clicks, Enter: the line is sent with no dialog. B sees it green within a second on
    the briefing map; C and D never receive it (client logs show no line deliveries). A's next
@@ -26,9 +27,9 @@ logged in as admin where a step says so.
 3. **Keys stay ours (R3).** While A draws: Enter does not open the chat, Escape does not close
    the map, M does not close the map, push-to-talk still transmits to B, the mouse wheel zooms,
    a drag pans without adding a point, a double click opens no marker dialog.
-4. **Width rule (US2).** A starts a line zoomed out and zooms in while drawing: the line keeps
-   its width on the screen. A finishes one line fully zoomed out (50 m on the ground, thin on the
-   screen at that zoom) and one zoomed in. Zoom in on the first: a band no wider than 50 m;
+4. **Width rule (US2).** A starts a line zoomed out, zooms in (the line scales with the map) and
+   clicks the next point: the whole line takes the thinner width of the new zoom. A finishes one
+   line fully zoomed out (50 m on the ground, thin on the screen at that zoom) and one zoomed in. Zoom in on the first: a band no wider than 50 m;
    zoom out on the second: a hairline. B sees the same ground widths at the same zoom as A.
    Lines lie under markers and the map shows through them.
 5. **Who drew it (US3).** B holds Left Shift: "A's name (n minutes ago)" next to the start dot;

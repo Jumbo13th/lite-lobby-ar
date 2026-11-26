@@ -3,8 +3,8 @@ FrameWidgetClass {
  Slot FrameWidgetSlot "{1D22000000000001}" {
   SizeX 360
   OffsetRight -360
-  SizeY 338
-  OffsetBottom -338
+  SizeY 356
+  OffsetBottom -356
  }
  "Z Order" 10000
  components {
@@ -77,7 +77,7 @@ FrameWidgetClass {
        }
        Clipping True
        AllowHeightOverride 1
-       HeightOverride 66
+       HeightOverride 84
        {
         VerticalLayoutWidgetClass "{1D22000000000013}" {
          Name "PreviewVLayout"
@@ -91,7 +91,7 @@ FrameWidgetClass {
            Slot LayoutSlot "{1D22000000000016}" {
             HorizontalAlign 1
            }
-           Size 38 38
+           Size 56 56
           }
           TextWidgetClass "{1D22000000000017}" {
            Name "PreviewText"

@@ -26,8 +26,8 @@ modded class SCR_MapMarkerWidgetComponent
 	// Applied in each direction from the icon's centre line.
 	protected const float LL_LINE_GAP = 2;
 
-	protected const float LL_LABEL_GAP = 3;
-	protected const float LL_DEFAULT_ICON_SIZE = 56;
+	static const float LL_LABEL_GAP = 3;
+	static const float LL_DEFAULT_ICON_SIZE = 56;
 
 	protected TextWidget m_wLLTitle;
 	protected TextWidget m_wLLMeta;
