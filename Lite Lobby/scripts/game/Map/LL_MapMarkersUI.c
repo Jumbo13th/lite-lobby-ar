@@ -100,8 +100,8 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	[Attribute("{1D21A7B8C9D0E1F2}UI/Map/InsertMarkerDialog.layout", UIWidgets.ResourceNamePicker, desc: "Insert-marker dialog layout", params: "layout")]
 	protected ResourceName m_sInsertDialogLayout;
 
-	protected const float DOUBLE_CLICK_MS = 400;
-	protected const int DOUBLE_CLICK_MAX_DIST_PX = 12;
+	static const float DOUBLE_CLICK_MS = 400;
+	static const int DOUBLE_CLICK_MAX_DIST_PX = 12;
 
 	protected Widget m_wLLDialogRoot;
 	protected LL_InsertMarkerDialog m_LLDialog;

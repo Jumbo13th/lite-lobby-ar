@@ -1,5 +1,5 @@
 // Map lines on the briefing, game and spectator maps (LL_MapBriefing.conf): drawing a line,
-// choosing its colour in the insert-marker dialog, rendering the local player's faction
+// recolouring it in the insert-marker dialog on a double click, rendering the local player's faction
 // lines, deleting with the marker delete key and author labels on the marker-info key.
 // Requests go through LL_LobbyPlayerComponent; the server decides and delivers everything,
 // and nothing is sent while a line is being drawn.
@@ -40,7 +40,10 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 	protected bool m_bDrawing;
 	protected ref array<int> m_aDraft = {};
-	protected float m_fDraftWidth;
+	protected float m_fLastClickTime = -float.MAX;
+	protected int m_iLastClickX;
+	protected int m_iLastClickY;
+	protected bool m_bLastClickAddedPoint;
 	protected int m_iDraftColor;
 	protected bool m_bPointLimitShown;
 	protected float m_fLastSentTime = -float.MAX;
@@ -211,10 +214,41 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			}
 
 			StartLine();
+			RegisterClick(false);
 			return;
 		}
 
-		AddCursorPoint();
+		// The marker dialog's double-click rule. The pair's first click added a point the
+		// player did not mean; the start point is never taken back.
+		if (IsDoubleClick())
+		{
+			if (m_bLastClickAddedPoint)
+				m_aDraft.Resize(m_aDraft.Count() - 2);
+
+			m_fLastClickTime = -float.MAX;
+			m_bDirty = true;
+			OpenDialog();
+			return;
+		}
+
+		RegisterClick(AddCursorPoint());
+	}
+
+	protected bool IsDoubleClick()
+	{
+		int mouseX, mouseY;
+		WidgetManager.GetMousePos(mouseX, mouseY);
+
+		return GetGame().GetWorld().GetWorldTime() - m_fLastClickTime <= LL_MapMarkersUI.DOUBLE_CLICK_MS
+			&& Math.AbsInt(mouseX - m_iLastClickX) <= LL_MapMarkersUI.DOUBLE_CLICK_MAX_DIST_PX
+			&& Math.AbsInt(mouseY - m_iLastClickY) <= LL_MapMarkersUI.DOUBLE_CLICK_MAX_DIST_PX;
+	}
+
+	protected void RegisterClick(bool addedPoint)
+	{
+		m_fLastClickTime = GetGame().GetWorld().GetWorldTime();
+		WidgetManager.GetMousePos(m_iLastClickX, m_iLastClickY);
+		m_bLastClickAddedPoint = addedPoint;
 	}
 
 	protected LL_EMapLineRefusal CheckLimits()
@@ -233,19 +267,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 	protected void StartLine()
 	{
-		float zoom = m_MapEntity.GetCurrentZoom();
-		if (zoom <= 0)
-			return;
-
-		float screenW, screenH;
-		GetGame().GetWorkspace().GetScreenSize(screenW, screenH);
-
-		// The server takes widths between these bounds only.
-		vector worldMin, worldMax;
-		GetGame().GetWorld().GetBoundBox(worldMin, worldMax);
-		float maxWidth = LL_MapLine.MAX_WIDTH_FRACTION * Math.Max(worldMax[0] - worldMin[0], worldMax[2] - worldMin[2]);
-
-		m_fDraftWidth = Math.Clamp(SCREEN_WIDTH_FRACTION * screenH / zoom, LL_MapLine.MIN_WIDTH_M, maxWidth);
 		m_iDraftColor = LL_MapMarkersUI.GetLastColorEntry();
 		m_aDraft.Clear();
 		m_bPointLimitShown = false;
@@ -254,7 +275,21 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		AddCursorPoint();
 	}
 
-	protected void AddCursorPoint()
+	//! The same width on the screen at any zoom, within the bounds the server accepts. A line
+	//! in progress is drawn with it every frame and sent with the value at Enter.
+	protected float GetDraftWidth()
+	{
+		float zoom = m_MapEntity.GetCurrentZoom();
+		if (zoom <= 0)
+			return LL_MapLine.MAX_WIDTH_M;
+
+		float screenW, screenH;
+		GetGame().GetWorkspace().GetScreenSize(screenW, screenH);
+
+		return Math.Clamp(SCREEN_WIDTH_FRACTION * screenH / zoom, LL_MapLine.MIN_WIDTH_M, LL_MapLine.MAX_WIDTH_M);
+	}
+
+	protected bool AddCursorPoint()
 	{
 		if (m_aDraft.Count() >= LL_MapLine.MAX_POINTS * 2)
 		{
@@ -262,7 +297,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 				ShowRefusal(LL_EMapLineRefusal.POINT_LIMIT);
 
 			m_bPointLimitShown = true;
-			return;
+			return false;
 		}
 
 		float worldX, worldY;
@@ -272,11 +307,12 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		int count = m_aDraft.Count();
 		if (count >= 2 && m_aDraft[count - 2] == x && m_aDraft[count - 1] == y)
-			return;
+			return false;
 
 		m_aDraft.Insert(x);
 		m_aDraft.Insert(y);
 		m_bDirty = true;
+		return true;
 	}
 
 	protected void OnInputFinish(float value, EActionTrigger reason)
@@ -284,7 +320,24 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		if (!m_bDrawing || m_wDialogRoot || m_aDraft.Count() < 4)
 			return;
 
-		OpenDialog();
+		// Refused here rather than by the server, so the drawn line is not lost.
+		float now = GetGame().GetWorld().GetWorldTime();
+		if (now - m_fLastSentTime < LL_MapLine.MIN_INTERVAL_S * 1000)
+		{
+			ShowRefusal(LL_EMapLineRefusal.TOO_SOON);
+			return;
+		}
+
+		LL_LobbyPlayerComponent lobbyPlayer = LL_LobbyPlayerComponent.GetLocalInstance();
+		if (lobbyPlayer)
+		{
+			array<int> points = {};
+			points.Copy(m_aDraft);
+			lobbyPlayer.AskAddMapLine(m_iDraftColor, GetDraftWidth(), points);
+		}
+
+		m_fLastSentTime = now;
+		DiscardDraft();
 	}
 
 	protected void OnInputCancel(float value, EActionTrigger reason)
@@ -313,10 +366,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 	protected void OpenDialog()
 	{
 		if (!m_PlacedConfig)
-		{
-			DiscardDraft();
 			return;
-		}
 
 		WorkspaceWidget workspace = GetGame().GetWorkspace();
 		m_wDialogRoot = workspace.CreateWidgets(DIALOG_LAYOUT, m_RootWidget);
@@ -375,35 +425,19 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			m_CursorModule.HandleDialog(false);
 	}
 
+	//! Recolours the line in progress and the remembered colour; drawing continues.
 	protected void OnDialogConfirm(int iconEntry, int colorEntry, string text)
 	{
-		// Refused here rather than by the server, so the drawn line is not lost.
-		float now = GetGame().GetWorld().GetWorldTime();
-		if (now - m_fLastSentTime < LL_MapLine.MIN_INTERVAL_S * 1000)
-		{
-			ShowRefusal(LL_EMapLineRefusal.TOO_SOON);
-			return;
-		}
-
-		LL_LobbyPlayerComponent lobbyPlayer = LL_LobbyPlayerComponent.GetLocalInstance();
-		if (lobbyPlayer)
-		{
-			array<int> points = {};
-			points.Copy(m_aDraft);
-			lobbyPlayer.AskAddMapLine(colorEntry, m_fDraftWidth, points);
-		}
-
+		m_iDraftColor = colorEntry;
 		LL_MapMarkersUI.SetLastColorEntry(colorEntry);
-		m_fLastSentTime = now;
+		m_bDirty = true;
 
 		CloseDialog();
-		DiscardDraft();
 	}
 
 	protected void OnDialogCancel()
 	{
 		CloseDialog();
-		DiscardDraft();
 	}
 
 	// Enter confirms unless the colour list is open: drawing is a mouse feature, so the
@@ -467,7 +501,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		}
 
 		if (m_bDrawing && !m_aDraft.IsEmpty())
-			AddLineCommands(slot, m_aDraft, m_fDraftWidth, m_iDraftColor, originX, originY, zoom);
+			AddLineCommands(slot, m_aDraft, GetDraftWidth(), m_iDraftColor, originX, originY, zoom);
 
 		m_wCanvas.SetDrawCommands(m_aCommands);
 	}

@@ -49,14 +49,28 @@ to each player of the faction when it is confirmed.
 - Q: How do players learn the drawing keys? → A: A short paragraph in the generated
   Communications briefing entry, next to the voice and radio keys. No on-screen hint.
 
+### Session 2026-11-27 (after the first in-game test)
+
+- Q: What happens to the width when the player zooms while drawing? → A: The line in progress
+  keeps its width on the screen and adapts to the zoom; its ground width is fixed when it is
+  finished.
+- Q: How wide can a line get? → A: At most 50 m on the ground; a line finished further out is
+  capped.
+- Q: Is the colour picked for every line? → A: No. Enter sends the line in the colour last chosen
+  in the insert-marker dialog, for a marker or a line. A double click while drawing opens the
+  colour-only dialog to change the colour of the line in progress.
+- Q: Does the line and its start point keep the interim look? → A: No. Their look is designed to
+  match the lobby's markers in a Claude Design round; until then the interim look stays.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Draw a line and share it with the faction (Priority: P1)
 
-A squad leader on the briefing map holds Ctrl and clicks: a dot marks the start. Every further
-click adds a straight segment from the previous point. Many close clicks make a curve, an arc
-or a circle. Enter ends the line and the insert-marker dialog opens; the leader picks a colour
-and confirms. The line takes that colour and appears on the map of every player of the faction.
+A squad leader on the briefing map holds Ctrl and clicks: a dot marks the start, in the colour
+last chosen in the insert-marker dialog. Every further click adds a straight segment from the
+previous point. Many close clicks make a curve, an arc or a circle. A double click opens the
+colour list to change the colour of the line. Enter ends the line, and it appears on the map of
+every player of the faction.
 
 **Why this priority**: it is the feature. Phase lines, boundaries, routes and objective areas
 are how a briefing is drawn.
@@ -71,29 +85,31 @@ does not.
    filled dot slightly wider than a line appears under the cursor, in the colour they last
    confirmed (the first colour of the list until they confirm one).
 2. **Given** a line in progress, **When** the player left clicks elsewhere, **Then** a straight
-   segment joins the previous point to the click, and no marker dialog opens, even for two
-   quick clicks close together.
-3. **Given** a line with at least two points, **When** the player presses Enter, **Then** point
-   adding ends and the insert-marker dialog opens with only the colour list, Cancel and OK,
-   preset to the last confirmed colour.
-4. **Given** the dialog is open, **When** the player picks another colour and confirms with OK or
-   Enter, **Then** the whole line, start dot included, takes that colour. Until then the line
-   keeps the colour it was drawn in.
-5. **Given** a confirmed line, **Then** every player of the author's faction sees it within one
+   segment joins the previous point to the click, and no marker dialog opens.
+3. **Given** a line in progress, **When** the player double clicks, **Then** no point is added and
+   the insert-marker dialog opens with only the colour list, Cancel and OK, preset to the line's
+   colour.
+4. **Given** that dialog is open, **When** the player picks another colour and confirms with OK or
+   Enter, **Then** the whole line, start dot included, takes that colour, the colour is
+   remembered for the next marker and line, and drawing continues. Cancel or Escape closes the
+   dialog and drawing continues unchanged.
+5. **Given** a line with at least two points, **When** the player presses Enter, **Then** the line
+   is finished and sent in its colour, with no dialog.
+6. **Given** a finished line, **Then** every player of the author's faction sees it within one
    second, on the briefing map, the game map and the spectator map, and no player of another
    faction or without a faction receives any part of it.
-6. **Given** the dialog is open, **When** the player cancels with Cancel or Escape, **Then** the
-   line is discarded and no other player ever received any of it.
 7. **Given** a line in progress, **When** the player presses Escape, **Then** the line is
-   discarded.
+   discarded and no other player ever received any of it.
+8. **Given** a colour chosen in the insert-marker dialog while placing a marker, **When** the
+   player starts a line, **Then** the line is drawn in that colour.
 
 ---
 
 ### User Story 2 - A line behaves like a map feature (Priority: P1)
 
-A line drawn zoomed out is a broad band on the ground; one drawn zoomed in is a fine trace. Both
-look equally thick on the screen at the moment they are drawn, and after that they belong to
-the map and scale with it like roads.
+A line finished zoomed out is a broad band on the ground, up to 50 m; one finished zoomed in is a
+fine trace. While being drawn, a line keeps the same thickness on the screen whatever the zoom;
+once finished it belongs to the map and scales with it like roads.
 
 **Why this priority**: it is what makes the drawing readable. A width fixed on the screen would
 make a phase line drawn for the whole map and a route drawn inside a village indistinguishable.
@@ -103,16 +119,19 @@ through the whole range and pan.
 
 **Acceptance Scenarios**:
 
-1. **Given** two lines drawn at different zooms, **When** each is drawn, **Then** both have the
-   same width on the screen at that moment, and their widths on the ground differ by the zoom
-   ratio.
-2. **Given** a finished line, **When** any player zooms or pans, **Then** the line stays on its
+1. **Given** two lines finished at different zooms below the cap, **When** each is finished,
+   **Then** both have the same width on the screen at that moment, and their widths on the ground
+   differ by the zoom ratio.
+2. **Given** a line in progress, **When** the player zooms in or out, **Then** the line keeps its
+   width on the screen.
+3. **Given** a line finished fully zoomed out, **Then** it is 50 m wide on the ground.
+4. **Given** a finished line, **When** any player zooms or pans, **Then** the line stays on its
    ground positions and its width scales with the map: zooming in on a line drawn zoomed out
    shows a wide band, zooming out on a line drawn zoomed in shows a hairline. The start dot
    follows the same rule.
-3. **Given** a line, **When** any player looks at it at any zoom, **Then** its ground width is the
+5. **Given** a line, **When** any player looks at it at any zoom, **Then** its ground width is the
    same for every player: width belongs to the line, not to the viewer.
-4. **Given** lines cross each other, roads or markers, **Then** the map and other lines show
+6. **Given** lines cross each other, roads or markers, **Then** the map and other lines show
    through them, and markers stay readable above them.
 
 ---
@@ -176,12 +195,14 @@ it; a second client switches from that faction to the other one.
   still finishes the line.
 - The player or the faction is at its line limit: Ctrl + left click tells the player and starts
   nothing; the server refuses such a request anyway. No line is ever removed to make room.
-- Enter while drawing finishes the line and does not open the chat; Enter in the dialog
-  confirms it.
-- Dragging the map to pan while a line is in progress adds no point; zooming keeps the line's
-  width as set when it started.
+- Enter while drawing finishes the line and does not open the chat; Enter in the colour dialog
+  confirms the colour.
+- Enter less than two seconds after the player's previous line tells the player to wait and
+  keeps the line in progress.
+- Dragging the map to pan while a line is in progress adds no point; zooming changes the line's
+  ground width so that it keeps its width on the screen.
 - A request sent to the server without the map screen (a modified client) with a colour not on
-  the list, too many or too few points, points outside the map, a width outside the zoom range,
+  the list, too many or too few points, points outside the map, a width outside 0.1 to 50 m,
   too soon after the previous line, or without the right to draw, is refused: nothing is stored
   and nothing is delivered.
 - A line delivered twice to one player (the full set on slot take and a new line in the same
@@ -203,23 +224,26 @@ it; a second client switches from that faction to the other one.
   is no freehand drawing.
 - **FR-003**: While a line is in progress, marker placement by double click and marker editing by
   click MUST be suspended.
-- **FR-004**: Enter MUST finish a line of two or more points and open the lobby's insert-marker
-  dialog with only the colour list, Cancel and OK. Escape MUST discard a line in progress.
+- **FR-004**: Enter MUST finish a line of two or more points and send it, with no dialog. Escape
+  MUST discard a line in progress. A double click while a line is in progress MUST add no point
+  and open the lobby's insert-marker dialog with only the colour list, Cancel and OK; drawing
+  continues after it closes.
 - **FR-005**: A line's colour MUST be one of the colours the insert-marker dialog offers. A line
-  in progress MUST be shown in the last confirmed colour; the colour chosen in the dialog MUST
-  apply to the whole line only on confirmation.
-- **FR-006**: A line's ground width MUST be set when the line starts, from the current zoom, so
-  that a fresh line has the same width on the screen at any zoom. After that the width MUST
-  scale with the map. The start dot MUST be slightly wider than the line and follow the same
-  rule.
+  starts in the colour last confirmed in that dialog, for a marker or a line; a colour confirmed
+  in the double-click dialog MUST recolour the whole line in progress and become the remembered
+  colour.
+- **FR-006**: While a line is in progress it MUST keep the same width on the screen at any zoom.
+  Its ground width MUST be fixed when it is finished, from the zoom at that moment, and MUST NOT
+  exceed 50 m. After that the width MUST scale with the map. The start dot MUST be slightly
+  wider than the line and follow the same rule.
 - **FR-007**: Lines MUST be semi-transparent and drawn above the map and beneath markers.
 - **FR-008**: A line MUST carry no text.
 - **FR-009**: Nothing MUST be sent while a line is in progress. A confirmed line MUST be sent as
   one request, and the server MUST deliver it only to the players of the author's faction; a
   delivery to every player filtered on their machines is forbidden.
 - **FR-010**: The server MUST determine the author's identity and faction itself, re-check the
-  right to draw, and validate the point count, that every point is on the map, the colour and the
-  width against the map's zoom range. Any failed check MUST refuse the whole request.
+  right to draw, and validate the point count, that every point is on the map, the colour and that
+  the width is between 0.1 and 50 m. Any failed check MUST refuse the whole request.
 - **FR-011**: The server MUST enforce 64 points per line, 20 lines per player and 150 lines per
   faction, and accept at most one new line from a player every two seconds. A refused request
   MUST tell the player why, in their language.
@@ -276,11 +300,10 @@ it; a second client switches from that faction to the other one.
   new stage restrictions and gives spectators nothing to edit. Players without a faction, Game
   Masters without a slot included, neither draw nor see lines.
 - A line cannot be edited; it is deleted and drawn again. There is no undo of the last point.
-- Cancel in the dialog discards the line, as it discards a marker.
 - Markers and lines share the last confirmed colour.
-- On the screen, a fresh line is about 2% of the screen height wide, the start dot about one and
-  a half times the line width, at about 60% opacity. Joints between segments need not be
-  smoothed. These values are tuned in game during review.
+- On the screen, a line in progress is about 2% of the screen height wide, the start dot about
+  one and a half times the line width, at about 60% opacity. Joints between segments need not be
+  smoothed. This is the interim look until the Claude Design round settles it.
 - The game's own pencil tool stays as it is: it draws for its user only and is not part of this
   feature.
 - Drawing is a keyboard-and-mouse feature; the dialog keeps its controller navigation.

@@ -6,10 +6,11 @@
 
 ## Summary
 
-Players draw polylines on the briefing and game maps: Ctrl + click starts a line, clicks add
-straight segments, Enter opens the insert-marker dialog with only the colour list, OK sends the
-line. Lines are drawn on one canvas per map screen as one polyline command each, with a ground
-width fixed from the zoom when the line started. The server validates every request, stores the
+Players draw polylines on the briefing and game maps: Ctrl + click starts a line in the colour
+last chosen in the insert-marker dialog, clicks add straight segments, a double click opens
+that dialog with only the colour list to recolour the line, Enter sends it. Lines are drawn on
+one canvas per map screen as one polyline command each; a line in progress keeps its width on
+the screen, and Enter fixes its ground width from the zoom, at most 50 m. The server validates every request, stores the
 lines per faction, delivers each line only to that faction's players through
 `LL_LobbyPlayerComponent` owner RPCs, re-delivers a faction's lines in paced batches when a
 player's faction changes, and saves them for session resume. Nothing is sent while a line is
@@ -158,13 +159,14 @@ docs/src/content/docs/
    - Map open: creates the canvas (`ZoneCanvas.layout`, Z order -450) in the map frame; map
      close: removes it, discards a line in progress, drops labels.
    - Start: on `MapSelect` with `LL_MapLineStart` held, if `LL_MapMarkersUI.LL_CanEditMarkers`
-     allows and the cache says the limits allow (otherwise the reason is shown); stores the
-     width from the zoom and the last confirmed colour.
+     allows and the cache says the limits allow (otherwise the reason is shown); takes the
+     last confirmed colour.
    - In progress: `ActivateContext("LL_MapLineContext")` every frame; re-checks the edit rule
-     every frame; clicks add points; Enter opens the dialog in line mode; Escape discards.
-   - Dialog: created and driven as `LL_MapMarkersUI` does; OK sends `RpcAsk_AddMapLine`, stores
-     the colour as the last confirmed one and discards the local line (the server's delivery
-     draws it); Cancel discards.
+     every frame; clicks add points; the width follows the zoom; a double click opens the dialog
+     in line mode; Enter sends `RpcAsk_AddMapLine` with the width of that moment (max 50 m) and
+     discards the local line (the server's delivery draws it); Escape discards.
+   - Dialog: created and driven as `LL_MapMarkersUI` does; OK recolours the line in progress and
+     stores the colour as the last confirmed one; Cancel only closes it. Drawing continues.
    - Render: rebuilds the commands when the zoom, the pan or the cache changed, or a line is in
      progress; culls by bounding box; one origin projection per frame (research R2).
    - Delete: `MapMarkerDelete` listener per research R10, then `RpcAsk_RemoveMapLine`.

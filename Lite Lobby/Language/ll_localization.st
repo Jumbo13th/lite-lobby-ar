@@ -2419,9 +2419,9 @@ StringTable {
   }
   CustomStringTableItem "{59CDCE5DA27B5E52}" {
    Id "LL-CommsGuide_LinesBody"
-   Target_en_us "<b>Ctrl + click</b> on the map starts a line and every further <b>click</b> adds a straight segment. <b>Enter</b> finishes it and asks for its color, <b>Esc</b> cancels it. Only your side sees your lines. Hold <b>Left Shift</b> to see who drew a line and when; point at your own line and press <b>Delete</b> to remove it."
-   Target_ru_ru "<b>Ctrl + клик</b> по карте начинает линию, каждый следующий <b>клик</b> добавляет прямой отрезок. <b>Enter</b> заканчивает линию и предлагает выбрать цвет, <b>Esc</b> отменяет её. Ваши линии видит только ваша сторона. Зажмите <b>левый Shift</b>, чтобы увидеть, кто и когда нарисовал линию; наведите курсор на свою линию и нажмите <b>Delete</b>, чтобы удалить её."
-   Modified 1795729957
+   Target_en_us "<b>Ctrl + click</b> on the map starts a line in the color last chosen for a marker, and every further <b>click</b> adds a straight segment. A <b>double click</b> changes the line's color, <b>Enter</b> sends it, <b>Esc</b> cancels it. Only your side sees your lines. Hold <b>Left Shift</b> to see who drew a line and when; point at your own line and press <b>Delete</b> to remove it."
+   Target_ru_ru "<b>Ctrl + клик</b> по карте начинает линию цветом, выбранным для последнего маркера, каждый следующий <b>клик</b> добавляет прямой отрезок. <b>Двойной клик</b> меняет цвет линии, <b>Enter</b> отправляет её, <b>Esc</b> отменяет. Ваши линии видит только ваша сторона. Зажмите <b>левый Shift</b>, чтобы увидеть, кто и когда нарисовал линию; наведите курсор на свою линию и нажмите <b>Delete</b>, чтобы удалить её."
+   Modified 1795816357
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }

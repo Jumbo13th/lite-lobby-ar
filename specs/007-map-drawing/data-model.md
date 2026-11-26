@@ -11,7 +11,7 @@ Held by the server line store, owned by `LL_LobbyManager` on the authority.
 | authorUid | string | Identity id of the author. Server only; never sent to a client. |
 | authorName | string | Player name when the line was accepted. |
 | colour | int | Index into the placed-marker colour list. |
-| width | float | Ground width in metres, 0.1 m to 5% of the larger world side. |
+| width | float | Ground width in metres, 0.1 m to 50 m. |
 | points | array<int> | Decimetres, x0, y0, x1, y1, ...; 4 to 128 numbers (2 to 64 points), all inside the world's bounding box. |
 | createdAt | WorldTimestamp | Server time of acceptance. |
 
@@ -55,10 +55,10 @@ Kept sorted by id. Cleared by the reset RPC, never by the client on its own.
 | Field | Type | Rule |
 |-------|------|------|
 | points | array<int> | Decimetres; 1 point after Ctrl + click, at most 64. |
-| width | float | Fixed when the line starts (research R2). |
-| colour | int | The last confirmed colour; replaced by the dialog's choice on OK. |
+| width | float | Not stored: follows the zoom every frame, fixed on Enter (research R2). |
+| colour | int | The last confirmed colour; replaced by the double-click dialog's choice on OK. |
 
-Discarded on Escape, on Cancel, when the map closes, or when the player loses the right to draw.
+Discarded on Escape, when the map closes, or when the player loses the right to draw.
 
 ## Persistent record (session resume)
 

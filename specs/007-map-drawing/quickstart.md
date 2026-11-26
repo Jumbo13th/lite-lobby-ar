@@ -13,19 +13,24 @@ logged in as admin where a step says so.
 
 ## Steps
 
-1. **Draw and share (US1).** A, on the briefing map: Ctrl + click; a dot appears in the last
-   marker colour. Click 20 points round an object, press Enter; the dialog shows only Colour,
-   Cancel and OK. Pick green, OK. Expected: the line turns green for A; B sees it within a second
-   on the briefing map; C and D never receive it (client logs show no line deliveries).
-2. **Cancel paths (US1).** A starts a line and presses Escape: gone. A draws two points, Enter,
-   then Cancel in the dialog: gone. B never saw either.
+1. **Draw and share (US1).** A places a marker and picks red in its dialog. Ctrl + click: a red
+   dot. Click 20 points round an object, double click: no point is added and the dialog shows
+   only Colour, Cancel and OK. Pick green, OK: the whole line turns green and drawing goes on.
+   Two more clicks, Enter: the line is sent with no dialog. B sees it green within a second on
+   the briefing map; C and D never receive it (client logs show no line deliveries). A's next
+   marker dialog preselects green.
+2. **Cancel paths (US1).** A starts a line and presses Escape: gone. A double clicks during a
+   line and cancels the dialog: the line is unchanged and drawing goes on. A sends a line and
+   presses Enter on the next one within 2 seconds: told to wait, the line stays. B never saw
+   the cancelled lines.
 3. **Keys stay ours (R3).** While A draws: Enter does not open the chat, Escape does not close
    the map, M does not close the map, push-to-talk still transmits to B, the mouse wheel zooms,
-   a drag pans without adding a point, a fast double click adds points and opens no marker dialog.
-4. **Width rule (US2).** A draws one line fully zoomed out and one fully zoomed in. Both look
-   equally thick while drawn. Zoom in on the first: a wide band; zoom out on the second: a
-   hairline. B sees the same ground widths at the same zoom as A. Lines lie under markers and the
-   map shows through them.
+   a drag pans without adding a point, a double click opens no marker dialog.
+4. **Width rule (US2).** A starts a line zoomed out and zooms in while drawing: the line keeps
+   its width on the screen. A finishes one line fully zoomed out (50 m on the ground, thin on the
+   screen at that zoom) and one zoomed in. Zoom in on the first: a band no wider than 50 m;
+   zoom out on the second: a hairline. B sees the same ground widths at the same zoom as A.
+   Lines lie under markers and the map shows through them.
 5. **Who drew it (US3).** B holds Left Shift: "A's name (n minutes ago)" next to the start dot;
    released, it goes.
 6. **Delete rights (US3).** B points at A's line and presses Delete: nothing. A does: it goes for

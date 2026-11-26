@@ -68,8 +68,7 @@ class LL_MapLineStore
 			return Refuse_S(playerId, LL_EMapLineRefusal.INVALID);
 
 		// Written so that NaN fails too.
-		float maxWidth = LL_MapLine.MAX_WIDTH_FRACTION * Math.Max(worldMax[0] - worldMin[0], worldMax[2] - worldMin[2]);
-		if (!(width >= LL_MapLine.MIN_WIDTH_M && width <= maxWidth))
+		if (!(width >= LL_MapLine.MIN_WIDTH_M && width <= LL_MapLine.MAX_WIDTH_M))
 			return Refuse_S(playerId, LL_EMapLineRefusal.INVALID);
 
 		string authorKey = GetAuthorKey_S(playerId);

@@ -25,13 +25,15 @@ Defines `LL_MapLineFinish` and `LL_MapLineCancel`; references `MapSelect`, `MapW
 | idle, may draw, under the limits | Ctrl + click | line starts with its dot; drawing context active |
 | idle, may draw, at a limit | Ctrl + click | nothing starts; the reason is shown |
 | drawing | click | point added (ignored past 64 points, with a message once) |
+| drawing | double click | the first click's point is taken back; dialog opens with the colour list only |
 | drawing | drag | map pans, no point |
-| drawing, 2+ points | Enter | drawing context ends; dialog opens with the colour list only |
+| drawing | zoom | the line keeps its width on the screen |
+| drawing, 2+ points | Enter | line sent in its colour with the width of this zoom (max 50 m); within 2 s of the previous line: message, line kept |
 | drawing, 1 point | Enter | nothing |
 | drawing | Escape | line discarded |
 | drawing | loses the right to draw, map closes | line discarded |
-| dialog | OK or Enter (unless the colour list is open) | line sent in the chosen colour; colour remembered for markers and lines; refused locally, dialog kept, within 2 s of the previous line |
-| dialog | Cancel or Escape | line discarded |
+| dialog | OK or Enter (unless the colour list is open) | line recoloured; colour remembered for markers and lines; drawing continues |
+| dialog | Cancel or Escape | dialog closes; drawing continues |
 | idle | Delete over a line | topmost deletable line removed, unless a removable marker is under the cursor |
 | any | hold Left Shift | author name and age at every visible start dot |
 

@@ -117,7 +117,22 @@ session resume.
 - [X] T029 [P] Add the changelog entry in `docs/src/content/docs/changelog.mdx` and `docs/src/content/docs/ru/changelog.mdx` under the next Workshop version: lines on the map (Ctrl + click, clicks, Enter, colour), shared with the faction, Left Shift shows who drew them, Delete removes your own, kept through a session resume.
 - [X] T030 [P] Update `../ARCHITECTURE.md` (workspace): the replication contract lists the six map line RPCs as faction-scoped owner RPCs on `LL_LobbyPlayerComponent`, "all map drawing" leaves the Nothing row, and the components section gets the line store, cache and map UI.
 - [X] T031 Review the whole diff against the constitution: WHY-only comments, `LL_` names, vanilla parameter names in overrides, no project or person named, no dead code, every `RplSave`/`RplLoad` untouched, every new conf id unique; `git grep -n -i "paint"` finds nothing of the earlier tool set.
-- [ ] T032 Operator: compile in Workbench, check the four configs (plan, Workbench steps) and run quickstart steps 1 to 12 on a dedicated server.
+- [X] T032 Operator: compile in Workbench and play the first version (2026-11-27); feedback recorded in spec Clarifications, session 2026-11-27.
+
+---
+
+## Phase 8: Amendments after the first in-game test (2026-11-27)
+
+**Purpose**: the spec's 2026-11-27 clarifications: width follows the zoom while drawing and is
+capped at 50 m, Enter sends without a dialog, a double click recolours, the look goes to a
+Claude Design round.
+
+- [X] T033 [US2] Replace `MAX_WIDTH_FRACTION` with `MAX_WIDTH_M = 50` in `LL/scripts/game/Map/LL_MapLine.c` and use it in `LL_MapLineStore.Add_S` (`LL/scripts/game/Map/LL_MapLineStore.c`) (FR-006, FR-010).
+- [X] T034 [US2] In `LL/scripts/game/Map/LL_MapLinesUI.c` compute the line in progress' width every frame from the current zoom (clamped to 0.1..50 m) and render it with that width; fix it on Enter (FR-006, research R2). Depends on T033.
+- [X] T035 [US1] In `LL/scripts/game/Map/LL_MapLinesUI.c` make Enter send the line at once in its colour (2-second rule checked first, line kept with a message), and make a double click while drawing take back the first click's point and open the colour-only dialog, whose OK recolours the line in progress, stores the colour and continues drawing, and whose Cancel only closes it (FR-004, FR-005, research R11). Depends on T034.
+- [X] T036 [P] Update the 1.2.0 changelog entry in `docs/src/content/docs/changelog.mdx` and `docs/src/content/docs/ru/changelog.mdx` and the Communications paragraph in `LL/Language/ll_localization.st` (regenerate the runtime tables) to the new keys: Enter sends, double click changes the colour, 50 m cap.
+- [X] T037 Prepare the Claude Design round for the line and start-point look: canvas https://claude.ai/artifact/UrPweJHXK6EAw8wLQ8P7fQ (brief, current look, options A to C); the chosen look becomes its own tasks once picked.
+- [ ] T038 Operator: compile and run quickstart steps 1 to 12 on a dedicated server.
 
 ---
 

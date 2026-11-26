@@ -20,7 +20,7 @@ class LL_MapLine
 	static const int MAX_LINES_PER_FACTION = 150;
 	static const float MIN_INTERVAL_S = 2;
 	static const float MIN_WIDTH_M = 0.1;
-	static const float MAX_WIDTH_FRACTION = 0.05;
+	static const float MAX_WIDTH_M = 50;
 
 	int m_iId;
 	int m_iColor;

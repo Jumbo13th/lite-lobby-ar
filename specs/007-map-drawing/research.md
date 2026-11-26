@@ -23,10 +23,11 @@ repository.
 
 ## R2. Width fixed on the ground, chosen from the zoom
 
-- **Decision**: when a line starts, its ground width is `0.02 × map frame height (px) /
-  SCR_MapEntity.GetCurrentZoom()`, stored in metres. Each frame it is drawn
-  `width × GetCurrentZoom()` pixels wide, never below 1 px. The start dot's radius is 0.75 × the
-  width.
+- **Decision**: while a line is in progress its ground width is recomputed every frame as
+  `0.02 × screen height (px) / SCR_MapEntity.GetCurrentZoom()`, so it keeps its width on the
+  screen through any zoom. Enter fixes the width at that moment, capped at 50 m. A stored line is
+  drawn `width × GetCurrentZoom()` pixels wide, never below 1 px. The start dot's radius is 0.75 ×
+  the width.
 - **Rationale**: `GetCurrentZoom()` is pixels per metre (`scripts/Game/Map/SCR_MapEntity.c`), so
   a ground width times the current zoom is exactly "scales with the map like a road".
 - **Projection cost**: `WorldToScreen(x, y, withPan = true)` is
@@ -81,7 +82,7 @@ repository.
 - **Decision**: points travel as `array<int>` of whole decimetres, x then y, two numbers per
   point. The server refuses a request with fewer than 2 or more than 64 points, any point outside
   the world's bounding box, a colour index outside the placed-marker colour list, or a width that
-  is not between 0.1 m and 5% of the larger world side.
+  is not between 0.1 m and 50 m.
 - **Rationale**: decimetres need no map-dependent packing that both sides would have to agree on.
   `world.GetBoundBox` is the vanilla way to bound positions
   (`scripts/Game/Camera/Components/SCR_LimitBoxManualCameraComponent.c`). The colour list is the
@@ -153,10 +154,13 @@ repository.
 ## R11. The colour-only dialog
 
 - **Decision**: `LL_InsertMarkerDialog` gets a line mode that hides `PreviewFrame`,
-  `EditBoxRoot` and `TypeCombo` from script and reports only the colour. The line UI opens and
-  drives it the way `LL_MapMarkersUI` does: `MapMarkerEditContext` each frame after a one-frame
-  gap, `MENU_ACTION_SELECT` and `MENU_ACTION_BACK` listeners, `HandleDialog`. Lines and markers
-  share the last confirmed colour.
+  `EditBoxRoot` and `TypeCombo` from script and reports only the colour. A double click while
+  drawing opens it (the 400 ms / 12 px rule of `LL_MapMarkersUI.RegisterClickAndCheckDouble`;
+  the point the first click of the pair added is taken back). The line UI drives it the way
+  `LL_MapMarkersUI` does: `MapMarkerEditContext` each frame after a one-frame gap,
+  `MENU_ACTION_SELECT` and `MENU_ACTION_BACK` listeners, `HandleDialog`. OK recolours the line in
+  progress and stores the colour; drawing continues. Lines and markers share the last confirmed
+  colour, so Enter sends without a dialog.
 - **Rationale**: the spec asks for the marker dialog itself (FR-004), so players meet one
   dialog for both. Hiding from script follows the layout rule that `Visible 0` drops children.
 

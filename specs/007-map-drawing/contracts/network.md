@@ -7,7 +7,7 @@ server; nothing is broadcast and nothing enters `RplSave`/`RplLoad`.
 
 | RPC | Arguments | Server checks, in order | On failure |
 |-----|-----------|------------------------|------------|
-| `RpcAsk_AddMapLine` | `int colour, float width, array<int> points` | marker edit rule; points count even and 4..128; every point inside the world box; colour in the placed-marker list; width 0.1 m..5% of the larger world side; author identity under 20 lines; faction under 150 lines; 2 s since the author's last accepted line | `RpcDo_OwnerMapLineRefused(reason)` to the requester; nothing stored |
+| `RpcAsk_AddMapLine` | `int colour, float width, array<int> points` | marker edit rule; points count even and 4..128; every point inside the world box; colour in the placed-marker list; width 0.1 m..50 m; author identity under 20 lines; faction under 150 lines; 2 s since the author's last accepted line | `RpcDo_OwnerMapLineRefused(reason)` to the requester; nothing stored |
 | `RpcAsk_RemoveMapLine` | `int lineId` | marker edit rule; line exists; line faction is the requester's faction; requester is the author (identity) or `SCR_Global.IsAdmin` | silently ignored |
 
 ## Server → one client
