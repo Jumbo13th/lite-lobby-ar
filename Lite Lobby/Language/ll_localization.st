@@ -1,127 +1,6 @@
 StringTable {
  ItemClassName "CustomStringTableItem"
  Items {
-  CustomStringTableItem "{4903E61E06E5DF32}" {
-   Id "LL-MapPaint_Brush"
-   Target_en_us "Brush (1)"
-   Target_ru_ru "Кисть (1)"
-  }
-  CustomStringTableItem "{AA2EC33661F98669}" {
-   Id "LL-MapPaint_Line"
-   Target_en_us "Straight line (2)"
-   Target_ru_ru "Прямая линия (2)"
-  }
-  CustomStringTableItem "{43DF18FD7C87586F}" {
-   Id "LL-MapPaint_Circle"
-   Target_en_us "Circle (3)"
-   Target_ru_ru "Окружность (3)"
-  }
-  CustomStringTableItem "{81E7F34DBE301DA1}" {
-   Id "LL-MapPaint_Anchor"
-   Target_en_us "Anchor line (Left Ctrl)"
-   Target_ru_ru "Ломаная линия (левый Ctrl)"
-  }
-  CustomStringTableItem "{F1F347B9239CAF04}" {
-   Id "LL-MapPaint_Eraser"
-   Target_en_us "Eraser (Shift)"
-   Target_ru_ru "Ластик (Shift)"
-  }
-  CustomStringTableItem "{44C5610EE2CDBF52}" {
-   Id "LL-MapPaint_Color"
-   Target_en_us "Drawing color (C)"
-   Target_ru_ru "Цвет рисования (C)"
-  }
-  CustomStringTableItem "{20E83ED04696C9DD}" {
-   Id "LL-MapPaint_Loading"
-   Target_en_us "Loading history..."
-   Target_ru_ru "Загрузка истории..."
-  }
-  CustomStringTableItem "{5AB2BFD23754F6FF}" {
-   Id "LL-MapPaint_Unavailable"
-   Target_en_us "History is unavailable. Reopen to retry."
-   Target_ru_ru "История недоступна. Откройте её снова."
-  }
-  CustomStringTableItem "{3D7EB6FA9BAAEF23}" {
-   Id "LL-MapPaint_Timeout"
-   Target_en_us "History request timed out. Reopen to retry."
-   Target_ru_ru "История не загрузилась. Откройте её снова."
-  }
-  CustomStringTableItem "{8F481C190741A053}" {
-   Id "LL-MapPaint_Empty"
-   Target_en_us "No changes in the last 5 minutes."
-   Target_ru_ru "За последние 5 минут изменений нет."
-  }
-  CustomStringTableItem "{A70C55E136E1B06A}" {
-   Id "LL-MapPaint_NotReady"
-   Target_en_us "Drawing data is not ready"
-   Target_ru_ru "Рисунки ещё не загружены"
-  }
-  CustomStringTableItem "{4DA2330FE78E0F35}" {
-   Id "LL-MapPaint_NoManager"
-   Target_en_us "No marker manager"
-   Target_ru_ru "Система маркеров недоступна"
-  }
-  CustomStringTableItem "{77238D42D8C1D50F}" {
-   Id "LL-MapPaint_NoFaction"
-   Target_en_us "No faction assigned"
-   Target_ru_ru "Сторона не выбрана"
-  }
-  CustomStringTableItem "{3861F2599F993C00}" {
-   Id "LL-MapPaint_NoSync"
-   Target_en_us "No MapMarkerSync component"
-   Target_ru_ru "Синхронизация маркеров недоступна"
-  }
-  CustomStringTableItem "{8F65C4146AE69587}" {
-   Id "LL-MapPaint_Waiting"
-   Target_en_us "Waiting for server snapshot"
-   Target_ru_ru "Ожидание рисунков с сервера"
-  }
-  CustomStringTableItem "{FE735DE07029BFFB}" {
-   Id "LL-MapPaint_HistoryBrush"
-   Target_en_us "%1 - Drew with the brush"
-   Target_ru_ru "%1 — рисование кистью"
-  }
-  CustomStringTableItem "{0CE8AFC086684D91}" {
-   Id "LL-MapPaint_HistoryLine"
-   Target_en_us "%1 - Drew a straight line"
-   Target_ru_ru "%1 — прямая линия"
-  }
-  CustomStringTableItem "{350A8EDF0DC85566}" {
-   Id "LL-MapPaint_HistoryCircle"
-   Target_en_us "%1 - Drew a circle"
-   Target_ru_ru "%1 — окружность"
-  }
-  CustomStringTableItem "{EA9E5874F696C688}" {
-   Id "LL-MapPaint_HistoryAnchor"
-   Target_en_us "%1 - Drew an anchor line"
-   Target_ru_ru "%1 — ломаная линия"
-  }
-  CustomStringTableItem "{3EAB984DF6D24AEA}" {
-   Id "LL-MapPaint_HistoryErase"
-   Target_en_us "%1 - Erased drawings"
-   Target_ru_ru "%1 — стирание рисунков"
-  }
-  CustomStringTableItem "{F2320ABE4C55CBC2}" {
-   Id "LL-MapPaint_HistoryEraseAuthor"
-   Target_en_us "%1 - Erased drawings by %2"
-   Target_ru_ru "%1 — стирание рисунков игрока %2"
-  }
-  CustomStringTableItem "{A9515C0DE80ADC27}" {
-   Id "LL-MapPaint_UnknownPlayer"
-   Target_en_us "Unknown player"
-   Target_ru_ru "Неизвестный игрок"
-  }
-  CustomStringTableItem "{D8DACA77021162BF}" {
-   Id "LL-MapPaint_Player"
-   Target_en_us "Player %1"
-   Target_ru_ru "Игрок %1"
-  }
-  CustomStringTableItem "{C3795503B63117B9}" {
-   Id "LL-MapPaint_LocalPlayer"
-   Target_en_us "Local player"
-   Target_ru_ru "Локальный игрок"
-  }
-
   CustomStringTableItem "{1D3100000000004C}" {
    Id "LL-AdminMessage_AdminAnnouncement"
    Target_en_us "Admin Announcement"
@@ -908,9 +787,9 @@ StringTable {
   }
   CustomStringTableItem "{1D310000000004A3}" {
    Id "LL-Keybind_MapMarkerInfo"
-   Target_en_us "Map: show marker times (hold)"
-   Target_ru_ru "Карта: время маркеров (удерживать)"
-   Modified 1788077228
+   Target_en_us "Map: show marker times and line authors (hold)"
+   Target_ru_ru "Карта: время маркеров и авторы линий (удерживать)"
+   Modified 1795729957
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }
@@ -2447,6 +2326,102 @@ StringTable {
    Target_en_us "Replay recording stopped: the server cannot write to its profile."
    Target_ru_ru "Запись реплея остановлена: сервер не может писать в профиль."
    Modified 1793465528
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{C3B452A17848F6C5}" {
+   Id "LL-Keybind_MapLineStart"
+   Target_en_us "Map: start a line (hold, then click)"
+   Target_ru_ru "Карта: начать линию (удерживать и кликнуть)"
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{9D03B8F8C543B77A}" {
+   Id "LL-Keybind_MapLineFinish"
+   Target_en_us "Map: finish the line"
+   Target_ru_ru "Карта: закончить линию"
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{27BAD5A811ED1B1D}" {
+   Id "LL-Keybind_MapLineCancel"
+   Target_en_us "Map: cancel the line"
+   Target_ru_ru "Карта: отменить линию"
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{3FA0AAFD3778DAB6}" {
+   Id "LL-MapLines_DialogTitle"
+   Target_en_us "MAP LINE"
+   Target_ru_ru "Линия на карте"
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{8208F9A48B6EC0B9}" {
+   Id "LL-MapLines_RefusedNotAllowed"
+   Target_en_us "You cannot draw on the map right now."
+   Target_ru_ru "Сейчас рисовать на карте нельзя."
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{A6B09C75BCDB4B60}" {
+   Id "LL-MapLines_RefusedPlayerLimit"
+   Target_en_us "You already have %1 lines on the map. Delete one of yours first."
+   Target_ru_ru "У вас уже %1 линий на карте. Сначала удалите одну из своих."
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{243AE6D335AEACFB}" {
+   Id "LL-MapLines_RefusedFactionLimit"
+   Target_en_us "Your side already has %1 lines on the map. Delete some to make room."
+   Target_ru_ru "У вашей стороны уже %1 линий на карте. Удалите лишние, чтобы освободить место."
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{ABBB8E02AA5EC7F5}" {
+   Id "LL-MapLines_RefusedTooSoon"
+   Target_en_us "Wait a moment before sending the next line."
+   Target_ru_ru "Подождите немного перед следующей линией."
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{EEC51592F71E1FEA}" {
+   Id "LL-MapLines_RefusedInvalid"
+   Target_en_us "The line was not accepted."
+   Target_ru_ru "Линия не принята."
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{ED58E57BB5A3F513}" {
+   Id "LL-MapLines_PointLimit"
+   Target_en_us "A line has at most %1 points. Press Enter to finish it."
+   Target_ru_ru "В линии не больше %1 точек. Нажмите Enter, чтобы закончить её."
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{972E5F9CE45E8826}" {
+   Id "LL-CommsGuide_LinesHeader"
+   Target_en_us "Map lines"
+   Target_ru_ru "Линии на карте"
+   Modified 1795729957
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{59CDCE5DA27B5E52}" {
+   Id "LL-CommsGuide_LinesBody"
+   Target_en_us "<b>Ctrl + click</b> on the map starts a line and every further <b>click</b> adds a straight segment. <b>Enter</b> finishes it and asks for its color, <b>Esc</b> cancels it. Only your side sees your lines. Hold <b>Left Shift</b> to see who drew a line and when; point at your own line and press <b>Delete</b> to remove it."
+   Target_ru_ru "<b>Ctrl + клик</b> по карте начинает линию, каждый следующий <b>клик</b> добавляет прямой отрезок. <b>Enter</b> заканчивает линию и предлагает выбрать цвет, <b>Esc</b> отменяет её. Ваши линии видит только ваша сторона. Зажмите <b>левый Shift</b>, чтобы увидеть, кто и когда нарисовал линию; наведите курсор на свою линию и нажмите <b>Delete</b>, чтобы удалить её."
+   Modified 1795729957
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }

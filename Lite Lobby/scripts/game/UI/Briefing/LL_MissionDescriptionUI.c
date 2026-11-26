@@ -193,6 +193,9 @@ class LL_MissionDescriptionPanel : ScriptedWidgetComponent
 		t += string.Format("%1<gap/>", WidgetManager.Translate("#LL-CommsGuide_KeyFrequency"));
 		t += string.Format("%1<br/>", WidgetManager.Translate("#LL-CommsGuide_EntryExample"));
 		t += "<hr/>";
+		t += string.Format("<h>%1</h>", WidgetManager.Translate("#LL-CommsGuide_LinesHeader"));
+		t += string.Format("%1<br/>", WidgetManager.Translate("#LL-CommsGuide_LinesBody"));
+		t += "<hr/>";
 		t += string.Format("<h>%1</h>", WidgetManager.Translate("#LL-CommsGuide_EffectsHeader"));
 		t += string.Format("%1<gap/>", WidgetManager.Translate("#LL-CommsGuide_EffectsBody"));
 		t += string.Format("<color=%1>%2</color>", COL_DIM, WidgetManager.Translate("#LL-CommsGuide_Rebind"));

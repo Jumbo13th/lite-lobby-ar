@@ -1,6 +1,7 @@
 // Compact insert-marker dialog at the cursor: description, type and colour with a live
-// preview. Pure UI: it reports (icon entry, colour entry, text) through GetOnConfirm and
-// GetOnCancel; construction and networking stay in LL_MapMarkersUI. Entries are indices
+// preview, or the colour alone for a map line. Pure UI: it reports (icon entry, colour
+// entry, text) through GetOnConfirm and GetOnCancel; construction and networking stay in
+// LL_MapMarkersUI and LL_MapLinesUI. Entries are indices
 // into the shared SCR_MapMarkerEntryPlaced config. Dropdown row icons are applied from
 // m_OnOpened because the combo rebuilds its elements on every open.
 
@@ -16,7 +17,12 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	// Dropdown lists open downward past the dialog's bottom edge.
 	protected const int DROPDOWN_RESERVE = 210;
 
+	// The rows a map line does not use: preview 66, description and type 8 + 44 each.
+	protected const int LINE_MODE_HIDDEN_HEIGHT = 170;
+
 	protected SCR_MapMarkerEntryPlaced m_Config;
+	protected bool m_bLineMode;
+	protected int m_iHeight = DIALOG_HEIGHT;
 
 	protected ImageWidget m_wPreviewIcon;
 	protected TextWidget m_wPreviewText;
@@ -155,6 +161,46 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		GetGame().GetCallqueue().Call(ClampOnScreen);
 	}
 
+	//! A map line has a colour and nothing else: the preview, description and type rows
+	//! are hidden and the dialog shrinks by their height. Confirm reports icon 0 and "".
+	void InitLine(notnull SCR_MapMarkerEntryPlaced config, int colorEntry)
+	{
+		m_Config = config;
+		m_bLineMode = true;
+
+		// Hidden from script: Visible 0 in a layout drops the node's children.
+		array<string> hiddenRows = {"PreviewFrame", "EditBoxRoot", "TypeCombo"};
+		foreach (string rowName : hiddenRows)
+		{
+			Widget row = m_wRoot.FindAnyWidget(rowName);
+			if (row)
+				row.SetVisible(false);
+		}
+
+		RichTextWidget header = RichTextWidget.Cast(m_wRoot.FindAnyWidget("HeaderText"));
+		if (header)
+			header.SetText("#LL-MapLines_DialogTitle");
+
+		if (m_ColorCombo)
+		{
+			array<ref SCR_MarkerColorEntry> colors = config.GetColorEntries();
+			foreach (SCR_MarkerColorEntry color : colors)
+			{
+				m_ColorCombo.AddItem(color.GetName());
+			}
+
+			if (colorEntry >= 0 && colorEntry < colors.Count())
+				m_ColorCombo.SetCurrentItem(colorEntry);
+			else
+				m_ColorCombo.SetCurrentItem(0);
+		}
+
+		m_iHeight = DIALOG_HEIGHT - LINE_MODE_HIDDEN_HEIGHT;
+		FrameSlot.SetSizeY(m_wRoot, m_iHeight);
+
+		GetGame().GetCallqueue().Call(ClampOnScreen);
+	}
+
 	//! Console users without the UGC privilege may not share content.
 	void SetConfirmEnabled(bool enabled)
 	{
@@ -164,7 +210,8 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	int GetSelectedIconEntry()
 	{
-		if (!m_TypeCombo)
+		// The colour rows of a line show the first glyph, the plain dot.
+		if (!m_TypeCombo || m_bLineMode)
 			return 0;
 
 		return m_TypeCombo.GetCurrentIndex();
@@ -225,7 +272,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		float posX = FrameSlot.GetPosX(m_wRoot);
 		float posY = FrameSlot.GetPosY(m_wRoot);
 
-		return x >= posX && x <= posX + DIALOG_WIDTH && y >= posY && y <= posY + DIALOG_HEIGHT;
+		return x >= posX && x <= posX + DIALOG_WIDTH && y >= posY && y <= posY + m_iHeight;
 	}
 
 	bool IsComboFocused()
@@ -288,6 +335,10 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	protected void OnComboClosed(SCR_ComboBoxComponent combo)
 	{
 		MarkEscapeConsumed();
+
+		// A focused list button would take the Enter meant to confirm the line.
+		if (m_bLineMode)
+			GetGame().GetWorkspace().SetFocusedWidget(null);
 	}
 
 	protected void OnSelectionChanged(SCR_ComboBoxComponent combo, int index)
@@ -392,8 +443,8 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 		if (x + DIALOG_WIDTH > sw)
 			x = sw - DIALOG_WIDTH;
-		if (y + DIALOG_HEIGHT + DROPDOWN_RESERVE > sh)
-			y = sh - DIALOG_HEIGHT - DROPDOWN_RESERVE;
+		if (y + m_iHeight + DROPDOWN_RESERVE > sh)
+			y = sh - m_iHeight - DROPDOWN_RESERVE;
 		if (x < 0)
 			x = 0;
 		if (y < 0)

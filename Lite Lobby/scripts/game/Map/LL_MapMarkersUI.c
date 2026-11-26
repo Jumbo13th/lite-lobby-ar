@@ -118,6 +118,17 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	protected static int s_iLastIconEntry;
 	protected static int s_iLastColorEntry;
 
+	//! Shared with map lines: one colour memory for both.
+	static int GetLastColorEntry()
+	{
+		return s_iLastColorEntry;
+	}
+
+	static void SetLastColorEntry(int colorEntry)
+	{
+		s_iLastColorEntry = colorEntry;
+	}
+
 	// Captured when the dialog opens, so the marker lands where the player double-clicked.
 	protected float m_fTargetWorldX;
 	protected float m_fTargetWorldY;
@@ -136,7 +147,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! The client must refuse too because the stock drag writes the new position locally
 	//! before asking the server; with the RPC dropped a spectator could redraw the plan
 	//! for themselves.
-	bool LL_CanEditMarkers()
+	static bool LL_CanEditMarkers()
 	{
 		// The spectator map is read-only outright; the death → spectator handover does
 		// not land in one frame.
@@ -171,9 +182,6 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! re-asserts its own screen position every frame otherwise.
 	override protected void OnDragWidget(Widget widget)
 	{
-		if (m_MapEntity.LL_IsPaintToolEnabled())
-			return;
-
 		if (!LL_CanEditMarkers())
 			return;
 
@@ -202,9 +210,6 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! Removal is intel too; the server refuses it from a spectator.
 	override protected void OnInputMarkerDelete(float value, EActionTrigger reason)
 	{
-		if (m_MapEntity.LL_IsPaintToolEnabled())
-			return;
-
 		if (!LL_CanEditMarkers())
 			return;
 
@@ -214,9 +219,6 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! Own placed marker → edit dialog; empty map → double-click → place dialog.
 	override protected void OnInputMapSelect(float value, EActionTrigger reason)
 	{
-		if (m_MapEntity.LL_IsPaintToolEnabled())
-			return;
-
 		if (!LL_CanEditMarkers())
 			return;
 
@@ -226,6 +228,14 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		// While the dialog is up its MapMarkerEditContext suppresses the menu's map
 		// context, so MapSelect never fires; outside clicks use the raw MouseLeft listener.
 		if (m_wLLDialogRoot)
+			return;
+
+		// Ctrl + click starts a map line, and every click of a line in progress is a point.
+		if (GetGame().GetInputManager().GetActionValue("LL_MapLineStart") > 0)
+			return;
+
+		LL_MapLinesUI linesUI = LL_MapLinesUI.Cast(m_MapEntity.GetMapUIComponent(LL_MapLinesUI));
+		if (linesUI && linesUI.IsBusy())
 			return;
 
 		array<Widget> widgets = SCR_MapCursorModule.GetMapWidgetsUnderCursor();
@@ -492,7 +502,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		if (!m_MarkerMgr)
 			return;
 
-		bool wanted = !m_MapEntity.LL_IsPaintToolEnabled() && GetGame().GetInputManager().GetActionValue("LL_MapMarkerInfo") > 0;
+		bool wanted = GetGame().GetInputManager().GetActionValue("LL_MapMarkerInfo") > 0;
 		if (wanted == m_bLLAgesShown)
 			return;
 
@@ -527,7 +537,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 
 	//! "12 minutes ago", translated. Under a minute gets its own wording; the stock helper
 	//! says "0 minutes ago".
-	protected string LL_FormatMarkerAge(WorldTimestamp timestamp)
+	static string LL_FormatMarkerAge(WorldTimestamp timestamp)
 	{
 		if (!timestamp)
 			return string.Empty;

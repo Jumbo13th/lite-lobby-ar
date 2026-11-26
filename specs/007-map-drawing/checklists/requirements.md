@@ -1,8 +1,8 @@
-# Specification Quality Checklist: Shared Map Drawing
+# Specification Quality Checklist: Map Line Drawing
 
-**Purpose**: Validate completeness before planning.
-**Created**: 2026-10-31
-**Feature**: [Specification](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning
+**Created**: 2026-11-26
+**Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 
@@ -13,10 +13,10 @@
 
 ## Requirement Completeness
 
-- [x] No unresolved clarification markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic
+- [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
 - [x] Edge cases are identified
 - [x] Scope is clearly bounded
@@ -31,5 +31,5 @@
 
 ## Notes
 
-These checks concern specification quality, not implementation or game verification. Operator accepted the specification and plan, including minimal source changes, lobby styling, retained native marker transport and the scoped Shift behavior. Extension hooks are not configured.
-
+- The three markers (FR-008 line text, FR-011 limits, FR-015 session resume and replays) were
+  answered by the operator on 2026-11-26 and recorded under Clarifications.

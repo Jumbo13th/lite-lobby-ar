@@ -10,18 +10,18 @@ modded class SCR_MapMarkerWidgetComponent
 {
 	// The font the stock marker layout declares; a font named only from script is not
 	// guaranteed to resolve, and this one is proven to.
-	protected const ResourceName LL_LABEL_FONT = "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt";
+	static const ResourceName LL_LABEL_FONT = "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt";
 
 	protected const int LL_TITLE_FONT_SIZE = 16;
-	protected const int LL_META_FONT_SIZE = 12;
+	static const int LL_META_FONT_SIZE = 12;
 
 	// The stock marker layout's own two colours, byte for byte.
 	protected const int LL_TITLE_COLOR = 0xFF000000;
-	protected const int LL_META_COLOR = 0xFF131313;
+	static const int LL_META_COLOR = 0xFF131313;
 
 	// Runtime SetShadow uses a different scale from a layout's ShadowSize: below about
 	// 10 nothing renders.
-	protected const int LL_SHADOW_SIZE = 10;
+	static const int LL_SHADOW_SIZE = 10;
 
 	// Applied in each direction from the icon's centre line.
 	protected const float LL_LINE_GAP = 2;

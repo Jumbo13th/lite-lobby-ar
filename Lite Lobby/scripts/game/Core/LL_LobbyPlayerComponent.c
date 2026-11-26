@@ -705,6 +705,129 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		markerMgr.LL_AddTrustedMarker(markerData);
 	}
 
+	// Map lines: the store (LL_MapLineStore) decides who receives what; this component
+	// only carries it. Each send is to this player alone.
+
+	protected ref LL_MapLineCache m_MapLineCache = new LL_MapLineCache();
+
+	LL_MapLineCache GetMapLineCache()
+	{
+		return m_MapLineCache;
+	}
+
+	void AskAddMapLine(int color, float width, notnull array<int> points)
+	{
+		Rpc(RpcAsk_AddMapLine, color, width, points);
+	}
+
+	void AskRemoveMapLine(int lineId)
+	{
+		Rpc(RpcAsk_RemoveMapLine, lineId);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_AddMapLine(int color, float width, array<int> points)
+	{
+		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+		if (!mgr || !mgr.GetMapLineStore())
+			return;
+
+		LL_EMapLineRefusal reason = mgr.GetMapLineStore().Add_S(GetPlayerId(), color, width, points);
+		if (reason == LL_EMapLineRefusal.NONE)
+			return;
+
+		// Rpc never runs on the sender.
+		if (GetGame().GetPlayerController() == GetOwner())
+			ShowMapLineRefused(reason);
+		else
+			Rpc(RpcDo_OwnerMapLineRefused, reason);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_RemoveMapLine(int lineId)
+	{
+		LL_LobbyManager mgr = LL_LobbyManager.GetInstance();
+		if (mgr && mgr.GetMapLineStore())
+			mgr.GetMapLineStore().Remove_S(GetPlayerId(), lineId);
+	}
+
+	void SendMapLine_S(notnull LL_MapLine line, bool own)
+	{
+		int ageSeconds;
+		ChimeraWorld world = GetGame().GetWorld();
+		if (world)
+			ageSeconds = Math.Max(0, world.GetServerTimestamp().DiffSeconds(line.m_CreatedAt));
+
+		if (GetGame().GetPlayerController() == GetOwner())
+			ApplyMapLine(line.m_iId, line.m_iColor, line.m_fWidth, ageSeconds, line.m_sAuthorName, own, line.m_aPoints);
+		else
+			Rpc(RpcDo_OwnerAddMapLine, line.m_iId, line.m_iColor, line.m_fWidth, ageSeconds, line.m_sAuthorName, own, line.m_aPoints);
+	}
+
+	void SendMapLineRemoved_S(int lineId)
+	{
+		if (GetGame().GetPlayerController() == GetOwner())
+			m_MapLineCache.Remove(lineId);
+		else
+			Rpc(RpcDo_OwnerRemoveMapLine, lineId);
+	}
+
+	void SendMapLinesReset_S()
+	{
+		if (GetGame().GetPlayerController() == GetOwner())
+			m_MapLineCache.Reset();
+		else
+			Rpc(RpcDo_OwnerResetMapLines);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_OwnerAddMapLine(int lineId, int color, float width, int ageSeconds, string authorName, bool own, array<int> points)
+	{
+		if (points)
+			ApplyMapLine(lineId, color, width, ageSeconds, authorName, own, points);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_OwnerRemoveMapLine(int lineId)
+	{
+		m_MapLineCache.Remove(lineId);
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_OwnerResetMapLines()
+	{
+		m_MapLineCache.Reset();
+	}
+
+	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
+	protected void RpcDo_OwnerMapLineRefused(int reason)
+	{
+		ShowMapLineRefused(reason);
+	}
+
+	// A fresh object: on a listen host the store's own line must not be shared.
+	protected void ApplyMapLine(int lineId, int color, float width, int ageSeconds, string authorName, bool own, notnull array<int> points)
+	{
+		LL_MapLine line = new LL_MapLine();
+		line.m_iId = lineId;
+		line.m_iColor = color;
+		line.m_fWidth = width;
+		line.m_aPoints.Copy(points);
+		line.m_sAuthorName = authorName;
+		line.m_bOwn = own;
+
+		ChimeraWorld world = GetGame().GetWorld();
+		if (world)
+			line.m_CreatedAt = world.GetServerTimestamp().PlusSeconds(-ageSeconds);
+
+		m_MapLineCache.Add(line);
+	}
+
+	void ShowMapLineRefused(LL_EMapLineRefusal reason)
+	{
+		ShowCommandHelp(LL_MapLine.TranslateRefusal(reason));
+	}
+
 	// Ready requires a slot; un-ready is always allowed.
 
 	void AskSetReady(bool ready)

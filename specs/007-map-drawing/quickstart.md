@@ -1,0 +1,51 @@
+# Quickstart: Validating Map Line Drawing
+
+Acceptance environment: the demo scenario (`Missions/LobbyDemo.conf`) on a dedicated server.
+Clients: A and B slotted in one faction, C in the other, D connected without a slot. One of them
+logged in as admin where a step says so.
+
+## Prerequisites
+
+1. Workbench compiles the addon with no script errors.
+2. `LL_MapBriefing.conf`, `chimeraInputCommon.conf`, `keyBindingMenu.conf` and
+   `LL_Persistence.conf` open in Workbench without errors (see plan, Workbench steps).
+3. The server log shows no `[LL_Lobby]` line errors at start.
+
+## Steps
+
+1. **Draw and share (US1).** A, on the briefing map: Ctrl + click; a dot appears in the last
+   marker colour. Click 20 points round an object, press Enter; the dialog shows only Colour,
+   Cancel and OK. Pick green, OK. Expected: the line turns green for A; B sees it within a second
+   on the briefing map; C and D never receive it (client logs show no line deliveries).
+2. **Cancel paths (US1).** A starts a line and presses Escape: gone. A draws two points, Enter,
+   then Cancel in the dialog: gone. B never saw either.
+3. **Keys stay ours (R3).** While A draws: Enter does not open the chat, Escape does not close
+   the map, M does not close the map, push-to-talk still transmits to B, the mouse wheel zooms,
+   a drag pans without adding a point, a fast double click adds points and opens no marker dialog.
+4. **Width rule (US2).** A draws one line fully zoomed out and one fully zoomed in. Both look
+   equally thick while drawn. Zoom in on the first: a wide band; zoom out on the second: a
+   hairline. B sees the same ground widths at the same zoom as A. Lines lie under markers and the
+   map shows through them.
+5. **Who drew it (US3).** B holds Left Shift: "A's name (n minutes ago)" next to the start dot;
+   released, it goes.
+6. **Delete rights (US3).** B points at A's line and presses Delete: nothing. A does: it goes for
+   A and B. B logs in as admin and deletes one of A's lines: gone for both. With A's own marker
+   on top of A's line, Delete removes only the marker.
+7. **Slot changes (US4).** A draws three lines. D takes a slot in A's faction and opens the map:
+   all three within 5 seconds. B switches to C's faction: A's lines leave B's map; C's lines
+   appear. A disconnects and reconnects: A's lines are still there and A can delete them.
+8. **Briefing to game (US4).** Lines drawn in the briefing are on the game map and on the
+   spectator map (read-only: Ctrl + click there starts nothing).
+9. **Refusals (edge cases).** A draws 20 lines; the 21st Ctrl + click shows the player-limit
+   message. A clicks 64 points; the 65th shows the point-limit message. A confirms two lines
+   within 2 seconds: the second is refused with the too-soon message. During hard freeze
+   Ctrl + click starts nothing, and a dead A cannot draw or delete.
+10. **Session resume (FR-015).** With lines on both sides, kill the server process and resume the
+    session: after retaking slots each faction has its lines, ages continue, authors can delete
+    theirs.
+11. **Scale (SC-005, SC-006).** Fill one faction to 150 lines (a test client drawing with
+    several players). Pan and zoom: no stutter; the frame time on the map rises by no more than
+    2 ms over an empty map. Run a 127-slot session with both factions at the limit through a
+    session resume: no replication kick, no script error.
+12. **Guide (FR-018).** The Communications entry of the briefing explains start, points, finish,
+    cancel, delete and the info key, in English and Russian.
