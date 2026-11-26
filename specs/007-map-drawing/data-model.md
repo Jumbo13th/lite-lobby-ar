@@ -18,7 +18,7 @@ Held by the server line store, owned by `LL_LobbyManager` on the authority.
 **Limits**: 64 points per line, 20 lines per author identity, 150 lines per faction. One
 accepted line per author identity every 2 seconds (last accepted time per identity).
 
-**Lifecycle**: accepted → stored → delivered to the faction → deleted by its author or an admin,
+**Lifecycle**: accepted → stored → delivered to the faction → deleted by any player of its faction who may place markers,
 or dropped with the mission. A session resume restores it with its id, author, colour, width,
 points and age.
 

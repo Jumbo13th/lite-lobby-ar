@@ -66,6 +66,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 	protected int m_iLastClickY;
 	protected bool m_bLastClickAddedPoint;
 	protected int m_iDraftColor;
+	protected int m_iColorBeforeDialog;
 	protected bool m_bPointLimitShown;
 	protected float m_fLastSentTime = -float.MAX;
 
@@ -181,6 +182,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		inputManager.AddActionListener("MapMarkerDelete", EActionTrigger.DOWN, OnInputDelete);
 		inputManager.AddActionListener("LL_MapLineFinish", EActionTrigger.DOWN, OnInputFinish);
 		inputManager.AddActionListener("LL_MapLineCancel", EActionTrigger.DOWN, OnInputCancel);
+		inputManager.AddActionListener("LL_MapLineUndo", EActionTrigger.DOWN, OnInputUndo);
 
 		m_bDirty = true;
 	}
@@ -192,6 +194,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		inputManager.RemoveActionListener("MapMarkerDelete", EActionTrigger.DOWN, OnInputDelete);
 		inputManager.RemoveActionListener("LL_MapLineFinish", EActionTrigger.DOWN, OnInputFinish);
 		inputManager.RemoveActionListener("LL_MapLineCancel", EActionTrigger.DOWN, OnInputCancel);
+		inputManager.RemoveActionListener("LL_MapLineUndo", EActionTrigger.DOWN, OnInputUndo);
 
 		CloseDialog();
 		DiscardDraft();
@@ -229,6 +232,14 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		{
 			CloseDialog();
 			DiscardDraft();
+		}
+
+		// The server refuses a line sent after the freeze, so one still in progress goes now.
+		if (IsBusy() && !LL_MapLine.IsDrawingPhase())
+		{
+			CloseDialog();
+			DiscardDraft();
+			ShowRefusal(LL_EMapLineRefusal.FREEZE_OVER);
 		}
 
 		if (m_wDialogRoot)
@@ -274,6 +285,12 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 			if (m_CursorModule && (m_CursorModule.GetCursorState() & SCR_MapCursorModule.STATE_POPUP_RESTRICTED) != 0)
 				return;
+
+			if (!LL_MapLine.IsDrawingPhase())
+			{
+				ShowRefusal(LL_EMapLineRefusal.FREEZE_OVER);
+				return;
+			}
 
 			LL_EMapLineRefusal refusal = CheckLimits();
 			if (refusal != LL_EMapLineRefusal.NONE)
@@ -417,6 +434,24 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			DiscardDraft();
 	}
 
+	//! Takes back the last point; with only the start left, cancels the line as Escape does.
+	protected void OnInputUndo(float value, EActionTrigger reason)
+	{
+		if (!m_bDrawing || m_wDialogRoot)
+			return;
+
+		if (m_aDraft.Count() <= 2)
+		{
+			DiscardDraft();
+			return;
+		}
+
+		m_aDraft.Resize(m_aDraft.Count() - 2);
+		m_bPointLimitShown = false;
+		m_fLastClickTime = -float.MAX;
+		m_bDirty = true;
+	}
+
 	protected void DiscardDraft()
 	{
 		if (!m_bDrawing)
@@ -456,9 +491,11 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		WidgetManager.GetMousePos(mouseX, mouseY);
 		FrameSlot.SetPos(m_wDialogRoot, workspace.DPIUnscale(mouseX), workspace.DPIUnscale(mouseY));
 
+		m_iColorBeforeDialog = m_iDraftColor;
 		m_Dialog.InitLine(m_PlacedConfig, m_iDraftColor);
 		m_Dialog.GetOnConfirm().Insert(OnDialogConfirm);
 		m_Dialog.GetOnCancel().Insert(OnDialogCancel);
+		m_Dialog.GetOnColorChanged().Insert(OnDialogColorChanged);
 
 		// Console users without the UGC privilege may not share content.
 		PlayerController pc = GetGame().GetPlayerController();
@@ -506,8 +543,18 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		CloseDialog();
 	}
 
+	//! The pick shows on the line at once; OK keeps it, Cancel puts the old colour back.
+	protected void OnDialogColorChanged(int colorEntry)
+	{
+		m_iDraftColor = colorEntry;
+		m_bDirty = true;
+	}
+
 	protected void OnDialogCancel()
 	{
+		m_iDraftColor = m_iColorBeforeDialog;
+		m_bDirty = true;
+
 		CloseDialog();
 	}
 
@@ -787,8 +834,8 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		if (!LL_MapMarkersUI.LL_CanEditMarkers())
 			return;
 
-		// One key, one deletion: the player's own marker under the cursor goes first.
-		if (IsOwnMarkerUnderCursor())
+		// One key, one deletion: a placed marker under the cursor goes first.
+		if (IsMarkerUnderCursor())
 			return;
 
 		LL_MapLine line = FindDeletableLineUnderCursor();
@@ -800,7 +847,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			lobbyPlayer.AskRemoveMapLine(line.m_iId);
 	}
 
-	protected bool IsOwnMarkerUnderCursor()
+	protected bool IsMarkerUnderCursor()
 	{
 		SCR_MapMarkerManagerComponent markerManager = SCR_MapMarkerManagerComponent.GetInstance();
 		if (!markerManager)
@@ -815,14 +862,19 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 				continue;
 
 			SCR_MapMarkerBase marker = markerManager.GetMarkerByWidget(widget);
-			if (marker && marker.CanBeRemovedByOwner() && SCR_MapMarkersUI.IsOwnedMarker(marker))
+			if (!marker || !marker.CanBeRemovedByOwner())
+				continue;
+
+			SCR_EMapMarkerType type = marker.GetType();
+			if (type == SCR_EMapMarkerType.PLACED_CUSTOM || type == SCR_EMapMarkerType.PLACED_MILITARY)
 				return true;
 		}
 
 		return false;
 	}
 
-	//! Topmost first, as drawn; the start dot or any segment counts.
+	//! Any line of the faction (the cache holds no other); only the start point deletes it, as
+	//! only its glyph deletes a marker; topmost first, as drawn.
 	protected LL_MapLine FindDeletableLineUnderCursor()
 	{
 		int mouseX, mouseY;
@@ -832,60 +884,25 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		int originX, originY;
 		m_MapEntity.WorldToScreen(0, 0, originX, originY, true);
 
-		bool isAdmin = SCR_Global.IsAdmin();
-
 		// The visible part of the Dot glyph: its label ink is the share of the square it fills.
-		float dotTolerance = Math.Max(GetGame().GetWorkspace().DPIScale(m_fDotSize * 0.5 * m_fDotInk), HIT_MIN_PX);
+		float tolerance = Math.Max(GetGame().GetWorkspace().DPIScale(m_fDotSize * 0.5 * m_fDotInk), HIT_MIN_PX);
 
 		array<ref LL_MapLine> lines = m_Cache.GetLines();
 		for (int i = lines.Count() - 1; i >= 0; i--)
 		{
 			LL_MapLine line = lines[i];
-			if (!line.m_bOwn && !isAdmin)
+			if (line.GetPointCount() == 0)
 				continue;
 
-			float drawnWidth = Math.Max(MIN_DRAWN_WIDTH, line.m_fWidth * zoom);
-			float tolerance = Math.Max(drawnWidth * 0.5, HIT_MIN_PX);
-
-			float prevX, prevY;
-			for (int p = 0; p < line.GetPointCount(); p++)
-			{
-				float worldX, worldY;
-				line.GetPoint(p, worldX, worldY);
-				float x = originX + worldX * zoom;
-				float y = originY - worldY * zoom;
-
-				if (p == 0)
-				{
-					if (Math.Sqrt((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY)) <= dotTolerance)
-						return line;
-				}
-				else if (DistanceToSegment(mouseX, mouseY, prevX, prevY, x, y) <= tolerance)
-				{
-					return line;
-				}
-
-				prevX = x;
-				prevY = y;
-			}
+			float worldX, worldY;
+			line.GetPoint(0, worldX, worldY);
+			float dx = originX + worldX * zoom - mouseX;
+			float dy = originY - worldY * zoom - mouseY;
+			if (Math.Sqrt(dx * dx + dy * dy) <= tolerance)
+				return line;
 		}
 
 		return null;
-	}
-
-	protected static float DistanceToSegment(float px, float py, float ax, float ay, float bx, float by)
-	{
-		float dx = bx - ax;
-		float dy = by - ay;
-		float lengthSq = dx * dx + dy * dy;
-
-		float t;
-		if (lengthSq > 0)
-			t = Math.Clamp(((px - ax) * dx + (py - ay) * dy) / lengthSq, 0, 1);
-
-		float cx = ax + t * dx - px;
-		float cy = ay + t * dy - py;
-		return Math.Sqrt(cx * cx + cy * cy);
 	}
 
 	//! Polled, as the marker ages are: a release lost while the dialog holds the input

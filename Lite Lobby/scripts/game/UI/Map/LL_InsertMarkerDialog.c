@@ -39,6 +39,9 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	protected ref ScriptInvokerBase<LL_InsertMarkerConfirmInvoker> m_OnConfirm = new ScriptInvokerBase<LL_InsertMarkerConfirmInvoker>();
 	protected ref ScriptInvokerVoid m_OnCancel = new ScriptInvokerVoid();
 
+	// (int colorEntry) on every pick, before OK: a map line recolours live.
+	protected ref ScriptInvoker m_OnColorChanged = new ScriptInvoker();
+
 	// A dropdown or the edit box consumes Escape in the same frame the cancel listener
 	// fires, and listener order is not guaranteed.
 	protected const float ESCAPE_CONSUMED_GRACE_MS = 150;
@@ -52,6 +55,11 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	ScriptInvokerVoid GetOnCancel()
 	{
 		return m_OnCancel;
+	}
+
+	ScriptInvoker GetOnColorChanged()
+	{
+		return m_OnColorChanged;
 	}
 
 	override void HandlerAttached(Widget w)
@@ -347,6 +355,9 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	protected void OnSelectionChanged(SCR_ComboBoxComponent combo, int index)
 	{
+		if (combo == m_ColorCombo)
+			m_OnColorChanged.Invoke(index);
+
 		UpdatePreview();
 	}
 

@@ -64,6 +64,9 @@ modded class SCR_MapMarkerManagerComponent
 	// subset is a strict subset of the broadcast. Faction-less markers still broadcast.
 	override void OnAskAddStaticMarker(SCR_MapMarkerBase markerData)
 	{
+		if (markerData)
+			LL_LogMarkerPlaced(markerData);
+
 		if (!markerData || markerData.GetMarkerFactionFlags() == 0)
 		{
 			super.OnAskAddStaticMarker(markerData);
@@ -92,6 +95,27 @@ modded class SCR_MapMarkerManagerComponent
 			if (lobbyPlayer)
 				lobbyPlayer.SendStaticMarker_S(markerData);
 		}
+	}
+
+	// The one server call every accepted marker passes, so the audit sees each placement once.
+	protected void LL_LogMarkerPlaced(notnull SCR_MapMarkerBase markerData)
+	{
+		int ownerId = markerData.GetMarkerOwnerID();
+		string owner = "server";
+		string factionKey;
+		if (ownerId != -1)
+		{
+			owner = GetGame().GetPlayerManager().GetPlayerName(ownerId);
+			Faction faction = SCR_FactionManager.SGetPlayerFaction(ownerId);
+			if (faction)
+				factionKey = faction.GetFactionKey();
+		}
+
+		int pos[2];
+		markerData.GetWorldPos(pos);
+
+		Print(string.Format("[LL_MapAudit] Marker %1 placed by %2 (player %3, %4): '%5' at %6 %7",
+			markerData.GetMarkerID(), owner, ownerId, factionKey, markerData.GetCustomText(), pos[0], pos[1]), LogLevel.NORMAL);
 	}
 
 	// Set while applying a marker the server addressed to this client: the client's own

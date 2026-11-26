@@ -139,6 +139,15 @@ Claude Design round.
 - [X] T043 [US3] In `LL/scripts/game/Map/LL_MapLinesUI.c` skip null widgets under the cursor: deleting a marker crashed `IsOwnMarkerUnderCursor` (operator, second test).
 - [X] T044 [US2] In `LL/scripts/game/Map/LL_MapLinesUI.c` set the line in progress' width from the zoom at each click that adds a point, draw it with that width between clicks and send it on Enter (FR-006, spec session 2026-11-27, second test).
 - [X] T045 Enlarge the insert-marker dialog icons in this pull request (operator's call): `LL/UI/Map/InsertMarkerDialog.layout` preview 38 → 56 px, its frame 66 → 84, dialog 338 → 356; `LL/scripts/game/UI/Map/LL_InsertMarkerDialog.c` `DIALOG_HEIGHT` 356, `LINE_MODE_HIDDEN_HEIGHT` 188, list icons 32 px through the stock element's `IconSize` overrides; changelog line.
+- [X] T046 [US1] Refuse new lines once the freeze time ends: `LL_MapLine.IsDrawingPhase` (`LL/scripts/game/Map/LL_MapLine.c`), refusal 7 in `LL_MapLineStore.Add_S`, Ctrl + click refused and a line in progress discarded with a message in `LL/scripts/game/Map/LL_MapLinesUI.c`; deletion unchanged (FR-001).
+- [X] T047 [US1] Backspace removes the last point, or cancels with only the start left: action `LL_MapLineUndo` in `LL/Configs/System/chimeraInputCommon.conf` and `LL_MapLineContext`, its `keyBindingMenu.conf` row, handler in `LL/scripts/game/Map/LL_MapLinesUI.c` (FR-004).
+- [X] T048 [P] Strings `LL-Keybind_MapLineUndo` and `LL-MapLines_RefusedFreezeOver`, the Communications paragraph and the 1.2.0 changelog in English and Russian; runtime tables regenerated.
+- [X] T049 [US3] Delete acts only on a line's start point (`FindDeletableLineUnderCursor` in `LL/scripts/game/Map/LL_MapLinesUI.c`; the segment test removed); guide paragraph and changelog wording (FR-012, research R10).
+- [X] T050 [US1] The colour dialog raises a colour-changed event (`LL/scripts/game/UI/Map/LL_InsertMarkerDialog.c`); the line in progress shows each pick at once and Cancel restores the previous colour (`LL/scripts/game/Map/LL_MapLinesUI.c`) (FR-005).
+- [X] T051 [US3] Lines: any faction player who may place markers deletes any faction line (`Remove_S` in `LL/scripts/game/Map/LL_MapLineStore.c`, hit test in `LL/scripts/game/Map/LL_MapLinesUI.c`); a placed marker under the cursor goes first (FR-012).
+- [X] T052 [US3] Markers: `m_bIsDeleteRestricted = false` and the faction and type gate with server-marker removal in `LL/scripts/game/Modded/LL_M_SCR_MapMarkerSyncComponent.c`; `RemoveOwnedMarker` override for server-owned markers in `LL/scripts/game/Map/LL_MapMarkersUI.c` (FR-012, research R15).
+- [X] T053 [US3] `[LL_MapAudit]` lines: line accepted and deleted (`LL_MapLineStore.c`), marker accepted (`LL/scripts/game/Modded/LL_M_SCR_MapMarkerManagerComponent.c`), marker deleted (`LL_M_SCR_MapMarkerSyncComponent.c`) (FR-020, research R16).
+- [X] T054 [P] Communications paragraph (any line or marker of your side can be deleted) and the 1.2.0 changelog in English and Russian; runtime tables regenerated.
 - [ ] T038 Operator: compile and run quickstart steps 1 to 12 on a dedicated server.
 
 ---

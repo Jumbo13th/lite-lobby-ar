@@ -34,9 +34,12 @@ logged in as admin where a step says so.
    Lines lie under markers and the map shows through them.
 5. **Who drew it (US3).** B holds Left Shift: "A's name (n minutes ago)" next to the start dot;
    released, it goes.
-6. **Delete rights (US3).** B points at A's line and presses Delete: nothing. A does: it goes for
-   A and B. B logs in as admin and deletes one of A's lines: gone for both. With A's own marker
-   on top of A's line, Delete removes only the marker.
+6. **Map cleanup (US3).** A points at the middle of a segment and presses Delete: nothing. B
+   points at the start point of A's line and presses Delete: gone for A and B. B deletes A's
+   marker the same way, and, after a session resume, a restored marker. With a marker on top of a
+   line's start point, Delete removes only the marker. C (other faction) sends a forged removal
+   for A's marker id: nothing changes. The server log has an `[LL_MapAudit]` line for every line
+   and marker placed and deleted, naming who, whose and what.
 7. **Slot changes (US4).** A draws three lines. D takes a slot in A's faction and opens the map:
    all three within 5 seconds. B switches to C's faction: A's lines leave B's map; C's lines
    appear. A disconnects and reconnects: A's lines are still there and A can delete them.
@@ -45,7 +48,10 @@ logged in as admin where a step says so.
 9. **Refusals (edge cases).** A draws 20 lines; the 21st Ctrl + click shows the player-limit
    message. A clicks 64 points; the 65th shows the point-limit message. A confirms two lines
    within 2 seconds: the second is refused with the too-soon message. During hard freeze
-   Ctrl + click starts nothing, and a dead A cannot draw or delete.
+   Ctrl + click starts nothing, and a dead A cannot draw or delete. A clicks three points and
+   presses Backspace three times: two points go, the third press cancels the line. A draws a
+   line while the freeze time runs out: it is discarded with the freeze message; after that
+   Ctrl + click only shows the message, and A can still delete an own line.
 10. **Session resume (FR-015).** With lines on both sides, kill the server process and resume the
     session: after retaking slots each faction has its lines, ages continue, authors can delete
     theirs.

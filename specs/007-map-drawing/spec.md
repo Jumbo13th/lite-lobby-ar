@@ -74,6 +74,34 @@ to each player of the faction when it is confirmed.
 - Q: Do the larger insert-marker dialog icons ship with this feature? → A: Yes, in the same pull
   request: the dialog preview grows from 38 to 56 px and the list icons from 20 to 32 px.
 
+### Session 2026-11-27 (freeze and undo)
+
+- Q: When can lines be drawn? → A: Before the game and during its freeze time; once the freeze
+  time ends no new line is accepted. Deleting lines stays allowed during the game.
+- Q: What happens to a line in progress when the freeze time ends? → A: It is discarded and the
+  player is told why.
+- Q: How is a misplaced point taken back? → A: Backspace removes the last point; with only the
+  start point left it cancels the line, as Escape does.
+
+### Session 2026-11-27 (third in-game test)
+
+- Q: Where does Delete act on a line? → A: Only on its start point, the Dot glyph, as a marker is
+  deleted on its glyph; pointing at a segment deletes nothing.
+- Q: When does a new colour show on the line in progress? → A: As soon as it is picked in the
+  colour dialog, before OK; Cancel puts the previous colour back.
+
+### Session 2026-11-27 (map cleanup)
+
+- Q: Who may delete lines and markers? → A: Any player of the faction who may place markers may
+  delete any of the faction's lines and placed markers, so a flood can be cleaned up by the
+  players themselves. Always on in Lite Lobby missions.
+- Q: Markers restored by a session resume belong to the server; can they be deleted? → A: Yes,
+  by their faction, like any other marker.
+- Q: Is the cleanup audited? → A: The server log gets one line for every line and marker placed
+  and every one deleted: who did it, whose it was, the faction, and what it was.
+- Q: Is this a separate specification? → A: No, it is part of this one: map cleanup covers lines
+  and markers alike.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Draw a line and share it with the faction (Priority: P1)
@@ -101,10 +129,10 @@ does not.
 3. **Given** a line in progress, **When** the player double clicks, **Then** no point is added and
    the insert-marker dialog opens with only the colour list, Cancel and OK, preset to the line's
    colour.
-4. **Given** that dialog is open, **When** the player picks another colour and confirms with OK or
-   Enter, **Then** the whole line, start dot included, takes that colour, the colour is
-   remembered for the next marker and line, and drawing continues. Cancel or Escape closes the
-   dialog and drawing continues unchanged.
+4. **Given** that dialog is open, **When** the player picks another colour, **Then** the whole
+   line, start point included, shows it at once; OK or Enter keeps it, remembers it for the
+   next marker and line, and drawing continues. Cancel or Escape puts the previous colour back
+   and drawing continues.
 5. **Given** a line with at least two points, **When** the player presses Enter, **Then** the line
    is finished and sent in its colour, with no dialog.
 6. **Given** a finished line, **Then** every player of the author's faction sees it within one
@@ -148,30 +176,38 @@ through the whole range and pan.
 
 ---
 
-### User Story 3 - See who drew a line and remove it (Priority: P2)
+### User Story 3 - See who drew a line and clean up the map (Priority: P2)
 
-A player removes a line they drew that is no longer valid. Any player can check who drew a line
-and when. An admin removes a line that should not be there.
+Any player of a faction removes a line or marker of that faction that is no longer valid or
+should not be there, whoever placed it, and can check who drew a line and when. If someone floods
+the map, the players clean it up themselves, and the server log shows who placed and who removed
+what.
 
-**Why this priority**: a plan changes during a mission, and lines stay until removed.
+**Why this priority**: a plan changes during a mission, lines and markers stay until removed, and
+one player must not be able to bury a faction's map with nobody able to clear it.
 
-**Independent Test**: two same-faction clients each draw a line; each tries to delete both; then
-an admin deletes one.
+**Independent Test**: two same-faction clients each draw a line and place a marker; each deletes
+the other's; a client of the other faction tries to delete one by a forged request; the server
+log is read afterwards.
 
 **Acceptance Scenarios**:
 
-1. **Given** the author points at their own line, at any segment or at the start dot, **When**
-   they press the marker delete key, **Then** the line disappears for every player of the
-   faction.
-2. **Given** a player points at a line someone else drew, **When** they press the marker delete
-   key, **Then** nothing happens.
-3. **Given** a server admin points at any line they can see, **When** they press the marker
-   delete key, **Then** the line disappears for every player of the faction.
+1. **Given** a player who may place markers points at the start point of any line of their
+   faction, theirs or not, **When** they press the marker delete key, **Then** the line
+   disappears for every player of the faction. Pointing at a segment deletes nothing.
+2. **Given** a player who may place markers points at any placed marker of their faction, theirs
+   or not, a marker restored by a session resume included, **When** they press the marker delete
+   key, **Then** the marker disappears for every player of the faction.
+3. **Given** a player of the other faction sends a request to delete a line or marker they cannot
+   see, **Then** the server refuses it and nothing changes.
 4. **Given** the author disconnected and came back, **When** they delete their line, **Then** it
    is removed as before the disconnect.
 5. **Given** lines on the map, **When** a player holds the marker-info key, **Then** next to each
    line's start dot the author's name and how long ago the line was drawn appear, worded as for
    markers, and they disappear when the key is released.
+6. **Given** players placed and deleted lines and markers, **When** an admin reads the server log,
+   **Then** each placement and each deletion is one line naming who did it, whose it was, the
+   faction, and what it was.
 
 ---
 
@@ -219,10 +255,15 @@ it; a second client switches from that faction to the other one.
   and nothing is delivered.
 - A line delivered twice to one player (the full set on slot take and a new line in the same
   moment) shows once; a deleted line never reappears.
-- Lines overlap: one press of the delete key removes one line, the topmost one the player may
-  delete.
+- Start points overlap: one press of the delete key removes one line, the topmost one. A placed
+  marker under the cursor is deleted first and the line is left alone.
+- A forged request deletes a line or marker of another faction, or a marker that is not a
+  placed one: refused, nothing changes.
 - Every machine stacks lines in the same order: the order the server accepted them.
 - Lines end with the mission.
+- The freeze time ends while a line is in progress: the line is discarded and the player is told;
+  after that Ctrl + click starts nothing and says why. A line sent at that moment is refused by
+  the server.
 
 ## Requirements *(mandatory)*
 
@@ -230,20 +271,24 @@ it; a second client switches from that faction to the other one.
 
 - **FR-001**: A player who may place markers MUST be able to start a line with Ctrl + left click
   on the briefing or game map. The rules are the markers' rules: a faction, a living slot
-  character, not the spectator map, not during hard freeze.
+  character, not the spectator map, not during hard freeze. Lines MUST only be drawn before
+  the game and during its freeze time: the server MUST refuse a line sent after the freeze time
+  ends, and a line in progress at that moment MUST be discarded with a message. Deleting stays
+  allowed.
 - **FR-002**: While a line is in progress, each left click MUST add one point joined to the
   previous one by a straight segment. Holding or dragging the mouse MUST never add points: there
   is no freehand drawing.
 - **FR-003**: While a line is in progress, marker placement by double click and marker editing by
   click MUST be suspended.
 - **FR-004**: Enter MUST finish a line of two or more points and send it, with no dialog. Escape
-  MUST discard a line in progress. A double click while a line is in progress MUST add no point
+  MUST discard a line in progress. Backspace MUST remove the last point, and with only the start
+  point left cancel the line. A double click while a line is in progress MUST add no point
   and open the lobby's insert-marker dialog with only the colour list, Cancel and OK; drawing
   continues after it closes.
 - **FR-005**: A line's colour MUST be one of the colours the insert-marker dialog offers. A line
-  starts in the colour last confirmed in that dialog, for a marker or a line; a colour confirmed
-  in the double-click dialog MUST recolour the whole line in progress and become the remembered
-  colour.
+  starts in the colour last confirmed in that dialog, for a marker or a line. A colour picked in
+  the double-click dialog MUST show on the whole line in progress at once; OK MUST keep it and
+  make it the remembered colour, Cancel MUST restore the previous one.
 - **FR-006**: Each click of a line in progress MUST set the whole line's ground width from the
   zoom at that click, so that it is 2% of the screen at that moment, never more than 50 m;
   between clicks the line scales with the map. Enter MUST send the width of the latest click.
@@ -262,9 +307,11 @@ it; a second client switches from that faction to the other one.
 - **FR-011**: The server MUST enforce 64 points per line, 20 lines per player and 150 lines per
   faction, and accept at most one new line from a player every two seconds. A refused request
   MUST tell the player why, in their language.
-- **FR-012**: The author and server admins MUST be able to delete a line by pointing at it and
-  pressing the marker delete key; nobody else can. The server MUST check the right to delete. The
-  author's right MUST survive a reconnect.
+- **FR-012**: Any player of a faction who may place markers MUST be able to delete any line of
+  that faction by pointing at its start point and pressing the marker delete key, and any placed
+  marker of that faction, a server-owned marker restored by a session resume included, the way
+  markers are deleted today. The server MUST check that the requester may place markers and that
+  the line or marker belongs to their faction (a faction-less marker counts as everyone's).
 - **FR-013**: A player who takes a slot in a faction MUST receive that faction's current lines; a
   player who leaves a faction MUST lose them and receive nothing more from it. Lines MUST stack in
   the order the server accepted them on every machine.
@@ -281,6 +328,9 @@ it; a second client switches from that faction to the other one.
   The map shows no drawing hint of its own.
 - **FR-019**: The feature MUST be reproducible in the demo world, verified on a dedicated server
   and measured at 127 occupied slots before it is called done.
+- **FR-020**: The server log MUST get one line for every line and marker placed and every one
+  deleted, naming the player who did it, whose line or marker it was, the faction, and what it
+  was (a line's id and point count, a marker's id, text and position).
 
 ### Key Entities
 
@@ -314,7 +364,10 @@ it; a second client switches from that faction to the other one.
 - The right to draw and delete is the right to place and delete markers; this feature adds no
   new stage restrictions and gives spectators nothing to edit. Players without a faction, Game
   Masters without a slot included, neither draw nor see lines.
-- A line cannot be edited; it is deleted and drawn again. There is no undo of the last point.
+- A line cannot be edited once sent; it is deleted and drawn again. A marker can still only be
+  edited by its owner.
+- Markers a Game Master placed from the editor, if the server owns them, are deleted like
+  restored markers: the server cannot tell them apart.
 - Markers and lines share the last confirmed colour.
 - On the screen, a line in progress is about 2% of the screen height wide. The band is about 55%
   opaque; its outline is a 2 px edge in the line's colour at about half its brightness, as on the

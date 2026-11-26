@@ -10,7 +10,8 @@ enum LL_EMapLineRefusal
 	FACTION_LIMIT = 3,
 	TOO_SOON = 4,
 	INVALID = 5,
-	POINT_LIMIT = 6
+	POINT_LIMIT = 6,
+	FREEZE_OVER = 7
 }
 
 class LL_MapLine
@@ -55,9 +56,26 @@ class LL_MapLine
 				return WidgetManager.Translate("#LL-MapLines_RefusedInvalid");
 			case LL_EMapLineRefusal.POINT_LIMIT:
 				return WidgetManager.Translate("#LL-MapLines_PointLimit", MAX_POINTS.ToString());
+			case LL_EMapLineRefusal.FREEZE_OVER:
+				return WidgetManager.Translate("#LL-MapLines_RefusedFreezeOver");
 		}
 
 		return WidgetManager.Translate("#LL-MapLines_RefusedNotAllowed");
+	}
+
+	//! Lines are planning: drawn before the game, or during its freeze time. Read the same way
+	//! on the server and the client; both values replicate on the game mode.
+	static bool IsDrawingPhase()
+	{
+		LL_GameModeCoop gameMode = LL_GameModeCoop.GetInstance();
+		if (!gameMode)
+			return false;
+
+		SCR_EGameModeState state = gameMode.GetLobbyState();
+		if (state == SCR_EGameModeState.GAME)
+			return gameMode.GetFreezeTimeRemaining() > 0;
+
+		return state != SCR_EGameModeState.DEBRIEFING;
 	}
 
 	static int ToDecimetres(float metres)

@@ -2353,6 +2353,22 @@ StringTable {
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }
+  CustomStringTableItem "{F330667B2CF06E37}" {
+   Id "LL-Keybind_MapLineUndo"
+   Target_en_us "Map: remove the line's last point"
+   Target_ru_ru "Карта: убрать последнюю точку линии"
+   Modified 1795733608
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
+  CustomStringTableItem "{4249A4A04ADF07AE}" {
+   Id "LL-MapLines_RefusedFreezeOver"
+   Target_en_us "Lines can only be drawn before the freeze time ends."
+   Target_ru_ru "Рисовать линии можно только до конца фризтайма."
+   Modified 1795733608
+   Author "[TT]Jumbo"
+   LastChanged "[TT]Jumbo"
+  }
   CustomStringTableItem "{3FA0AAFD3778DAB6}" {
    Id "LL-MapLines_DialogTitle"
    Target_en_us "MAP LINE"
@@ -2419,9 +2435,9 @@ StringTable {
   }
   CustomStringTableItem "{59CDCE5DA27B5E52}" {
    Id "LL-CommsGuide_LinesBody"
-   Target_en_us "<b>Ctrl + click</b> on the map starts a line in the color last chosen for a marker, and every further <b>click</b> adds a straight segment. A <b>double click</b> changes the line's color, <b>Enter</b> sends it, <b>Esc</b> cancels it. Only your side sees your lines. Hold <b>Left Shift</b> to see who drew a line and when; point at your own line and press <b>Delete</b> to remove it."
-   Target_ru_ru "<b>Ctrl + клик</b> по карте начинает линию цветом, выбранным для последнего маркера, каждый следующий <b>клик</b> добавляет прямой отрезок. <b>Двойной клик</b> меняет цвет линии, <b>Enter</b> отправляет её, <b>Esc</b> отменяет. Ваши линии видит только ваша сторона. Зажмите <b>левый Shift</b>, чтобы увидеть, кто и когда нарисовал линию; наведите курсор на свою линию и нажмите <b>Delete</b>, чтобы удалить её."
-   Modified 1795816357
+   Target_en_us "<b>Ctrl + click</b> on the map starts a line in the color last chosen for a marker, and every further <b>click</b> adds a straight segment; <b>Backspace</b> takes the last point back. A <b>double click</b> changes the line's color, <b>Enter</b> sends it, <b>Esc</b> cancels it. Lines can be drawn until the freeze time ends, and only your side sees them. Hold <b>Left Shift</b> to see who drew a line and when; point at a line's start point and press <b>Delete</b> to remove it. Anyone on your side can remove any line or marker of your side."
+   Target_ru_ru "<b>Ctrl + клик</b> по карте начинает линию цветом, выбранным для последнего маркера, каждый следующий <b>клик</b> добавляет прямой отрезок, <b>Backspace</b> убирает последнюю точку. <b>Двойной клик</b> меняет цвет линии, <b>Enter</b> отправляет её, <b>Esc</b> отменяет. Рисовать линии можно до конца фризтайма, и видит их только ваша сторона. Зажмите <b>левый Shift</b>, чтобы увидеть, кто и когда нарисовал линию; наведите курсор на начальную точку линии и нажмите <b>Delete</b>, чтобы удалить её. Любой игрок вашей стороны может удалить любую линию или маркер своей стороны."
+   Modified 1795736000
    Author "[TT]Jumbo"
    LastChanged "[TT]Jumbo"
   }

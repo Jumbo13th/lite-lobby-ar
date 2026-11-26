@@ -207,6 +207,27 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		super.OnDragEnd(widget, wasDragged);
 	}
 
+	//! Any faction member may delete any placed marker of the faction. A server-owned one (restored
+	//! by a session resume) is dropped by the stock client path, so its id goes to the server
+	//! directly; the server decides (LL_M_SCR_MapMarkerSyncComponent.RPC_AskRemoveStaticMarker).
+	override protected void RemoveOwnedMarker(SCR_MapMarkerBase marker)
+	{
+		if (marker && marker.GetMarkerID() != -1 && marker.GetMarkerOwnerID() == -1 && !Replication.IsServer())
+		{
+			PlayerController playerController = GetGame().GetPlayerController();
+			SCR_MapMarkerSyncComponent markerSync;
+			if (playerController)
+				markerSync = SCR_MapMarkerSyncComponent.Cast(playerController.FindComponent(SCR_MapMarkerSyncComponent));
+
+			if (markerSync)
+				markerSync.AskRemoveStaticMarker(marker.GetMarkerID());
+
+			return;
+		}
+
+		super.RemoveOwnedMarker(marker);
+	}
+
 	//! Removal is intel too; the server refuses it from a spectator.
 	override protected void OnInputMarkerDelete(float value, EActionTrigger reason)
 	{

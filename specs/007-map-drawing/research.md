@@ -56,7 +56,8 @@ repository.
     `LL_MapLineStart` (Left or Right Ctrl, polled with `GetActionValue`) is held.
   - While a line is in progress, the UI activates a new context `LL_MapLineContext` every frame
     (Priority 60, Flags `0xc`, as `MapMarkerEditContext`). It defines `LL_MapLineFinish` (Enter,
-    numpad Enter) and `LL_MapLineCancel` (Escape), and references only the map's navigation
+    numpad Enter), `LL_MapLineCancel` (Escape) and `LL_MapLineUndo` (Backspace), and references
+    only the map's navigation
     actions (`MapSelect`, `MapWheelUp`, `MapWheelDown`, `MapZoomIn`, `MapZoomOut`, `MapPanDrag`,
     `MapPanH`, `MapPanV`, `MapCursorX`, `MapCursorY`, `MapDrag`), `LL_MapMarkerInfo` and `VONDirect`.
 - **Rationale**: the vanilla marker editor and the lobby's insert-marker dialog take the keyboard
@@ -125,9 +126,9 @@ repository.
 
 - **Decision**: the server stores the author's identity id (`SCR_PlayerIdentityUtils.GetPlayerIdentityId`)
   and name. Clients never receive the identity; each delivery carries an `own` flag computed for
-  that recipient. Delete is allowed to the author (identity match) or to `SCR_Global.IsAdmin`,
-  when the line's faction is the requester's faction and the requester passes the marker edit
-  rule. Limits (20 per player) and the 2-second rate count by identity, so a reconnect neither
+  that recipient (it still counts the player's own lines against their limit). Any player of the
+  line's faction who passes the marker edit rule may delete it (map cleanup, spec session
+  2026-11-27). Limits (20 per player) and the 2-second rate count by identity, so a reconnect neither
   resets nor breaks them.
 - **Rationale**: Principle V: reconnect identity is the identity id, never the player id. The
   marker edit rule (faction, living slot character, no hard freeze) is reused, not copied:
@@ -160,8 +161,8 @@ repository.
 
 - **Decision**: on `MapMarkerDelete`, if one of the player's removable markers is under the
   cursor, the marker is deleted and lines are left alone. Otherwise the topmost line the player
-  may delete whose start dot or any segment is within its half width (at least 6 px) of the
-  cursor is deleted.
+  may delete whose start point (the visible part of the Dot glyph, at least 6 px) is under the
+  cursor is deleted. Segments do not count: a line is deleted at its glyph, as a marker is.
 - **Rationale**: one key, one deletion, markers first, matching how the stock marker delete reads
   widgets under the cursor (`SCR_MapMarkersUI.OnInputMarkerDelete`).
 
@@ -200,3 +201,31 @@ repository.
 Files from the branch's first commit that this design does not use are deleted, and the files
 that commit modified return to their `main` content before this feature's changes are applied.
 The list is in [plan.md](plan.md).
+
+## R15. Deleting other players' markers
+
+- **Decision**: turn on the game's own switch: `SCR_MapMarkerSyncComponent.m_bIsDeleteRestricted`
+  is set to false after `super.OnPostInit` in `LL_M_SCR_MapMarkerSyncComponent`, where the marker
+  limit is already set (the stock source of the value is the mission header's
+  `m_bMapMarkerEnableDeleteByAnyone`). The stock client paths already ask the server for any
+  removable marker under the cursor (Delete key and radial entry). The lobby's
+  `RPC_AskRemoveStaticMarker` override adds what the stock switch lacks: the marker must be a
+  placed one (custom or military) and visible to the requester's faction (its faction flags, or
+  none). A server-owned marker (a restored one) is removed by the override itself with
+  `OnRemoveSynchedMarker` and `OnAskRemoveStaticMarker`, exactly as the stock
+  `SCR_MapMarkerManagerComponent.RemoveStaticMarker` does for server markers on the authority;
+  on the client `LL_MapMarkersUI.RemoveOwnedMarker` sends such a marker's id straight to
+  `SCR_MapMarkerSyncComponent.AskRemoveStaticMarker`, because the stock client path drops server
+  markers.
+- **Rationale**: the game already supports "delete by anyone" and its server path; only the
+  faction gate (Principle V) and the restored markers are the lobby's.
+
+## R16. Audit log
+
+- **Decision**: one `Print` line tagged `[LL_MapAudit]` per event, on the server: a line accepted
+  or deleted (`LL_MapLineStore`), a marker accepted (`LL_M_SCR_MapMarkerManagerComponent.OnAskAddStaticMarker`,
+  the one place an accepted marker passes) and a marker deleted (the
+  `RPC_AskRemoveStaticMarker` override). Each names the actor (name and player id), the owner or
+  author, the faction and the object (line id and point count; marker id, text and position).
+- **Rationale**: the server log is where admins already read joins, kicks and resumes. No new
+  file, setting or network traffic; the per-player limits bound the volume.

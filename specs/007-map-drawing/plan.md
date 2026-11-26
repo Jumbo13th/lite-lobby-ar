@@ -190,7 +190,7 @@ docs/src/content/docs/
 1. Compile.
 2. Open and save nothing, only check for errors: `Configs/Map/LL_MapBriefing.conf` (new
    `LL_MapLinesUI` entry), `Configs/System/chimeraInputCommon.conf` (actions `LL_MapLineStart`,
-   `LL_MapLineFinish`, `LL_MapLineCancel`; context `LL_MapLineContext`),
+   `LL_MapLineFinish`, `LL_MapLineCancel`, `LL_MapLineUndo`; context `LL_MapLineContext`),
    `Configs/System/keyBindingMenu.conf`, `Configs/Systems/Persistence/LL_Persistence.conf`.
    Reload any of them if Workbench holds a stale buffer.
 3. Run [quickstart.md](quickstart.md) on a dedicated server.

@@ -51,6 +51,10 @@ class LL_MapLineStore
 		if (!faction)
 			return Refuse_S(playerId, LL_EMapLineRefusal.NOT_ALLOWED);
 
+		// Removal stays open after the freeze: an outdated plan can still be cleared.
+		if (!LL_MapLine.IsDrawingPhase())
+			return Refuse_S(playerId, LL_EMapLineRefusal.FREEZE_OVER);
+
 		if (!points || points.Count() % 2 != 0 || points.Count() < 4 || points.Count() > LL_MapLine.MAX_POINTS * 2)
 			return Refuse_S(playerId, LL_EMapLineRefusal.INVALID);
 
@@ -102,6 +106,10 @@ class LL_MapLineStore
 		m_aLines.Insert(line);
 		m_mLastAccepted.Set(authorKey, now);
 
+		Print(string.Format("[LL_MapAudit] Line %1 drawn by %2 (player %3, %4): %5 points from %6 %7, colour %8, width %9 m",
+			line.m_iId, line.m_sAuthorName, playerId, factionKey, line.GetPointCount(),
+			LL_MapLine.ToMetres(points[0]), LL_MapLine.ToMetres(points[1]), color, width), LogLevel.NORMAL);
+
 		array<int> recipients = {};
 		GetFactionPlayers_S(factionKey, recipients);
 		foreach (int recipientId : recipients)
@@ -114,7 +122,9 @@ class LL_MapLineStore
 		return LL_EMapLineRefusal.NONE;
 	}
 
-	//! Silently ignored when not allowed: a removal reveals nothing and needs no answer.
+	//! Any player of the line's faction who may place markers: a flood is cleaned up by the
+	//! players themselves, and the audit line names who did it. Silently ignored when not
+	//! allowed: a removal reveals nothing and needs no answer.
 	void Remove_S(int playerId, int lineId)
 	{
 		if (!Replication.IsServer() || !CanEdit_S(playerId))
@@ -132,8 +142,8 @@ class LL_MapLineStore
 		if (line.m_sFactionKey != faction.GetFactionKey())
 			return;
 
-		if (line.m_sAuthorKey != GetAuthorKey_S(playerId) && !SCR_Global.IsAdmin(playerId))
-			return;
+		Print(string.Format("[LL_MapAudit] Line %1 by %2 (%3) deleted by %4 (player %5)",
+			lineId, line.m_sAuthorName, line.m_sFactionKey, GetGame().GetPlayerManager().GetPlayerName(playerId), playerId), LogLevel.NORMAL);
 
 		FactionKey factionKey = line.m_sFactionKey;
 		m_aLines.RemoveOrdered(index);

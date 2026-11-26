@@ -7,8 +7,9 @@ server; nothing is broadcast and nothing enters `RplSave`/`RplLoad`.
 
 | RPC | Arguments | Server checks, in order | On failure |
 |-----|-----------|------------------------|------------|
-| `RpcAsk_AddMapLine` | `int colour, float width, array<int> points` | marker edit rule; points count even and 4..128; every point inside the world box; colour in the placed-marker list; width 0.1 m..50 m; author identity under 20 lines; faction under 150 lines; 2 s since the author's last accepted line | `RpcDo_OwnerMapLineRefused(reason)` to the requester; nothing stored |
-| `RpcAsk_RemoveMapLine` | `int lineId` | marker edit rule; line exists; line faction is the requester's faction; requester is the author (identity) or `SCR_Global.IsAdmin` | silently ignored |
+| `RpcAsk_AddMapLine` | `int colour, float width, array<int> points` | marker edit rule; before the game or during its freeze time; points count even and 4..128; every point inside the world box; colour in the placed-marker list; width 0.1 m..50 m; author identity under 20 lines; faction under 150 lines; 2 s since the author's last accepted line | `RpcDo_OwnerMapLineRefused(reason)` to the requester; nothing stored |
+| `RpcAsk_RemoveMapLine` | `int lineId` | marker edit rule; line exists; line faction is the requester's faction | silently ignored |
+| stock `RPC_AskRemoveStaticMarker` (lobby override) | `int markerID` | marker edit rule; marker exists; placed type; visible to the requester's faction; a server-owned marker is removed by the override | silently ignored |
 
 ## Server → one client
 
@@ -20,7 +21,8 @@ server; nothing is broadcast and nothing enters `RplSave`/`RplLoad`.
 | `RpcDo_OwnerMapLineRefused` | `int reason` | a refused add |
 
 Refusal reasons: 1 not allowed to draw now, 2 player line limit, 3 faction line limit, 4 too soon
-after the previous line, 5 invalid line. Reason 6 (point limit) is raised by the client while drawing and never sent.
+after the previous line, 5 invalid line, 7 the freeze time is over. Reason 6 (point limit) is
+raised by the client while drawing and never sent.
 
 ## Ordering
 
