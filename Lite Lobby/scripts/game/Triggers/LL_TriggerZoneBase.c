@@ -32,6 +32,19 @@ class LL_TriggerZoneBase : LL_TriggerComponent
 	protected ref array<float> m_aPolygon2D = {};
 	protected ref array<SCR_FlagComponent> m_aFlags = {};
 
+	//! The outline before activation too; activation builds it only after the game phase starts.
+	bool GetZoneOutline(notnull array<float> polygon)
+	{
+		if (!m_aPolygon2D.IsEmpty())
+		{
+			polygon.Copy(m_aPolygon2D);
+			return true;
+		}
+
+		BuildPolygon(m_sZoneEntityName, GetOwner(), polygon);
+		return polygon.Count() >= 6;
+	}
+
 	// False = the shape is unusable and the subclass stays inert.
 	protected bool SetupZone()
 	{

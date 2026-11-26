@@ -1,19 +1,19 @@
 // Voice rooms for players without a living character. Each connected player gets a
 // replicated VoN proxy entity with a radio (LL_VoNProxyComponent); rooms are string-keyed
-// channels and the server owns the assignments. Radio state is applied on every machine
-// because the proxies replicate everywhere.
+// channels and the server owns the assignments. Proxies are placed on every machine
+// because they replicate everywhere.
 //
-// Isolation: room ↔ room by frequency (the engine skips encryption checks between
-// editor-connected endpoints), menu ↔ gameplay by encryption key ("LLVoN#" namespace),
-// proximity speech by spreading the proxies 200 m apart.
+// Isolation is distance: menu talk is direct speech through the Game Master pipeline,
+// which ignores frequencies and encryption keys, so each proxy stands at its room's
+// position (GetRoomPosition), rooms a 200 m grid cell apart, 10 km above the playable space.
 //
 // Channel keys: "Lobby", "Faction_{key}", "Group_{groupId}_{key}", "Command_{key}",
 // "Public_{playerId}", "Deafen_{playerId}".
 //
 // Parking: a player controlling a living character speaks through real radios, so their
-// menu radio is parked on a per-player key. The flag is computed on the server and
-// replicated, never derived from local entity state: a death moves the channel in the
-// same server frame as the kill, so the channel RPC races the corpse's replicated state.
+// proxy stands in a cell of its own. The flag is computed on the server and replicated,
+// never derived from local entity state: a death moves the channel in the same server
+// frame as the kill, so the channel RPC races the corpse's replicated state.
 
 class LL_VoNChannelsManagerClass : SCR_BaseGameModeComponentClass
 {
@@ -26,10 +26,6 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 
 	// Server-side; clients resolve proxies through LL_VoNProxyComponent's registry.
 	protected ref map<int, IEntity> m_mProxies_S = new map<int, IEntity>();
-
-	// Grid slots are reused after disconnect; player ids grow forever on a running server
-	// and would eventually place a proxy outside the radio bubble.
-	protected ref map<int, int> m_mProxySlots_S = new map<int, int>();
 
 	protected static LL_VoNChannelsManager s_Instance;
 
@@ -48,8 +44,8 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 	// Server-only; resolved one frame later, see QueueSlotChannelUpdate_S.
 	protected ref array<int> m_aPendingSlotMoves_S = {};
 
-	// Applied one frame later on every machine, see ApplyRadioKey.
-	protected ref array<int> m_aPendingRadioApplies = {};
+	// Applied one frame later on every machine, see PlaceProxy.
+	protected ref array<int> m_aPendingPlacements = {};
 
 	protected ref ScriptInvoker m_OnPlayerChannelChanged = new ScriptInvoker(); // (int playerId, string channelKey)
 	protected ref ScriptInvoker m_OnPlayerParkedChanged = new ScriptInvoker(); // (int playerId, bool parked)
@@ -108,9 +104,8 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 		QueueSlotChannelUpdate_S(playerId);
 	}
 
-	// Changing slot is an unassign + assign pair in one call stack, and the transceiver
-	// does not reliably apply a second SetFrequency in the same frame. Resolving the final
-	// state one frame later produces at most one hop.
+	// Changing slot is an unassign + assign pair in one call stack; resolving the final
+	// state one frame later sends one channel update instead of two.
 	protected void QueueSlotChannelUpdate_S(int playerId)
 	{
 		if (m_aPendingSlotMoves_S.Contains(playerId))
@@ -432,12 +427,8 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 			return;
 		}
 
-		// A radio transmission also carries proximity speech around the sender, so proxies
-		// are spread 200 m apart, beyond direct-speech range and inside the menu radio's
-		// range. 10 km up keeps the net away from the playable space; y=50000 asserts.
-		int slot = AllocateProxySlot_S(playerId);
 		EntitySpawnParams params = new EntitySpawnParams();
-		params.Transform[3] = Vector(200 * Math.Mod(slot, 16), 10000, 200 * Math.Floor(slot / 16));
+		params.Transform[3] = GetRoomPosition(playerId);
 
 		IEntity proxy = GetGame().SpawnEntityPrefab(Resource.Load(m_sVoNProxyPrefab), GetGame().GetWorld(), params);
 		if (!proxy)
@@ -481,10 +472,10 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 			vonComp.ConnectEditorToVoNSystem(playerId);
 
 		m_mProxies_S.Set(playerId, proxy);
-		Print(string.Format("[LL_VoN] Proxy created for player %1 '%2' (grid slot %3, at %4)",
-			playerId, PlayerNameFor(playerId), slot, proxy.GetOrigin().ToString()), LogLevel.NORMAL);
+		Print(string.Format("[LL_VoN] Proxy created for player %1 '%2' (at %3)",
+			playerId, PlayerNameFor(playerId), proxy.GetOrigin().ToString()), LogLevel.NORMAL);
 
-		ApplyRadioKey(playerId);
+		PlaceProxy(playerId);
 	}
 
 	protected string PlayerNameFor(int playerId)
@@ -508,49 +499,9 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 		return name;
 	}
 
-	// Smallest free grid slot. Linear scan — bounded by the player count.
-	protected int AllocateProxySlot_S(int playerId)
-	{
-		int existing;
-		if (m_mProxySlots_S.Find(playerId, existing))
-			return existing;
-
-		int slot = 0;
-		// Bounded by the player count; the guard turns a corrupt map into a log line
-		// instead of a watchdog hang.
-		int guard = 0;
-		while (true)
-		{
-			bool used = false;
-			for (int i = 0; i < m_mProxySlots_S.Count(); i++)
-			{
-				if (m_mProxySlots_S.GetElement(i) == slot)
-				{
-					used = true;
-					break;
-				}
-			}
-
-			if (!used)
-				break;
-
-			slot++;
-
-			if (++guard > 10000)
-			{
-				Print(string.Format("[LL_DIAG] AllocateProxySlot_S guard tripped at slot %1 (proxySlots=%2) — no free slot found (potential lock)", slot, m_mProxySlots_S.Count()), LogLevel.ERROR);
-				break;
-			}
-		}
-
-		m_mProxySlots_S.Set(playerId, slot);
-		return slot;
-	}
-
 	protected void DeleteProxy_S(int playerId)
 	{
 		IEntity proxy;
-		m_mProxySlots_S.Remove(playerId);
 		if (!m_mProxies_S.Find(playerId, proxy))
 			return;
 
@@ -568,136 +519,82 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 			playerId, PlayerNameFor(playerId)), LogLevel.NORMAL);
 	}
 
-	// Since 1.8 editor-connected menu voice goes through the Game Master pipeline, which
-	// discovers endpoints by transceiver class, ignores frequencies and keys, and gates by
-	// distance between the positions GetEditorWorldLocation reports. Rooms are therefore
-	// virtual positions computed from replicated state: same channel = in speech range,
-	// other channels 1 km apart, parked and unassigned players out of range of every room.
+	// Editor-connected menu voice goes through the Game Master pipeline, which discovers
+	// endpoints by transceiver class, ignores frequencies and keys, and gates by distance.
+	// Since 1.9 it takes that distance from the entity GetActiveEditorEntity returns, so the
+	// proxy stands at this position on every machine (PlaceProxyNow): same channel = in
+	// speech range, other rooms a grid cell away, parked and unassigned in cells of their own.
 	vector GetRoomPosition(int playerId)
 	{
 		// A parked device never transmits; no cluster is within earshot.
 		if (IsPlayerParked(playerId))
-			return Vector(-5000, 10000, -5000);
+			return RoomCell(0);
 
 		string channelKey;
 		if (!m_mPlayerChannels.Find(playerId, channelKey))
-			return Vector(-6000, 10000, -6000);
+			return RoomCell(1);
 
 		int index = m_aChannels.Find(channelKey);
 		if (index < 0)
-			return Vector(-6000, 10000, -6000);
+			return RoomCell(1);
 
 		// Members spread inside the cluster; an id collision co-locates two, which is harmless.
 		vector memberOffset = Vector(2 * Math.Mod(playerId, 5), 0, 2 * Math.Mod(Math.Floor(playerId / 5), 5));
-		return Vector(1000 + 1000 * index, 10000, 1000) + memberOffset;
+		return RoomCell(index + 2) + memberOffset;
 	}
 
-	// The radio's own frequency still carries room isolation: channels take a slot from
-	// their index in the replicated list (identical order everywhere). Slot 0 (= min) is
-	// reserved for parked radios.
-	protected int ChannelFrequencyFor(BaseTransceiver tsv, string channelKey)
+	// The proxy spawn grid: 200 m is beyond direct-speech range, and proxies have always
+	// lived inside this footprint without hitting the world-bounds assert.
+	protected vector RoomCell(int cell)
 	{
-		int minFreq = tsv.GetMinFrequency();
-		int maxFreq = tsv.GetMaxFrequency();
-		int step = tsv.GetFrequencyResolution();
-		if (step <= 0)
-			step = 10;
-
-		int index = m_aChannels.Find(channelKey);
-		if (index < 0)
-			return minFreq;
-
-		int freq = minFreq + (index + 1) * step;
-		if (freq > maxFreq)
-		{
-			// Wrapping would merge two rooms; widen the band on the proxy prefab instead.
-			Print(string.Format("[LL_VoN] Out of frequency slots for channel '%1' (%2 channels, band %3-%4 step %5)",
-				channelKey, m_aChannels.Count(), minFreq, maxFreq, step), LogLevel.WARNING);
-			freq = maxFreq;
-		}
-
-		return freq;
+		return Vector(200 * Math.Mod(cell, 16), 10000, 200 * Math.Floor(cell / 16));
 	}
 
 	// Runs on every machine. Deferred and coalesced: one event can deliver two updates for
-	// a player in one frame and the transceiver does not reliably apply a second
-	// SetFrequency in the same frame.
-	void ApplyRadioKey(int playerId)
+	// a player in one frame, and the proxy can stream in before or after its channel data.
+	void PlaceProxy(int playerId)
 	{
-		if (m_aPendingRadioApplies.Contains(playerId))
+		if (m_aPendingPlacements.Contains(playerId))
 			return;
 
-		m_aPendingRadioApplies.Insert(playerId);
+		m_aPendingPlacements.Insert(playerId);
 
-		if (m_aPendingRadioApplies.Count() == 1)
-			GetGame().GetCallqueue().CallLater(ResolveRadioApplies, 0, false);
+		if (m_aPendingPlacements.Count() == 1)
+			GetGame().GetCallqueue().CallLater(ResolvePlacements, 0, false);
 	}
 
-	protected void ResolveRadioApplies()
+	protected void ResolvePlacements()
 	{
-		foreach (int playerId : m_aPendingRadioApplies)
+		foreach (int playerId : m_aPendingPlacements)
 		{
-			ApplyRadioKeyNow(playerId);
+			PlaceProxyNow(playerId);
 		}
 
-		m_aPendingRadioApplies.Clear();
+		m_aPendingPlacements.Clear();
 	}
 
-	protected void ApplyRadioKeyNow(int playerId)
+	protected void PlaceProxyNow(int playerId)
 	{
 		IEntity proxy = LL_VoNProxyComponent.GetProxyEntity(playerId);
 		if (!proxy)
 			return;
 
-		BaseRadioComponent radio = BaseRadioComponent.Cast(proxy.FindComponent(BaseRadioComponent));
-		if (!radio || radio.TransceiversCount() < 1)
-			return;
-
-		BaseTransceiver tsv = radio.GetTransceiver(0);
-		if (!tsv)
-			return;
-
-		string channelKey;
-		if (!m_mPlayerChannels.Find(playerId, channelKey))
-			return;
-
-		// The "LLVoN#" namespace keeps the radio-level key from colliding with mission radios.
-		// Parked is the replicated flag, never local entity state. The local editor check is
-		// the one local exception: a player inside Game Master keeps receiving their proxy's
-		// room, so the proxy parks while their own editor is open.
-		if (IsPlayerParked(playerId) || IsLocalEditorOpenFor(playerId))
-		{
-			radio.SetEncryptionKey(string.Format("LLVoN#Parked_%1", playerId));
-			tsv.SetFrequency(tsv.GetMinFrequency());
-			return;
-		}
-
-		radio.SetEncryptionKey("LLVoN#" + channelKey);
-		tsv.SetFrequency(ChannelFrequencyFor(tsv, channelKey));
-	}
-
-	// Re-evaluated on editor open/close through LL_MenuVoN.Refresh.
-	protected bool IsLocalEditorOpenFor(int playerId)
-	{
-		PlayerController pc = GetGame().GetPlayerController();
-		if (!pc || pc.GetPlayerId() != playerId)
-			return false;
-
-		SCR_EditorManagerEntity editorManager = SCR_EditorManagerEntity.GetInstance();
-		return editorManager && editorManager.IsOpened();
+		// Every machine places its own copy from replicated state, so rooms never depend on
+		// whether the engine replicates the move.
+		proxy.SetOrigin(GetRoomPosition(playerId));
 	}
 
 	protected void ApplySetPlayerChannel(int playerId, string channelKey)
 	{
 		m_mPlayerChannels.Set(playerId, channelKey);
-		ApplyRadioKey(playerId);
+		PlaceProxy(playerId);
 		m_OnPlayerChannelChanged.Invoke(playerId, channelKey);
 	}
 
 	protected void ApplySetPlayerParked(int playerId, bool parked)
 	{
 		m_mPlayerParked.Set(playerId, parked);
-		ApplyRadioKey(playerId);
+		PlaceProxy(playerId);
 
 		// The flag is the server saying "you are (not) a menu speaker now"; the local device
 		// re-evaluates on it because no local entity event fires on death.
@@ -805,7 +702,7 @@ class LL_VoNChannelsManager : SCR_BaseGameModeComponent
 			m_OnPlayerChannelChanged.Invoke(m_mPlayerChannels.GetKey(i), m_mPlayerChannels.GetElement(i));
 
 			// Proxies streamed in before this data arrived.
-			ApplyRadioKey(m_mPlayerChannels.GetKey(i));
+			PlaceProxy(m_mPlayerChannels.GetKey(i));
 		}
 	}
 

@@ -125,6 +125,11 @@ class LL_TriggerComponent : ScriptComponent
 			return;
 		m_bFired = true;
 
+		string replayLabel = m_sMessage;
+		if (replayLabel == "")
+			replayLabel = m_sTitle;
+		LL_ReplayRecorderComponent.RecordTrigger_S(GetStatKey(), replayLabel);
+
 		if (m_bBroadcastMessage && m_sMessage != "")
 			BroadcastFiredMessage();
 

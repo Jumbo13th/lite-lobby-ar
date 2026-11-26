@@ -71,8 +71,8 @@ modded class SCR_VoNComponent
 		if (editor && super.IsEntityActiveEditor(editor))
 			return super.GetEditorWorldLocation(playerId);
 
-		// Since 1.8 the Game Master pipeline gates delivery by the distance between the
-		// positions this callback reports, on the server and on clients alike.
+		// The Game Master pipeline gates delivery by distance. 1.8 read it here; 1.9 reads the
+		// position of the entity GetActiveEditorEntity returns, so both must be the room.
 		LL_VoNChannelsManager vonMgr = LL_VoNChannelsManager.GetInstance();
 		if (vonMgr)
 			return vonMgr.GetRoomPosition(playerId);
