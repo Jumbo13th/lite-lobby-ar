@@ -252,7 +252,9 @@ The list is in [plan.md](plan.md).
   host the marker's widget was gone before the line UI heard the press.
 - **Settled syncs**: a slot switch is a leave (no faction) and a take in one frame. Faction
   changes are recorded and settled on the next sync tick against the faction the player already
-  holds, so a same-side switch sends nothing; a disconnect forgets what the player held.
+  holds, so a same-side switch sends nothing; a disconnect forgets what the player held. A line
+  added or removed while a player is between a leave and a retake of that side does not reach
+  them, so that change also forgets what they hold and the retake becomes a full resync.
 - **Restore keeps every line**: a saved line whose id a line drawn before the restore already
   took is renumbered above the highest id instead of dropped.
 - **Server interval 1 s**: the client waits 2 s between lines by its clock, the server checks 1 s

@@ -160,6 +160,7 @@ Claude Design round.
 - [X] T061 [US1] The cursor-state check covers every click of a line in progress (`OnInputMapSelect` in `LL_MapLinesUI.c`).
 - [X] T062 [US1] The colour rows of the line dialog show the line's start glyph: `InitLine` takes the resolved Dot entry instead of assuming entry 0 (`LL_InsertMarkerDialog.c`, `LL_MapLinesUI.c`).
 - [X] T063 [US3] Author labels hold their lines, so placing them each frame is linear in the line count (`LL_MapLinesUI.c`).
+- [X] T064 [US4] A line change that misses a player between a leave and a retake of its side turns their settle into a full resync (`ResyncMissedChange_S` from `Add_S` and `Remove_S` in `LL/scripts/game/Map/LL_MapLineStore.c`).
 - [ ] T038 Operator: compile and run quickstart steps 1 to 12 on a dedicated server.
 
 ---

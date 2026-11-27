@@ -121,6 +121,7 @@ class LL_MapLineStore
 				lobbyPlayer.SendMapLine_S(line, GetAuthorKey_S(recipientId) == authorKey);
 		}
 
+		ResyncMissedChange_S(factionKey);
 		return LL_EMapLineRefusal.NONE;
 	}
 
@@ -157,6 +158,8 @@ class LL_MapLineStore
 			if (lobbyPlayer)
 				lobbyPlayer.SendMapLineRemoved_S(lineId);
 		}
+
+		ResyncMissedChange_S(factionKey);
 	}
 
 	//! Asks for the player's lines to be those of the faction (none: cleared), settled on the
@@ -182,6 +185,22 @@ class LL_MapLineStore
 	{
 		m_mSyncedFaction.Remove(playerId);
 		m_mPendingFaction.Remove(playerId);
+	}
+
+	//! A player who left the faction and retakes it before the tick missed this change, and the
+	//! tick would settle the switch as nothing; forgetting what they hold makes it a full resync.
+	protected void ResyncMissedChange_S(FactionKey factionKey)
+	{
+		foreach (int playerId, string pendingKey : m_mPendingFaction)
+		{
+			string syncedKey;
+			if (!m_mSyncedFaction.Find(playerId, syncedKey) || syncedKey != factionKey)
+				continue;
+
+			Faction current = SCR_FactionManager.SGetPlayerFaction(playerId);
+			if (!current || current.GetFactionKey() != factionKey)
+				m_mSyncedFaction.Remove(playerId);
+		}
 	}
 
 	//! A newer sync replaces the queued one. Owner RPCs arrive in order, so the clear lands after
