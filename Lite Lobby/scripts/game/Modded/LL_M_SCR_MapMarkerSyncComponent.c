@@ -7,9 +7,8 @@ modded class SCR_MapMarkerSyncComponent
 	// Vanilla's per-player cap is 10 and the mission header is read in the stock
 	// OnPostInit, so the value is set after super. Must stay positive: <= 0 disables
 	// placement. Markers persist across disconnects, so this also bounds accumulation.
-	// Delete by anyone is the stock mission-header switch, on in every lobby mission so a
-	// faction can clean up a flood itself; the stock path checks no faction, so
-	// RPC_AskRemoveStaticMarker adds that gate.
+	// Delete by anyone lets a faction clear a flood itself; RPC_AskRemoveStaticMarker adds the
+	// faction gate the stock path lacks.
 	override void OnPostInit(IEntity owner)
 	{
 		super.OnPostInit(owner);
@@ -52,9 +51,8 @@ modded class SCR_MapMarkerSyncComponent
 		super.RPC_AskAddStaticMarker(markerData);
 	}
 
-	// A placed marker the requester's faction can see, theirs or not. A server-owned one (restored
-	// by a session resume) is removed here as the stock RemoveStaticMarker removes server markers
-	// on the authority, because the stock RPC refuses them.
+	// Any placed marker of the requester's faction. The stock RPC refuses server-owned (restored)
+	// markers, so those are removed the way the stock RemoveStaticMarker does on the authority.
 	override protected void RPC_AskRemoveStaticMarker(int markerID)
 	{
 		if (!LL_CanEditSharedMarkers())
@@ -98,8 +96,7 @@ modded class SCR_MapMarkerSyncComponent
 		string owner = "server (restored)";
 		if (ownerId != -1)
 		{
-			// The owner may have left; their id is still in the log of their own placement.
-			owner = GetGame().GetPlayerManager().GetPlayerName(ownerId);
+			owner =GetGame().GetPlayerManager().GetPlayerName(ownerId);
 			if (owner.IsEmpty())
 				owner = "player " + ownerId.ToString();
 		}

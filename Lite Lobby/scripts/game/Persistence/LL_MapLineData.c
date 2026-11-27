@@ -54,9 +54,9 @@ class LL_MapLineData : PersistentState
 			lines.Insert(line);
 		}
 
-		lobbyManager.GetMapLineStore().Restore_S(lines);
+		int restored = lobbyManager.GetMapLineStore().Restore_S(lines);
 
-		Print(string.Format("[LL_Lobby] Resume: %1 map line(s) restored", lines.Count()), LogLevel.NORMAL);
+		Print(string.Format("[LL_Lobby] Resume: %1 map line(s) restored", restored), LogLevel.NORMAL);
 		m_aPending = null;
 	}
 }

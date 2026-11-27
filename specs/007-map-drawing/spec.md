@@ -256,7 +256,10 @@ it; a second client switches from that faction to the other one.
 - A line delivered twice to one player (the full set on slot take and a new line in the same
   moment) shows once; a deleted line never reappears.
 - Start points overlap: one press of the delete key removes one line, the topmost one. A placed
-  marker under the cursor is deleted first and the line is left alone.
+  marker under the cursor is deleted first and the line is left alone. Markers overlap: one
+  press removes one marker.
+- A refusal is told on the map while it is open, also when the mission hides the chat.
+- A player changes slot within their side: their lines are not cleared or sent again.
 - A forged request deletes a line or marker of another faction, or a marker that is not a
   placed one: refused, nothing changes.
 - Every machine stacks lines in the same order: the order the server accepted them.
@@ -305,7 +308,8 @@ it; a second client switches from that faction to the other one.
   right to draw, and validate the point count, that every point is on the map, the colour and that
   the width is between 0.1 and 50 m. Any failed check MUST refuse the whole request.
 - **FR-011**: The server MUST enforce 64 points per line, 20 lines per player and 150 lines per
-  faction, and accept at most one new line from a player every two seconds. A refused request
+  faction, and accept at most one new line from a player every second; the player's own map waits
+  two seconds between lines, so delay on the network never refuses a line it allowed. A refused request
   MUST tell the player why, in their language.
 - **FR-012**: Any player of a faction who may place markers MUST be able to delete any line of
   that faction by pointing at its start point and pressing the marker delete key, and any placed

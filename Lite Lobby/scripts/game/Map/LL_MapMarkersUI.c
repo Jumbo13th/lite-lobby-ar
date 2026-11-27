@@ -118,7 +118,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	protected static int s_iLastIconEntry;
 	protected static int s_iLastColorEntry;
 
-	//! Shared with map lines: one colour memory for both.
+	//! One colour memory for markers and map lines.
 	static int GetLastColorEntry()
 	{
 		return s_iLastColorEntry;
@@ -207,9 +207,8 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		super.OnDragEnd(widget, wasDragged);
 	}
 
-	//! Any faction member may delete any placed marker of the faction. A server-owned one (restored
-	//! by a session resume) is dropped by the stock client path, so its id goes to the server
-	//! directly; the server decides (LL_M_SCR_MapMarkerSyncComponent.RPC_AskRemoveStaticMarker).
+	//! The stock client path drops a server-owned (restored) marker, so its id goes straight to
+	//! the server, which decides.
 	override protected void RemoveOwnedMarker(SCR_MapMarkerBase marker)
 	{
 		if (marker && marker.GetMarkerID() != -1 && marker.GetMarkerOwnerID() == -1 && !Replication.IsServer())
@@ -228,13 +227,33 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		super.RemoveOwnedMarker(marker);
 	}
 
-	//! Removal is intel too; the server refuses it from a spectator.
+	//! Removal is intel too; the server refuses it from a spectator. One press removes one marker,
+	//! not every one under the cursor as the stock handler does; with none, it goes to the lines.
 	override protected void OnInputMarkerDelete(float value, EActionTrigger reason)
 	{
 		if (!LL_CanEditMarkers())
 			return;
 
-		super.OnInputMarkerDelete(value, reason);
+		array<Widget> widgets = SCR_MapCursorModule.GetMapWidgetsUnderCursor();
+		foreach (Widget widget : widgets)
+		{
+			if (!widget || !widget.FindHandler(SCR_MapMarkerWidgetComponent))
+				continue;
+
+			SCR_MapMarkerBase marker = m_MarkerMgr.GetMarkerByWidget(widget);
+			if (!marker || !marker.CanBeRemovedByOwner())
+				continue;
+
+			if (marker.GetType() != SCR_EMapMarkerType.PLACED_CUSTOM && marker.GetType() != SCR_EMapMarkerType.PLACED_MILITARY)
+				continue;
+
+			RemoveOwnedMarker(marker);
+			return;
+		}
+
+		LL_MapLinesUI linesUI = LL_MapLinesUI.Cast(m_MapEntity.GetMapUIComponent(LL_MapLinesUI));
+		if (linesUI)
+			linesUI.TryDeleteLineUnderCursor();
 	}
 
 	//! Own placed marker → edit dialog; empty map → double-click → place dialog.
@@ -251,7 +270,6 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		if (m_wLLDialogRoot)
 			return;
 
-		// Ctrl + click starts a map line, and every click of a line in progress is a point.
 		if (GetGame().GetInputManager().GetActionValue("LL_MapLineStart") > 0)
 			return;
 

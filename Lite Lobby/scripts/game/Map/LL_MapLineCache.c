@@ -1,7 +1,5 @@
-// The local player's map lines: exactly what the server delivered for their current
-// faction, ordered by server id, which is also the stacking order. Owned by the local
-// LL_LobbyPlayerComponent, so it ends with the mission, and fed only by its owner RPCs.
-// A line can arrive twice (live and in a faction sync).
+// The local player's map lines as the server delivered them for their faction, ordered by
+// server id, which is the stacking order. A line can arrive twice: live and in a faction sync.
 
 class LL_MapLineCache
 {

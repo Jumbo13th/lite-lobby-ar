@@ -229,3 +229,27 @@ The list is in [plan.md](plan.md).
   author, the faction and the object (line id and point count; marker id, text and position).
 - **Rationale**: the server log is where admins already read joins, kicks and resumes. No new
   file, setting or network traffic; the per-player limits bound the volume.
+
+## R17. Review fixes (PR #12 review, 2026-11-27)
+
+- **Refusals on the map**: the chat feed is hidden in GAME for alive slotted players when the
+  mission disables chat, and drawing happens during the freeze of GAME. A refusal is shown for
+  four seconds in a panel at the bottom centre of the open map, on the same band and in the same
+  style as the map screens' footer (`UI/Map/MapLineNotice.layout`: the footer's dark panel,
+  72 px tall, bottom edge 80 px up, the navigation button's 16 pt font). Plain text over the map
+  was tried first and was unreadable. With the map closed it goes to the chat as before.
+- **One marker per press**: the stock `OnInputMarkerDelete` removes every marker under the
+  cursor. With markers open to the whole faction that is a stack of teammates' markers, so the
+  lobby's override removes the first one only, and with no marker under the cursor it hands the
+  press to the line UI (`TryDeleteLineUnderCursor`). One handler decides for markers and lines,
+  so the order is fixed without any timing; two listeners on the same key raced, and on a listen
+  host the marker's widget was gone before the line UI heard the press.
+- **Settled syncs**: a slot switch is a leave (no faction) and a take in one frame. Faction
+  changes are recorded and settled on the next sync tick against the faction the player already
+  holds, so a same-side switch sends nothing; a disconnect forgets what the player held.
+- **Restore keeps every line**: a saved line whose id a line drawn before the restore already
+  took is renumbered above the highest id instead of dropped.
+- **Server interval 1 s**: the client waits 2 s between lines by its clock, the server checks 1 s
+  by its own, so network delay cannot refuse, and lose, a line the client allowed.
+- **Clicks during a map tool drag**: the cursor-state check (pan, drag, rotate) applies to every
+  click of a line, not only the first.

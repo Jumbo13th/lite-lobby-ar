@@ -97,7 +97,6 @@ modded class SCR_MapMarkerManagerComponent
 		}
 	}
 
-	// The one server call every accepted marker passes, so the audit sees each placement once.
 	protected void LL_LogMarkerPlaced(notnull SCR_MapMarkerBase markerData)
 	{
 		int ownerId = markerData.GetMarkerOwnerID();

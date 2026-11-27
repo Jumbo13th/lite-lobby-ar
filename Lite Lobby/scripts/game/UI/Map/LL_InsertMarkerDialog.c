@@ -1,9 +1,8 @@
 // Compact insert-marker dialog at the cursor: description, type and colour with a live
 // preview, or the colour alone for a map line. Pure UI: it reports (icon entry, colour
-// entry, text) through GetOnConfirm and GetOnCancel; construction and networking stay in
-// LL_MapMarkersUI and LL_MapLinesUI. Entries are indices
-// into the shared SCR_MapMarkerEntryPlaced config. Dropdown row icons are applied from
-// m_OnOpened because the combo rebuilds its elements on every open.
+// entry, text) through GetOnConfirm and GetOnCancel; the callers build and send. Entries
+// are indices into the shared SCR_MapMarkerEntryPlaced config. Dropdown row icons are
+// applied from m_OnOpened because the combo rebuilds its elements on every open.
 
 void LL_InsertMarkerConfirmInvoker(int iconEntry, int colorEntry, string text);
 typedef func LL_InsertMarkerConfirmInvoker;
@@ -20,8 +19,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	// The rows a map line does not use: preview 84, description and type 8 + 44 each.
 	protected const int LINE_MODE_HIDDEN_HEIGHT = 188;
 
-	// The stock icon element is 20 px, and the glyphs sit padded inside their squares: at that
-	// size a dot is a few pixels.
+	// At the stock 20 px a padded glyph such as the dot is a few pixels.
 	protected const float ROW_ICON_SIZE = 32;
 
 	protected SCR_MapMarkerEntryPlaced m_Config;
@@ -39,7 +37,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	protected ref ScriptInvokerBase<LL_InsertMarkerConfirmInvoker> m_OnConfirm = new ScriptInvokerBase<LL_InsertMarkerConfirmInvoker>();
 	protected ref ScriptInvokerVoid m_OnCancel = new ScriptInvokerVoid();
 
-	// (int colorEntry) on every pick, before OK: a map line recolours live.
+	// (int colorEntry) on every pick, before OK.
 	protected ref ScriptInvoker m_OnColorChanged = new ScriptInvoker();
 
 	// A dropdown or the edit box consumes Escape in the same frame the cancel listener
@@ -173,14 +171,13 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		GetGame().GetCallqueue().Call(ClampOnScreen);
 	}
 
-	//! A map line has a colour and nothing else: the preview, description and type rows
-	//! are hidden and the dialog shrinks by their height. Confirm reports icon 0 and "".
+	//! Colour only; confirm reports icon 0 and "". The other rows are hidden from script:
+	//! Visible 0 in a layout drops a node's children.
 	void InitLine(notnull SCR_MapMarkerEntryPlaced config, int colorEntry)
 	{
 		m_Config = config;
 		m_bLineMode = true;
 
-		// Hidden from script: Visible 0 in a layout drops the node's children.
 		array<string> hiddenRows = {"PreviewFrame", "EditBoxRoot", "TypeCombo"};
 		foreach (string rowName : hiddenRows)
 		{
@@ -222,7 +219,6 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	int GetSelectedIconEntry()
 	{
-		// The colour rows of a line show the first glyph, the plain dot.
 		if (!m_TypeCombo || m_bLineMode)
 			return 0;
 

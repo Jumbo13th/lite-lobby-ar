@@ -1,7 +1,6 @@
 // Static map markers as the marker manager replicates them to a joining client. Restored
 // markers are server markers: the session-scoped owner id cannot be re-linked. The faction
-// gate keeps working, and the faction deletes them through the lobby's server-marker path
-// (LL_M_SCR_MapMarkerSyncComponent.RPC_AskRemoveStaticMarker).
+// gate still applies, and the faction deletes them like any other placed marker.
 
 class LL_MarkerRecord
 {

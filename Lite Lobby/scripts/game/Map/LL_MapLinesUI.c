@@ -1,8 +1,5 @@
-// Map lines on the briefing, game and spectator maps (LL_MapBriefing.conf): drawing a line,
-// recolouring it in the insert-marker dialog on a double click, rendering the local player's faction
-// lines, deleting with the marker delete key and author labels on the marker-info key.
-// Requests go through LL_LobbyPlayerComponent; the server decides and delivers everything,
-// and nothing is sent while a line is being drawn.
+// Map lines on the briefing, game and spectator maps: drawing, recolouring, rendering the faction's
+// lines, deleting and author labels. The server decides and delivers; nothing is sent mid-line.
 
 class LL_MapLinesUI : SCR_MapUIBaseComponent
 {
@@ -42,6 +39,8 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 	protected ref array<ref CanvasWidgetCommand> m_aCommands = {};
 	protected ref array<ref LineDrawCommand> m_aOutlinePool = {};
 	protected ref array<ref LineDrawCommand> m_aLinePool = {};
+	// Read at map open, as faction colours resolve at runtime; from copies, because an entry's
+	// Color instance is shared with the markers.
 	protected ref array<int> m_aPackedColors = {};
 	protected ref array<int> m_aPackedOutlineColors = {};
 	protected ref array<int> m_aPackedIconColors = {};
@@ -52,6 +51,14 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 	protected float m_fDotSize;
 	protected float m_fDotInk = 1;
 	protected ref array<ImageWidget> m_aStartIcons = {};
+
+	protected const ResourceName NOTICE_LAYOUT = "{9F3872243809E843}UI/Map/MapLineNotice.layout";
+	protected const int NOTICE_MS = 4000;
+
+	// Puts the layout's 72 px panel on the map footer's band.
+	protected const float NOTICE_BOTTOM = 80;
+	protected Widget m_wNoticeRoot;
+	protected TextWidget m_wNoticeText;
 
 	protected bool m_bDirty;
 	protected float m_fLastZoom;
@@ -95,8 +102,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		ResolveDotIcon();
 	}
 
-	//! The Dot entry of the marker list, read the way LL_MapMarkerEntryPlaced.InitClientSettings
-	//! sizes a placed marker; a mission list without a Dot falls back to its first icon.
 	protected void ResolveDotIcon()
 	{
 		LL_MapMarkerEntryPlaced placed = LL_MapMarkerEntryPlaced.Cast(m_PlacedConfig);
@@ -148,7 +153,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		m_wCanvasRoot = layoutRoot;
 		m_wCanvasRoot.SetZOrder(CANVAS_Z_ORDER);
 
-		// Faction colours resolve at runtime, so the palette is read once the map opens.
 		m_aPackedColors.Clear();
 		m_aPackedOutlineColors.Clear();
 		m_aPackedIconColors.Clear();
@@ -157,7 +161,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			array<ref SCR_MarkerColorEntry> colors = m_PlacedConfig.GetColorEntries();
 			for (int i = 0; i < colors.Count(); i++)
 			{
-				// Copies: the entry may hand out its own instance, which markers share.
 				Color entryColor = m_PlacedConfig.GetColorEntry(i);
 				Color color = Color.FromInt(Color.WHITE);
 				if (entryColor)
@@ -179,7 +182,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		InputManager inputManager = GetGame().GetInputManager();
 		inputManager.AddActionListener("MapSelect", EActionTrigger.DOWN, OnInputMapSelect);
-		inputManager.AddActionListener("MapMarkerDelete", EActionTrigger.DOWN, OnInputDelete);
 		inputManager.AddActionListener("LL_MapLineFinish", EActionTrigger.DOWN, OnInputFinish);
 		inputManager.AddActionListener("LL_MapLineCancel", EActionTrigger.DOWN, OnInputCancel);
 		inputManager.AddActionListener("LL_MapLineUndo", EActionTrigger.DOWN, OnInputUndo);
@@ -191,7 +193,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 	{
 		InputManager inputManager = GetGame().GetInputManager();
 		inputManager.RemoveActionListener("MapSelect", EActionTrigger.DOWN, OnInputMapSelect);
-		inputManager.RemoveActionListener("MapMarkerDelete", EActionTrigger.DOWN, OnInputDelete);
 		inputManager.RemoveActionListener("LL_MapLineFinish", EActionTrigger.DOWN, OnInputFinish);
 		inputManager.RemoveActionListener("LL_MapLineCancel", EActionTrigger.DOWN, OnInputCancel);
 		inputManager.RemoveActionListener("LL_MapLineUndo", EActionTrigger.DOWN, OnInputUndo);
@@ -210,8 +211,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		m_wCanvasRoot = null;
 		m_wCanvas = null;
 
-		// The spectator map is a layer of a menu that stays alive: widgets left in the map
-		// frame would stack up on every open.
 		foreach (ImageWidget icon : m_aStartIcons)
 		{
 			if (icon)
@@ -219,6 +218,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		}
 
 		m_aStartIcons.Clear();
+		HideNotice();
 
 		super.OnMapClose(config);
 	}
@@ -234,7 +234,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			DiscardDraft();
 		}
 
-		// The server refuses a line sent after the freeze, so one still in progress goes now.
 		if (IsBusy() && !LL_MapLine.IsDrawingPhase())
 		{
 			CloseDialog();
@@ -244,8 +243,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		if (m_wDialogRoot)
 		{
-			// One-frame gap, as the marker dialog: the Enter that finished the line must
-			// not land in the dialog's context.
 			if (m_bDialogDelayed)
 				GetGame().GetInputManager().ActivateContext("MapMarkerEditContext");
 			else
@@ -253,8 +250,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		}
 		else if (m_bDrawing)
 		{
-			// Suppresses the menu's map context, so Enter cannot open the chat and Escape
-			// cannot close the map while a line is in progress.
+			// Over the menu's map context: Enter must not open the chat, Escape not close the map.
 			GetGame().GetInputManager().ActivateContext("LL_MapLineContext");
 		}
 
@@ -275,15 +271,15 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		if (!m_wCanvas || m_wDialogRoot)
 			return;
 
+		if (m_CursorModule && (m_CursorModule.GetCursorState() & SCR_MapCursorModule.STATE_POPUP_RESTRICTED) != 0)
+			return;
+
 		if (!m_bDrawing)
 		{
 			if (GetGame().GetInputManager().GetActionValue("LL_MapLineStart") <= 0)
 				return;
 
 			if (!LL_MapMarkersUI.LL_CanEditMarkers())
-				return;
-
-			if (m_CursorModule && (m_CursorModule.GetCursorState() & SCR_MapCursorModule.STATE_POPUP_RESTRICTED) != 0)
 				return;
 
 			if (!LL_MapLine.IsDrawingPhase())
@@ -304,8 +300,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			return;
 		}
 
-		// The marker dialog's double-click rule. The pair's first click added a point the
-		// player did not mean; the start point is never taken back.
 		if (IsDoubleClick())
 		{
 			if (m_bLastClickAddedPoint)
@@ -361,9 +355,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		AddCursorPoint();
 	}
 
-	//! The ground width that is 2% of the screen at the current zoom, within the bounds the
-	//! server accepts. Taken for the whole line at each click; between clicks the line scales
-	//! with the map, and Enter sends the last value.
 	protected float GetZoomWidth()
 	{
 		float zoom = m_MapEntity.GetCurrentZoom();
@@ -408,7 +399,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		if (!m_bDrawing || m_wDialogRoot || m_aDraft.Count() < 4)
 			return;
 
-		// Refused here rather than by the server, so the drawn line is not lost.
 		float now = GetGame().GetWorld().GetWorldTime();
 		if (now - m_fLastSentTime < LL_MapLine.MIN_INTERVAL_S * 1000)
 		{
@@ -434,7 +424,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			DiscardDraft();
 	}
 
-	//! Takes back the last point; with only the start left, cancels the line as Escape does.
 	protected void OnInputUndo(float value, EActionTrigger reason)
 	{
 		if (!m_bDrawing || m_wDialogRoot)
@@ -464,9 +453,47 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 	protected void ShowRefusal(LL_EMapLineRefusal reason)
 	{
-		LL_LobbyPlayerComponent lobbyPlayer = LL_LobbyPlayerComponent.GetLocalInstance();
-		if (lobbyPlayer)
-			lobbyPlayer.ShowMapLineRefused(reason);
+		ShowNotice(LL_MapLine.TranslateRefusal(reason));
+	}
+
+	//! False when the map is not open.
+	bool ShowNotice(string text)
+	{
+		if (!m_wCanvas || !m_RootWidget)
+			return false;
+
+		if (!m_wNoticeRoot)
+		{
+			m_wNoticeRoot = GetGame().GetWorkspace().CreateWidgets(NOTICE_LAYOUT, m_RootWidget);
+			if (!m_wNoticeRoot)
+				return false;
+
+			m_wNoticeText = TextWidget.Cast(m_wNoticeRoot.FindAnyWidget("Text"));
+
+			FrameSlot.SetAnchorMin(m_wNoticeRoot, 0.5, 1);
+			FrameSlot.SetAnchorMax(m_wNoticeRoot, 0.5, 1);
+			FrameSlot.SetAlignment(m_wNoticeRoot, 0.5, 1);
+			FrameSlot.SetSizeToContent(m_wNoticeRoot, true);
+			FrameSlot.SetPos(m_wNoticeRoot, 0, -NOTICE_BOTTOM);
+		}
+
+		if (m_wNoticeText)
+			m_wNoticeText.SetTextFormat("%1", text);
+
+		GetGame().GetCallqueue().Remove(HideNotice);
+		GetGame().GetCallqueue().CallLater(HideNotice, NOTICE_MS, false);
+		return true;
+	}
+
+	protected void HideNotice()
+	{
+		GetGame().GetCallqueue().Remove(HideNotice);
+
+		if (m_wNoticeRoot)
+			m_wNoticeRoot.RemoveFromHierarchy();
+
+		m_wNoticeRoot = null;
+		m_wNoticeText = null;
 	}
 
 	protected void OpenDialog()
@@ -497,7 +524,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		m_Dialog.GetOnCancel().Insert(OnDialogCancel);
 		m_Dialog.GetOnColorChanged().Insert(OnDialogColorChanged);
 
-		// Console users without the UGC privilege may not share content.
 		PlayerController pc = GetGame().GetPlayerController();
 		SocialComponent social;
 		if (pc)
@@ -533,7 +559,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			m_CursorModule.HandleDialog(false);
 	}
 
-	//! Recolours the line in progress and the remembered colour; drawing continues.
 	protected void OnDialogConfirm(int iconEntry, int colorEntry, string text)
 	{
 		m_iDraftColor = colorEntry;
@@ -543,7 +568,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		CloseDialog();
 	}
 
-	//! The pick shows on the line at once; OK keeps it, Cancel puts the old colour back.
 	protected void OnDialogColorChanged(int colorEntry)
 	{
 		m_iDraftColor = colorEntry;
@@ -558,8 +582,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		CloseDialog();
 	}
 
-	// Enter confirms unless the colour list is open: drawing is a mouse feature, so the
-	// focused list button must not swallow it.
 	protected void OnDialogInputConfirm(float value, EActionTrigger reason)
 	{
 		if (!m_Dialog || !m_bDialogDelayed || m_Dialog.IsComboOpened())
@@ -576,9 +598,8 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		m_Dialog.Cancel();
 	}
 
-	//! Commands are rebuilt only when the view or the lines changed. Every point is the
-	//! projected world origin plus its offset times the zoom, which is what
-	//! SCR_MapEntity.WorldToScreen computes, at one engine call per frame.
+	//! One WorldToScreen call per frame: points are the projected origin plus offset times zoom,
+	//! and culling uses this projection because the map's visible frame can lag a pan.
 	protected void Render()
 	{
 		float zoom = m_MapEntity.GetCurrentZoom();
@@ -594,8 +615,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		int originX, originY;
 		m_MapEntity.WorldToScreen(0, 0, originX, originY, true);
 
-		// The screen in world metres, from this frame's projection; the map's own visible
-		// frame is refreshed inside its update and can lag one frame behind a pan.
 		float screenW, screenH;
 		GetGame().GetWorkspace().GetScreenSize(screenW, screenH);
 		float viewMinX = -originX / zoom;
@@ -632,10 +651,8 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		m_wCanvas.SetDrawCommands(m_aCommands);
 	}
 
-	//! The band is drawn once, then its outline as a closed loop along both edges: an outline
-	//! drawn under the whole band would double its opacity. The outline fields of
-	//! LineDrawCommand are not used because no official script shows what the engine does
-	//! with them.
+	//! The outline is a closed loop along both edges: under the whole band it would double the
+	//! band's opacity. LineDrawCommand's own outline fields are unused in official scripts.
 	protected void AddLineCommands(int slot, array<int> points, float width, int colorEntry, int originX, int originY, float zoom)
 	{
 		while (m_aLinePool.Count() <= slot)
@@ -688,8 +705,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		PlaceStartIcon(slot, lineCommand.m_Vertices[0], lineCommand.m_Vertices[1], colorEntry);
 	}
 
-	//! The band's outline as one closed loop: the left edge forward, then the right edge back,
-	//! each vertex pushed out along the mitre of its two segments.
 	protected static void BuildEdgeLoop(notnull array<float> center, float halfWidth, notnull array<float> outLoop)
 	{
 		outLoop.Clear();
@@ -777,8 +792,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		}
 	}
 
-	//! A placed Dot marker's glyph: its imageset quad, its tint, its size, all from the same
-	//! entry, at a constant screen size like every marker.
 	protected void PlaceStartIcon(int slot, float screenX, float screenY, int colorEntry)
 	{
 		if (m_sDotImageset.IsEmpty() || !m_wCanvasRoot)
@@ -808,7 +821,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		if (!mapFrame)
 			return null;
 
-		// A start point must never eat a click meant for the map.
 		ImageWidget icon = ImageWidget.Cast(GetGame().GetWorkspace().CreateWidget(
 			WidgetType.ImageWidgetTypeID,
 			WidgetFlags.BLEND | WidgetFlags.VISIBLE | WidgetFlags.STRETCH | WidgetFlags.IGNORE_CURSOR | WidgetFlags.NOFOCUS,
@@ -826,16 +838,11 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		return icon;
 	}
 
-	protected void OnInputDelete(float value, EActionTrigger reason)
+	//! Called by LL_MapMarkersUI's Delete handler when no marker is under the cursor, so one
+	//! press removes one thing.
+	void TryDeleteLineUnderCursor()
 	{
 		if (!m_wCanvas || IsBusy() || !m_Cache)
-			return;
-
-		if (!LL_MapMarkersUI.LL_CanEditMarkers())
-			return;
-
-		// One key, one deletion: a placed marker under the cursor goes first.
-		if (IsMarkerUnderCursor())
 			return;
 
 		LL_MapLine line = FindDeletableLineUnderCursor();
@@ -847,34 +854,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			lobbyPlayer.AskRemoveMapLine(line.m_iId);
 	}
 
-	protected bool IsMarkerUnderCursor()
-	{
-		SCR_MapMarkerManagerComponent markerManager = SCR_MapMarkerManagerComponent.GetInstance();
-		if (!markerManager)
-			return false;
-
-		// The marker UI's own Delete listener may have removed a marker this frame; the traced
-		// list still holds its destroyed widget.
-		array<Widget> widgets = SCR_MapCursorModule.GetMapWidgetsUnderCursor();
-		foreach (Widget widget : widgets)
-		{
-			if (!widget || !widget.FindHandler(SCR_MapMarkerWidgetComponent))
-				continue;
-
-			SCR_MapMarkerBase marker = markerManager.GetMarkerByWidget(widget);
-			if (!marker || !marker.CanBeRemovedByOwner())
-				continue;
-
-			SCR_EMapMarkerType type = marker.GetType();
-			if (type == SCR_EMapMarkerType.PLACED_CUSTOM || type == SCR_EMapMarkerType.PLACED_MILITARY)
-				return true;
-		}
-
-		return false;
-	}
-
-	//! Any line of the faction (the cache holds no other); only the start point deletes it, as
-	//! only its glyph deletes a marker; topmost first, as drawn.
 	protected LL_MapLine FindDeletableLineUnderCursor()
 	{
 		int mouseX, mouseY;
@@ -884,7 +863,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		int originX, originY;
 		m_MapEntity.WorldToScreen(0, 0, originX, originY, true);
 
-		// The visible part of the Dot glyph: its label ink is the share of the square it fills.
 		float tolerance = Math.Max(GetGame().GetWorkspace().DPIScale(m_fDotSize * 0.5 * m_fDotInk), HIT_MIN_PX);
 
 		array<ref LL_MapLine> lines = m_Cache.GetLines();
@@ -905,8 +883,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		return null;
 	}
 
-	//! Polled, as the marker ages are: a release lost while the dialog holds the input
-	//! context would strand the labels.
+	//! Polled: a key release lost while the dialog holds the input context would strand the labels.
 	protected void UpdateLabels()
 	{
 		bool wanted = GetGame().GetInputManager().GetActionValue("LL_MapMarkerInfo") > 0;
@@ -938,7 +915,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			float x = originX + worldX * zoom;
 			float y = originY - worldY * zoom;
 
-			// Where a Dot marker's label sits: past the glyph's ink, then the label gap.
 			float offset = m_fDotSize * 0.5 * m_fDotInk + SCR_MapMarkerWidgetComponent.LL_LABEL_GAP;
 			FrameSlot.SetPos(label, workspace.DPIUnscale(x) + offset, workspace.DPIUnscale(y));
 			label.SetVisible(true);
@@ -957,7 +933,6 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		foreach (LL_MapLine line : m_Cache.GetLines())
 		{
-			// A label must never eat a click meant for the map.
 			Widget created = GetGame().GetWorkspace().CreateWidget(
 				WidgetType.TextWidgetTypeID,
 				WidgetFlags.VISIBLE | WidgetFlags.IGNORE_CURSOR | WidgetFlags.NOFOCUS,
@@ -980,8 +955,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			FrameSlot.SetSizeToContent(label, true);
 			FrameSlot.SetAlignment(label, 0, 0.5);
 
-			// Format parameters, never a finished string: SetText translates anything
-			// starting with '#'.
+			// Format parameters: SetText would translate a name starting with '#'.
 			string age = LL_MapMarkersUI.LL_FormatMarkerAge(line.m_CreatedAt);
 			if (age.IsEmpty())
 				label.SetTextFormat("%1", line.m_sAuthorName);

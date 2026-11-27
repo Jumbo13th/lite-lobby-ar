@@ -58,7 +58,7 @@ arguments or fewer; no prefab change
 | V. Replication | New replicated values: none. New RPCs: `RpcAsk_AddMapLine` (client → server, validated), `RpcAsk_RemoveMapLine` (client → server, validated), `RpcDo_OwnerAddMapLine`, `RpcDo_OwnerRemoveMapLine`, `RpcDo_OwnerResetMapLines`, `RpcDo_OwnerMapLineRefused` (server → one client). Visibility: faction-scoped, filtered on the server; the author identity never leaves the server; refusals are requester-only. Bulk: a faction's lines go as a paced, ordered batch after each faction change. All argument lists are 7 or fewer. Identity for ownership, limits and rate is the identity id. | PASS |
 | VI. Comments and Hygiene | Comments only for the constraints: the context suppression, the per-frame projection, the pacing, the paired save/restore. New files `LL_`-prefixed; modded files keep vanilla parameter names. The branch's unused earlier files are deleted in the same change. | PASS |
 | VII. Optional Integrations | Not touched. | PASS |
-| Engine and Asset Constraints | No `.et`, `.layout`, `.acp` or `.meta` change; `ZoneCanvas.layout` is reused. `.conf` edits use fresh ids and are listed for the operator. | PASS |
+| Engine and Asset Constraints | No `.et` or `.acp` change; `ZoneCanvas.layout` is reused. One new layout, `UI/Map/MapLineNotice.layout`, with a hand-written `.meta` (GUID {9F3872243809E843}) and the edited `InsertMarkerDialog.layout`, both listed for the operator; `.conf` edits use fresh ids. | PASS |
 | User Interface | The existing dialog, its components and its input handling; labels in the marker label style; reviewed in game at 1080p and 1440p (quickstart). | PASS |
 | Localization | New keys `LL-MapLines_*`, `LL-CommsGuide_Lines*` and `LL-Keybind_MapLineStart` in `ll_localization.st`, English and Russian, runtime tables regenerated. | PASS |
 | Documentation | Changelog entry in English and Russian under the next Workshop version; `ARCHITECTURE.md` replication contract and component list updated. | PASS |
@@ -193,9 +193,12 @@ docs/src/content/docs/
    `LL_MapLineFinish`, `LL_MapLineCancel`, `LL_MapLineUndo`; context `LL_MapLineContext`),
    `Configs/System/keyBindingMenu.conf`, `Configs/Systems/Persistence/LL_Persistence.conf`.
    Reload any of them if Workbench holds a stale buffer.
-3. Run [quickstart.md](quickstart.md) on a dedicated server.
+3. Open `UI/Map/MapLineNotice.layout` (new) and `UI/Map/InsertMarkerDialog.layout`; check that
+   Workbench keeps the notice's GUID {9F3872243809E843}. If it assigns another, the
+   `NOTICE_LAYOUT` constant in `LL_MapLinesUI.c` must be changed to it.
+4. Run [quickstart.md](quickstart.md) on a dedicated server.
 
-No prefab, layout or asset import.
+No prefab or asset import.
 
 ## Constitution Check (post-design)
 

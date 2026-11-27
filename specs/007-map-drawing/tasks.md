@@ -148,6 +148,16 @@ Claude Design round.
 - [X] T052 [US3] Markers: `m_bIsDeleteRestricted = false` and the faction and type gate with server-marker removal in `LL/scripts/game/Modded/LL_M_SCR_MapMarkerSyncComponent.c`; `RemoveOwnedMarker` override for server-owned markers in `LL/scripts/game/Map/LL_MapMarkersUI.c` (FR-012, research R15).
 - [X] T053 [US3] `[LL_MapAudit]` lines: line accepted and deleted (`LL_MapLineStore.c`), marker accepted (`LL/scripts/game/Modded/LL_M_SCR_MapMarkerManagerComponent.c`), marker deleted (`LL_M_SCR_MapMarkerSyncComponent.c`) (FR-020, research R16).
 - [X] T054 [P] Communications paragraph (any line or marker of your side can be deleted) and the 1.2.0 changelog in English and Russian; runtime tables regenerated.
+
+## Phase 9: Review fixes (PR #12 review, 2026-11-27)
+
+- [X] T055 [US1] Refusals shown in a footer-style panel at the bottom centre of the open map (`LL/UI/Map/MapLineNotice.layout` + `.meta`, `ShowNotice` in `LL/scripts/game/Map/LL_MapLinesUI.c`; `ShowMapLineRefused` in `LL/scripts/game/Core/LL_LobbyPlayerComponent.c` routes there, chat only with the map closed) (FR-011, research R17).
+- [X] T056 [US3] One Delete press removes one marker: `OnInputMarkerDelete` override in `LL/scripts/game/Map/LL_MapMarkersUI.c` (research R17).
+- [X] T057 [US3] One Delete handler for markers and lines: the marker UI's override passes a press with no marker under the cursor to `LL_MapLinesUI.TryDeleteLineUnderCursor`; the line UI has no Delete listener of its own (fixes the listen-host double deletion without timing).
+- [X] T058 [US4] Faction changes settled per sync tick against the faction held (`StartSync_S`, `ApplySync_S`, `ForgetPlayer_S` in `LL/scripts/game/Map/LL_MapLineStore.c`; forgotten on disconnect in `LL_LobbyManager.OnPlayerDisconnected`); restore forces a fresh sync.
+- [X] T059 [US4] `Restore_S` renumbers a saved line whose id is taken and returns the restored count (`LL_MapLineStore.c`, `LL/scripts/game/Persistence/LL_MapLineData.c`).
+- [X] T060 [US1] Server line interval 1 s (`SERVER_MIN_INTERVAL_S` in `LL/scripts/game/Map/LL_MapLine.c`), client 2 s.
+- [X] T061 [US1] The cursor-state check covers every click of a line in progress (`OnInputMapSelect` in `LL_MapLinesUI.c`).
 - [ ] T038 Operator: compile and run quickstart steps 1 to 12 on a dedicated server.
 
 ---

@@ -705,8 +705,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		markerMgr.LL_AddTrustedMarker(markerData);
 	}
 
-	// Map lines: the store (LL_MapLineStore) decides who receives what; this component
-	// only carries it. Each send is to this player alone.
+	// Map lines: LL_MapLineStore decides who receives what; every send goes to this player alone.
 
 	protected ref LL_MapLineCache m_MapLineCache = new LL_MapLineCache();
 
@@ -736,7 +735,6 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		if (reason == LL_EMapLineRefusal.NONE)
 			return;
 
-		// Rpc never runs on the sender.
 		if (GetGame().GetPlayerController() == GetOwner())
 			ShowMapLineRefused(reason);
 		else
@@ -751,6 +749,7 @@ class LL_LobbyPlayerComponent : ScriptComponent
 			mgr.GetMapLineStore().Remove_S(GetPlayerId(), lineId);
 	}
 
+	//! The client gets its own copy even on a listen host: the cache writes client-only fields.
 	void SendMapLine_S(notnull LL_MapLine line, bool own)
 	{
 		int ageSeconds;
@@ -805,7 +804,6 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		ShowMapLineRefused(reason);
 	}
 
-	// A fresh object: on a listen host the store's own line must not be shared.
 	protected void ApplyMapLine(int lineId, int color, float width, int ageSeconds, string authorName, bool own, notnull array<int> points)
 	{
 		LL_MapLine line = new LL_MapLine();
@@ -823,9 +821,20 @@ class LL_LobbyPlayerComponent : ScriptComponent
 		m_MapLineCache.Add(line);
 	}
 
+	//! On the open map when there is one: a mission may hide the chat feed in GAME.
 	void ShowMapLineRefused(LL_EMapLineRefusal reason)
 	{
-		ShowCommandHelp(LL_MapLine.TranslateRefusal(reason));
+		string text = LL_MapLine.TranslateRefusal(reason);
+
+		SCR_MapEntity mapEntity = SCR_MapEntity.GetMapInstance();
+		if (mapEntity && mapEntity.IsOpen())
+		{
+			LL_MapLinesUI linesUI = LL_MapLinesUI.Cast(mapEntity.GetMapUIComponent(LL_MapLinesUI));
+			if (linesUI && linesUI.ShowNotice(text))
+				return;
+		}
+
+		ShowCommandHelp(text);
 	}
 
 	// Ready requires a slot; un-ready is always allowed.

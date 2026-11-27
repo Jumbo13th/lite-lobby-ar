@@ -1,7 +1,5 @@
-// Server-side map lines: storage, every check a request has to pass, delivery to the
-// author's faction only, and the paced re-delivery after a player's faction changes.
-// Created by LL_LobbyManager on the authority. Lines are faction intel, so they never ride
-// a broadcast or the join snapshot: each recipient gets its own owner RPC.
+// Server-side map lines: checks, storage and delivery to the author's faction. Lines are faction
+// intel, so they never ride a broadcast or the join snapshot: each recipient gets an owner RPC.
 
 class LL_MapLineSyncJob
 {
@@ -24,6 +22,11 @@ class LL_MapLineStore
 	protected ref map<string, float> m_mLastAccepted = new map<string, float>();
 
 	protected ref array<ref LL_MapLineSyncJob> m_aJobs = {};
+
+	// Player id → faction held ("" for none) / asked for since the last tick. A slot switch is a
+	// leave and a take in one frame; settling per tick makes a same-side switch a no-op.
+	protected ref map<int, string> m_mSyncedFaction = new map<int, string>();
+	protected ref map<int, string> m_mPendingFaction = new map<int, string>();
 	protected bool m_bTickScheduled;
 
 	array<ref LL_MapLine> GetLines()
@@ -51,7 +54,6 @@ class LL_MapLineStore
 		if (!faction)
 			return Refuse_S(playerId, LL_EMapLineRefusal.NOT_ALLOWED);
 
-		// Removal stays open after the freeze: an outdated plan can still be cleared.
 		if (!LL_MapLine.IsDrawingPhase())
 			return Refuse_S(playerId, LL_EMapLineRefusal.FREEZE_OVER);
 
@@ -71,7 +73,7 @@ class LL_MapLineStore
 		if (color < 0 || color >= GetColorCount())
 			return Refuse_S(playerId, LL_EMapLineRefusal.INVALID);
 
-		// Written so that NaN fails too.
+		// NaN fails only in this form.
 		if (!(width >= LL_MapLine.MIN_WIDTH_M && width <= LL_MapLine.MAX_WIDTH_M))
 			return Refuse_S(playerId, LL_EMapLineRefusal.INVALID);
 
@@ -86,7 +88,7 @@ class LL_MapLineStore
 
 		float now = GetGame().GetWorld().GetWorldTime();
 		float last;
-		if (m_mLastAccepted.Find(authorKey, last) && now - last < LL_MapLine.MIN_INTERVAL_S * 1000)
+		if (m_mLastAccepted.Find(authorKey, last) && now - last < LL_MapLine.SERVER_MIN_INTERVAL_S * 1000)
 			return Refuse_S(playerId, LL_EMapLineRefusal.TOO_SOON);
 
 		LL_MapLine line = new LL_MapLine();
@@ -122,9 +124,8 @@ class LL_MapLineStore
 		return LL_EMapLineRefusal.NONE;
 	}
 
-	//! Any player of the line's faction who may place markers: a flood is cleaned up by the
-	//! players themselves, and the audit line names who did it. Silently ignored when not
-	//! allowed: a removal reveals nothing and needs no answer.
+	//! Any faction player who may place markers, so players clean up a flood themselves; the
+	//! audit log names who. A refused removal gets no answer: it reveals nothing.
 	void Remove_S(int playerId, int lineId)
 	{
 		if (!Replication.IsServer() || !CanEdit_S(playerId))
@@ -158,14 +159,35 @@ class LL_MapLineStore
 		}
 	}
 
-	//! Clears the player's lines, then queues the faction's. A newer sync for the same
-	//! player replaces the pending one; owner RPCs arrive in order, so the clear always
-	//! lands before the lines of its own sync and after any line sent earlier.
-	void StartSync_S(int playerId, Faction faction)
+	//! Asks for the player's lines to be those of the faction (none: cleared), settled on the
+	//! next tick. force re-sends even when the player already holds that faction's lines.
+	void StartSync_S(int playerId, Faction faction, bool force = false)
 	{
 		if (!Replication.IsServer())
 			return;
 
+		string factionKey;
+		if (faction)
+			factionKey = faction.GetFactionKey();
+
+		if (force)
+			m_mSyncedFaction.Remove(playerId);
+
+		m_mPendingFaction.Set(playerId, factionKey);
+		ScheduleTick_S();
+	}
+
+	//! A reconnecting client starts with no lines, whatever this player id held before.
+	void ForgetPlayer_S(int playerId)
+	{
+		m_mSyncedFaction.Remove(playerId);
+		m_mPendingFaction.Remove(playerId);
+	}
+
+	//! A newer sync replaces the queued one. Owner RPCs arrive in order, so the clear lands after
+	//! any line sent earlier and before this sync's lines.
+	protected void ApplySync_S(int playerId, FactionKey factionKey)
+	{
 		for (int i = m_aJobs.Count() - 1; i >= 0; i--)
 		{
 			if (m_aJobs[i].m_iPlayerId == playerId)
@@ -177,38 +199,43 @@ class LL_MapLineStore
 			return;
 
 		lobbyPlayer.SendMapLinesReset_S();
+		m_mSyncedFaction.Set(playerId, factionKey);
 
-		if (!faction)
+		if (factionKey.IsEmpty())
 			return;
 
 		LL_MapLineSyncJob job = new LL_MapLineSyncJob();
 		job.m_iPlayerId = playerId;
 
-		FactionKey factionKey = faction.GetFactionKey();
 		foreach (LL_MapLine line : m_aLines)
 		{
 			if (line.m_sFactionKey == factionKey)
 				job.m_aLineIds.Insert(line.m_iId);
 		}
 
-		if (job.m_aLineIds.IsEmpty())
-			return;
-
-		m_aJobs.Insert(job);
-		ScheduleTick_S();
+		if (!job.m_aLineIds.IsEmpty())
+			m_aJobs.Insert(job);
 	}
 
-	//! Lines from a resumed session, then a sync for everyone already in a faction.
-	void Restore_S(notnull array<ref LL_MapLine> lines)
+	//! A saved line whose id was taken by a line drawn before the restore is renumbered, not
+	//! lost. Returns how many were restored.
+	int Restore_S(notnull array<ref LL_MapLine> lines)
 	{
 		foreach (LL_MapLine line : lines)
 		{
-			if (FindIndex(line.m_iId) >= 0)
-				continue;
-
-			m_aLines.Insert(line);
 			if (line.m_iId >= m_iNextId)
 				m_iNextId = line.m_iId + 1;
+		}
+
+		foreach (LL_MapLine line : lines)
+		{
+			if (FindIndex(line.m_iId) >= 0)
+			{
+				line.m_iId = m_iNextId;
+				m_iNextId++;
+			}
+
+			m_aLines.Insert(line);
 		}
 
 		array<int> players = {};
@@ -217,8 +244,10 @@ class LL_MapLineStore
 		{
 			Faction faction = SCR_FactionManager.SGetPlayerFaction(playerId);
 			if (faction)
-				StartSync_S(playerId, faction);
+				StartSync_S(playerId, faction, true);
 		}
+
+		return lines.Count();
 	}
 
 	protected void ScheduleTick_S()
@@ -233,6 +262,17 @@ class LL_MapLineStore
 	protected void SyncTick_S()
 	{
 		m_bTickScheduled = false;
+
+		foreach (int pendingId, string pendingKey : m_mPendingFaction)
+		{
+			string syncedKey;
+			if (m_mSyncedFaction.Find(pendingId, syncedKey) && syncedKey == pendingKey)
+				continue;
+
+			ApplySync_S(pendingId, pendingKey);
+		}
+
+		m_mPendingFaction.Clear();
 
 		int budget = SYNC_LINES_PER_TICK;
 		for (int i = 0; i < m_aJobs.Count() && budget > 0; i++)
@@ -252,7 +292,6 @@ class LL_MapLineStore
 				int index = FindIndex(job.m_aLineIds[0]);
 				job.m_aLineIds.RemoveOrdered(0);
 
-				// Deleted while queued.
 				if (index < 0)
 					continue;
 
@@ -273,7 +312,6 @@ class LL_MapLineStore
 			ScheduleTick_S();
 	}
 
-	//! The same rule as shared markers: a faction, a living slot character, no hard freeze.
 	protected bool CanEdit_S(int playerId)
 	{
 		PlayerController pc = GetGame().GetPlayerManager().GetPlayerController(playerId);
@@ -290,7 +328,6 @@ class LL_MapLineStore
 		return reason;
 	}
 
-	//! Survives reconnects; a session-scoped fallback only when the player has no key.
 	protected string GetAuthorKey_S(int playerId)
 	{
 		string key;

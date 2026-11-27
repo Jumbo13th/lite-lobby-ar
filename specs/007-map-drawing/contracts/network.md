@@ -7,7 +7,7 @@ server; nothing is broadcast and nothing enters `RplSave`/`RplLoad`.
 
 | RPC | Arguments | Server checks, in order | On failure |
 |-----|-----------|------------------------|------------|
-| `RpcAsk_AddMapLine` | `int colour, float width, array<int> points` | marker edit rule; before the game or during its freeze time; points count even and 4..128; every point inside the world box; colour in the placed-marker list; width 0.1 m..50 m; author identity under 20 lines; faction under 150 lines; 2 s since the author's last accepted line | `RpcDo_OwnerMapLineRefused(reason)` to the requester; nothing stored |
+| `RpcAsk_AddMapLine` | `int colour, float width, array<int> points` | marker edit rule; before the game or during its freeze time; points count even and 4..128; every point inside the world box; colour in the placed-marker list; width 0.1 m..50 m; author identity under 20 lines; faction under 150 lines; 1 s since the author's last accepted line (the client waits 2 s) | `RpcDo_OwnerMapLineRefused(reason)` to the requester; nothing stored |
 | `RpcAsk_RemoveMapLine` | `int lineId` | marker edit rule; line exists; line faction is the requester's faction | silently ignored |
 | stock `RPC_AskRemoveStaticMarker` (lobby override) | `int markerID` | marker edit rule; marker exists; placed type; visible to the requester's faction; a server-owned marker is removed by the override | silently ignored |
 

@@ -20,6 +20,10 @@ class LL_MapLine
 	static const int MAX_LINES_PER_PLAYER = 20;
 	static const int MAX_LINES_PER_FACTION = 150;
 	static const float MIN_INTERVAL_S = 2;
+
+	// Half the client's wait: clocks and network delay differ, and a line the client allowed
+	// must not be refused and lost.
+	static const float SERVER_MIN_INTERVAL_S = 1;
 	static const float MIN_WIDTH_M = 0.1;
 	static const float MAX_WIDTH_M = 50;
 
@@ -41,7 +45,6 @@ class LL_MapLine
 	vector m_vMin;
 	vector m_vMax;
 
-	//! Client side, in the player's language. POINT_LIMIT is only raised while drawing.
 	static string TranslateRefusal(LL_EMapLineRefusal reason)
 	{
 		switch (reason)
@@ -119,7 +122,6 @@ class LL_MapLine
 			maxY = Math.Max(maxY, y);
 		}
 
-		// The start dot is wider than the line.
 		float pad = m_fWidth;
 		m_vMin = Vector(minX - pad, 0, minY - pad);
 		m_vMax = Vector(maxX + pad, 0, maxY + pad);

@@ -771,7 +771,6 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 				lobbyPlayer.SyncFactionMarkers_S(faction);
 		}
 
-		// Also with no faction: the previous faction's lines must leave this player's map.
 		LL_MapLineStore lineStore = GetMapLineStore();
 		if (lineStore)
 			lineStore.StartSync_S(playerId, faction);
@@ -2483,6 +2482,9 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 		if (!Replication.IsServer())
 			return;
+
+		if (m_MapLineStore)
+			m_MapLineStore.ForgetPlayer_S(playerId);
 
 		LL_SlotData slot = FindSlotByPlayerId(playerId);
 		if (slot)
