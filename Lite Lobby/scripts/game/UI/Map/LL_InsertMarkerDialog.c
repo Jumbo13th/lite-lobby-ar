@@ -1,8 +1,8 @@
 // Compact insert-marker dialog at the cursor: description, type and colour with a live
-// preview. Pure UI: it reports (icon entry, colour entry, text) through GetOnConfirm and
-// GetOnCancel; construction and networking stay in LL_MapMarkersUI. Entries are indices
-// into the shared SCR_MapMarkerEntryPlaced config. Dropdown row icons are applied from
-// m_OnOpened because the combo rebuilds its elements on every open.
+// preview, or the colour alone for a map line. Pure UI: it reports (icon entry, colour
+// entry, text) through GetOnConfirm and GetOnCancel; the callers build and send. Entries
+// are indices into the shared SCR_MapMarkerEntryPlaced config. Dropdown row icons are
+// applied from m_OnOpened because the combo rebuilds its elements on every open.
 
 void LL_InsertMarkerConfirmInvoker(int iconEntry, int colorEntry, string text);
 typedef func LL_InsertMarkerConfirmInvoker;
@@ -11,12 +11,21 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 {
 	// Fixed size: content-driven sizing mismeasured the late-sizing WLib buttons.
 	protected const int DIALOG_WIDTH = 360;
-	protected const int DIALOG_HEIGHT = 338;
+	protected const int DIALOG_HEIGHT = 356;
 
 	// Dropdown lists open downward past the dialog's bottom edge.
 	protected const int DROPDOWN_RESERVE = 210;
 
+	// The rows a map line does not use: preview 84, description and type 8 + 44 each.
+	protected const int LINE_MODE_HIDDEN_HEIGHT = 188;
+
+	// At the stock 20 px a padded glyph such as the dot is a few pixels.
+	protected const float ROW_ICON_SIZE = 32;
+
 	protected SCR_MapMarkerEntryPlaced m_Config;
+	protected bool m_bLineMode;
+	protected int m_iLineIconEntry;
+	protected int m_iHeight = DIALOG_HEIGHT;
 
 	protected ImageWidget m_wPreviewIcon;
 	protected TextWidget m_wPreviewText;
@@ -28,6 +37,9 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	protected ref ScriptInvokerBase<LL_InsertMarkerConfirmInvoker> m_OnConfirm = new ScriptInvokerBase<LL_InsertMarkerConfirmInvoker>();
 	protected ref ScriptInvokerVoid m_OnCancel = new ScriptInvokerVoid();
+
+	// (int colorEntry) on every pick, before OK.
+	protected ref ScriptInvoker m_OnColorChanged = new ScriptInvoker();
 
 	// A dropdown or the edit box consumes Escape in the same frame the cancel listener
 	// fires, and listener order is not guaranteed.
@@ -42,6 +54,11 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	ScriptInvokerVoid GetOnCancel()
 	{
 		return m_OnCancel;
+	}
+
+	ScriptInvoker GetOnColorChanged()
+	{
+		return m_OnColorChanged;
 	}
 
 	override void HandlerAttached(Widget w)
@@ -155,6 +172,46 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		GetGame().GetCallqueue().Call(ClampOnScreen);
 	}
 
+	//! Colour only, the rows drawn with the line's start glyph. The other rows are hidden from
+	//! script: Visible 0 in a layout drops a node's children.
+	void InitLine(notnull SCR_MapMarkerEntryPlaced config, int iconEntry, int colorEntry)
+	{
+		m_Config = config;
+		m_bLineMode = true;
+		m_iLineIconEntry = iconEntry;
+
+		array<string> hiddenRows = {"PreviewFrame", "EditBoxRoot", "TypeCombo"};
+		foreach (string rowName : hiddenRows)
+		{
+			Widget row = m_wRoot.FindAnyWidget(rowName);
+			if (row)
+				row.SetVisible(false);
+		}
+
+		RichTextWidget header = RichTextWidget.Cast(m_wRoot.FindAnyWidget("HeaderText"));
+		if (header)
+			header.SetText("#LL-MapLines_DialogTitle");
+
+		if (m_ColorCombo)
+		{
+			array<ref SCR_MarkerColorEntry> colors = config.GetColorEntries();
+			foreach (SCR_MarkerColorEntry color : colors)
+			{
+				m_ColorCombo.AddItem(color.GetName());
+			}
+
+			if (colorEntry >= 0 && colorEntry < colors.Count())
+				m_ColorCombo.SetCurrentItem(colorEntry);
+			else
+				m_ColorCombo.SetCurrentItem(0);
+		}
+
+		m_iHeight = DIALOG_HEIGHT - LINE_MODE_HIDDEN_HEIGHT;
+		FrameSlot.SetSizeY(m_wRoot, m_iHeight);
+
+		GetGame().GetCallqueue().Call(ClampOnScreen);
+	}
+
 	//! Console users without the UGC privilege may not share content.
 	void SetConfirmEnabled(bool enabled)
 	{
@@ -164,6 +221,9 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	int GetSelectedIconEntry()
 	{
+		if (m_bLineMode)
+			return m_iLineIconEntry;
+
 		if (!m_TypeCombo)
 			return 0;
 
@@ -225,7 +285,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		float posX = FrameSlot.GetPosX(m_wRoot);
 		float posY = FrameSlot.GetPosY(m_wRoot);
 
-		return x >= posX && x <= posX + DIALOG_WIDTH && y >= posY && y <= posY + DIALOG_HEIGHT;
+		return x >= posX && x <= posX + DIALOG_WIDTH && y >= posY && y <= posY + m_iHeight;
 	}
 
 	bool IsComboFocused()
@@ -288,11 +348,28 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 	protected void OnComboClosed(SCR_ComboBoxComponent combo)
 	{
 		MarkEscapeConsumed();
+
+		// A focused list button would take the Enter meant to confirm the line.
+		if (m_bLineMode)
+			GetGame().GetWorkspace().SetFocusedWidget(null);
 	}
 
 	protected void OnSelectionChanged(SCR_ComboBoxComponent combo, int index)
 	{
+		if (combo == m_ColorCombo)
+			m_OnColorChanged.Invoke(index);
+
 		UpdatePreview();
+	}
+
+	protected void SetRowIconSize(notnull Widget element)
+	{
+		SizeLayoutWidget iconSize = SizeLayoutWidget.Cast(element.FindAnyWidget("IconSize"));
+		if (!iconSize)
+			return;
+
+		iconSize.SetWidthOverride(ROW_ICON_SIZE);
+		iconSize.SetHeightOverride(ROW_ICON_SIZE);
 	}
 
 	//! Paint each type row with its glyph, tinted in the currently selected color.
@@ -318,6 +395,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 				continue;
 
 			icon.LoadImageFromSet(0, imageset, quad);
+			SetRowIconSize(element);
 			icon.SetColor(color);
 		}
 	}
@@ -343,6 +421,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 				continue;
 
 			icon.LoadImageFromSet(0, imageset, quad);
+			SetRowIconSize(element);
 			icon.SetColor(m_Config.GetColorEntry(i));
 		}
 	}
@@ -392,8 +471,8 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 		if (x + DIALOG_WIDTH > sw)
 			x = sw - DIALOG_WIDTH;
-		if (y + DIALOG_HEIGHT + DROPDOWN_RESERVE > sh)
-			y = sh - DIALOG_HEIGHT - DROPDOWN_RESERVE;
+		if (y + m_iHeight + DROPDOWN_RESERVE > sh)
+			y = sh - m_iHeight - DROPDOWN_RESERVE;
 		if (x < 0)
 			x = 0;
 		if (y < 0)

@@ -100,8 +100,8 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	[Attribute("{1D21A7B8C9D0E1F2}UI/Map/InsertMarkerDialog.layout", UIWidgets.ResourceNamePicker, desc: "Insert-marker dialog layout", params: "layout")]
 	protected ResourceName m_sInsertDialogLayout;
 
-	protected const float DOUBLE_CLICK_MS = 400;
-	protected const int DOUBLE_CLICK_MAX_DIST_PX = 12;
+	static const float DOUBLE_CLICK_MS = 400;
+	static const int DOUBLE_CLICK_MAX_DIST_PX = 12;
 
 	protected Widget m_wLLDialogRoot;
 	protected LL_InsertMarkerDialog m_LLDialog;
@@ -117,6 +117,17 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	// close/reopen. Text is never remembered.
 	protected static int s_iLastIconEntry;
 	protected static int s_iLastColorEntry;
+
+	//! One colour memory for markers and map lines.
+	static int GetLastColorEntry()
+	{
+		return s_iLastColorEntry;
+	}
+
+	static void SetLastColorEntry(int colorEntry)
+	{
+		s_iLastColorEntry = colorEntry;
+	}
 
 	// Captured when the dialog opens, so the marker lands where the player double-clicked.
 	protected float m_fTargetWorldX;
@@ -136,7 +147,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 	//! The client must refuse too because the stock drag writes the new position locally
 	//! before asking the server; with the RPC dropped a spectator could redraw the plan
 	//! for themselves.
-	protected bool LL_CanEditMarkers()
+	static bool LL_CanEditMarkers()
 	{
 		// The spectator map is read-only outright; the death → spectator handover does
 		// not land in one frame.
@@ -196,13 +207,53 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		super.OnDragEnd(widget, wasDragged);
 	}
 
-	//! Removal is intel too; the server refuses it from a spectator.
+	//! The stock client path drops a server-owned (restored) marker, so its id goes straight to
+	//! the server, which decides.
+	override protected void RemoveOwnedMarker(SCR_MapMarkerBase marker)
+	{
+		if (marker && marker.GetMarkerID() != -1 && marker.GetMarkerOwnerID() == -1 && !Replication.IsServer())
+		{
+			PlayerController playerController = GetGame().GetPlayerController();
+			SCR_MapMarkerSyncComponent markerSync;
+			if (playerController)
+				markerSync = SCR_MapMarkerSyncComponent.Cast(playerController.FindComponent(SCR_MapMarkerSyncComponent));
+
+			if (markerSync)
+				markerSync.AskRemoveStaticMarker(marker.GetMarkerID());
+
+			return;
+		}
+
+		super.RemoveOwnedMarker(marker);
+	}
+
+	//! Removal is intel too; the server refuses it from a spectator. One press removes one marker,
+	//! not every one under the cursor as the stock handler does; with none, it goes to the lines.
 	override protected void OnInputMarkerDelete(float value, EActionTrigger reason)
 	{
 		if (!LL_CanEditMarkers())
 			return;
 
-		super.OnInputMarkerDelete(value, reason);
+		array<Widget> widgets = SCR_MapCursorModule.GetMapWidgetsUnderCursor();
+		foreach (Widget widget : widgets)
+		{
+			if (!widget || !widget.FindHandler(SCR_MapMarkerWidgetComponent))
+				continue;
+
+			SCR_MapMarkerBase marker = m_MarkerMgr.GetMarkerByWidget(widget);
+			if (!marker || !marker.CanBeRemovedByOwner())
+				continue;
+
+			if (marker.GetType() != SCR_EMapMarkerType.PLACED_CUSTOM && marker.GetType() != SCR_EMapMarkerType.PLACED_MILITARY)
+				continue;
+
+			RemoveOwnedMarker(marker);
+			return;
+		}
+
+		LL_MapLinesUI linesUI = LL_MapLinesUI.Cast(m_MapEntity.GetMapUIComponent(LL_MapLinesUI));
+		if (linesUI)
+			linesUI.TryDeleteLineUnderCursor();
 	}
 
 	//! Own placed marker → edit dialog; empty map → double-click → place dialog.
@@ -217,6 +268,13 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 		// While the dialog is up its MapMarkerEditContext suppresses the menu's map
 		// context, so MapSelect never fires; outside clicks use the raw MouseLeft listener.
 		if (m_wLLDialogRoot)
+			return;
+
+		if (GetGame().GetInputManager().GetActionValue("LL_MapLineStart") > 0)
+			return;
+
+		LL_MapLinesUI linesUI = LL_MapLinesUI.Cast(m_MapEntity.GetMapUIComponent(LL_MapLinesUI));
+		if (linesUI && linesUI.IsBusy())
 			return;
 
 		array<Widget> widgets = SCR_MapCursorModule.GetMapWidgetsUnderCursor();
@@ -518,7 +576,7 @@ class LL_MapMarkersUI : SCR_MapMarkersUI
 
 	//! "12 minutes ago", translated. Under a minute gets its own wording; the stock helper
 	//! says "0 minutes ago".
-	protected string LL_FormatMarkerAge(WorldTimestamp timestamp)
+	static string LL_FormatMarkerAge(WorldTimestamp timestamp)
 	{
 		if (!timestamp)
 			return string.Empty;

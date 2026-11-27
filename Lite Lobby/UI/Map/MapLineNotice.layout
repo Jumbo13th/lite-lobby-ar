@@ -1,0 +1,44 @@
+SizeLayoutWidgetClass {
+ Name "LL_MapLineNotice"
+ Slot FrameWidgetSlot "{41A5FCE996636987}" {
+  SizeToContent 1
+ }
+ "Z Order" 100
+ AllowHeightOverride 1
+ HeightOverride 68
+ {
+  OverlayWidgetClass "{1C6F65656EAB6564}" {
+   Name "NoticeOverlay"
+   Slot AlignableSlot "{47AAD51C97264E63}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+   }
+   {
+    PanelWidgetClass "{E89CAFF44E01ACCD}" {
+     Name "NoticePanel"
+     Slot OverlayWidgetSlot "{1393712C752F5A51}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0.008 0.012 0.016 0.95
+     style full
+    }
+    TextWidgetClass "{B1CF06CE3490618A}" {
+     Name "Text"
+     Slot OverlayWidgetSlot "{82B2AC2E8D033CD7}" {
+      HorizontalAlign 1
+      VerticalAlign 1
+      Padding 24 0 24 0
+     }
+     Color 1 1 1 1
+     Text ""
+     "Font Size" 16
+     "Min Font Size" 16
+     FontProperties FontProperties "{02A290D24E826E2A}" {
+      Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+     }
+    }
+   }
+  }
+ }
+}

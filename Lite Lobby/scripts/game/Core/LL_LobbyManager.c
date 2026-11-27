@@ -100,6 +100,20 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 		super.OnDelete(owner);
 		if (s_Instance == this)
 			s_Instance = null;
+
+		if (m_MapLineStore)
+			m_MapLineStore.Stop();
+	}
+
+	// Server only; created on first use because replication is not settled at OnPostInit.
+	protected ref LL_MapLineStore m_MapLineStore;
+
+	LL_MapLineStore GetMapLineStore()
+	{
+		if (!m_MapLineStore && Replication.IsServer())
+			m_MapLineStore = new LL_MapLineStore();
+
+		return m_MapLineStore;
 	}
 
 	array<ref LL_SlotData> GetSlots()
@@ -756,6 +770,10 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 			if (lobbyPlayer)
 				lobbyPlayer.SyncFactionMarkers_S(faction);
 		}
+
+		LL_MapLineStore lineStore = GetMapLineStore();
+		if (lineStore)
+			lineStore.StartSync_S(playerId, faction);
 	}
 
 	void SetSlotDamageState_S(int slotRplId, int damageState)
@@ -2464,6 +2482,9 @@ class LL_LobbyManager : SCR_BaseGameModeComponent
 
 		if (!Replication.IsServer())
 			return;
+
+		if (m_MapLineStore)
+			m_MapLineStore.ForgetPlayer_S(playerId);
 
 		LL_SlotData slot = FindSlotByPlayerId(playerId);
 		if (slot)

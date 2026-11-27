@@ -5,6 +5,17 @@ description: What changed in each Lite Lobby version on the Workshop.
 
 What changed in each [Lite Lobby version on the Workshop](https://reforger.armaplatform.com/workshop/699319AAA5BFC57F), newest first.
 
+## 1.2.0 {#v1-2-0}
+
+- Added lines on the map: hold **Ctrl** and click to start a line in the color last chosen for a marker, click to add straight segments, double click to change the line's color in the **Map line** dialog (the line shows each color as you pick it), press **Enter** to send it. **Backspace** removes the last point, **Esc** cancels the line.
+- Lines can be drawn before the game and during the freeze time; once the freeze time ends no new lines can be drawn, but lines can still be removed.
+- A line takes its thickness from the zoom at each click (at most 50 m on the ground) and keeps it when sent; between clicks it scales with the map.
+- Lines are seen only by your side, including on the spectator map, and stay when their author leaves. Hold **Left Shift** to see who drew each line and when; point at a line's start point and press **Delete** to remove it.
+- Any player of a side can delete any line or marker of that side, whoever placed it, markers restored by a session resume included. The server log records every line and marker placed and deleted: who, whose and what (`[LL_MapAudit]`).
+- Up to 20 lines per player and 150 per side, 64 points per line. Lines come back with a session resume.
+- The **Communications** briefing entry explains the line keys.
+- The **Insert marker** dialog shows a larger marker preview and larger icons in its **Type** and **Color** lists.
+
 ## 1.1.2 — 7 November 2026 {#v1-1-2}
 
 - Notifications that a player joined, left, was kicked or was banned are now shown only to the Game Master. Everyone still sees when the Game Master leaves.
