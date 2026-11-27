@@ -178,7 +178,7 @@ docs/src/content/docs/
    progress or while `LL_MapLineStart` is held; `LL_CanEditMarkers` and the age wording become
    static and public; the last confirmed colour gets a static getter and setter.
 8. **Dialog** (`LL_InsertMarkerDialog.InitLine`): hides `PreviewFrame`, `EditBoxRoot` and
-   `TypeCombo`; focuses the colour list; confirm reports the colour.
+   `TypeCombo`; focuses the colour list; the colour rows show the start glyph; confirm reports the colour.
 9. **Persistence**: `LL_MapLineData` and `LL_MapLineSerializer` per research R12, plus their
    entries in `LL_Persistence.conf`.
 10. **Guide and texts**: the Communications paragraph; refusal messages; the keybinding name.

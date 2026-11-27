@@ -5,7 +5,7 @@ SizeLayoutWidgetClass {
  }
  "Z Order" 100
  AllowHeightOverride 1
- HeightOverride 72
+ HeightOverride 68
  {
   OverlayWidgetClass "{1C6F65656EAB6564}" {
    Name "NoticeOverlay"

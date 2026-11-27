@@ -24,6 +24,7 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	protected SCR_MapMarkerEntryPlaced m_Config;
 	protected bool m_bLineMode;
+	protected int m_iLineIconEntry;
 	protected int m_iHeight = DIALOG_HEIGHT;
 
 	protected ImageWidget m_wPreviewIcon;
@@ -171,12 +172,13 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 		GetGame().GetCallqueue().Call(ClampOnScreen);
 	}
 
-	//! Colour only; confirm reports icon 0 and "". The other rows are hidden from script:
-	//! Visible 0 in a layout drops a node's children.
-	void InitLine(notnull SCR_MapMarkerEntryPlaced config, int colorEntry)
+	//! Colour only, the rows drawn with the line's start glyph. The other rows are hidden from
+	//! script: Visible 0 in a layout drops a node's children.
+	void InitLine(notnull SCR_MapMarkerEntryPlaced config, int iconEntry, int colorEntry)
 	{
 		m_Config = config;
 		m_bLineMode = true;
+		m_iLineIconEntry = iconEntry;
 
 		array<string> hiddenRows = {"PreviewFrame", "EditBoxRoot", "TypeCombo"};
 		foreach (string rowName : hiddenRows)
@@ -219,7 +221,10 @@ class LL_InsertMarkerDialog : SCR_ScriptedWidgetComponent
 
 	int GetSelectedIconEntry()
 	{
-		if (!m_TypeCombo || m_bLineMode)
+		if (m_bLineMode)
+			return m_iLineIconEntry;
+
+		if (!m_TypeCombo)
 			return 0;
 
 		return m_TypeCombo.GetCurrentIndex();

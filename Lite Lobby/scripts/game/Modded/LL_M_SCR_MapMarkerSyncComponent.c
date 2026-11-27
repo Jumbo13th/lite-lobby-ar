@@ -96,7 +96,7 @@ modded class SCR_MapMarkerSyncComponent
 		string owner = "server (restored)";
 		if (ownerId != -1)
 		{
-			owner =GetGame().GetPlayerManager().GetPlayerName(ownerId);
+			owner = GetGame().GetPlayerManager().GetPlayerName(ownerId);
 			if (owner.IsEmpty())
 				owner = "player " + ownerId.ToString();
 		}

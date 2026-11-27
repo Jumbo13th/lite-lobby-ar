@@ -50,13 +50,16 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 	protected string m_sDotQuad;
 	protected float m_fDotSize;
 	protected float m_fDotInk = 1;
+	protected int m_iDotEntry;
 	protected ref array<ImageWidget> m_aStartIcons = {};
 
 	protected const ResourceName NOTICE_LAYOUT = "{9F3872243809E843}UI/Map/MapLineNotice.layout";
 	protected const int NOTICE_MS = 4000;
+	protected const string FOOTER_PANEL = "FooterNavPanel";
+	protected const float NOTICE_GAP = 10;
 
-	// Puts the layout's 72 px panel on the map footer's band.
-	protected const float NOTICE_BOTTOM = 80;
+	// Without a footer: the centre of the footer band the map menus share (bottom 80, height 72).
+	protected const float NOTICE_CENTER_Y = 116;
 	protected Widget m_wNoticeRoot;
 	protected TextWidget m_wNoticeText;
 
@@ -83,7 +86,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 	protected bool m_bLabelsShown;
 	protected ref array<TextWidget> m_aLabels = {};
-	protected ref array<int> m_aLabelLineIds = {};
+	protected ref array<ref LL_MapLine> m_aLabelLines = {};
 
 	//! A line in progress or its colour dialog; the marker UI stays out of the way.
 	bool IsBusy()
@@ -109,19 +112,20 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 			return;
 
 		array<ref LL_MarkerIconEntry> icons = placed.GetLLIcons();
-		LL_MarkerIconEntry dot = icons[0];
-		foreach (LL_MarkerIconEntry icon : icons)
+		m_iDotEntry = 0;
+		foreach (int i, LL_MarkerIconEntry icon : icons)
 		{
 			ResourceName imageset;
 			string quad;
 			icon.GetIconResource(imageset, quad);
 			if (quad == DOT_QUAD)
 			{
-				dot = icon;
+				m_iDotEntry = i;
 				break;
 			}
 		}
 
+		LL_MarkerIconEntry dot = icons[m_iDotEntry];
 		dot.GetIconResource(m_sDotImageset, m_sDotQuad);
 		m_fDotInk = dot.GetLabelInk();
 		m_fDotSize = dot.GetIconSize();
@@ -211,6 +215,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		m_wCanvasRoot = null;
 		m_wCanvas = null;
 
+		// The spectator map's menu stays alive between opens: icons left in its frame would pile up.
 		foreach (ImageWidget icon : m_aStartIcons)
 		{
 			if (icon)
@@ -243,6 +248,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		if (m_wDialogRoot)
 		{
+			// One-frame gap so the opening double-click cannot land in the dialog context.
 			if (m_bDialogDelayed)
 				GetGame().GetInputManager().ActivateContext("MapMarkerEditContext");
 			else
@@ -256,6 +262,9 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		Render();
 		UpdateLabels();
+
+		if (m_wNoticeRoot)
+			PlaceNotice();
 	}
 
 	protected void OnCacheChanged()
@@ -470,11 +479,11 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 			m_wNoticeText = TextWidget.Cast(m_wNoticeRoot.FindAnyWidget("Text"));
 
-			FrameSlot.SetAnchorMin(m_wNoticeRoot, 0.5, 1);
-			FrameSlot.SetAnchorMax(m_wNoticeRoot, 0.5, 1);
-			FrameSlot.SetAlignment(m_wNoticeRoot, 0.5, 1);
+			FrameSlot.SetAnchorMin(m_wNoticeRoot, 0, 0);
+			FrameSlot.SetAnchorMax(m_wNoticeRoot, 0, 0);
+			FrameSlot.SetAlignment(m_wNoticeRoot, 0, 0.5);
 			FrameSlot.SetSizeToContent(m_wNoticeRoot, true);
-			FrameSlot.SetPos(m_wNoticeRoot, 0, -NOTICE_BOTTOM);
+			m_wNoticeRoot.SetOpacity(0);
 		}
 
 		if (m_wNoticeText)
@@ -483,6 +492,46 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		GetGame().GetCallqueue().Remove(HideNotice);
 		GetGame().GetCallqueue().CallLater(HideNotice, NOTICE_MS, false);
 		return true;
+	}
+
+	//! Every frame while shown: the footer differs between map menus, and a new notice has no
+	//! size before its first layout pass. Centred on the screen unless that overlaps the footer.
+	protected void PlaceNotice()
+	{
+		float width, height;
+		m_wNoticeRoot.GetScreenSize(width, height);
+		if (width <= 0)
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		float rootX, rootY, rootW, rootH;
+		m_RootWidget.GetScreenPos(rootX, rootY);
+		m_RootWidget.GetScreenSize(rootW, rootH);
+
+		float x = (rootW - width) * 0.5;
+		float centerY = rootH - workspace.DPIScale(NOTICE_CENTER_Y);
+
+		Widget footer;
+		Widget menuRoot = m_MapEntity.GetMapMenuRoot();
+		if (menuRoot)
+			footer = menuRoot.FindAnyWidget(FOOTER_PANEL);
+
+		if (footer && footer.IsVisibleInHierarchy())
+		{
+			float footerX, footerY, footerW, footerH;
+			footer.GetScreenPos(footerX, footerY);
+			footer.GetScreenSize(footerW, footerH);
+
+			x = Math.Max(x, footerX - rootX + footerW + workspace.DPIScale(NOTICE_GAP));
+			centerY = footerY - rootY + footerH * 0.5;
+
+			SizeLayoutWidget sizer = SizeLayoutWidget.Cast(m_wNoticeRoot);
+			if (sizer)
+				sizer.SetHeightOverride(workspace.DPIUnscale(footerH));
+		}
+
+		FrameSlot.SetPos(m_wNoticeRoot, workspace.DPIUnscale(x), workspace.DPIUnscale(centerY));
+		m_wNoticeRoot.SetOpacity(1);
 	}
 
 	protected void HideNotice()
@@ -519,7 +568,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		FrameSlot.SetPos(m_wDialogRoot, workspace.DPIUnscale(mouseX), workspace.DPIUnscale(mouseY));
 
 		m_iColorBeforeDialog = m_iDraftColor;
-		m_Dialog.InitLine(m_PlacedConfig, m_iDraftColor);
+		m_Dialog.InitLine(m_PlacedConfig, m_iDotEntry, m_iDraftColor);
 		m_Dialog.GetOnConfirm().Insert(OnDialogConfirm);
 		m_Dialog.GetOnCancel().Insert(OnDialogCancel);
 		m_Dialog.GetOnColorChanged().Insert(OnDialogColorChanged);
@@ -903,7 +952,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 
 		foreach (int i, TextWidget label : m_aLabels)
 		{
-			LL_MapLine line = FindCachedLine(m_aLabelLineIds[i]);
+			LL_MapLine line = m_aLabelLines[i];
 			if (!line || line.GetPointCount() == 0)
 			{
 				label.SetVisible(false);
@@ -963,7 +1012,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 				label.SetTextFormat("%1 (%2)", line.m_sAuthorName, age);
 
 			m_aLabels.Insert(label);
-			m_aLabelLineIds.Insert(line.m_iId);
+			m_aLabelLines.Insert(line);
 		}
 	}
 
@@ -976,21 +1025,7 @@ class LL_MapLinesUI : SCR_MapUIBaseComponent
 		}
 
 		m_aLabels.Clear();
-		m_aLabelLineIds.Clear();
+		m_aLabelLines.Clear();
 		m_bLabelsShown = false;
-	}
-
-	protected LL_MapLine FindCachedLine(int id)
-	{
-		if (!m_Cache)
-			return null;
-
-		foreach (LL_MapLine line : m_Cache.GetLines())
-		{
-			if (line.m_iId == id)
-				return line;
-		}
-
-		return null;
 	}
 }

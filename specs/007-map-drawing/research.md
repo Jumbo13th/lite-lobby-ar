@@ -236,8 +236,14 @@ The list is in [plan.md](plan.md).
   mission disables chat, and drawing happens during the freeze of GAME. A refusal is shown for
   four seconds in a panel at the bottom centre of the open map, on the same band and in the same
   style as the map screens' footer (`UI/Map/MapLineNotice.layout`: the footer's dark panel,
-  72 px tall, bottom edge 80 px up, the navigation button's 16 pt font). Plain text over the map
-  was tried first and was unreadable. With the map closed it goes to the chat as before.
+  the navigation button's 16 pt font). While shown it is placed every frame from the footer
+  panel (`FooterNavPanel`) itself: the same height and vertical centre, horizontally in the
+  middle of the screen unless that overlaps the footer, else 10 px to its right. The footers
+  differ - the briefing map's has five buttons and reaches past the middle - so fixed numbers
+  overlapped it there. Without a footer (spectator map) the layout's 68 px (the footer panel's
+  own height: 48 px input button less its -5 px trims, plus 15 px padding above and below) is
+  centred 116 px up, the centre of the footer band. Plain text over the map was tried first and
+  was unreadable. With the map closed it goes to the chat as before.
 - **One marker per press**: the stock `OnInputMarkerDelete` removes every marker under the
   cursor. With markers open to the whole faction that is a stack of teammates' markers, so the
   lobby's override removes the first one only, and with no marker under the cursor it hands the
